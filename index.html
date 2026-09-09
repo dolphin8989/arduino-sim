@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.91</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -112,8 +112,11 @@
     background-size:22px 22px;
   }
   .canvas-inner{position:relative; width:2300px; height:1600px; transform-origin:0 0;}
-  .zoom-badge{position:absolute; right:14px; bottom:14px; z-index:20; display:flex; align-items:center; gap:4px; background:rgba(18,20,25,.88); border:1px solid var(--border-strong); border-radius:8px; padding:5px 7px; font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--text-dim); box-shadow:0 4px 10px rgba(0,0,0,.35);}
-  .zoom-badge button{width:22px; height:22px; border-radius:5px; border:1px solid var(--border-strong); background:#20242c; color:var(--text); cursor:pointer; font-size:.8rem; line-height:1;}
+  /* 캔버스 우하단에 항상 떠 있는 HUD라 스크롤로 보드가 그 밑에 오면 클릭/드래그를 가로채던
+     문제가 있었습니다 — 컨테이너 자체는 pointer-events:none으로 클릭을 통과시키고, 실제
+     눌러야 하는 버튼에만 auto로 되돌려 그 부분만 클릭되게 합니다. */
+  .zoom-badge{position:absolute; right:14px; bottom:14px; z-index:20; display:flex; align-items:center; gap:4px; background:rgba(18,20,25,.88); border:1px solid var(--border-strong); border-radius:8px; padding:5px 7px; font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--text-dim); box-shadow:0 4px 10px rgba(0,0,0,.35); pointer-events:none;}
+  .zoom-badge button{width:22px; height:22px; border-radius:5px; border:1px solid var(--border-strong); background:#20242c; color:var(--text); cursor:pointer; font-size:.8rem; line-height:1; pointer-events:auto;}
   .zoom-badge button:hover{background:#2a2f38;}
   .zoom-badge span{min-width:38px; text-align:center;}
   svg#wireCanvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5; overflow:visible;}
@@ -181,14 +184,17 @@
   .ep-card .ep-title{font-size:.76rem; color:var(--text); font-weight:600; margin-bottom:3px;}
   .ep-card .ep-desc{font-size:.66rem; color:var(--text-faint); line-height:1.4;}
 
-  /* Legend */
+  /* Legend — 캔버스 좌하단에 항상 떠 있는 HUD라, 스크롤로 그 아래에 보드가 오면 클릭/드래그를
+     가로채던 문제가 있었습니다. 컨테이너 자체는 pointer-events:none으로 클릭을 통과시키고,
+     실제로 눌러야 하는 목록(전선 항목 클릭 -> 색상 편집)에만 auto로 되돌립니다. */
   .legend{
     position:absolute; left:236px; bottom:20px; width:270px; max-height:220px;
     background:rgba(22,27,34,.92); border:1px solid var(--border); border-radius:10px;
     z-index:6; backdrop-filter:blur(6px); overflow:hidden; display:flex; flex-direction:column;
+    pointer-events:none;
   }
   .legend h4{padding:10px 12px 6px; font-size:.68rem; text-transform:uppercase; letter-spacing:.6px; color:var(--text-faint); font-weight:600;}
-  .legend-list{list-style:none; padding:0 12px 12px; overflow-y:auto; display:flex; flex-direction:column; gap:5px;}
+  .legend-list{list-style:none; padding:0 12px 12px; overflow-y:auto; display:flex; flex-direction:column; gap:5px; pointer-events:auto;}
   .legend-list li{font-size:.74rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; display:flex; align-items:center; gap:7px;}
   .legend-dot{width:8px; height:8px; border-radius:50%; flex:0 0 auto;}
   .legend-empty{padding:0 12px 12px; font-size:.72rem; color:var(--text-faint);}
@@ -552,6 +558,24 @@
     background:linear-gradient(160deg, rgba(255,255,255,.05), transparent 40%), linear-gradient(135deg, #0f9297, #053e42);
     height:236px;
   }
+  /* ESP32 계열 보드(esp32b/esp32d/esp32t) — 검정 톤 PCB에 실버 실크스크린 */
+  .board.board-esp32{
+    background:linear-gradient(160deg, rgba(255,255,255,.04), transparent 40%), linear-gradient(135deg, #22262c, #0a0c0e);
+  }
+  .board.board-esp32b{height:300px;}
+  .board.board-esp32d{height:340px;}
+  .board.board-esp32t{width:640px; height:560px;}
+  .chip-esp32{
+    width:130px; height:56px; top:190px; left:38px; border-radius:3px; border:1px solid #3f444b;
+    background:repeating-linear-gradient(45deg,#767c85 0 3px, #5c6169 3px 6px);
+  }
+  .chip-esp32 .chip-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:.5rem; color:#e4e7ea; text-align:center; line-height:1.35;}
+  .tft-screen-wrap{
+    position:absolute; background:#000; border-radius:6px; padding:8px; border:2px solid #000;
+    box-shadow:0 0 0 1px #3a3f46, 0 6px 16px rgba(0,0,0,.5);
+  }
+  .tft-screen{display:block; border-radius:2px; cursor:pointer; image-rendering:pixelated;}
+  .tft-caption{position:absolute; font-family:'IBM Plex Mono',monospace; font-size:.5rem; color:#8fdfe3; letter-spacing:.5px;}
   .onboard-led{position:absolute; width:8px; height:8px; border-radius:50%; background:#3a0d0d; box-shadow:0 0 0 1px #000;}
   .onboard-led.on{background:#ff4433; box-shadow:0 0 7px #ff4433;}
   .onboard-cap{position:absolute; font-family:'IBM Plex Mono',monospace; font-size:.5rem; color:#bfe0ff;}
@@ -618,16 +642,17 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.91</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
   <div class="toolbar">
+    <button class="btn ghost" onclick="startNewProject()" data-i18n="toolbar.newProject">🆕 새 프로젝트 시작</button>
     <select id="langSelect" class="lang-select" onchange="setLanguage(this.value)" title="Language / 언어">
       <option value="ko">한국어</option>
       <option value="en">English</option>
     </select>
-    <button class="btn primary" onclick="openBoardPopup('r4')">💻 <span data-i18n="toolbar.editor">코드 에디터 &amp; 컴파일러</span></button>
+    <button class="btn primary" onclick="openMainEditor()">💻 <span data-i18n="toolbar.editor">코드 에디터 &amp; 컴파일러</span></button>
     <button class="btn ghost" onclick="clearSerial()" data-i18n="toolbar.clearConsole">콘솔 지우기</button>
     <button class="btn ghost" onclick="openBomList()" data-i18n="toolbar.bom">BOM List</button>
     <button class="btn ghost" id="btnGallery" onclick="toggleExampleGallery()" data-i18n="toolbar.gallery">🗂 예제 갤러리</button>
@@ -649,6 +674,26 @@
   <div class="palette">
     <div class="palette-title" data-i18n="palette.title">부품 상자</div>
     <div class="palette-items">
+      <div class="palette-item" onclick="spawnBoard('r4')">
+        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#232f42,#070a10);border:1px solid #2a4d63;"></div></div>
+        <span data-i18n="palette.addr4">Uno R4 WiFi 보드 추가</span>
+      </div>
+      <div class="palette-item" onclick="spawnBoard('r3')">
+        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#12a2a8,#054145);"></div></div>
+        <span data-i18n="palette.addr3">Uno R3 보드 추가</span>
+      </div>
+      <div class="palette-item" onclick="spawnBoard('esp32b')">
+        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#3a3f46,#0a0c0e);border:1px solid #555;"></div></div>
+        <span data-i18n="palette.addesp32b">ESP32 DevKit 보드 추가</span>
+      </div>
+      <div class="palette-item" onclick="spawnBoard('esp32d')">
+        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#3a3f46,#0a0c0e);border:1px solid #555;"><div style="width:12px;height:8px;margin:4px auto;background:#0af;border-radius:1px;"></div></div></div>
+        <span data-i18n="palette.addesp32d">ESP32 보드 추가<br>(컬러 디스플레이 내장)</span>
+      </div>
+      <div class="palette-item" onclick="spawnBoard('esp32t')">
+        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#3a3f46,#0a0c0e);border:1px solid #555;"><div style="width:16px;height:9px;margin:3px auto;background:#0af;border-radius:1px;"></div></div></div>
+        <span data-i18n="palette.addesp32t">ESP32 보드 추가<br>(7인치 터치 디스플레이 내장)</span>
+      </div>
       <div class="palette-item" onclick="spawnComponent('led')">
         <div class="swatch"><div style="width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8f80,#a11a10 70%);"></div></div>
         <span data-i18n="palette.led">LED</span>
@@ -767,14 +812,6 @@
         <div class="swatch"><div style="width:22px;height:16px;border-radius:3px;background:linear-gradient(180deg,#4a5568,#232a35);border:1px solid #111;"></div></div>
         <span data-i18n="palette.relay">5V 릴레이 모듈<br>(48V DC/220V AC 스위칭)</span>
       </div>
-      <div class="palette-item" onclick="spawnBoard('r4')">
-        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#232f42,#070a10);border:1px solid #2a4d63;"></div></div>
-        <span data-i18n="palette.addr4">Uno R4 WiFi 보드 추가</span>
-      </div>
-      <div class="palette-item" onclick="spawnBoard('r3')">
-        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#12a2a8,#054145);"></div></div>
-        <span data-i18n="palette.addr3">Uno R3 보드 추가</span>
-      </div>
     </div>
     <div class="palette-hint">
       <b data-i18n="hint.title">동작 안내:</b><br>
@@ -790,7 +827,6 @@
   <div class="canvas-area" id="canvasArea">
     <div class="canvas-inner" id="canvasInner">
       <svg id="wireCanvas"></svg>
-      <div class="placed-component board" id="arduinoBoard" data-board="r4" style="left:480px; top:360px;"></div>
     </div>
     <div class="zoom-badge">
       <button onclick="zoomCanvasBy(1/1.15)" data-i18n-title="zoom.outTitle" title="축소">−</button>
@@ -816,13 +852,16 @@
       <button class="ep-tab active" data-tab="exp" onclick="switchGalleryTab('exp')" data-i18n="gallery.tabExp">⚡ 전기 실험</button>
       <button class="ep-tab" data-tab="r4" onclick="switchGalleryTab('r4')" data-i18n="gallery.tabR4">🅡4 R4 코딩</button>
       <button class="ep-tab" data-tab="r3" onclick="switchGalleryTab('r3')" data-i18n="gallery.tabR3">🅡3 R3 코딩</button>
+      <button class="ep-tab" data-tab="esp32b" onclick="switchGalleryTab('esp32b')" data-i18n="gallery.tabEsp32b">📶 ESP32 DevKit</button>
+      <button class="ep-tab" data-tab="esp32d" onclick="switchGalleryTab('esp32d')" data-i18n="gallery.tabEsp32d">🖥 ESP32 디스플레이</button>
+      <button class="ep-tab" data-tab="esp32t" onclick="switchGalleryTab('esp32t')" data-i18n="gallery.tabEsp32t">👆 ESP32 터치</button>
       <button class="ep-tab" data-tab="comm" onclick="switchGalleryTab('comm')" data-i18n="gallery.tabComm">📡 통신 예제</button>
     </div>
     <div class="example-panel-body" id="galleryBody"></div>
   </aside>
 
   <!-- R4 Code & Toolchain Popup -->
-  <div class="board-popup" id="popupR4" style="left:58%; top:60px;">
+  <div class="board-popup" id="popupR4" hidden style="left:58%; top:60px;">
     <div class="popup-head" data-drag-handle>
       <b>Uno R4 WiFi — C/C++ GCC Toolchain &amp; Serial</b>
       <button class="btn ghost" onclick="closeBoardPopup('r4')" data-i18n="popup.close">닫기 ✕</button>
@@ -942,6 +981,8 @@ void loop() {
 /* ============ i18n (Korean/English) ============ */
 const STRINGS = {
   "board.resetTitle": { ko: "리셋", en: "Reset" },
+  "esp32.displayCaption": { ko: "코드가 tft.* 함수를 호출하면 여기 그려집니다", en: "Drawn here when your code calls tft.* functions" },
+  "esp32.touchCaption": { ko: "화면을 클릭/드래그하면 터치로 인식됩니다 (Touch.pressed/x/y)", en: "Click/drag the screen to simulate a touch (Touch.pressed/x/y)" },
   "bom.bldcdriver": { ko: "BLDC 드라이버 (ESC)", en: "BLDC Driver (ESC)" },
   "bom.breadboard": { ko: "브레드보드", en: "Breadboard" },
   "bom.btmodule": { ko: "블루투스 모듈", en: "Bluetooth Module" },
@@ -961,8 +1002,13 @@ const STRINGS = {
   "bom.unitCount": { ko: "개", en: "" },
   "bom.wifiap": { ko: "무선 AP (신호 발생)", en: "Wireless AP (signal gen)" },
   "bom.wireCount": { ko: "연결된 전선", en: "Wires connected" },
+  "board.r4": { ko: "Arduino Uno R4 WiFi", en: "Arduino Uno R4 WiFi" },
+  "board.r3": { ko: "Arduino Uno R3", en: "Arduino Uno R3" },
+  "board.esp32b": { ko: "ESP32 개발보드 (DevKit)", en: "ESP32 DevKit Board" },
+  "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
+  "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9", en: "K's Simulator Ver0.9" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.91", en: "K's Simulator Ver0.91" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -1040,6 +1086,9 @@ const STRINGS = {
   "gallery.tabExp": { ko: "⚡ 전기 실험", en: "⚡ Electrical Experiments" },
   "gallery.tabR3": { ko: "🅡3 R3 코딩", en: "🅡3 R3 Coding" },
   "gallery.tabR4": { ko: "🅡4 R4 코딩", en: "🅡4 R4 Coding" },
+  "gallery.tabEsp32b": { ko: "📶 ESP32 DevKit", en: "📶 ESP32 DevKit" },
+  "gallery.tabEsp32d": { ko: "🖥 ESP32 디스플레이", en: "🖥 ESP32 Display" },
+  "gallery.tabEsp32t": { ko: "👆 ESP32 터치", en: "👆 ESP32 Touch" },
   "gallery.tabComm": { ko: "📡 통신 예제", en: "📡 Communication" },
   "gallery.title": { ko: "예제 갤러리", en: "Example Gallery" },
   "comm.wifiApR4.title": { ko: "무선 AP ↔ R4 메시지 예제", en: "Wireless AP ↔ R4 Messaging" },
@@ -1089,6 +1138,9 @@ const STRINGS = {
   "motor.stopped": { ko: "정지", en: "Stopped" },
   "palette.addr3": { ko: "Uno R3 보드 추가", en: "Add Uno R3 board" },
   "palette.addr4": { ko: "Uno R4 WiFi 보드 추가", en: "Add Uno R4 WiFi board" },
+  "palette.addesp32b": { ko: "ESP32 DevKit 보드 추가", en: "Add ESP32 DevKit board" },
+  "palette.addesp32d": { ko: "ESP32 보드 추가<br>(컬러 디스플레이 내장)", en: "Add ESP32 board<br>(built-in color display)" },
+  "palette.addesp32t": { ko: "ESP32 보드 추가<br>(7인치 터치 디스플레이 내장)", en: "Add ESP32 board<br>(built-in 7\" touch display)" },
   "palette.capacitor": { ko: "커패시터<br>(pF/nF/µF)", en: "Capacitor<br>(pF/nF/µF)" },
   "palette.capacitorE": { ko: "전해 커패시터<br>(극성 있음)", en: "Electrolytic Capacitor<br>(polarized)" },
   "palette.inductor": { ko: "인덕터 (코일)<br>(µH/mH/H)", en: "Inductor (Coil)<br>(µH/mH/H)" },
@@ -1128,6 +1180,22 @@ const STRINGS = {
   "popup.exApiVsReg": { ko: "13번(API) vs 12번(레지스터)", en: "Pin 13 (API) vs Pin 12 (Register)" },
   "popup.exCounter": { ko: "카운터 예제", en: "Counter Example" },
   "popup.exCounterD13": { ko: "카운터 &amp; D13 점멸", en: "Counter &amp; D13 Blink" },
+  "popup.exCounterGpio2": { ko: "카운터 &amp; GPIO2 점멸", en: "Counter &amp; GPIO2 Blink" },
+  "popup.exWifi": { ko: "WiFi 연결 &amp; IP 확인", en: "WiFi Connect &amp; Check IP" },
+  "popup.exDisplay": { ko: "TFT 화면에 그림 그리기", en: "Draw on the TFT Display" },
+  "popup.exTouch": { ko: "터치스크린 좌표 입력", en: "Touchscreen Coordinate Input" },
+  "popup.exPwm32": { ko: "PWM으로 LED 밝기 조절", en: "Fade LED Brightness via PWM" },
+  "popup.exPrefs32": { ko: "Preferences로 부팅 횟수 저장", en: "Save Boot Count via Preferences" },
+  "popup.exWifiDisplay": { ko: "TFT에 WiFi 상태 표시", en: "Show WiFi Status on TFT" },
+  "popup.exClockDisplay": { ko: "TFT에 튀는 공 애니메이션", en: "Bouncing Ball Animation on TFT" },
+  "popup.exTouchButton": { ko: "터치로 켜고 끄는 버튼", en: "Tap-to-Toggle Touch Button" },
+  "popup.exTouchSlider": { ko: "드래그로 값 조절하는 슬라이더", en: "Drag-to-Set Touch Slider" },
+  "popup.exFireworksR4": { ko: "🎆 불꽃놀이 (외부 LED)", en: "🎆 Fireworks (External LED)" },
+  "popup.exFireworksDisplay": { ko: "🎆 TFT 불꽃놀이", en: "🎆 Fireworks on TFT" },
+  "popup.exFireworksTouch": { ko: "🎆 대형 화면 불꽃놀이", en: "🎆 Fireworks on the Big Screen" },
+  "popup.exColorDraw": { ko: "터치로 색상 바꿔가며 그림 그리기", en: "Touch-Draw with Changing Colors" },
+  "popup.exStopwatch": { ko: "스톱워치", en: "Stopwatch" },
+  "popup.exClock": { ko: "현재 시간 시계", en: "Current-Time Clock" },
   "popup.exRegister": { ko: "DDR/PORT 레지스터 직접제어", en: "Direct DDR/PORT Register Control" },
   "popup.exRelay": { ko: "5V 릴레이로 220V 부하 스위칭", en: "Switch a 220V Load with a 5V Relay" },
   "popup.regCycles0": { ko: "레지스터 직접제어(DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)", en: "Direct register control (DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)" },
@@ -1159,14 +1227,17 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9", en: "K's Arduino Simulator Ver0.9" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.91", en: "K's Arduino Simulator Ver0.91" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.clearConsole": { ko: "콘솔 지우기", en: "Clear Console" },
   "toolbar.editor": { ko: "코드 에디터 &amp; 컴파일러", en: "Code Editor &amp; Compiler" },
   "toolbar.gallery": { ko: "🗂 예제 갤러리", en: "🗂 Example Gallery" },
+  "toolbar.newProject": { ko: "🆕 새 프로젝트 시작", en: "🆕 Start New Project" },
   "toolbar.save": { ko: "💾 저장", en: "💾 Save" },
   "toolbar.open": { ko: "📂 열기", en: "📂 Open" },
   "toolbar.simStart": { ko: "▶ 시뮬레이션 시작", en: "▶ Start Simulation" },
+  "confirm.newProject": { ko: "기존 작업 내용을 모두 지우고 새로 시작하시겠습니까?", en: "Clear everything and start a new project?" },
+  "toast.newProject": { ko: "새 프로젝트를 시작합니다.", en: "Starting a new project." },
   "toast.saved": { ko: "작업 내용을 파일로 저장했습니다.", en: "Your work has been saved to a file." },
   "toast.loaded": { ko: "파일을 불러왔습니다.", en: "File loaded." },
   "toast.loadError": { ko: "파일을 불러오지 못했습니다 (올바른 저장 파일이 맞는지 확인해 주세요).", en: "Couldn't load the file (make sure it's a valid save file)." },
@@ -1252,11 +1323,39 @@ const ANALOG_PINS = [
   {id:'A4', label:'A4'}, {id:'A5', label:'A5'}
 ];
 const POWER_KIND_PINS = new Set(['IOREF', '3V3', '5V', 'VIN']);
-const GND_KIND_PINS = new Set(['GND_D', 'GND_P1', 'GND_P2']);
+const GND_KIND_PINS = new Set(['GND_D', 'GND_P1', 'GND_P2', 'GND_E1']);
 const PIN_KIND = {};
 [...DIGITAL_PINS, ...POWER_PINS, ...ANALOG_PINS].forEach(p => {
   PIN_KIND[p.id] = POWER_KIND_PINS.has(p.id) ? 'power' : GND_KIND_PINS.has(p.id) ? 'gnd' : 'signal';
 });
+
+// ESP32 계열 보드(esp32b/esp32d/esp32t) 공용 핀 배열 — 실제 30핀 ESP32-WROOM-32 개발보드에서
+// 흔히 노출되는 GPIO를 기준으로 구성했습니다(정확한 배치는 제조사·모델마다 조금씩 다를 수
+// 있어, 교육에서 흔히 다루는 구성을 기준으로 삼았습니다). 디스플레이 내장형(esp32d/esp32t)은
+// 실제 보드라면 일부 GPIO를 디스플레이 자체가 이미 쓰고 있을 수 있다는 점만 참고하세요.
+const ESP32_GPIO_PINS = [
+  {id:'EN', label:'EN'}, {id:'GPIO23', label:'23'}, {id:'GPIO22', label:'22'},
+  {id:'GPIO1', label:'TX0'}, {id:'GPIO3', label:'RX0'}, {id:'GPIO21', label:'21'},
+  {id:'GPIO19', label:'19'}, {id:'GPIO18', label:'18'}, {id:'GPIO5', label:'5'},
+  {id:'GPIO17', label:'TX2'}, {id:'GPIO16', label:'RX2'}, {id:'GPIO4', label:'4'},
+  {id:'GPIO0', label:'0'}, {id:'GPIO2', label:'2'}, {id:'GPIO15', label:'15'}
+];
+const ESP32_POWER_PINS = [
+  {id:'3V3', label:'3V3'}, {id:'GND_E1', label:'GND'}, {id:'VIN', label:'5V(VIN)'}
+];
+// ADC1 채널(32~39)만 골랐습니다 — ESP32의 ADC2는 Wi-Fi 사용 중에는 정확히 동작하지 않는다는
+// 실제 제약이 있어서, Wi-Fi를 함께 쓰는 보드에서 언제나 안전하게 쓸 수 있는 핀만 노출합니다.
+// 라벨은 짧게(숫자만) 유지합니다 — "36(VP)"처럼 길게 쓰면 ADC 6핀이 촘촘히 붙어있는 이 줄에서
+// 옆 핀 글자와 겹쳐 보입니다. VP/VN 별칭은 title(마우스 오버 툴팁)에만 남겨둡니다.
+const ESP32_ADC_PINS = [
+  {id:'GPIO36', label:'36', title:'GPIO36 (VP)'}, {id:'GPIO39', label:'39', title:'GPIO39 (VN)'}, {id:'GPIO34', label:'34'},
+  {id:'GPIO35', label:'35'}, {id:'GPIO32', label:'32'}, {id:'GPIO33', label:'33'}
+];
+[...ESP32_GPIO_PINS, ...ESP32_POWER_PINS, ...ESP32_ADC_PINS].forEach(p => {
+  PIN_KIND[p.id] = POWER_KIND_PINS.has(p.id) ? 'power' : GND_KIND_PINS.has(p.id) ? 'gnd' : 'signal';
+});
+// 보드 타입별 "온보드 LED"가 실제로 물려있는 핀 — runTick에서 그 핀 상태를 읽어 보드 위 LED를 켭니다.
+const BOARD_ONBOARD_LED_PIN = { r4: 'D13', r3: 'D13', esp32b: 'GPIO2', esp32d: 'GPIO2', esp32t: 'GPIO2' };
 
 // AVR 8비트 레지스터(DDRx/PORTx) <-> 아두이노 핀 번호 매핑. R3(ATmega328P)의 실제 배선과 동일.
 const AVR_PORT_PIN_MAP = {
@@ -1286,14 +1385,14 @@ const mcuVM = {
 };
 // 보드 인스턴스 키(예: 'r4', 'r4_2', 'r3', 'r3_2') -> 그 보드의 실제 DOM 엘리먼트 id.
 // digitalRead()/analogRead() 등 코드 실행 샌드박스 안에서 "내 보드 자신의 핀"을 찾을 때 사용합니다.
-const boardDomId = { r4: 'arduinoBoard', r3: 'arduinoBoard_r3' };
+const boardDomId = { r4: 'arduinoBoard_r4', r3: 'arduinoBoard_r3' };
 // 보드 인스턴스 키 -> { key, type('r3'|'r4'), domId } — 여러 보드에 걸친 공통 작업(캐릭터 LED,
-// 매트릭스, 사이클 readout 갱신 등)을 순회할 때 사용하는 레지스트리입니다.
-const boardInstances = {
-  r4: { key: 'r4', type: 'r4', domId: 'arduinoBoard' },
-};
-// 타입별로 지금까지 몇 대를 만들었는지(기본 내장 보드 포함) 세어 다음 인스턴스 키를 정합니다.
-const boardSpawnCount = { r4: 1, r3: 0 };
+// 매트릭스, 사이클 readout 갱신 등)을 순회할 때 사용하는 레지스트리입니다. R4도 R3처럼 처음엔
+// 캔버스에 없고, 팔레트에서 "Uno R4 WiFi 보드 추가"를 눌러야(spawnBoard('r4')) 등록됩니다.
+const boardInstances = {};
+// 타입별로 지금까지 몇 대를 만들었는지 세어 다음 인스턴스 키를 정합니다. R4/R3 모두 아직 한 대도
+// 없는 상태(0)로 시작합니다.
+const boardSpawnCount = { r4: 0, r3: 0 };
 
 // C/C++ 변수 선언문을 JS 런타임 호환 형태로 변환
 function transpileCppToJs(cppCode) {
@@ -1313,6 +1412,19 @@ function transpileCppToJs(cppCode) {
   js = js.replace(/&Wire\b/g, 'Wire');
   js = js.replace(/\bLiquidCrystal\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new LiquidCrystal($2);');
   js = js.replace(/\bAdafruit_SSD1306\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new Adafruit_SSD1306($2);');
+
+  // TFT_eSPI/Adafruit_ST7789/Adafruit_ILI9341/Adafruit_ST7735 객체 선언(C++ 생성자 호출 문법,
+  // "= 클래스명(...)"으로 대입하는 형태와 괄호 없는 기본 선언 형태 둘 다)을 JS `new` 호출로
+  // 치환합니다. 실제 라이브러리는 생성자에 SPI 핀 번호(&SPI, TFT_CS, TFT_DC, TFT_RST 등)를
+  // 넘기지만, 이 시뮬레이터의 TFT_eSPI 클래스는 그 핀 배선 대신 항상 보드에 내장된 화면
+  // <canvas>를 그대로 사용하므로 생성자 인자는 그냥 버립니다.
+  ['TFT_eSPI', 'Adafruit_ST7789', 'Adafruit_ILI9341', 'Adafruit_ST7735'].forEach(cls => {
+    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*=\\s*${cls}\\s*\\([^)]*\\)\\s*;`, 'g'), (_m, name) => `let ${name} = new ${cls}();`);
+    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*\\([^)]*\\)\\s*;`, 'g'), (_m, name) => `let ${name} = new ${cls}();`);
+    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*;`, 'g'), (_m, name) => `let ${name} = new ${cls}();`);
+  });
+  // Preferences(NVS) 객체 선언 — 괄호 없는 기본 생성자 호출("Preferences prefs;")만 흔히 쓰입니다.
+  js = js.replace(/\bPreferences\s+(\w+)\s*;/g, 'let $1 = new Preferences();');
 
   // DDRx/PORTx/PINx 레지스터 직접 접근을 __regs 프록시 객체 참조로 치환 — digitalWrite() 등의
   // API 호출 없이도 실제로 동작(핀 상태에 반영)하도록 합니다.
@@ -1350,6 +1462,12 @@ function transpileCppToJs(cppCode) {
   // String(아두이노 String 클래스)도 스칼라 타입과 동일하게 지워줍니다. JS에는 이미 전역
   // String(생성자) 객체가 있어서, 변수명으로 안 쓰이는 한 값 자체(Serial.readString() 결과 등,
   // 이미 JS 문자열)는 그대로 잘 동작합니다.
+  // "const char* ssid = ...;" 처럼 문자열 리터럴을 가리키는 포인터 선언(ESP32 WiFi 예제에 흔함)도
+  // 타입만 지우고 평범한 변수로 취급합니다(이 시뮬레이터는 실제 포인터 연산을 지원하지 않으므로,
+  // 그냥 문자열 값 자체를 담는 변수로 단순화합니다). 포인터(별표) 버전을 먼저 지워야, 별표가 없는
+  // 일반 스칼라 타입 규칙과 충돌하지 않습니다.
+  js = js.replace(/\bconst\s+char\s*\*\s*(\w+)/g, 'const $1');
+  js = js.replace(/\b(?:unsigned\s+)?char\s*\*\s*(\w+)/g, 'let $1');
   js = js.replace(/\bconst\s+(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte|String)\s+(\w+)/g, 'const $1');
   js = js.replace(/\b(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte|String)\s+(\w+)/g, 'let $1');
 
@@ -1433,8 +1551,12 @@ function executeCompilerPipeline(board) {
   btn.disabled = true;
 
   logSerial(`\n================ [ GCC Compiler Toolchain: ${board.toUpperCase()} ] ================`, board);
-  const mcuTarget = board.startsWith('r3') ? 'atmega328p' : 'renesas_ra4m1';
-  logSerial(`avr-g++ -c -g -Os -Wall -Wextra -std=gnu++17 -fno-exceptions -mmcu=${mcuTarget} sketch.cpp -o sketch.o`, board);
+  const isEsp32Board = board.startsWith('esp32');
+  const mcuTarget = board.startsWith('r3') ? 'atmega328p' : isEsp32Board ? 'esp32' : 'renesas_ra4m1';
+  const ccBin = isEsp32Board ? 'xtensa-esp32-elf-g++' : 'avr-g++';
+  const ldBin = isEsp32Board ? 'xtensa-esp32-elf-gcc' : 'avr-gcc';
+  const objcopyBin = isEsp32Board ? 'xtensa-esp32-elf-objcopy' : 'avr-objcopy';
+  logSerial(`${ccBin} -c -g -Os -Wall -Wextra -std=gnu++17 -fno-exceptions -mmcu=${mcuTarget} sketch.cpp -o sketch.o`, board);
 
   // 구문 검증
   const errors = [];
@@ -1522,17 +1644,17 @@ function executeCompilerPipeline(board) {
   }, 250);
 
   setTimeout(() => {
-    logSerial(`[2/3] Linking objects: avr-gcc -mmcu=${mcuTarget} sketch.o -o firmware.elf`, board);
+    logSerial(`[2/3] Linking objects: ${ldBin} -mmcu=${mcuTarget} sketch.o -o firmware.elf`, board);
   }, 500);
 
   setTimeout(() => {
-    logSerial(`[3/3] Generating Hex Binary: avr-objcopy -O ihex -R .eeprom firmware.elf firmware.hex`, board);
+    logSerial(`[3/3] Generating ${isEsp32Board ? 'Binary' : 'Hex Binary'}: ${objcopyBin} ${isEsp32Board ? '-O binary firmware.elf firmware.bin' : '-O ihex -R .eeprom firmware.elf firmware.hex'}`, board);
 
-    const flashBase = board.startsWith('r3') ? 1420 : 3840;
+    const flashBase = board.startsWith('r3') ? 1420 : isEsp32Board ? 18000 : 3840;
     const flashSize = flashBase + rawCode.length * 4;
-    const maxFlash = board.startsWith('r3') ? 32256 : 262144;
-    const ramSize = 180 + Math.floor(rawCode.length * 0.3);
-    const maxRam = board.startsWith('r3') ? 2048 : 32768;
+    const maxFlash = board.startsWith('r3') ? 32256 : isEsp32Board ? 1310720 : 262144;
+    const ramSize = 180 + Math.floor(rawCode.length * 0.3) + (isEsp32Board ? 16000 : 0);
+    const maxRam = board.startsWith('r3') ? 2048 : isEsp32Board ? 327680 : 32768;
 
     logSerial(`\nProgram storage: ${flashSize} bytes (${((flashSize/maxFlash)*100).toFixed(1)}%) of maximum ${maxFlash} bytes.`, board);
     logSerial(`Dynamic memory:  ${ramSize} bytes (${((ramSize/maxRam)*100).toFixed(1)}%) of maximum ${maxRam} bytes.`, board);
@@ -1640,10 +1762,23 @@ function deployToMCU(board, rawCode) {
         mcuVM['${board}'].apiCycles += ${API_CALL_CYCLES};
         mcuVM['${board}'].cycleOffsetNs += ${API_CALL_CYCLES} * (1e9 / mcuVM['${board}'].clockHz);
       }
+      // ESP32는 핀을 항상 GPIO 번호로 직접 부릅니다(A0~A5처럼 별도 아날로그 핀 이름이 없고,
+      // pinMode(2, OUTPUT)이 실제로 "GPIO2"를 가리킵니다) — Uno(R3/R4)의 "D2"/"A0" 표기와 다르므로,
+      // 숫자 핀 번호를 보드 실제 핀 이름으로 바꿀 때 보드 종류에 따라 접두사를 다르게 붙입니다.
+      const __IS_ESP32 = ${board.startsWith('esp32')};
+      function __digitalPinName(p) {
+        let pn = String(p);
+        if (/^\\d+$/.test(pn)) pn = (__IS_ESP32 ? 'GPIO' : 'D') + pn;
+        return pn;
+      }
+      function __analogPinName(p) {
+        let pn = String(p);
+        if (/^\\d+$/.test(pn)) pn = (__IS_ESP32 ? 'GPIO' : 'A') + pn;
+        return pn;
+      }
       function pinMode(p, m) {
         __bumpApi();
-        let pn = String(p);
-        if (/^\\d+$/.test(pn)) pn = 'D' + pn;
+        const pn = __digitalPinName(p);
         const avrBit = PIN_TO_AVR_BIT[pn];
         if (avrBit) {
           const letter = avrBit[0], bit = avrBit[1];
@@ -1653,8 +1788,7 @@ function deployToMCU(board, rawCode) {
       }
       function digitalWrite(pin, val) {
         __bumpApi();
-        let p = String(pin);
-        if (/^\\d+$/.test(p)) p = 'D' + p;
+        const p = __digitalPinName(pin);
         mcuVM['${board}'].pinState[p] = { type: 'digital', v: val ? 1 : 0 };
         const avrBit = PIN_TO_AVR_BIT[p];
         if (avrBit) {
@@ -1665,21 +1799,18 @@ function deployToMCU(board, rawCode) {
       }
       function analogWrite(pin, val) {
         __bumpApi();
-        let p = String(pin);
-        if (/^\\d+$/.test(p)) p = 'D' + p;
+        const p = __digitalPinName(pin);
         mcuVM['${board}'].pinState[p] = { type: 'pwm', v: Math.max(0, Math.min(255, val)) / 255 };
       }
       function digitalRead(pin) {
         __bumpApi();
-        let p = String(pin);
-        if (/^\\d+$/.test(p)) p = 'D' + p;
+        const p = __digitalPinName(pin);
         const reading = boardPinReading(boardDomId['${board}'], p);
         return reading ? (reading.v >= 0.5 ? 1 : 0) : 1;
       }
       function analogRead(pin) {
         __bumpApi();
-        let p = String(pin);
-        if (/^\\d+$/.test(p)) p = 'A' + p;
+        const p = __analogPinName(pin);
         const reading = boardPinReading(boardDomId['${board}'], p);
         return reading ? Math.floor(reading.v * 1023) : 0;
       }
@@ -1697,6 +1828,30 @@ function deployToMCU(board, rawCode) {
       function map(x, in_min, in_max, out_min, out_max) {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
       }
+      // random(max) -> [0, max), random(min, max) -> [min, max) 정수를 돌려줍니다(실제 아두이노
+      // random()과 동일한 범위 규칙). randomSeed()는 이 시뮬레이터에서는 매번 다른 결과를 주는
+      // Math.random() 기반이라 특별히 시드를 고정할 필요가 없어 호출만 무시합니다.
+      function random(a, b) {
+        if (b === undefined) { b = a; a = 0; }
+        if (a >= b) return a;
+        return a + Math.floor(Math.random() * (b - a));
+      }
+      function randomSeed(seed) {}
+      // 자주 쓰이는 나머지 아두이노 math.h 매크로/함수들 — 전부 JS Math의 얇은 래퍼입니다.
+      function sin(x) { return Math.sin(x); }
+      function cos(x) { return Math.cos(x); }
+      function tan(x) { return Math.tan(x); }
+      function sqrt(x) { return Math.sqrt(x); }
+      function pow(x, y) { return Math.pow(x, y); }
+      function abs(x) { return Math.abs(x); }
+      function constrain(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+      function min(a, b) { return Math.min(a, b); }
+      function max(a, b) { return Math.max(a, b); }
+      // 현재 시간 예제용 — 실제 하드웨어라면 RTC 칩이나 NTP(WiFi.h)가 필요하지만, 이 시뮬레이터는
+      // 시뮬레이터를 실행 중인 컴퓨터의 실제 현재 시각을 그대로 읽어오는 것으로 단순화했습니다.
+      function hourNow() { return new Date().getHours(); }
+      function minuteNow() { return new Date().getMinutes(); }
+      function secondNow() { return new Date().getSeconds(); }
       // I2C Wire 라이브러리 자리표시자 (begin() 등 호출만 무시하고 넘어갑니다).
       const Wire = { begin: function(){}, beginTransmission: function(){}, endTransmission: function(){}, write: function(){}, requestFrom: function(){} };
       const SSD1306_SWITCHCAPVCC = 2, SSD1306_EXTERNALVCC = 1, WHITE = 1, BLACK = 0;
@@ -1803,6 +1958,138 @@ function deployToMCU(board, rawCode) {
           }
         }
         clear() { mcuVM['${board}'].ledMatrix = Array.from({ length: 8 }, () => new Array(12).fill(0)); }
+      }
+
+      // ===================== ESP32 전용 라이브러리 (WiFi / TFT / Touch / Preferences / ledc) =====================
+      // 이 심 하나가 R4/R3/ESP32 세 계열을 모두 같은 sandboxPrefix로 실행하기 때문에, 아래 라이브러리들은
+      // 코드에서 실제로 호출하지 않으면(즉 R3/R4 스케치에는) 그냥 존재만 하고 아무 영향이 없습니다.
+      //
+      // WiFi.h — WiFi.begin(ssid, pass) 후 실제 공유기 접속처럼 약간의 지연을 두고 WL_CONNECTED로
+      // 전환됩니다(실제 하드웨어처럼 SSID 문자열로 IP 마지막 자리를 결정해, 같은 이름으로 여러 번
+      // 연결해도 항상 같은 IP가 나오도록 흉내냅니다).
+      const WL_IDLE_STATUS=0, WL_NO_SSID_AVAIL=1, WL_SCAN_COMPLETED=2, WL_CONNECTED=3, WL_CONNECT_FAILED=4, WL_CONNECTION_LOST=5, WL_DISCONNECTED=6;
+      const WiFi = {
+        _status: WL_DISCONNECTED, _ssid: '', _ip: '0.0.0.0',
+        begin: function(ssid, pass) {
+          this._ssid = String(ssid !== undefined ? ssid : '');
+          this._status = WL_IDLE_STATUS;
+          const self = this;
+          setTimeout(function() {
+            self._status = WL_CONNECTED;
+            const hash = Array.from(self._ssid).reduce((a, c) => a + c.charCodeAt(0), 0);
+            self._ip = '192.168.0.' + (100 + (hash % 150));
+          }, 800);
+        },
+        status: function() { return this._status; },
+        localIP: function() { return this._ip; },
+        SSID: function() { return this._ssid; },
+        RSSI: function() { return -40 - Math.floor(Math.random() * 30); },
+        disconnect: function() { this._status = WL_DISCONNECTED; this._ip = '0.0.0.0'; },
+        macAddress: function() { return 'AA:BB:CC:DD:EE:FF'; },
+        mode: function() {}
+      };
+
+      // BluetoothSerial(SerialBT.h) — 시리얼처럼 print/println만 지원하는 단순화된 스텁입니다.
+      const SerialBT = {
+        begin: function(name) { logSerial('[BT] ' + (name !== undefined ? name : 'ESP32') + ' 페어링 대기 중...', '${board}'); },
+        available: function() { return 0; },
+        read: function() { return -1; },
+        print: function(v) { logSerial(String(v), '${board}'); },
+        println: function(v) { logSerial(String(v !== undefined ? v : ''), '${board}'); }
+      };
+
+      // Touch — 7인치 터치 보드(esp32t)의 화면을 마우스로 클릭/드래그하면 그 좌표가 실시간으로
+      // mcuVM['${board}'].touch에 기록됩니다(bindTouchScreenEvents). 실제 TFT_eSPI의
+      // tft.getTouch(&x, &y)는 C++ 포인터 출력 매개변수를 쓰는데, 이 시뮬레이터의 코드
+      // 변환기(transpileCppToJs)는 C++ 포인터를 지원하지 않으므로, 이 시뮬레이터에서는 대신
+      // Touch.pressed()/Touch.x()/Touch.y() 세 함수로 단순화했습니다.
+      const Touch = {
+        pressed: function() { const t = mcuVM['${board}'].touch; return !!(t && t.pressed); },
+        x: function() { const t = mcuVM['${board}'].touch; return t ? t.x : 0; },
+        y: function() { const t = mcuVM['${board}'].touch; return t ? t.y : 0; }
+      };
+
+      // ledc 하드웨어 PWM(ESP32 LED Control) — analogWrite와 마찬가지로 지정한 핀의 pinState를
+      // PWM(0~1 duty)으로 갱신합니다.
+      function ledcSetup(channel, freq, resolutionBits) { return freq; }
+      function ledcAttachPin(pin, channel) {
+        mcuVM['${board}']._ledcChannel = mcuVM['${board}']._ledcChannel || {};
+        let p = String(pin);
+        if (/^\\d+$/.test(p)) p = 'GPIO' + p;
+        mcuVM['${board}']._ledcChannel[channel] = p;
+      }
+      function ledcWrite(channel, duty) {
+        const p = (mcuVM['${board}']._ledcChannel || {})[channel];
+        if (p !== undefined) mcuVM['${board}'].pinState[p] = { type: 'pwm', v: Math.max(0, Math.min(255, duty)) / 255 };
+      }
+      // touchRead — 정전식 터치 센서 핀의 정전용량 값을 흉내낸 난수 스텁입니다(실제로는 손이
+      // 가까워지면 값이 낮아지지만, 이 시뮬레이터는 물리적 터치를 감지할 수 없습니다).
+      function touchRead(pin) { return 30 + Math.floor(Math.random() * 10); }
+
+      // TFT_eSPI / Adafruit_GFX 계열 컬러 TFT 그래픽 라이브러리 (ESP32 디스플레이/터치 보드 전용).
+      // 실제 SPI 프레임버퍼 전송 과정 없이, 그림을 그리는 즉시 화면 <canvas> 엘리먼트에 직접
+      // 그려서 반영합니다 — delay()가 실제로 시간을 멈추는 이 시뮬레이터 구조 덕분에, 그리기와
+      // delay()를 번갈아 호출하는 순서 그대로 화면이 실시간으로 진행되어 보입니다.
+      const TFT_BLACK=0x0000, TFT_WHITE=0xFFFF, TFT_RED=0xF800, TFT_GREEN=0x07E0, TFT_BLUE=0x001F,
+            TFT_YELLOW=0xFFE0, TFT_CYAN=0x07FF, TFT_MAGENTA=0xF81F, TFT_ORANGE=0xFDA0, TFT_DARKGREY=0x7BEF, TFT_LIGHTGREY=0xC618, TFT_NAVY=0x000F, TFT_SKYBLUE=0x867D;
+      function __rgb565ToCss(c) {
+        c = c & 0xFFFF;
+        const r = Math.round(((c >> 11) & 0x1F) * 255 / 31), g = Math.round(((c >> 5) & 0x3F) * 255 / 63), b = Math.round((c & 0x1F) * 255 / 31);
+        return 'rgb(' + r + ',' + g + ',' + b + ')';
+      }
+      class TFT_eSPI {
+        constructor() {
+          this._canvas = document.getElementById('${board}_tft');
+          this._ctx = this._canvas ? this._canvas.getContext('2d') : null;
+          this._cx = 0; this._cy = 0; this._color = TFT_WHITE; this._size = 1;
+        }
+        width() { return this._canvas ? this._canvas.width : 0; }
+        height() { return this._canvas ? this._canvas.height : 0; }
+        init() {} begin() { return true; } setRotation() {} invertDisplay() {}
+        fillScreen(color) { if (this._ctx) { this._ctx.fillStyle = __rgb565ToCss(color); this._ctx.fillRect(0, 0, this.width(), this.height()); } }
+        drawPixel(x, y, color) { if (this._ctx) { this._ctx.fillStyle = __rgb565ToCss(color); this._ctx.fillRect(x, y, 1, 1); } }
+        drawLine(x0, y0, x1, y1, color) { if (this._ctx) { this._ctx.strokeStyle = __rgb565ToCss(color); this._ctx.beginPath(); this._ctx.moveTo(x0 + 0.5, y0 + 0.5); this._ctx.lineTo(x1 + 0.5, y1 + 0.5); this._ctx.stroke(); } }
+        drawRect(x, y, w, h, color) { if (this._ctx) { this._ctx.strokeStyle = __rgb565ToCss(color); this._ctx.strokeRect(x + 0.5, y + 0.5, w, h); } }
+        fillRect(x, y, w, h, color) { if (this._ctx) { this._ctx.fillStyle = __rgb565ToCss(color); this._ctx.fillRect(x, y, w, h); } }
+        drawCircle(x, y, r, color) { if (this._ctx) { this._ctx.strokeStyle = __rgb565ToCss(color); this._ctx.beginPath(); this._ctx.arc(x, y, r, 0, Math.PI * 2); this._ctx.stroke(); } }
+        fillCircle(x, y, r, color) { if (this._ctx) { this._ctx.fillStyle = __rgb565ToCss(color); this._ctx.beginPath(); this._ctx.arc(x, y, r, 0, Math.PI * 2); this._ctx.fill(); } }
+        drawRoundRect(x, y, w, h, rad, color) { if (this._ctx) { this._ctx.strokeStyle = __rgb565ToCss(color); this._ctx.beginPath(); if (this._ctx.roundRect) this._ctx.roundRect(x, y, w, h, rad); else this._ctx.rect(x, y, w, h); this._ctx.stroke(); } }
+        fillRoundRect(x, y, w, h, rad, color) { if (this._ctx) { this._ctx.fillStyle = __rgb565ToCss(color); this._ctx.beginPath(); if (this._ctx.roundRect) this._ctx.roundRect(x, y, w, h, rad); else this._ctx.rect(x, y, w, h); this._ctx.fill(); } }
+        setCursor(x, y) { this._cx = x; this._cy = y; }
+        setTextColor(fg) { this._color = fg; }
+        setTextSize(s) { this._size = s || 1; }
+        drawString(text, x, y) { this.setCursor(x, y); this._print(String(text)); }
+        print(text) { this._print(String(text)); }
+        println(text) { this._print(String(text !== undefined ? text : '')); this._cx = 0; this._cy += 8 * this._size + 2; }
+        _print(s) {
+          if (!this._ctx) return;
+          const size = 8 * this._size;
+          this._ctx.fillStyle = __rgb565ToCss(this._color);
+          this._ctx.font = size + 'px monospace';
+          this._ctx.textBaseline = 'top';
+          this._ctx.fillText(s, this._cx, this._cy);
+          this._cx += this._ctx.measureText(s).width;
+        }
+        color565(r, g, b) { return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3); }
+      }
+      const Adafruit_ST7789 = TFT_eSPI, Adafruit_ILI9341 = TFT_eSPI, Adafruit_ST7735 = TFT_eSPI;
+
+      // Preferences(NVS) — 실제 플래시 대신, 이 보드 인스턴스의 메모리 안에서만 유지되는
+      // 단순한 키/값 저장소입니다(시뮬레이터를 새로고침하거나 다시 컴파일하면 초기화됩니다).
+      class Preferences {
+        constructor() { this._ns = 'default'; this._store = mcuVM['${board}']._nvs = mcuVM['${board}']._nvs || {}; }
+        begin(ns) { this._ns = ns || 'default'; if (!this._store[this._ns]) this._store[this._ns] = {}; return true; }
+        end() {}
+        clear() { this._store[this._ns] = {}; }
+        putInt(k, v) { this._store[this._ns][k] = v; return 4; }
+        putFloat(k, v) { this._store[this._ns][k] = v; return 4; }
+        putString(k, v) { this._store[this._ns][k] = String(v); return String(v).length; }
+        putBool(k, v) { this._store[this._ns][k] = !!v; return 1; }
+        getInt(k, def) { const ns = this._store[this._ns] || {}; return (k in ns) ? ns[k] : (def || 0); }
+        getFloat(k, def) { const ns = this._store[this._ns] || {}; return (k in ns) ? ns[k] : (def || 0); }
+        getString(k, def) { const ns = this._store[this._ns] || {}; return (k in ns) ? ns[k] : (def || ''); }
+        getBool(k, def) { const ns = this._store[this._ns] || {}; return (k in ns) ? ns[k] : (def || false); }
+        remove(k) { delete (this._store[this._ns] || {})[k]; }
       }
     `;
 
@@ -1937,7 +2224,7 @@ function buildHeader(containerId, pins){
     const pin = document.createElement('div');
     pin.className = 'pin';
     pin.dataset.pin = p.id;
-    pin.title = p.id;
+    pin.title = p.title || p.id;
     const name = document.createElement('span');
     name.className = 'pin-name';
     name.textContent = p.label;
@@ -1946,11 +2233,9 @@ function buildHeader(containerId, pins){
   });
 }
 
-document.getElementById('arduinoBoard').innerHTML = buildR4BoardHTML('r4');
-buildHeader('rowDigital_r4', DIGITAL_PINS);
-buildHeader('rowPower_r4', POWER_PINS);
-buildHeader('rowAnalog_r4', ANALOG_PINS);
-rebuildMatrixGrid('matrixGrid_r4');
+// R4는 이제 R3와 똑같이, 사용자가 팔레트에서 "Uno R4 WiFi 보드 추가"를 눌러야만 캔버스에
+// 나타납니다(첫 화면에 저절로 떠 있지 않습니다) — spawnBoard('r4')가 그 시점에 보드 그림을
+// 새로 만들고, 이미 HTML에 있는 정적 팝업(popupR4)을 재사용합니다.
 
 /* ============ Component Spawning & Draggables ============ */
 let activeDrag = null, dragOffset = {x:0,y:0};
@@ -1968,7 +2253,37 @@ function deselectComponent(){
 
 function makeDraggable(el){
   el.addEventListener('mousedown', (e) => {
-    if (e.target.closest('.pin, .pin-mini, input, select, .btn-cap, .reset-btn')) return;
+    // 핀/터치스크린은 각자 다른 용도(배선 연결, 터치 그림)로 마우스를 쓰므로 절대 드래그를
+    // 가로채면 안 됩니다 — 완전히 그대로 둡니다.
+    if (e.target.closest('.pin, .pin-mini, .tft-screen')) return;
+    // 저항값 입력칸, 모드 선택 셀렉트, 커패시터 극성 버튼, 리셋 버튼처럼 부품 "중앙"을 차지하고
+    // 있는 조작 요소는, 그냥 누르기만 하면(움직임 없이 떼면) 원래대로 클릭/포커스/값 변경이
+    // 되어야 하지만, 누른 채로 조금이라도 끌면 그 순간부터 부품 자체를 드래그하는 것으로
+    // 전환합니다 — 부품 중앙만 눌러도 이동시킬 수 있어야 한다는 요청에 따른 처리입니다.
+    const interactiveTarget = e.target.closest('input, select, .btn-cap, .reset-btn');
+    if (interactiveTarget){
+      const startX = e.clientX, startY = e.clientY;
+      const rect0 = el.getBoundingClientRect();
+      const offX = (startX - rect0.left) / canvasZoom, offY = (startY - rect0.top) / canvasZoom;
+      const THRESHOLD = 5;
+      let dragStarted = false;
+      const onMove = (ev) => {
+        if (dragStarted) return;
+        if (Math.hypot(ev.clientX - startX, ev.clientY - startY) < THRESHOLD) return;
+        dragStarted = true;
+        selectComponent(el);
+        activeDrag = el;
+        dragOffset.x = offX;
+        dragOffset.y = offY;
+      };
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+      return;
+    }
     selectComponent(el);
     activeDrag = el;
     const rect = el.getBoundingClientRect();
@@ -2117,39 +2432,50 @@ function deleteComponent(el){
   const removedWires = wires.filter(w => el.contains(w.from) || el.contains(w.to));
   removedWires.forEach(w => { w.element.remove(); (w.pointEls || []).forEach(c => c.remove()); });
   wires = wires.filter(w => !removedWires.includes(w));
-  // 보드 자체를 지우는 경우: 그 보드의 실행 루프를 멈추고(gen 무효화), 레지스트리(boardInstances/
-  // boardDomId)에서도 빼서 이후의 순회 작업(runTick의 매트릭스/D13 LED/사이클 readout 갱신 등)이
-  // 삭제된 보드를 건드리지 않게 합니다. "r4" 키만 하나뿐인 기본 내장 보드(#arduinoBoard)를
-  // 가리키므로(never re-spawnable) 항상 보호합니다. "r3"는 처음 한 번만 정적 팝업(popupR3)을
-  // 재사용할 뿐 다른 보드와 똑같이 지워질 수 있는 보드이므로(지워지면 이후 spawnBoard('r3')는
-  // 새 키로 새로 만들어집니다), 실행루프/레지스트리는 똑같이 정리하고 정적 팝업만 삭제 대신
-  // 숨김 처리합니다(완전히 지우면 DOM에서 코드 에디터 등이 통째로 사라져 버립니다).
+  // 보드 자체를 지우는 경우: 그 보드의 실행 루프를 멈추고(gen 무효화), 레지스트리(boardInstances)
+  // 에서도 빼서 이후의 순회 작업(runTick의 매트릭스/D13 LED/사이클 readout 갱신 등)이 삭제된
+  // 보드를 건드리지 않게 합니다. "r4"/"r3"는 처음(=깨끗한 기본 키) 한 번만 정적 팝업(popupR4/
+  // popupR3)을 재사용할 뿐 다른 보드와 똑같이 지워질 수 있는 보드이므로(지워지면 이후
+  // spawnBoard('r4'|'r3')는 다시 그 깨끗한 키로 새로 만들어집니다), 실행루프/레지스트리는
+  // 똑같이 정리하고 정적 팝업만 삭제 대신 숨김 처리합니다(완전히 지우면 DOM에서 코드 에디터
+  // 등이 통째로 사라져 버립니다).
   if (el.classList.contains('board')){
     const key = el.dataset.board;
-    const isBaseR4 = key === 'r4';
-    if (key && !isBaseR4 && mcuVM[key]) mcuVM[key].gen = (mcuVM[key].gen || 0) + 1;
+    const usesStaticPopup = key === 'r4' || key === 'r3';
+    if (key && mcuVM[key]) mcuVM[key].gen = (mcuVM[key].gen || 0) + 1;
     const popup = document.getElementById(`popup${key ? key.toUpperCase() : ''}`);
     if (popup){
-      if (isBaseR4 || key === 'r3') popup.hidden = true;
+      if (usesStaticPopup) popup.hidden = true;
       else popup.remove();
     }
-    if (key && !isBaseR4) delete boardInstances[key];
+    if (key) delete boardInstances[key];
   }
-  if (el.id !== 'arduinoBoard') el.remove(); // 기본 내장 R4 보드 DOM 자체는 항상 남겨둡니다.
+  el.remove();
   updateAllWires();
   updateLegend();
 }
 
-// 캔버스에 현재 놓여있는 모든 부품(기본 내장 R4 보드는 제외)과 전선을 지워, 예제를 새로 고를
-// 때마다 깨끗한 캔버스에서 그 예제만 새로 배치되게 합니다.
+// 캔버스에 현재 놓여있는 모든 부품·보드와 전선을 지워, 예제를 새로 고를 때마다(또는 "새
+// 프로젝트 시작") 깨끗한 캔버스에서 새로 시작할 수 있게 합니다.
 function clearCanvasAll(){
   document.querySelectorAll('.placed-component').forEach(el => {
-    if (el.id === 'arduinoBoard') return; // 기본 내장 R4 보드는 항상 남겨둡니다.
     deleteComponent(el);
   });
   wires.slice().forEach(w => deleteWire(w)); // 혹시 남아있는 보드-보드 직결 전선까지 마저 정리
   Object.keys(commWireTags).forEach(k => { commWireTags[k] = []; });
   closeWireEditor();
+}
+
+// 툴바의 "새 프로젝트 시작" 버튼 — 확인창을 띄운 뒤 캔버스(부품·보드·전선)를 전부 지우고,
+// 확대/축소·스크롤 위치도 원래대로 되돌려서 정말 아무것도 없는 깨끗한 상태로 되돌립니다.
+function startNewProject(){
+  if (!confirm(tr('confirm.newProject'))) return;
+  if (isSimulating) toggleSimulation(); // 시뮬레이션 중이었다면 먼저 멈춰서 "▶ 시뮬레이션 시작" 버튼 상태로 되돌립니다.
+  clearCanvasAll();
+  resetCanvasZoom();
+  const area = document.getElementById('canvasArea');
+  if (area) { area.scrollLeft = 0; area.scrollTop = 0; }
+  showToast(tr('toast.newProject'));
 }
 
 const SENSOR_DEFS = {
@@ -3011,10 +3337,17 @@ function createWire(pinA, pinB){
   path.setAttribute('class', 'wire-path');
   path.setAttribute('stroke', WIRE_DEFAULT_COLOR);
   svg.appendChild(path);
-  // points: 사용자가 더블클릭으로 추가한 "꺾임점"들 — from → points[0] → points[1] → ... → to
-  // 순서대로 이어 그립니다. 각 점은 canvasInner의 비확대 좌표계 기준 절대 좌표({x,y})이고,
-  // 부품이 움직여도 점 자체는 그 자리에 고정됩니다(양 끝 핀만 부품을 따라갑니다).
-  const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR, points: [], pointEls: [] };
+  // points: 꺾임점들 — from → points[0] → points[1] → ... → to 순서대로 이어 그립니다. 각 점은
+  // canvasInner의 비확대 좌표계 기준 절대 좌표({x,y})이고, 부품이 움직여도 점 자체는 그 자리에
+  // 고정됩니다(양 끝 핀만 부품을 따라갑니다). 더블클릭으로 점을 새로 추가/삭제할 수도 있지만,
+  // 매번 더블클릭 위치를 정확히 맞추기 어렵다는 피드백에 따라 기본적으로 두 핀을 잇는 직선을
+  // 4등분한 자리에 점 3개를 만들어 두어, 만들자마자 바로 드래그로 배선을 정리할 수 있게 합니다.
+  const p1_0 = pinCenter(pinA), p2_0 = pinCenter(pinB);
+  const initialPoints = [1, 2, 3].map(i => ({
+    x: p1_0.x + (p2_0.x - p1_0.x) * (i / 4),
+    y: p1_0.y + (p2_0.y - p1_0.y) * (i / 4),
+  }));
+  const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR, points: initialPoints, pointEls: [] };
   wires.push(wireObj);
   updateWirePosition(wireObj);
   // 한 번 클릭 = 색상 편집기, 더블클릭 = 그 위치에 꺾임점 추가. 브라우저는 더블클릭 시
@@ -4003,11 +4336,12 @@ function runTick(){
     updateRelayVisual(relay.id, energized);
   });
 
-  // 1. 보드 D13 온보드 LED 제어 (배선이 없으면 그 보드 자신의 실행 결과를 그대로 사용) — 보드 전부
-  Object.values(boardInstances).forEach(({ key, domId }) => {
+  // 1. 보드 온보드 LED 제어 (배선이 없으면 그 보드 자신의 실행 결과를 그대로 사용) — 보드 전부.
+  // 온보드 LED가 물린 핀은 보드 종류마다 다릅니다(Uno 계열은 D13, ESP32 계열은 GPIO2).
+  Object.values(boardInstances).forEach(({ key, type, domId }) => {
     const ledEl = document.getElementById(`l13Led_${key}`);
     if (!ledEl || !document.getElementById(domId)) return;
-    const r = boardPinReading(domId, 'D13');
+    const r = boardPinReading(domId, BOARD_ONBOARD_LED_PIN[type] || 'D13');
     ledEl.classList.toggle('on', !!r && r.v >= 0.5);
   });
 
@@ -4330,6 +4664,12 @@ function closeBoardPopup(board){
   const p = document.getElementById(`popup${board.toUpperCase()}`);
   if (p) p.hidden = true;
 }
+// 툴바의 "코드 에디터 & 컴파일러" 버튼: R4가 이제 처음부터 캔버스에 있지 않으므로, 없으면
+// 먼저 만들어준 뒤 그 팝업을 엽니다.
+function openMainEditor(){
+  if (!boardInstances['r4']) spawnBoard('r4');
+  openBoardPopup('r4');
+}
 
 function makePopupDraggable(popup){
   const handle = popup.querySelector('[data-drag-handle]');
@@ -4402,26 +4742,97 @@ function buildR3BoardHTML(key){
     <div class="header-row analog" id="rowAnalog_${key}"></div>`;
 }
 
+// ESP32 계열 3종의 보드 그림을 만듭니다.
+//  - esp32b: 디스플레이 없는 기본 개발보드(DevKit)
+//  - esp32d: 컬러 TFT 디스플레이가 보드에 내장(240x135, ST7789 계열과 비슷한 소형 화면)
+//  - esp32t: 7인치 정전식 터치 디스플레이가 보드에 내장(480x320, 클릭/드래그로 터치 입력)
+// 화면(캔버스)은 sandboxPrefix의 TFT_eSPI 클래스가 즉시 그 위에 직접 그림을 그립니다.
+const ESP32_TFT_RES = { esp32d: { w: 240, h: 135 }, esp32t: { w: 480, h: 320 } };
+function esp32TftCanvasId(key){ return `${key}_tft`; }
+function buildESP32BoardHTML(key, type){
+  const suffix = key.includes('_') ? ' #' + key.split('_')[1] : '';
+  const titleMap = { esp32b: 'ESP32 DEVKIT', esp32d: 'ESP32 DISPLAY', esp32t: 'ESP32 TOUCH 7"' };
+  const title = titleMap[type] + suffix;
+  const res = ESP32_TFT_RES[type];
+  const screenHtml = res ? `
+    <div class="tft-screen-wrap" style="${type === 'esp32t' ? 'top:78px; left:72px;' : 'top:120px; left:210px;'}">
+      <canvas class="tft-screen" id="${esp32TftCanvasId(key)}" width="${res.w}" height="${res.h}" style="width:${res.w}px; height:${res.h}px;"></canvas>
+    </div>
+    <div class="tft-caption" style="${type === 'esp32t' ? 'top:420px; left:72px;' : 'top:274px; left:210px;'}">${type === 'esp32t' ? tr('esp32.touchCaption') : tr('esp32.displayCaption')}</div>` : '';
+  const chipTop = type === 'esp32t' ? 430 : 190;
+  return `
+    <div class="silk silk-word" style="top:20px; left:26px; font-size:.6rem;">ESPRESSIF</div>
+    <div class="silk silk-title" style="top:34px; left:26px; font-size:1.05rem;">${title}</div>
+    <div class="silk silk-sub" style="top:64px; left:26px;">ESP32-WROOM-32 · XTENSA LX6 DUAL-CORE</div>
+
+    <div class="power-led" id="powerLed_${key}" style="top:20px; left:${type==='esp32t'?560:420}px;"></div>
+    <div class="power-cap" style="top:28px; left:${type==='esp32t'?554:414}px;">ON</div>
+    <div class="onboard-led" id="l13Led_${key}" style="top:20px; left:${type==='esp32t'?590:450}px;"></div>
+    <div class="onboard-cap" style="top:28px; left:${type==='esp32t'?580:440}px;">L(2)</div>
+
+    <div class="reset-btn" onclick="resetBoard('${key}')" data-i18n-title="board.resetTitle" title="리셋(EN)" style="top:6px; left:26px; width:20px; height:20px;"><div class="cap"></div></div>
+    <div class="reset-caption" style="top:28px; left:14px; font-size:.5rem;">EN</div>
+
+    <div class="chip chip-esp32" style="top:${chipTop}px;"><div class="chip-label">ESP32-WROOM-32<br>Wi-Fi + BT</div></div>
+    ${screenHtml}
+
+    <div class="header-row top" id="rowDigital_${key}"></div>
+    <div class="header-row power" id="rowPower_${key}"></div>
+    <div class="header-row analog" id="rowAnalog_${key}"></div>
+    <div class="header-caption cap-power">POWER</div>
+    <div class="header-caption cap-analog">ADC (ADC1)</div>`;
+}
+// 7인치 터치 보드(esp32t)의 화면을 클릭/드래그하면 그 좌표를 터치 입력으로 기록해, 예제 코드의
+// Touch.pressed()/Touch.x()/Touch.y()로 읽을 수 있게 합니다. 보드를 드래그하는 것과 충돌하지
+// 않도록(캔버스 클릭 = 터치, 보드 클릭 = 이동) mousedown 단계에서 전파를 막습니다.
+function bindTouchScreenEvents(key, type){
+  if (type !== 'esp32t') return;
+  const canvas = document.getElementById(esp32TftCanvasId(key));
+  if (!canvas) return;
+  const mcu = mcuVM[key];
+  const setTouch = (e, pressed) => {
+    const r = canvas.getBoundingClientRect();
+    mcu.touch = { pressed, x: Math.round((e.clientX - r.left) * (canvas.width / r.width)), y: Math.round((e.clientY - r.top) * (canvas.height / r.height)) };
+  };
+  canvas.addEventListener('mousedown', (e) => { e.stopPropagation(); setTouch(e, true); });
+  canvas.addEventListener('mousemove', (e) => { if (mcu.touch && mcu.touch.pressed) setTouch(e, true); });
+  window.addEventListener('mouseup', () => { if (mcu.touch) mcu.touch.pressed = false; });
+}
+
 // R4/R3 코드 에디터 & 빌드 콘솔 팝업을 새 인스턴스용으로 통째로 만들어 body에 붙입니다.
 // 기본 내장된 popupR4/popupR3(HTML에 이미 정적으로 있음)는 이 함수를 거치지 않고,
 // 그 이후에 추가되는 모든 보드(두 번째 R4, 두 번째 R3, ...)가 이 함수로 팝업을 얻습니다.
 function buildBoardPopupHTML(key, type){
-  const isR3 = type === 'r3';
+  const isEsp32 = ESP32_BOARD_TYPES.has(type);
   const KEY = key.toUpperCase();
-  const label = isR3 ? 'Uno R3' : 'Uno R4 WiFi';
+  const label = boardTypeLabel(type);
   const suffix = key.includes('_') ? ' #' + key.split('_')[1] : '';
-  const targetLine = isR3 ? 'Target: ATmega328P (8-bit AVR @ 16MHz)' : 'Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)';
-  const toolchain = isR3 ? 'AVR-GCC' : 'C/C++ GCC';
-  // DDRx/PORTx/PINx 직접제어 예제는 AVR(ATmega328P, R3)에만 있는 개념입니다 — R4(RA4M1,
-  // ARM Cortex-M4)는 레지스터 구성이 전혀 달라(PODR/PDR 등) 같은 이름의 레지스터가 없으므로,
-  // 이 두 예제는 R3에만 제공합니다.
-  const extraButtons = isR3
-    ? `<button class="btn ghost" onclick="runCodeExample('${key}','register')">${tr('popup.exRegister')}</button>
+  const targetLine = type === 'r3' ? 'Target: ATmega328P (8-bit AVR @ 16MHz)'
+    : isEsp32 ? 'Target: ESP32-WROOM-32 (Xtensa LX6 dual-core @ 240MHz)'
+    : 'Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)';
+  const toolchain = type === 'r3' ? 'AVR-GCC' : isEsp32 ? 'Xtensa-GCC' : 'C/C++ GCC';
+  // DDRx/PORTx/PINx 직접제어 예제는 AVR(ATmega328P, R3)에만 있는 개념입니다 — R4/ESP32는 레지스터
+  // 구성이 전혀 달라 같은 이름의 레지스터가 없으므로, 이 두 예제는 R3에만 제공합니다.
+  let counterButton, extraButtons;
+  if (type === 'r3'){
+    counterButton = `<button class="btn ghost" onclick="runCodeExample('${key}','counter')">${tr('popup.exCounterD13')}</button>`;
+    extraButtons = `<button class="btn ghost" onclick="runCodeExample('${key}','register')">${tr('popup.exRegister')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','api_vs_register')">${tr('popup.exApiVsReg')}</button>
-        <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`
-    : `<button class="btn ghost" onclick="runCodeExample('${key}','analog')">${tr('popup.exAnalog')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`;
-  const defaultCode = `// Arduino ${label}${suffix} sketch\nint count = 0;\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Board ${key} Tick: ");\n  Serial.println(count);\n  delay(200);\n}`;
+  } else if (isEsp32){
+    // 보드 종류(DevKit/디스플레이/터치)에 맞는 예제 목록 배열을 그대로 재사용해, 갤러리 탭과
+    // 팝업의 빠른 실행 버튼이 항상 같은 예제 세트를 보여주게 합니다.
+    const defs = type === 'esp32b' ? ESP32B_EXAMPLE_DEFS : type === 'esp32d' ? ESP32D_EXAMPLE_DEFS : ESP32T_EXAMPLE_DEFS;
+    const buttons = defs.map(d => `<button class="btn ghost" onclick="runCodeExample('${key}','${d.key}')">${tr(d.titleKey)}</button>`);
+    counterButton = buttons[0];
+    extraButtons = buttons.slice(1).join('\n        ');
+  } else {
+    counterButton = `<button class="btn ghost" onclick="runCodeExample('${key}','counter')">${tr('popup.exCounterD13')}</button>`;
+    extraButtons = `<button class="btn ghost" onclick="runCodeExample('${key}','analog')">${tr('popup.exAnalog')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`;
+  }
+  const ledPinValue = isEsp32 ? 'const int ledPin = 2;' : 'const int ledPin = 13;';
+  const defaultCode = `// ${label}${suffix} sketch\nint count = 0;\n${ledPinValue}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Board ${key} Tick: ");\n  Serial.println(count);\n  delay(200);\n}`;
 
   const div = document.createElement('div');
   div.className = 'board-popup';
@@ -4448,7 +4859,7 @@ function buildBoardPopupHTML(key, type){
     <div class="popup-body">
       <div class="example-buttons">
         <button class="btn primary" id="btnCompile${KEY}" onclick="executeCompilerPipeline('${key}')">${tr('popup.compile')}</button>
-        <button class="btn ghost" onclick="runCodeExample('${key}','counter')">${tr('popup.exCounterD13')}</button>
+        ${counterButton}
         ${extraButtons}
       </div>
       <div class="code-editor-wrap">
@@ -4467,16 +4878,25 @@ function buildBoardPopupHTML(key, type){
   return div;
 }
 
-// type: 'r4' 또는 'r3'. 호출할 때마다 그 타입의 보드를 새로 한 대 더 캔버스에 추가합니다
-// (기본 내장 R4, 최초 1회의 R3는 이미 만들어져 있는 마크업/팝업을 재사용하고, 그 이후부터는
-// 이 함수가 보드 그림 + 팝업(코드 에디터/빌드 콘솔)을 전부 새로 만들어 등록합니다).
+const ESP32_BOARD_TYPES = new Set(['esp32b', 'esp32d', 'esp32t']);
+// type: 'r4' / 'r3' / 'esp32b'(기본 DevKit) / 'esp32d'(컬러 디스플레이 내장) / 'esp32t'(7인치 터치
+// 디스플레이 내장). 호출할 때마다 그 타입의 보드를 새로 한 대 더 캔버스에 추가합니다 — 기본
+// 내장 R4, 최초 1회의 R3는 이미 만들어져 있는 정적 마크업/팝업을 재사용하고, 그 외 모든 경우는
+// 이 함수가 보드 그림 + 팝업(코드 에디터/빌드 콘솔)을 전부 새로 만들어 등록합니다.
 function spawnBoard(type, dropX, dropY){
-  const isFirstOfType = boardSpawnCount[type] === 0;
+  // 깨끗한 기본 키(타입 이름 그대로, 예: 'r3'/'esp32b')는 "이 타입의 첫 대"가 아니라 "지금 그
+  // 키를 쓰는 살아있는 보드가 없을 때" 재사용합니다 — 예제 갤러리 카드를 여러 번 눌러 같은
+  // 타입의 보드를 지우고 새로 만드는 흐름(clearCanvasAll -> spawnBoard)에서, boardSpawnCount는
+  // 계속 누적되지만 boardInstances[type]는 지워진 상태이므로 이 둘을 구분해야 합니다.
+  const reuseBareKey = !boardInstances[type];
   boardSpawnCount[type] = (boardSpawnCount[type] || 0) + 1;
-  const key = isFirstOfType ? type : `${type}_${boardSpawnCount[type]}`;
+  const key = reuseBareKey ? type : `${type}_${boardSpawnCount[type]}`;
+  const isEsp32 = ESP32_BOARD_TYPES.has(type);
 
   const el = document.createElement('div');
-  el.className = type === 'r3' ? 'placed-component board board-r3' : 'placed-component board';
+  el.className = type === 'r3' ? 'placed-component board board-r3'
+    : isEsp32 ? `placed-component board board-esp32 board-${type}`
+    : 'placed-component board';
   el.id = `arduinoBoard_${key}`;
   el.dataset.board = key;
   if (typeof dropX === 'number' && typeof dropY === 'number'){
@@ -4488,18 +4908,30 @@ function spawnBoard(type, dropX, dropY){
     el.style.left = '480px';
     el.style.top = (360 + row * 460) + 'px';
   }
-  el.innerHTML = type === 'r3' ? buildR3BoardHTML(key) : buildR4BoardHTML(key);
+  el.innerHTML = type === 'r3' ? buildR3BoardHTML(key) : isEsp32 ? buildESP32BoardHTML(key, type) : buildR4BoardHTML(key);
   document.getElementById('canvasInner').appendChild(el);
 
-  buildHeader(`rowDigital_${key}`, DIGITAL_PINS);
-  buildHeader(`rowPower_${key}`, POWER_PINS);
-  buildHeader(`rowAnalog_${key}`, ANALOG_PINS);
+  const topPins = isEsp32 ? ESP32_GPIO_PINS : DIGITAL_PINS;
+  const powerPins = isEsp32 ? ESP32_POWER_PINS : POWER_PINS;
+  const analogPins = isEsp32 ? ESP32_ADC_PINS : ANALOG_PINS;
+  buildHeader(`rowDigital_${key}`, topPins);
+  buildHeader(`rowPower_${key}`, powerPins);
+  buildHeader(`rowAnalog_${key}`, analogPins);
   if (type === 'r4') rebuildMatrixGrid(`matrixGrid_${key}`);
 
-  if (!isFirstOfType) buildBoardPopupHTML(key, type); // r4의 첫 대, r3의 첫 대는 정적 팝업 재사용
-  if (!mcuVM[key]) mcuVM[key] = createMcuState(type === 'r3' ? 16e6 : 48e6);
+  // 깨끗한 기본 키('r4' 또는 'r3')로 만들어질 때만 이미 HTML에 있는 정적 팝업(popupR4/popupR3)을
+  // 재사용합니다(지워졌다가 다시 만들어진 경우도 포함 — deleteComponent가 이 둘의 정적 팝업은
+  // 완전히 지우지 않고 숨김 처리만 해두므로, 여기서 다시 그 자리를 씁니다). 번호가 붙는 인스턴스
+  // (r3_2, ...)와 ESP32 계열은 항상 새 팝업을 만듭니다.
+  const reusesStaticPopup = key === type && (type === 'r4' || type === 'r3');
+  if (!reusesStaticPopup) buildBoardPopupHTML(key, type);
+  if (!mcuVM[key]) mcuVM[key] = createMcuState(type === 'r3' ? 16e6 : isEsp32 ? 240e6 : 48e6);
   boardDomId[key] = el.id;
   boardInstances[key] = { key, type, domId: el.id };
+  // mcuVM[key]가 만들어진 다음에 터치 이벤트를 연결해야 합니다 — bindTouchScreenEvents가
+  // mcuVM[key] 객체를 그 자리에서 바로 참조해서 붙잡아두기 때문에, 순서가 바뀌면 리스너가
+  // undefined를 붙잡은 채로 남아 클릭할 때마다 오류가 납니다.
+  if (isEsp32) bindTouchScreenEvents(key, type);
 
   makeDraggable(el);
   bindPinEvents();
@@ -4618,6 +5050,70 @@ function loadExampleCode(board, type){
         ? `// R3 <-> R4 serial (UART) communication example -- R4 side. Waits for a message from\n// R3 and replies with "ACK" over the same wire.\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println("R4 ready");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String msg = Serial.readStringUntil('\\n');\n    Serial.print("R4 received: ");\n    Serial.println(msg);\n    Serial.println("ACK");\n  }\n  delay(100);\n}`
         : `// R3 ↔ R4 시리얼(UART) 통신 예제 — R4 쪽. R3가 보낸 메시지를 기다렸다가 받으면, 같은 선으로\n// "ACK"를 되돌려 보냅니다.\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println("R4 준비 완료");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String msg = Serial.readStringUntil('\\n');\n    Serial.print("R4가 받은 메시지: ");\n    Serial.println(msg);\n    Serial.println("ACK");\n  }\n  delay(100);\n}`;
     }
+  } else if (type === 'counter32'){
+    editor.value = currentLang === 'en'
+      ? `// ESP32: counter & GPIO2 blink (GPIO2 is the onboard LED on most ESP32 dev boards)\nint count = 0;\nconst int ledPin = 2;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Counter: ");\n  Serial.println(count);\n  delay(200);\n}`
+      : `// ESP32: 카운터 & GPIO2 점멸 예제 (GPIO2는 대부분의 ESP32 개발보드에서 온보드 LED입니다)\nint count = 0;\nconst int ledPin = 2;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("카운터: ");\n  Serial.println(count);\n  delay(200);\n}`;
+  } else if (type === 'wifi'){
+    editor.value = currentLang === 'en'
+      ? `#include <WiFi.h>\n\n// Simplified WiFi demo: this simulator does not implement a real 802.11 stack,\n// so WiFi.begin() simply "connects" after a short delay and hands back a\n// simulated local IP address, just enough to practice the usual WiFi.h API.\n\nconst char* ssid = "MySchoolWiFi";\nconst char* password = "12345678";\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println("Connecting to WiFi...");\n  WiFi.begin(ssid, password);\n}\n\nvoid loop() {\n  if (WiFi.status() == WL_CONNECTED) {\n    Serial.print("Connected! IP address: ");\n    Serial.println(WiFi.localIP());\n    Serial.print("Signal strength (RSSI): ");\n    Serial.println(WiFi.RSSI());\n  } else {\n    Serial.println("Waiting for connection...");\n  }\n  delay(1000);\n}`
+      : `#include <WiFi.h>\n\n// 단순화된 WiFi 예제: 이 시뮬레이터는 실제 802.11 프로토콜 스택을 구현하지 않으므로,\n// WiFi.begin()을 호출하면 잠시 뒤 "연결됨" 상태가 되고 가상의 IP 주소를 돌려줍니다 —\n// WiFi.h의 기본적인 API 사용법을 연습하기에 충분한 수준으로 단순화했습니다.\n\nconst char* ssid = "MySchoolWiFi";\nconst char* password = "12345678";\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println("WiFi에 연결 중...");\n  WiFi.begin(ssid, password);\n}\n\nvoid loop() {\n  if (WiFi.status() == WL_CONNECTED) {\n    Serial.print("연결됨! IP 주소: ");\n    Serial.println(WiFi.localIP());\n    Serial.print("신호 강도(RSSI): ");\n    Serial.println(WiFi.RSSI());\n  } else {\n    Serial.println("연결 대기 중...");\n  }\n  delay(1000);\n}`;
+  } else if (type === 'display'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// Draws directly onto the board's built-in color TFT screen.\nTFT_eSPI tft = TFT_eSPI();\nint x = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setTextSize(2);\n  tft.setCursor(10, 10);\n  tft.println("Hello, ESP32!");\n}\n\nvoid loop() {\n  tft.fillRect(0, 40, tft.width(), 20, TFT_BLACK); // clear the previous frame\n  tft.fillCircle(x, 50, 8, TFT_CYAN);\n  x += 6;\n  if (x > tft.width()) x = 0;\n  delay(50);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 보드에 내장된 컬러 TFT 화면에 직접 그림을 그립니다.\nTFT_eSPI tft = TFT_eSPI();\nint x = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setTextSize(2);\n  tft.setCursor(10, 10);\n  tft.println("Hello, ESP32!");\n}\n\nvoid loop() {\n  tft.fillRect(0, 40, tft.width(), 20, TFT_BLACK); // 이전 프레임 지우기\n  tft.fillCircle(x, 50, 8, TFT_CYAN);\n  x += 6;\n  if (x > tft.width()) x = 0;\n  delay(50);\n}`;
+  } else if (type === 'touch'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// Touch the 7" screen to draw dots where you press. Touch.pressed()/x()/y() are\n// this simulator's simplified stand-in for the real tft.getTouch(&x, &y) --\n// this simulator's transpiler cannot handle C++ pointer output parameters,\n// so it is exposed as three plain function calls instead.\nTFT_eSPI tft = TFT_eSPI();\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("Touch the screen to draw");\n}\n\nvoid loop() {\n  if (Touch.pressed()) {\n    int x = Touch.x();\n    int y = Touch.y();\n    tft.fillCircle(x, y, 4, TFT_YELLOW);\n    Serial.print("Touch at: ");\n    Serial.print(x);\n    Serial.print(", ");\n    Serial.println(y);\n  }\n  delay(20);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 7인치 화면을 누르면 그 자리에 점이 그려집니다. Touch.pressed()/x()/y()는 실제 하드웨어의\n// tft.getTouch(&x, &y)를 단순화한 것입니다 — 이 시뮬레이터의 코드 변환기는 C++ 포인터 출력\n// 매개변수를 지원하지 않으므로, 대신 값을 그냥 돌려주는 함수 3개로 단순화했습니다.\nTFT_eSPI tft = TFT_eSPI();\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("화면을 눌러서 그림을 그려보세요");\n}\n\nvoid loop() {\n  if (Touch.pressed()) {\n    int x = Touch.x();\n    int y = Touch.y();\n    tft.fillCircle(x, y, 4, TFT_YELLOW);\n    Serial.print("터치 위치: ");\n    Serial.print(x);\n    Serial.print(", ");\n    Serial.println(y);\n  }\n  delay(20);\n}`;
+  } else if (type === 'pwm32'){
+    editor.value = currentLang === 'en'
+      ? `// ESP32 hardware PWM (ledc): smoothly fades an LED's brightness up and down.\n#define LED_PIN 5\n#define PWM_CHANNEL 0\n#define PWM_FREQ 5000\n#define PWM_RES 8\n\nint brightness = 0;\nint fadeAmount = 5;\n\nvoid setup() {\n  Serial.begin(9600);\n  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RES);\n  ledcAttachPin(LED_PIN, PWM_CHANNEL);\n}\n\nvoid loop() {\n  ledcWrite(PWM_CHANNEL, brightness);\n  Serial.print("Brightness: ");\n  Serial.println(brightness);\n  brightness += fadeAmount;\n  if (brightness <= 0 || brightness >= 255) fadeAmount = -fadeAmount;\n  delay(50);\n}`
+      : `// ESP32 하드웨어 PWM(ledc)으로 LED 밝기를 서서히 밝게/어둡게 반복합니다.\n#define LED_PIN 5\n#define PWM_CHANNEL 0\n#define PWM_FREQ 5000\n#define PWM_RES 8\n\nint brightness = 0;\nint fadeAmount = 5;\n\nvoid setup() {\n  Serial.begin(9600);\n  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RES);\n  ledcAttachPin(LED_PIN, PWM_CHANNEL);\n}\n\nvoid loop() {\n  ledcWrite(PWM_CHANNEL, brightness);\n  Serial.print("밝기: ");\n  Serial.println(brightness);\n  brightness += fadeAmount;\n  if (brightness <= 0 || brightness >= 255) fadeAmount = -fadeAmount;\n  delay(50);\n}`;
+  } else if (type === 'prefs32'){
+    editor.value = currentLang === 'en'
+      ? `#include <Preferences.h>\n\n// Preferences(NVS): saves a value that survives across "flashes" -- each time you\n// recompile/upload this exact sketch again, the boot count keeps increasing instead\n// of resetting to 1 (in this simulator, the value lives in this board's memory and\n// resets only when the board itself is removed from the canvas).\nPreferences prefs;\nint bootCount = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  prefs.begin("storage");\n  bootCount = prefs.getInt("bootCount", 0);\n  bootCount++;\n  prefs.putInt("bootCount", bootCount);\n  Serial.print("Boot count: ");\n  Serial.println(bootCount);\n}\n\nvoid loop() {\n  delay(1000);\n}`
+      : `#include <Preferences.h>\n\n// Preferences(NVS): "플래싱"해도 사라지지 않고 유지되는 값을 저장합니다 -- 이 스케치를 다시\n// 컴파일/업로드할 때마다 부팅 횟수가 1로 리셋되지 않고 계속 늘어납니다(이 시뮬레이터에서는\n// 이 값이 보드 인스턴스의 메모리에 저장되며, 그 보드를 캔버스에서 삭제할 때만 초기화됩니다).\nPreferences prefs;\nint bootCount = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  prefs.begin("storage");\n  bootCount = prefs.getInt("bootCount", 0);\n  bootCount++;\n  prefs.putInt("bootCount", bootCount);\n  Serial.print("부팅 횟수: ");\n  Serial.println(bootCount);\n}\n\nvoid loop() {\n  delay(1000);\n}`;
+  } else if (type === 'wifi_display'){
+    editor.value = currentLang === 'en'
+      ? `#include <WiFi.h>\n#include <TFT_eSPI.h>\n\n// Shows the WiFi connection status and IP address directly on the board's TFT screen.\nTFT_eSPI tft = TFT_eSPI();\nconst char* ssid = "MySchoolWiFi";\nconst char* password = "12345678";\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setTextSize(2);\n  tft.setCursor(10, 10);\n  tft.println("Connecting WiFi...");\n  WiFi.begin(ssid, password);\n}\n\nvoid loop() {\n  tft.fillRect(0, 40, tft.width(), 60, TFT_BLACK);\n  tft.setCursor(10, 40);\n  if (WiFi.status() == WL_CONNECTED) {\n    tft.setTextColor(TFT_GREEN);\n    tft.println("WiFi Connected");\n    tft.setCursor(10, 60);\n    tft.setTextColor(TFT_WHITE);\n    tft.println(WiFi.localIP());\n  } else {\n    tft.setTextColor(TFT_YELLOW);\n    tft.println("Connecting...");\n  }\n  delay(500);\n}`
+      : `#include <WiFi.h>\n#include <TFT_eSPI.h>\n\n// WiFi 연결 상태와 IP 주소를 보드의 TFT 화면에 직접 표시합니다.\nTFT_eSPI tft = TFT_eSPI();\nconst char* ssid = "MySchoolWiFi";\nconst char* password = "12345678";\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setTextSize(2);\n  tft.setCursor(10, 10);\n  tft.println("WiFi에 연결 중...");\n  WiFi.begin(ssid, password);\n}\n\nvoid loop() {\n  tft.fillRect(0, 40, tft.width(), 60, TFT_BLACK);\n  tft.setCursor(10, 40);\n  if (WiFi.status() == WL_CONNECTED) {\n    tft.setTextColor(TFT_GREEN);\n    tft.println("WiFi 연결됨");\n    tft.setCursor(10, 60);\n    tft.setTextColor(TFT_WHITE);\n    tft.println(WiFi.localIP());\n  } else {\n    tft.setTextColor(TFT_YELLOW);\n    tft.println("연결 대기 중...");\n  }\n  delay(500);\n}`;
+  } else if (type === 'clock_display'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// A simple bouncing-ball animation that fills the whole TFT screen -- a good example\n// of "erase old position, then draw the new one" style animation.\nTFT_eSPI tft = TFT_eSPI();\nint x = 20, y = 20, dx = 4, dy = 3, r = 8;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n}\n\nvoid loop() {\n  tft.fillCircle(x, y, r, TFT_BLACK); // erase the previous position\n  x += dx;\n  y += dy;\n  if (x <= r || x >= tft.width() - r) dx = -dx;\n  if (y <= r || y >= tft.height() - r) dy = -dy;\n  tft.fillCircle(x, y, r, TFT_ORANGE);\n  delay(30);\n}`
+      : `#include <TFT_eSPI.h>\n\n// TFT 화면 전체를 튀어다니는 공 애니메이션 -- "이전 위치를 지우고 새 위치를 그리는" 방식의\n// 대표적인 애니메이션 예제입니다.\nTFT_eSPI tft = TFT_eSPI();\nint x = 20, y = 20, dx = 4, dy = 3, r = 8;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n}\n\nvoid loop() {\n  tft.fillCircle(x, y, r, TFT_BLACK); // 이전 위치 지우기\n  x += dx;\n  y += dy;\n  if (x <= r || x >= tft.width() - r) dx = -dx;\n  if (y <= r || y >= tft.height() - r) dy = -dy;\n  tft.fillCircle(x, y, r, TFT_ORANGE);\n  delay(30);\n}`;
+  } else if (type === 'touch_button'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// Tap the on-screen button to toggle it on (green) / off (grey).\nTFT_eSPI tft = TFT_eSPI();\nbool ledOn = false;\nbool wasPressed = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("Tap the button to toggle");\n  tft.fillRoundRect(180, 100, 120, 60, 10, TFT_DARKGREY);\n}\n\nvoid loop() {\n  bool pressed = Touch.pressed();\n  if (pressed && !wasPressed) {\n    int tx = Touch.x();\n    int ty = Touch.y();\n    if (tx > 180 && tx < 300 && ty > 100 && ty < 160) {\n      ledOn = !ledOn;\n      tft.fillRoundRect(180, 100, 120, 60, 10, ledOn ? TFT_GREEN : TFT_DARKGREY);\n      Serial.println(ledOn ? "Button ON" : "Button OFF");\n    }\n  }\n  wasPressed = pressed;\n  delay(30);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 화면의 버튼을 누르면 켜짐(초록)/꺼짐(회색)이 토글됩니다.\nTFT_eSPI tft = TFT_eSPI();\nbool ledOn = false;\nbool wasPressed = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("버튼을 눌러 켜고 꺼보세요");\n  tft.fillRoundRect(180, 100, 120, 60, 10, TFT_DARKGREY);\n}\n\nvoid loop() {\n  bool pressed = Touch.pressed();\n  if (pressed && !wasPressed) {\n    int tx = Touch.x();\n    int ty = Touch.y();\n    if (tx > 180 && tx < 300 && ty > 100 && ty < 160) {\n      ledOn = !ledOn;\n      tft.fillRoundRect(180, 100, 120, 60, 10, ledOn ? TFT_GREEN : TFT_DARKGREY);\n      Serial.println(ledOn ? "버튼 켜짐" : "버튼 꺼짐");\n    }\n  }\n  wasPressed = pressed;\n  delay(30);\n}`;
+  } else if (type === 'touch_slider'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// Drag your finger along the bar to set a value from 0 to 100, shown at top-left.\nTFT_eSPI tft = TFT_eSPI();\nint sliderX = 40, sliderW = 400, sliderY = 150;\nint knobX = 40;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("Drag the bar to set a value");\n  tft.fillRect(sliderX, sliderY, sliderW, 8, TFT_DARKGREY);\n}\n\nvoid loop() {\n  if (Touch.pressed()) {\n    int tx = Touch.x();\n    if (tx < sliderX) tx = sliderX;\n    if (tx > sliderX + sliderW) tx = sliderX + sliderW;\n    tft.fillCircle(knobX, sliderY + 4, 14, TFT_BLACK);\n    tft.fillRect(sliderX, sliderY, sliderW, 8, TFT_DARKGREY);\n    knobX = tx;\n    tft.fillCircle(knobX, sliderY + 4, 14, TFT_CYAN);\n    int value = map(knobX, sliderX, sliderX + sliderW, 0, 100);\n    tft.fillRect(10, 40, 200, 20, TFT_BLACK);\n    tft.setCursor(10, 40);\n    tft.print("Value: ");\n    tft.println(value);\n    Serial.print("Value: ");\n    Serial.println(value);\n  }\n  delay(30);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 막대를 손으로 드래그하면 왼쪽 위에 0~100 사이의 값이 표시됩니다.\nTFT_eSPI tft = TFT_eSPI();\nint sliderX = 40, sliderW = 400, sliderY = 150;\nint knobX = 40;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("막대를 드래그해서 값을 조절하세요");\n  tft.fillRect(sliderX, sliderY, sliderW, 8, TFT_DARKGREY);\n}\n\nvoid loop() {\n  if (Touch.pressed()) {\n    int tx = Touch.x();\n    if (tx < sliderX) tx = sliderX;\n    if (tx > sliderX + sliderW) tx = sliderX + sliderW;\n    tft.fillCircle(knobX, sliderY + 4, 14, TFT_BLACK);\n    tft.fillRect(sliderX, sliderY, sliderW, 8, TFT_DARKGREY);\n    knobX = tx;\n    tft.fillCircle(knobX, sliderY + 4, 14, TFT_CYAN);\n    int value = map(knobX, sliderX, sliderX + sliderW, 0, 100);\n    tft.fillRect(10, 40, 200, 20, TFT_BLACK);\n    tft.setCursor(10, 40);\n    tft.print("값: ");\n    tft.println(value);\n    Serial.print("값: ");\n    Serial.println(value);\n  }\n  delay(30);\n}`;
+  } else if (type === 'fireworks_r4'){
+    editor.value = currentLang === 'en'
+      ? `// R4 fireworks example -- R4 has no screen, so an external LED (pin D9, PWM) stands in for the show.\n// D9 slowly brightens for "liftoff", flickers rapidly and randomly for the "burst", then fades out as\n// the firework dies down -- the same launch -> burst -> fade rhythm, expressed purely through brightness.\nconst int ledPin = 9; // PWM-capable pin\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  Serial.println("Liftoff!");\n  for (int b = 0; b <= 255; b += 15) {\n    analogWrite(ledPin, b);\n    delay(20);\n  }\n\n  Serial.println("Boom! The firework burst!");\n  for (int i = 0; i < 15; i++) {\n    analogWrite(ledPin, random(80, 256));\n    delay(30);\n  }\n\n  analogWrite(ledPin, 0);\n  Serial.println("The firework has faded away.");\n  delay(random(400, 1200));\n}`
+      : `// R4 불꽃놀이 예제 -- R4는 화면이 없어서, 외부 LED(핀 D9, PWM)의 밝기 변화로 불꽃놀이를 표현합니다.\n// D9가 서서히 밝아지며 "발사"를, 순간적으로 무작위로 반짝이며 "폭발"을, 다시 서서히 어두워지며\n// 불꽃이 사그라드는 모습을 표현합니다 -- 발사->폭발->소멸의 리듬을 밝기 변화만으로 재현합니다.\nconst int ledPin = 9; // PWM 가능한 핀\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  Serial.println("발사!");\n  for (int b = 0; b <= 255; b += 15) {\n    analogWrite(ledPin, b);\n    delay(20);\n  }\n\n  Serial.println("펑! 불꽃이 터졌습니다!");\n  for (int i = 0; i < 15; i++) {\n    analogWrite(ledPin, random(80, 256));\n    delay(30);\n  }\n\n  analogWrite(ledPin, 0);\n  Serial.println("불꽃이 사그라들었습니다.");\n  delay(random(400, 1200));\n}`;
+  } else if (type === 'fireworks_display'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// Fireworks: a dot rises from the bottom-center, and once it reaches its target height it\n// bursts into several pieces that fly outward in every direction. Each burst picks a random color.\nTFT_eSPI tft = TFT_eSPI();\n\nint phase = 0; // 0 = rising, 1 = bursting\nint rocketX, rocketY, targetY;\nint burstColor;\n\nint px[8];\nint py[8];\nfloat vx[8];\nfloat vy[8];\nint life[8];\n\nint COLORS[6] = {TFT_RED, TFT_YELLOW, TFT_CYAN, TFT_MAGENTA, TFT_GREEN, TFT_ORANGE};\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  rocketX = tft.width() / 2;\n  rocketY = tft.height() - 2;\n  targetY = 10 + random(0, tft.height() / 2);\n}\n\nvoid loop() {\n  if (phase == 0) {\n    tft.fillCircle(rocketX, rocketY, 2, TFT_BLACK);\n    rocketY -= 4;\n    if (rocketY <= targetY) {\n      burstColor = COLORS[random(0, 6)];\n      for (int i = 0; i < 8; i++) {\n        float angle = (6.2832 / 8.0) * i;\n        float speed = 1.1 + (random(0, 10) / 10.0);\n        vx[i] = cos(angle) * speed;\n        vy[i] = sin(angle) * speed;\n        px[i] = rocketX;\n        py[i] = rocketY;\n        life[i] = 12 + random(0, 6);\n      }\n      phase = 1;\n    } else {\n      tft.fillCircle(rocketX, rocketY, 2, TFT_WHITE);\n    }\n    delay(30);\n    return;\n  }\n\n  bool anyAlive = false;\n  for (int i = 0; i < 8; i++) {\n    if (life[i] <= 0) continue;\n    tft.fillCircle(px[i], py[i], 2, TFT_BLACK);\n    px[i] += vx[i];\n    py[i] += vy[i];\n    vy[i] += 0.12;\n    life[i]--;\n    if (life[i] > 0) {\n      tft.fillCircle(px[i], py[i], 2, burstColor);\n      anyAlive = true;\n    }\n  }\n  if (!anyAlive) {\n    Serial.println("The firework has faded. Getting ready for the next launch...");\n    delay(300);\n    rocketX = random(20, tft.width() - 20);\n    rocketY = tft.height() - 2;\n    targetY = 10 + random(0, tft.height() / 2);\n    phase = 0;\n  }\n  delay(30);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 불꽃놀이: 화면 아래 중앙에서 점 하나가 솟아오르다가, 목표 높이에 이르면 여러 조각으로\n// 터져서 사방으로 퍼집니다. 터질 때마다 무작위로 다른 색을 사용합니다.\nTFT_eSPI tft = TFT_eSPI();\n\nint phase = 0; // 0 = 상승 중, 1 = 폭발 중\nint rocketX, rocketY, targetY;\nint burstColor;\n\nint px[8];\nint py[8];\nfloat vx[8];\nfloat vy[8];\nint life[8];\n\nint COLORS[6] = {TFT_RED, TFT_YELLOW, TFT_CYAN, TFT_MAGENTA, TFT_GREEN, TFT_ORANGE};\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  rocketX = tft.width() / 2;\n  rocketY = tft.height() - 2;\n  targetY = 10 + random(0, tft.height() / 2);\n}\n\nvoid loop() {\n  if (phase == 0) {\n    tft.fillCircle(rocketX, rocketY, 2, TFT_BLACK);\n    rocketY -= 4;\n    if (rocketY <= targetY) {\n      burstColor = COLORS[random(0, 6)];\n      for (int i = 0; i < 8; i++) {\n        float angle = (6.2832 / 8.0) * i;\n        float speed = 1.1 + (random(0, 10) / 10.0);\n        vx[i] = cos(angle) * speed;\n        vy[i] = sin(angle) * speed;\n        px[i] = rocketX;\n        py[i] = rocketY;\n        life[i] = 12 + random(0, 6);\n      }\n      phase = 1;\n    } else {\n      tft.fillCircle(rocketX, rocketY, 2, TFT_WHITE);\n    }\n    delay(30);\n    return;\n  }\n\n  bool anyAlive = false;\n  for (int i = 0; i < 8; i++) {\n    if (life[i] <= 0) continue;\n    tft.fillCircle(px[i], py[i], 2, TFT_BLACK);\n    px[i] += vx[i];\n    py[i] += vy[i];\n    vy[i] += 0.12;\n    life[i]--;\n    if (life[i] > 0) {\n      tft.fillCircle(px[i], py[i], 2, burstColor);\n      anyAlive = true;\n    }\n  }\n  if (!anyAlive) {\n    Serial.println("불꽃이 사그라들었습니다. 다음 발사 준비...");\n    delay(300);\n    rocketX = random(20, tft.width() - 20);\n    rocketY = tft.height() - 2;\n    targetY = 10 + random(0, tft.height() / 2);\n    phase = 0;\n  }\n  delay(30);\n}`;
+  } else if (type === 'fireworks_touch'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// Big-screen fireworks: a dot launches from a random spot along the bottom, then bursts into\n// exactly 7 pieces flying outward -- each piece gets its own random color.\nTFT_eSPI tft = TFT_eSPI();\n\nint phase = 0;\nint rocketX, rocketY, targetY;\n\nint px[7];\nint py[7];\nfloat vx[7];\nfloat vy[7];\nint life[7];\nint pcolor[7];\n\nint COLORS[6] = {TFT_RED, TFT_YELLOW, TFT_CYAN, TFT_MAGENTA, TFT_GREEN, TFT_ORANGE};\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  rocketX = random(60, tft.width() - 60);\n  rocketY = tft.height() - 2;\n  targetY = 40 + random(0, tft.height() / 2);\n}\n\nvoid loop() {\n  if (phase == 0) {\n    tft.fillCircle(rocketX, rocketY, 3, TFT_BLACK);\n    rocketY -= 6;\n    if (rocketY <= targetY) {\n      for (int i = 0; i < 7; i++) {\n        float angle = (6.2832 / 7.0) * i;\n        float speed = 1.6 + (random(0, 12) / 10.0);\n        vx[i] = cos(angle) * speed;\n        vy[i] = sin(angle) * speed;\n        px[i] = rocketX;\n        py[i] = rocketY;\n        life[i] = 18 + random(0, 8);\n        pcolor[i] = COLORS[random(0, 6)];\n      }\n      phase = 1;\n    } else {\n      tft.fillCircle(rocketX, rocketY, 3, TFT_WHITE);\n    }\n    delay(25);\n    return;\n  }\n\n  bool anyAlive = false;\n  for (int i = 0; i < 7; i++) {\n    if (life[i] <= 0) continue;\n    tft.fillCircle(px[i], py[i], 3, TFT_BLACK);\n    px[i] += vx[i];\n    py[i] += vy[i];\n    vy[i] += 0.1;\n    life[i]--;\n    if (life[i] > 0) {\n      tft.fillCircle(px[i], py[i], 3, pcolor[i]);\n      anyAlive = true;\n    }\n  }\n  if (!anyAlive) {\n    Serial.println("One firework faded. Picking the next launch spot...");\n    delay(250);\n    rocketX = random(60, tft.width() - 60);\n    rocketY = tft.height() - 2;\n    targetY = 40 + random(0, tft.height() / 2);\n    phase = 0;\n  }\n  delay(25);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 대형 화면 불꽃놀이: 화면 아래쪽의 무작위 위치에서 점이 솟아올라, 정확히 7개의 조각으로\n// 사방에 퍼집니다. 조각마다 색깔이 서로 다르게 무작위로 뽑힙니다.\nTFT_eSPI tft = TFT_eSPI();\n\nint phase = 0;\nint rocketX, rocketY, targetY;\n\nint px[7];\nint py[7];\nfloat vx[7];\nfloat vy[7];\nint life[7];\nint pcolor[7];\n\nint COLORS[6] = {TFT_RED, TFT_YELLOW, TFT_CYAN, TFT_MAGENTA, TFT_GREEN, TFT_ORANGE};\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  rocketX = random(60, tft.width() - 60);\n  rocketY = tft.height() - 2;\n  targetY = 40 + random(0, tft.height() / 2);\n}\n\nvoid loop() {\n  if (phase == 0) {\n    tft.fillCircle(rocketX, rocketY, 3, TFT_BLACK);\n    rocketY -= 6;\n    if (rocketY <= targetY) {\n      for (int i = 0; i < 7; i++) {\n        float angle = (6.2832 / 7.0) * i;\n        float speed = 1.6 + (random(0, 12) / 10.0);\n        vx[i] = cos(angle) * speed;\n        vy[i] = sin(angle) * speed;\n        px[i] = rocketX;\n        py[i] = rocketY;\n        life[i] = 18 + random(0, 8);\n        pcolor[i] = COLORS[random(0, 6)];\n      }\n      phase = 1;\n    } else {\n      tft.fillCircle(rocketX, rocketY, 3, TFT_WHITE);\n    }\n    delay(25);\n    return;\n  }\n\n  bool anyAlive = false;\n  for (int i = 0; i < 7; i++) {\n    if (life[i] <= 0) continue;\n    tft.fillCircle(px[i], py[i], 3, TFT_BLACK);\n    px[i] += vx[i];\n    py[i] += vy[i];\n    vy[i] += 0.1;\n    life[i]--;\n    if (life[i] > 0) {\n      tft.fillCircle(px[i], py[i], 3, pcolor[i]);\n      anyAlive = true;\n    }\n  }\n  if (!anyAlive) {\n    Serial.println("불꽃 하나가 사그라들었습니다. 다음 발사 위치를 고릅니다...");\n    delay(250);\n    rocketX = random(60, tft.width() - 60);\n    rocketY = tft.height() - 2;\n    targetY = 40 + random(0, tft.height() / 2);\n    phase = 0;\n  }\n  delay(25);\n}`;
+  } else if (type === 'color_draw'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// Tap a swatch at the top to change color, then draw below with that color.\nTFT_eSPI tft = TFT_eSPI();\n\nint COLORS[6] = {TFT_RED, TFT_YELLOW, TFT_GREEN, TFT_CYAN, TFT_BLUE, TFT_MAGENTA};\nint currentColor = TFT_YELLOW;\nint currentIndex = 1;\nbool wasPressed = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("Tap a color, then draw below");\n  for (int i = 0; i < 6; i++) {\n    tft.fillRect(20 + i * 70, 40, 55, 40, COLORS[i]);\n  }\n  tft.drawRect(20 + currentIndex * 70 - 2, 38, 59, 44, TFT_WHITE);\n}\n\nvoid loop() {\n  bool pressed = Touch.pressed();\n  if (pressed && !wasPressed) {\n    int tx = Touch.x();\n    int ty = Touch.y();\n    if (ty > 40 && ty < 80) {\n      int idx = ((tx - 20) / 70) | 0;\n      if (idx >= 0 && idx < 6) {\n        tft.drawRect(20 + currentIndex * 70 - 2, 38, 59, 44, TFT_BLACK);\n        currentIndex = idx;\n        currentColor = COLORS[idx];\n        tft.drawRect(20 + currentIndex * 70 - 2, 38, 59, 44, TFT_WHITE);\n        Serial.println("Color changed.");\n      }\n    }\n  }\n  if (pressed) {\n    int tx = Touch.x();\n    int ty = Touch.y();\n    if (ty > 100) {\n      tft.fillCircle(tx, ty, 5, currentColor);\n    }\n  }\n  wasPressed = pressed;\n  delay(20);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 위쪽 색상 칸을 터치해서 색을 바꾸고, 아래쪽을 터치해서 그 색으로 그림을 그립니다.\nTFT_eSPI tft = TFT_eSPI();\n\nint COLORS[6] = {TFT_RED, TFT_YELLOW, TFT_GREEN, TFT_CYAN, TFT_BLUE, TFT_MAGENTA};\nint currentColor = TFT_YELLOW;\nint currentIndex = 1;\nbool wasPressed = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("위에서 색을 고르고 아래에서 그려보세요");\n  for (int i = 0; i < 6; i++) {\n    tft.fillRect(20 + i * 70, 40, 55, 40, COLORS[i]);\n  }\n  tft.drawRect(20 + currentIndex * 70 - 2, 38, 59, 44, TFT_WHITE);\n}\n\nvoid loop() {\n  bool pressed = Touch.pressed();\n  if (pressed && !wasPressed) {\n    int tx = Touch.x();\n    int ty = Touch.y();\n    if (ty > 40 && ty < 80) {\n      int idx = ((tx - 20) / 70) | 0;\n      if (idx >= 0 && idx < 6) {\n        tft.drawRect(20 + currentIndex * 70 - 2, 38, 59, 44, TFT_BLACK);\n        currentIndex = idx;\n        currentColor = COLORS[idx];\n        tft.drawRect(20 + currentIndex * 70 - 2, 38, 59, 44, TFT_WHITE);\n        Serial.println("색상을 바꿨습니다.");\n      }\n    }\n  }\n  if (pressed) {\n    int tx = Touch.x();\n    int ty = Touch.y();\n    if (ty > 100) {\n      tft.fillCircle(tx, ty, 5, currentColor);\n    }\n  }\n  wasPressed = pressed;\n  delay(20);\n}`;
+  } else if (type === 'stopwatch'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// Tap anywhere to start/stop the stopwatch. Shows elapsed time as MM:SS.CC.\nTFT_eSPI tft = TFT_eSPI();\n\nbool running = false;\nbool wasPressed = false;\nunsigned long startedAt = 0;\nunsigned long elapsedMs = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setTextSize(2);\n  tft.setCursor(10, 10);\n  tft.println("Tap anywhere: start / stop");\n}\n\nvoid loop() {\n  bool pressed = Touch.pressed();\n  if (pressed && !wasPressed) {\n    if (running) {\n      elapsedMs += millis() - startedAt;\n      running = false;\n      Serial.println("Stopwatch stopped");\n    } else {\n      startedAt = millis();\n      running = true;\n      Serial.println("Stopwatch started");\n    }\n  }\n  wasPressed = pressed;\n\n  unsigned long showMs = elapsedMs;\n  if (running) showMs += millis() - startedAt;\n  int totalSec = (showMs / 1000) | 0;\n  int mm = (totalSec / 60) | 0;\n  int ss = totalSec % 60;\n  int cs = ((showMs % 1000) / 10) | 0;\n\n  tft.fillRect(40, 100, 400, 80, TFT_BLACK);\n  tft.setTextSize(6);\n  tft.setCursor(60, 110);\n  if (mm < 10) tft.print("0");\n  tft.print(mm);\n  tft.print(":");\n  if (ss < 10) tft.print("0");\n  tft.print(ss);\n  tft.print(".");\n  if (cs < 10) tft.print("0");\n  tft.print(cs);\n  tft.setTextSize(2);\n\n  delay(30);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 화면을 터치할 때마다 스톱워치가 시작/정지됩니다. 경과 시간을 분:초.1/100초로 보여줍니다.\nTFT_eSPI tft = TFT_eSPI();\n\nbool running = false;\nbool wasPressed = false;\nunsigned long startedAt = 0;\nunsigned long elapsedMs = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setTextSize(2);\n  tft.setCursor(10, 10);\n  tft.println("화면을 터치: 시작 / 정지");\n}\n\nvoid loop() {\n  bool pressed = Touch.pressed();\n  if (pressed && !wasPressed) {\n    if (running) {\n      elapsedMs += millis() - startedAt;\n      running = false;\n      Serial.println("스톱워치 정지");\n    } else {\n      startedAt = millis();\n      running = true;\n      Serial.println("스톱워치 시작");\n    }\n  }\n  wasPressed = pressed;\n\n  unsigned long showMs = elapsedMs;\n  if (running) showMs += millis() - startedAt;\n  int totalSec = (showMs / 1000) | 0;\n  int mm = (totalSec / 60) | 0;\n  int ss = totalSec % 60;\n  int cs = ((showMs % 1000) / 10) | 0;\n\n  tft.fillRect(40, 100, 400, 80, TFT_BLACK);\n  tft.setTextSize(6);\n  tft.setCursor(60, 110);\n  if (mm < 10) tft.print("0");\n  tft.print(mm);\n  tft.print(":");\n  if (ss < 10) tft.print("0");\n  tft.print(ss);\n  tft.print(".");\n  if (cs < 10) tft.print("0");\n  tft.print(cs);\n  tft.setTextSize(2);\n\n  delay(30);\n}`;
+  } else if (type === 'clock'){
+    editor.value = currentLang === 'en'
+      ? `#include <TFT_eSPI.h>\n\n// A digital clock showing the current time -- since a simulated MCU has no real-time clock\n// chip or NTP connection, this simulator simplifies it to hourNow()/minuteNow()/secondNow(),\n// which read the actual current time from the computer running the simulator.\nTFT_eSPI tft = TFT_eSPI();\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n}\n\nvoid loop() {\n  int h = hourNow();\n  int m = minuteNow();\n  int s = secondNow();\n\n  tft.fillRect(0, 0, tft.width(), tft.height(), TFT_BLACK);\n  tft.setTextColor(TFT_CYAN);\n  tft.setTextSize(8);\n  tft.setCursor(70, 110);\n  if (h < 10) tft.print("0");\n  tft.print(h);\n  tft.print(":");\n  if (m < 10) tft.print("0");\n  tft.print(m);\n  tft.print(":");\n  if (s < 10) tft.print("0");\n  tft.print(s);\n\n  Serial.print("Current time: ");\n  Serial.print(h);\n  Serial.print(":");\n  Serial.print(m);\n  Serial.print(":");\n  Serial.println(s);\n\n  delay(1000);\n}`
+      : `#include <TFT_eSPI.h>\n\n// 현재 시간을 보여주는 디지털 시계 -- 시뮬레이터의 가상 MCU에는 실제 RTC 칩이나 NTP 연결이\n// 없으므로, 이 시뮬레이터에서는 hourNow()/minuteNow()/secondNow()로 단순화해서 시뮬레이터를\n// 실행 중인 컴퓨터의 실제 현재 시각을 그대로 읽어옵니다.\nTFT_eSPI tft = TFT_eSPI();\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n}\n\nvoid loop() {\n  int h = hourNow();\n  int m = minuteNow();\n  int s = secondNow();\n\n  tft.fillRect(0, 0, tft.width(), tft.height(), TFT_BLACK);\n  tft.setTextColor(TFT_CYAN);\n  tft.setTextSize(8);\n  tft.setCursor(70, 110);\n  if (h < 10) tft.print("0");\n  tft.print(h);\n  tft.print(":");\n  if (m < 10) tft.print("0");\n  tft.print(m);\n  tft.print(":");\n  if (s < 10) tft.print("0");\n  tft.print(s);\n\n  Serial.print("현재 시간: ");\n  Serial.print(h);\n  Serial.print(":");\n  Serial.print(m);\n  Serial.print(":");\n  Serial.println(s);\n\n  delay(1000);\n}`;
   }
   refreshLineNumbers(editor, document.getElementById(`lineNum${board.toUpperCase()}`));
   executeCompilerPipeline(board);
@@ -4637,13 +5133,21 @@ function BOM_LABELS_FN(){ return {
   capacitor: tr('comp.capacitor.label'), 'capacitor-e': tr('comp.capacitorE.label'), inductor: tr('comp.inductor.label'),
   relay: tr('comp.relay.title'),
 }; }
+function boardTypeLabel(type){
+  return {
+    r4: tr('board.r4'), r3: tr('board.r3'),
+    esp32b: tr('board.esp32b'), esp32d: tr('board.esp32d'), esp32t: tr('board.esp32t'),
+  }[type] || type;
+}
 function openBomList(){
   const counts = {};
   document.querySelectorAll('.placed-component').forEach(el => {
     let key, label;
     if (el.classList.contains('board')){
-      key = el.dataset.board.startsWith('r3') ? 'board-r3' : 'board-r4';
-      label = el.dataset.board.startsWith('r3') ? 'Arduino Uno R3' : 'Arduino Uno R4 WiFi';
+      const inst = boardInstances[el.dataset.board];
+      const type = inst ? inst.type : (el.dataset.board.startsWith('r3') ? 'r3' : 'r4');
+      key = 'board-' + type;
+      label = boardTypeLabel(type);
     } else {
       const m = el.id.match(/^comp_(.+)_\d+$/);
       key = m ? m[1] : 'unknown';
@@ -4715,6 +5219,7 @@ const ICO_RLC = svgIcon(`<path d="M4 30q5-16 10 0t10 0" stroke="#5ad0e6" stroke-
 const ICO_RELAY = svgIcon(`<circle cx="14" cy="22" r="7" fill="none" stroke="#8b93a1" stroke-width="2"/><line x1="24" y1="14" x2="24" y2="30" stroke="#8b93a1" stroke-width="2"/><path d="M26 22 38 14M26 22h12" stroke="#ff5c5c" stroke-width="2.2" stroke-linecap="round"/>`);
 const ICO_CHIP_R4 = svgIcon(`<rect x="10" y="10" width="24" height="24" rx="3" fill="none" stroke="#3fd0d6" stroke-width="2"/><text x="22" y="26" font-size="9" fill="#3fd0d6" text-anchor="middle" font-family="monospace">R4</text>`);
 const ICO_CHIP_R3 = svgIcon(`<rect x="10" y="10" width="24" height="24" rx="3" fill="none" stroke="#ffb454" stroke-width="2"/><text x="22" y="26" font-size="9" fill="#ffb454" text-anchor="middle" font-family="monospace">R3</text>`);
+const ICO_CHIP_ESP32 = svgIcon(`<rect x="7" y="10" width="30" height="24" rx="3" fill="none" stroke="#3ddc84" stroke-width="2"/><text x="22" y="26" font-size="7.5" fill="#3ddc84" text-anchor="middle" font-family="monospace">ESP32</text>`);
 const ICO_WIFI = svgIcon(`<path d="M12 2 L4 18 M12 2 L20 18" stroke="#3fd0d6" stroke-width="2" fill="none"/><circle cx="12" cy="18" r="1.8" fill="#3fd0d6"/>`);
 const ICO_BT = svgIcon(`<path d="M22 8 L30 16 L22 24 M22 8 L22 36 M22 24 L30 32 M22 8 L14 16 L22 24 L14 32" stroke="#5aa9e6" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`);
 const ICO_SERIAL = svgIcon(`<rect x="6" y="14" width="14" height="16" rx="2" fill="none" stroke="#3ddc84" stroke-width="2"/><rect x="24" y="14" width="14" height="16" rx="2" fill="none" stroke="#ffb454" stroke-width="2"/><path d="M20 19h4M20 25h4" stroke="#8b93a1" stroke-width="2" marker-end="url(#a)"/>`);
@@ -4736,12 +5241,36 @@ const R4_EXAMPLE_DEFS = [
   { key: 'counter', titleKey: 'popup.exCounterD13' },
   { key: 'analog', titleKey: 'popup.exAnalog' },
   { key: 'relay', titleKey: 'popup.exRelay' },
+  { key: 'fireworks', titleKey: 'popup.exFireworksR4' },
 ];
 const R3_EXAMPLE_DEFS = [
   { key: 'counter', titleKey: 'popup.exCounter' },
   { key: 'register', titleKey: 'popup.exRegister' },
   { key: 'api_vs_register', titleKey: 'popup.exApiVsReg' },
   { key: 'relay', titleKey: 'popup.exRelay' },
+];
+// ESP32 코딩 예제 — 보드 종류별로 갤러리 탭을 따로 두어(DevKit/디스플레이/터치) 각 보드가
+// 실제로 할 수 있는 예제만 모아 보여줍니다.
+const ESP32B_EXAMPLE_DEFS = [
+  { key: 'counter32', board: 'esp32b', titleKey: 'popup.exCounterGpio2' },
+  { key: 'wifi', board: 'esp32b', titleKey: 'popup.exWifi' },
+  { key: 'pwm32', board: 'esp32b', titleKey: 'popup.exPwm32' },
+  { key: 'prefs32', board: 'esp32b', titleKey: 'popup.exPrefs32' },
+];
+const ESP32D_EXAMPLE_DEFS = [
+  { key: 'display', board: 'esp32d', titleKey: 'popup.exDisplay' },
+  { key: 'wifi_display', board: 'esp32d', titleKey: 'popup.exWifiDisplay' },
+  { key: 'clock_display', board: 'esp32d', titleKey: 'popup.exClockDisplay' },
+  { key: 'fireworks_display', board: 'esp32d', titleKey: 'popup.exFireworksDisplay' },
+];
+const ESP32T_EXAMPLE_DEFS = [
+  { key: 'touch', board: 'esp32t', titleKey: 'popup.exTouch' },
+  { key: 'touch_button', board: 'esp32t', titleKey: 'popup.exTouchButton' },
+  { key: 'touch_slider', board: 'esp32t', titleKey: 'popup.exTouchSlider' },
+  { key: 'fireworks_touch', board: 'esp32t', titleKey: 'popup.exFireworksTouch' },
+  { key: 'color_draw', board: 'esp32t', titleKey: 'popup.exColorDraw' },
+  { key: 'stopwatch', board: 'esp32t', titleKey: 'popup.exStopwatch' },
+  { key: 'clock', board: 'esp32t', titleKey: 'popup.exClock' },
 ];
 
 let galleryTab = 'exp';
@@ -4773,16 +5302,22 @@ function renderGalleryBody(){
   if (!body) return;
   let defs, icon, onClick;
   if (galleryTab === 'exp'){
-    defs = EXPERIMENT_DEFS; onClick = (key) => `runElectricalExperiment('${key}')`;
+    defs = EXPERIMENT_DEFS; onClick = (d) => `runElectricalExperiment('${d.key}')`;
   } else if (galleryTab === 'r4'){
-    defs = R4_EXAMPLE_DEFS; icon = ICO_CHIP_R4; onClick = (key) => `runCodeExample('r4','${key}')`;
+    defs = R4_EXAMPLE_DEFS; icon = ICO_CHIP_R4; onClick = (d) => `runCodeExample('r4','${d.key}')`;
   } else if (galleryTab === 'r3'){
-    defs = R3_EXAMPLE_DEFS; icon = ICO_CHIP_R3; onClick = (key) => `runCodeExample('r3','${key}')`;
+    defs = R3_EXAMPLE_DEFS; icon = ICO_CHIP_R3; onClick = (d) => `runCodeExample('r3','${d.key}')`;
+  } else if (galleryTab === 'esp32b'){
+    defs = ESP32B_EXAMPLE_DEFS; icon = ICO_CHIP_ESP32; onClick = (d) => `runCodeExample('${d.board}','${d.key}')`;
+  } else if (galleryTab === 'esp32d'){
+    defs = ESP32D_EXAMPLE_DEFS; icon = ICO_CHIP_ESP32; onClick = (d) => `runCodeExample('${d.board}','${d.key}')`;
+  } else if (galleryTab === 'esp32t'){
+    defs = ESP32T_EXAMPLE_DEFS; icon = ICO_CHIP_ESP32; onClick = (d) => `runCodeExample('${d.board}','${d.key}')`;
   } else {
-    defs = COMM_EXAMPLE_DEFS; icon = ICO_COMM; onClick = (key) => `runCommExample('${key}')`;
+    defs = COMM_EXAMPLE_DEFS; icon = ICO_COMM; onClick = (d) => `runCommExample('${d.key}')`;
   }
   body.innerHTML = defs.map(d => `
-    <div class="ep-card" onclick="${onClick(d.key)}">
+    <div class="ep-card" onclick="${onClick(d)}">
       <div class="ep-icon">${d.icon || icon}</div>
       <div class="ep-text">
         <div class="ep-title">${tr(d.titleKey)}</div>
@@ -4794,16 +5329,23 @@ function renderGalleryBody(){
 // 코딩 예제 카드: 해당 보드가 캔버스에 아직 없으면(R3는 기본 미배치) 하나 만들고, 예제 코드를
 // 불러온 뒤 그 보드의 코드 에디터 팝업을 열어줍니다.
 function runCodeExample(board, key){
+  // R4 불꽃놀이 예제는 화면이 없는 R4 특성상 외부 LED를 자동으로 배치·배선해야 하므로,
+  // 코드만 불러오는 일반 흐름 대신 전용 함수(runFireworksR4Example)로 넘깁니다.
+  if (board === 'r4' && key === 'fireworks'){ clearCanvasAll(); runFireworksR4Example(); return; }
   // 기본 내장 보드(r4/r3)의 예제를 고르면 "예제만 새로" 보이도록 캔버스를 완전히 비우고
   // 시작합니다. 사용자가 직접 여러 대 추가해 둔 보드(r4_2, r3_2, ...)는 예제 갤러리의 대상이
   // 아니라 사용자가 직접 구성한 회로이므로, 그 보드의 팝업 버튼을 눌렀을 때는 캔버스를
   // 비우지 않고 그 보드의 코드만 바꿔 올립니다.
-  const isDefaultBoard = board === 'r4' || board === 'r3';
+  const isDefaultBoard = board === 'r4' || board === 'r3' || ESP32_BOARD_TYPES.has(board);
   if (isDefaultBoard) clearCanvasAll();
-  if (board === 'r3' && !boardInstances['r3']) spawnBoard('r3');
+  if (isDefaultBoard && !boardInstances[board]) spawnBoard(board);
   loadExampleCode(board, key);
   openBoardPopup(board);
   ensureSimRunning(); // 이미 시뮬레이션 중이었다면 새로 올라간 코드로 자동 재시작합니다.
+  // 새로 만들어진 보드가 화면 밖(스크롤 아래)에 있어 안 보이는 경우가 많아 "예제를 눌렀는데
+  // 아무것도 안 보인다"는 혼란을 줄 수 있으므로, 그 보드 위치로 캔버스를 스크롤해줍니다.
+  const el = boardInstances[board] ? document.getElementById(boardInstances[board].domId) : null;
+  if (el) focusCanvasOn(parseFloat(el.style.left) || 0, parseFloat(el.style.top) || 0);
 }
 
 // 전기 실험 카드: 필요한 부품을 캔버스의 정해진 자리에 자동으로 배치·배선하고 시뮬레이션을
@@ -4934,6 +5476,9 @@ function runRlcPhaseExperiment(){
 // 그대로 불러와, 컴파일 → 실행 → 실제 스위칭까지 한 번에 확인할 수 있습니다.
 function runRelaySwitchExperiment(){
   const BX = 1500, BY = 140, key = 'relay-switch';
+  // R4가 더 이상 처음부터 캔버스에 있지 않으므로(팔레트로만 추가), 이 실험에 필요한 R4 보드가
+  // 없으면 여기서 먼저 만들어줍니다.
+  if (!boardInstances['r4']) spawnBoard('r4');
   const relay = placeExp('relay', key, BX, BY);
   const psu = placeExp('psu', key, BX + 200, BY + 150);
   document.querySelector(`#${psu} .psu-mode`).value = 'ac1';
@@ -4945,7 +5490,7 @@ function runRelaySwitchExperiment(){
   const mm = placeExp('multimeter', key, BX + 420, BY + 40);
   document.querySelector(`#${mm} .mm-mode`).value = 'acv';
 
-  const boardEl = document.getElementById('arduinoBoard');
+  const boardEl = document.getElementById(boardDomId['r4']);
   const d5v = boardEl ? boardEl.querySelector('[data-pin="5V"]') : null;
   const dgnd = boardEl ? boardEl.querySelector('[data-pin="GND_P1"]') : null;
   const d7 = boardEl ? boardEl.querySelector('[data-pin="D7"]') : null;
@@ -4964,6 +5509,24 @@ function runRelaySwitchExperiment(){
 
   document.getElementById(`${psu}_switch`).click();
   loadExampleCode('r4', 'relay');
+  ensureSimRunning();
+  focusCanvasOn(BX, BY);
+}
+
+// R4 불꽃놀이 예제: R4에는 화면이 없으므로, D9(PWM)에 외부 LED를 하나 달아 밝기 변화로
+// "발사 -> 폭발 -> 소멸"을 표현합니다. 실험(전기 실험)들과 똑같은 방식으로 LED를 자동 배치·배선합니다.
+function runFireworksR4Example(){
+  const BX = 1500, BY = 140, key = 'fireworks-r4';
+  if (!boardInstances['r4']) spawnBoard('r4');
+  const led = placeExp('led', key, BX, BY);
+  const boardEl = document.getElementById(boardDomId['r4']);
+  const d9 = boardEl ? boardEl.querySelector('[data-pin="D9"]') : null;
+  const dgnd = boardEl ? boardEl.querySelector('[data-pin="GND_P1"]') : null;
+  if (d9 && dgnd){
+    createWire(d9, document.querySelector(`#${led} [data-pin$="_A"]`));
+    createWire(dgnd, document.querySelector(`#${led} [data-pin$="_K"]`));
+  }
+  loadExampleCode('r4', 'fireworks_r4');
   ensureSimRunning();
   focusCanvasOn(BX, BY);
 }
@@ -5006,6 +5569,7 @@ function runCommExample(key){
 //   R4가 받는다"는 개념을 하나의 디지털 펄스로 단순화해 표현한 것입니다.
 function runWifiApR4Example(){
   const key = 'wifi-ap-r4';
+  if (!boardInstances['r4']) spawnBoard('r4');
   const r4El = document.getElementById(boardDomId['r4']);
   if (!r4El) return;
   const pos = elCanvasPos(r4El);
@@ -5037,6 +5601,7 @@ function runWifiApR4Example(){
 function runBtR3R4Example(){
   const key = 'bt-r3-r4';
   if (!boardInstances['r3']) spawnBoard('r3');
+  if (!boardInstances['r4']) spawnBoard('r4');
   const r3El = document.getElementById(boardDomId['r3']);
   const r4El = document.getElementById(boardDomId['r4']);
   if (!r3El || !r4El) return;
@@ -5071,6 +5636,7 @@ function runBtR3R4Example(){
 function runSerialR3R4Example(){
   const key = 'serial-r3-r4';
   if (!boardInstances['r3']) spawnBoard('r3');
+  if (!boardInstances['r4']) spawnBoard('r4');
   const r3El = document.getElementById(boardDomId['r3']);
   const r4El = document.getElementById(boardDomId['r4']);
   if (!r3El || !r4El) return;
@@ -5141,9 +5707,7 @@ function pinDescriptorFor(pinEl, boardIndexByDomId, compIndexById){
   const boardEl = pinEl.closest('.board');
   if (boardEl){
     const key = boardEl.dataset.board;
-    return key === 'r4'
-      ? { kind: 'board', board: 'base', pin: pinEl.dataset.pin }
-      : { kind: 'board', board: boardIndexByDomId[boardEl.id], pin: pinEl.dataset.pin };
+    return { kind: 'board', board: boardIndexByDomId[boardEl.id], pin: pinEl.dataset.pin };
   }
   const compEl = pinEl.closest('.placed-component');
   if (!compEl) return null;
@@ -5152,7 +5716,8 @@ function pinDescriptorFor(pinEl, boardIndexByDomId, compIndexById){
 function resolvePinDescriptor(desc, boardDomIdByIndex, compIdByIndex){
   if (!desc) return null;
   if (desc.kind === 'board'){
-    const domId = desc.board === 'base' ? 'arduinoBoard' : boardDomIdByIndex[desc.board];
+    // 'base'는 예전 저장 파일(R4가 항상 존재한다고 가정하던 버전)과의 호환용입니다.
+    const domId = desc.board === 'base' ? boardDomId['r4'] : boardDomIdByIndex[desc.board];
     const boardEl = domId ? document.getElementById(domId) : null;
     return boardEl ? boardEl.querySelector(`[data-pin="${desc.pin}"]`) : null;
   }
@@ -5162,10 +5727,13 @@ function resolvePinDescriptor(desc, boardDomIdByIndex, compIdByIndex){
 }
 
 function serializeProject(){
-  const extraBoards = Object.values(boardInstances).filter(b => b.key !== 'r4');
+  // R4도 이제 R3/ESP32처럼 "있을 수도, 없을 수도 있는" 보드라서, boardInstances에 있는 그대로
+  // 전부 저장합니다(예전엔 R4가 항상 있다고 가정해 따로 baseR4Code로만 저장했습니다 — 그 옛
+  // 저장 파일은 restoreProjectState에서 계속 읽을 수 있게 남겨둡니다).
+  const allBoards = Object.values(boardInstances);
   const boardIndexByDomId = {};
-  extraBoards.forEach((b, i) => { boardIndexByDomId[b.domId] = i; });
-  const boards = extraBoards.map(b => {
+  allBoards.forEach((b, i) => { boardIndexByDomId[b.domId] = i; });
+  const boards = allBoards.map(b => {
     const editor = document.getElementById(`codeEditor${b.key.toUpperCase()}`);
     const el = document.getElementById(b.domId);
     return { type: b.type, left: el ? el.style.left : '', top: el ? el.style.top : '', code: editor ? editor.value : '' };
@@ -5192,8 +5760,7 @@ function serializeProject(){
   }).filter(Boolean);
 
   return {
-    app: 'k-arduino-sim', version: 1, savedAt: new Date().toISOString(), lang: currentLang,
-    baseR4Code: document.getElementById('codeEditorR4') ? document.getElementById('codeEditorR4').value : '',
+    app: 'k-arduino-sim', version: 2, savedAt: new Date().toISOString(), lang: currentLang,
     boards, components, wires: wireList,
   };
 }
@@ -5237,6 +5804,12 @@ function restoreProjectState(data){
     boardDomIdByIndex.push(inst ? inst.domId : null);
   });
 
+  // v1 저장 파일(R4가 항상 캔버스에 있다고 가정하던 버전) 호환: baseR4Code 필드가 있다는 것
+  // 자체가 옛 파일이라는 뜻이고, 그 파일의 배선 중에는 R4 핀에 연결된 것(from/to.board==='base')도
+  // 있을 수 있으므로, 코드가 비어 있어도 R4는 먼저 만들어둡니다.
+  if ('baseR4Code' in data && !boardInstances['r4']){
+    spawnBoard('r4');
+  }
   if (data.baseR4Code){
     const editor = document.getElementById('codeEditorR4');
     if (editor){
