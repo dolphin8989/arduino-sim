@@ -119,10 +119,17 @@
   .zoom-badge button{width:22px; height:22px; border-radius:5px; border:1px solid var(--border-strong); background:#20242c; color:var(--text); cursor:pointer; font-size:.8rem; line-height:1; pointer-events:auto;}
   .zoom-badge button:hover{background:#2a2f38;}
   .zoom-badge span{min-width:38px; text-align:center;}
-  svg#wireCanvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5; overflow:visible;}
+  /* 전선이 보드/부품 "뒤"로 지나가 보이게, 배치된 부품(.placed-component, z-index:3)보다
+     낮은 z-index를 줍니다 — 부품이 없는 빈 구간에서는 그대로 보이고 클릭도 되지만, 부품(특히
+     보드) 밑을 지나는 구간은 그 부품에 가려집니다. */
+  svg#wireCanvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2; overflow:visible;}
   .wire-path{fill:none; stroke-width:3; stroke-linecap:round; pointer-events:stroke; cursor:pointer; opacity:.92;}
   .wire-path:hover{opacity:1; filter:drop-shadow(0 0 3px rgba(255,255,255,.5));}
   .wire-path.wire-selected{opacity:1; filter:drop-shadow(0 0 5px rgba(255,255,255,.85));}
+  /* 꺾임점 핸들은 선(wire-path)과 다른 SVG(wireHandleCanvas)에 그려서, 부품/보드(z-index:3~4)보다
+     위(z-index:5)에 오게 합니다 — 선 자체는 부품 뒤로 숨어도, 핸들은 부품 위에 있어도 항상
+     손으로 잡아 드래그할 수 있어야 하기 때문입니다. */
+  svg#wireHandleCanvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5; overflow:visible;}
   .wire-point-handle{fill:#12151a; stroke-width:2; cursor:grab; pointer-events:all;}
   .wire-point-handle:hover{fill:#fff; r:6;}
 
@@ -827,6 +834,7 @@
   <div class="canvas-area" id="canvasArea">
     <div class="canvas-inner" id="canvasInner">
       <svg id="wireCanvas"></svg>
+      <svg id="wireHandleCanvas"></svg>
     </div>
     <div class="zoom-badge">
       <button onclick="zoomCanvasBy(1/1.15)" data-i18n-title="zoom.outTitle" title="축소">−</button>
@@ -1190,7 +1198,7 @@ const STRINGS = {
   "popup.exClockDisplay": { ko: "TFT에 튀는 공 애니메이션", en: "Bouncing Ball Animation on TFT" },
   "popup.exTouchButton": { ko: "터치로 켜고 끄는 버튼", en: "Tap-to-Toggle Touch Button" },
   "popup.exTouchSlider": { ko: "드래그로 값 조절하는 슬라이더", en: "Drag-to-Set Touch Slider" },
-  "popup.exFireworksR4": { ko: "🎆 불꽃놀이 (외부 LED)", en: "🎆 Fireworks (External LED)" },
+  "popup.exFireworksR4": { ko: "🎆 불꽃놀이 (내장 매트릭스)", en: "🎆 Fireworks (Built-in Matrix)" },
   "popup.exFireworksDisplay": { ko: "🎆 TFT 불꽃놀이", en: "🎆 Fireworks on TFT" },
   "popup.exFireworksTouch": { ko: "🎆 대형 화면 불꽃놀이", en: "🎆 Fireworks on the Big Screen" },
   "popup.exColorDraw": { ko: "터치로 색상 바꿔가며 그림 그리기", en: "Touch-Draw with Changing Colors" },
@@ -3386,7 +3394,9 @@ function updateAllWires(){ wires.forEach(updateWirePosition); }
 // 각 꺾임점마다 화면에 작은 원(핸들)을 그려서 드래그로 옮기거나 더블클릭으로 지울 수 있게
 // 합니다. points 배열과 개수가 항상 맞도록, 부족하면 새로 만들고 남으면 지웁니다.
 function syncWirePointHandles(w){
-  const svg = document.getElementById('wireCanvas');
+  // 핸들은 wireCanvas가 아니라 wireHandleCanvas에 그립니다 — 선은 부품 뒤로 숨어야 하지만,
+  // 핸들은 부품 위에서도 항상 드래그로 잡을 수 있어야 하기 때문입니다(위 CSS 주석 참고).
+  const svg = document.getElementById('wireHandleCanvas');
   while (w.pointEls.length < w.points.length){
     const idx = w.pointEls.length;
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -5090,10 +5100,10 @@ function loadExampleCode(board, type){
     editor.value = currentLang === 'en'
       ? `#include <TFT_eSPI.h>\n\n// Drag your finger along the bar to set a value from 0 to 100, shown at top-left.\nTFT_eSPI tft = TFT_eSPI();\nint sliderX = 40, sliderW = 400, sliderY = 150;\nint knobX = 40;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("Drag the bar to set a value");\n  tft.fillRect(sliderX, sliderY, sliderW, 8, TFT_DARKGREY);\n}\n\nvoid loop() {\n  if (Touch.pressed()) {\n    int tx = Touch.x();\n    if (tx < sliderX) tx = sliderX;\n    if (tx > sliderX + sliderW) tx = sliderX + sliderW;\n    tft.fillCircle(knobX, sliderY + 4, 14, TFT_BLACK);\n    tft.fillRect(sliderX, sliderY, sliderW, 8, TFT_DARKGREY);\n    knobX = tx;\n    tft.fillCircle(knobX, sliderY + 4, 14, TFT_CYAN);\n    int value = map(knobX, sliderX, sliderX + sliderW, 0, 100);\n    tft.fillRect(10, 40, 200, 20, TFT_BLACK);\n    tft.setCursor(10, 40);\n    tft.print("Value: ");\n    tft.println(value);\n    Serial.print("Value: ");\n    Serial.println(value);\n  }\n  delay(30);\n}`
       : `#include <TFT_eSPI.h>\n\n// 막대를 손으로 드래그하면 왼쪽 위에 0~100 사이의 값이 표시됩니다.\nTFT_eSPI tft = TFT_eSPI();\nint sliderX = 40, sliderW = 400, sliderY = 150;\nint knobX = 40;\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  tft.setTextColor(TFT_WHITE);\n  tft.setCursor(10, 10);\n  tft.println("막대를 드래그해서 값을 조절하세요");\n  tft.fillRect(sliderX, sliderY, sliderW, 8, TFT_DARKGREY);\n}\n\nvoid loop() {\n  if (Touch.pressed()) {\n    int tx = Touch.x();\n    if (tx < sliderX) tx = sliderX;\n    if (tx > sliderX + sliderW) tx = sliderX + sliderW;\n    tft.fillCircle(knobX, sliderY + 4, 14, TFT_BLACK);\n    tft.fillRect(sliderX, sliderY, sliderW, 8, TFT_DARKGREY);\n    knobX = tx;\n    tft.fillCircle(knobX, sliderY + 4, 14, TFT_CYAN);\n    int value = map(knobX, sliderX, sliderX + sliderW, 0, 100);\n    tft.fillRect(10, 40, 200, 20, TFT_BLACK);\n    tft.setCursor(10, 40);\n    tft.print("값: ");\n    tft.println(value);\n    Serial.print("값: ");\n    Serial.println(value);\n  }\n  delay(30);\n}`;
-  } else if (type === 'fireworks_r4'){
+  } else if (type === 'fireworks'){
     editor.value = currentLang === 'en'
-      ? `// R4 fireworks example -- R4 has no screen, so an external LED (pin D9, PWM) stands in for the show.\n// D9 slowly brightens for "liftoff", flickers rapidly and randomly for the "burst", then fades out as\n// the firework dies down -- the same launch -> burst -> fade rhythm, expressed purely through brightness.\nconst int ledPin = 9; // PWM-capable pin\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  Serial.println("Liftoff!");\n  for (int b = 0; b <= 255; b += 15) {\n    analogWrite(ledPin, b);\n    delay(20);\n  }\n\n  Serial.println("Boom! The firework burst!");\n  for (int i = 0; i < 15; i++) {\n    analogWrite(ledPin, random(80, 256));\n    delay(30);\n  }\n\n  analogWrite(ledPin, 0);\n  Serial.println("The firework has faded away.");\n  delay(random(400, 1200));\n}`
-      : `// R4 불꽃놀이 예제 -- R4는 화면이 없어서, 외부 LED(핀 D9, PWM)의 밝기 변화로 불꽃놀이를 표현합니다.\n// D9가 서서히 밝아지며 "발사"를, 순간적으로 무작위로 반짝이며 "폭발"을, 다시 서서히 어두워지며\n// 불꽃이 사그라드는 모습을 표현합니다 -- 발사->폭발->소멸의 리듬을 밝기 변화만으로 재현합니다.\nconst int ledPin = 9; // PWM 가능한 핀\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  Serial.println("발사!");\n  for (int b = 0; b <= 255; b += 15) {\n    analogWrite(ledPin, b);\n    delay(20);\n  }\n\n  Serial.println("펑! 불꽃이 터졌습니다!");\n  for (int i = 0; i < 15; i++) {\n    analogWrite(ledPin, random(80, 256));\n    delay(30);\n  }\n\n  analogWrite(ledPin, 0);\n  Serial.println("불꽃이 사그라들었습니다.");\n  delay(random(400, 1200));\n}`;
+      ? `#include <Arduino_LED_Matrix.h>\n\n// Fireworks on the R4's built-in 8x12 LED matrix: a single lit pixel rises up a column, then\n// bursts into an expanding diamond-shaped ring of pixels (using Manhattan distance) before\n// clearing and launching again from a new random column.\nArduinoLEDMatrix matrix;\n\nint phase = 0; // 0 = rising, 1 = bursting\nint col = 5;\nint row = 7;\nint targetRow;\nint burstRadius = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  matrix.begin();\n  targetRow = random(0, 3);\n}\n\nvoid loop() {\n  int frame[8][12];\n\n  if (phase == 0) {\n    frame[row][col] = 1;\n    matrix.renderBitmap(frame);\n    row--;\n    if (row <= targetRow) {\n      burstRadius = 0;\n      phase = 1;\n    }\n    delay(80);\n    return;\n  }\n\n  for (int r = 0; r < 8; r++) {\n    for (int c = 0; c < 12; c++) {\n      int dist = abs(r - targetRow) + abs(c - col);\n      if (dist == burstRadius) frame[r][c] = 1;\n    }\n  }\n  matrix.renderBitmap(frame);\n  Serial.print("Boom! burst radius ");\n  Serial.println(burstRadius);\n  burstRadius++;\n  delay(120);\n\n  if (burstRadius > 4) {\n    int blank[8][12];\n    matrix.renderBitmap(blank);\n    delay(300);\n    col = random(2, 10);\n    row = 7;\n    targetRow = random(0, 3);\n    phase = 0;\n  }\n}`
+      : `#include <Arduino_LED_Matrix.h>\n\n// R4에 내장된 8x12 LED 매트릭스로 표현하는 불꽃놀이입니다. 켜진 점 하나가 한 열을 따라\n// 위로 올라가다가, 목표 높이에 이르면 (Manhattan 거리 기준으로) 점점 커지는 다이아몬드\n// 모양의 테두리로 "펑" 터집니다. 그 후 화면을 지우고 새로운 무작위 열에서 다시 발사합니다.\nArduinoLEDMatrix matrix;\n\nint phase = 0; // 0 = 상승 중, 1 = 폭발 중\nint col = 5;\nint row = 7;\nint targetRow;\nint burstRadius = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  matrix.begin();\n  targetRow = random(0, 3);\n}\n\nvoid loop() {\n  int frame[8][12];\n\n  if (phase == 0) {\n    frame[row][col] = 1;\n    matrix.renderBitmap(frame);\n    row--;\n    if (row <= targetRow) {\n      burstRadius = 0;\n      phase = 1;\n    }\n    delay(80);\n    return;\n  }\n\n  for (int r = 0; r < 8; r++) {\n    for (int c = 0; c < 12; c++) {\n      int dist = abs(r - targetRow) + abs(c - col);\n      if (dist == burstRadius) frame[r][c] = 1;\n    }\n  }\n  matrix.renderBitmap(frame);\n  Serial.print("펑! 폭발 반경 ");\n  Serial.println(burstRadius);\n  burstRadius++;\n  delay(120);\n\n  if (burstRadius > 4) {\n    int blank[8][12];\n    matrix.renderBitmap(blank);\n    delay(300);\n    col = random(2, 10);\n    row = 7;\n    targetRow = random(0, 3);\n    phase = 0;\n  }\n}`;
   } else if (type === 'fireworks_display'){
     editor.value = currentLang === 'en'
       ? `#include <TFT_eSPI.h>\n\n// Fireworks: a dot rises from the bottom-center, and once it reaches its target height it\n// bursts into several pieces that fly outward in every direction. Each burst picks a random color.\nTFT_eSPI tft = TFT_eSPI();\n\nint phase = 0; // 0 = rising, 1 = bursting\nint rocketX, rocketY, targetY;\nint burstColor;\n\nint px[8];\nint py[8];\nfloat vx[8];\nfloat vy[8];\nint life[8];\n\nint COLORS[6] = {TFT_RED, TFT_YELLOW, TFT_CYAN, TFT_MAGENTA, TFT_GREEN, TFT_ORANGE};\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n  rocketX = tft.width() / 2;\n  rocketY = tft.height() - 2;\n  targetY = 10 + random(0, tft.height() / 2);\n}\n\nvoid loop() {\n  if (phase == 0) {\n    tft.fillCircle(rocketX, rocketY, 2, TFT_BLACK);\n    rocketY -= 4;\n    if (rocketY <= targetY) {\n      burstColor = COLORS[random(0, 6)];\n      for (int i = 0; i < 8; i++) {\n        float angle = (6.2832 / 8.0) * i;\n        float speed = 1.1 + (random(0, 10) / 10.0);\n        vx[i] = cos(angle) * speed;\n        vy[i] = sin(angle) * speed;\n        px[i] = rocketX;\n        py[i] = rocketY;\n        life[i] = 12 + random(0, 6);\n      }\n      phase = 1;\n    } else {\n      tft.fillCircle(rocketX, rocketY, 2, TFT_WHITE);\n    }\n    delay(30);\n    return;\n  }\n\n  bool anyAlive = false;\n  for (int i = 0; i < 8; i++) {\n    if (life[i] <= 0) continue;\n    tft.fillCircle(px[i], py[i], 2, TFT_BLACK);\n    px[i] += vx[i];\n    py[i] += vy[i];\n    vy[i] += 0.12;\n    life[i]--;\n    if (life[i] > 0) {\n      tft.fillCircle(px[i], py[i], 2, burstColor);\n      anyAlive = true;\n    }\n  }\n  if (!anyAlive) {\n    Serial.println("The firework has faded. Getting ready for the next launch...");\n    delay(300);\n    rocketX = random(20, tft.width() - 20);\n    rocketY = tft.height() - 2;\n    targetY = 10 + random(0, tft.height() / 2);\n    phase = 0;\n  }\n  delay(30);\n}`
@@ -5329,9 +5339,6 @@ function renderGalleryBody(){
 // 코딩 예제 카드: 해당 보드가 캔버스에 아직 없으면(R3는 기본 미배치) 하나 만들고, 예제 코드를
 // 불러온 뒤 그 보드의 코드 에디터 팝업을 열어줍니다.
 function runCodeExample(board, key){
-  // R4 불꽃놀이 예제는 화면이 없는 R4 특성상 외부 LED를 자동으로 배치·배선해야 하므로,
-  // 코드만 불러오는 일반 흐름 대신 전용 함수(runFireworksR4Example)로 넘깁니다.
-  if (board === 'r4' && key === 'fireworks'){ clearCanvasAll(); runFireworksR4Example(); return; }
   // 기본 내장 보드(r4/r3)의 예제를 고르면 "예제만 새로" 보이도록 캔버스를 완전히 비우고
   // 시작합니다. 사용자가 직접 여러 대 추가해 둔 보드(r4_2, r3_2, ...)는 예제 갤러리의 대상이
   // 아니라 사용자가 직접 구성한 회로이므로, 그 보드의 팝업 버튼을 눌렀을 때는 캔버스를
@@ -5509,24 +5516,6 @@ function runRelaySwitchExperiment(){
 
   document.getElementById(`${psu}_switch`).click();
   loadExampleCode('r4', 'relay');
-  ensureSimRunning();
-  focusCanvasOn(BX, BY);
-}
-
-// R4 불꽃놀이 예제: R4에는 화면이 없으므로, D9(PWM)에 외부 LED를 하나 달아 밝기 변화로
-// "발사 -> 폭발 -> 소멸"을 표현합니다. 실험(전기 실험)들과 똑같은 방식으로 LED를 자동 배치·배선합니다.
-function runFireworksR4Example(){
-  const BX = 1500, BY = 140, key = 'fireworks-r4';
-  if (!boardInstances['r4']) spawnBoard('r4');
-  const led = placeExp('led', key, BX, BY);
-  const boardEl = document.getElementById(boardDomId['r4']);
-  const d9 = boardEl ? boardEl.querySelector('[data-pin="D9"]') : null;
-  const dgnd = boardEl ? boardEl.querySelector('[data-pin="GND_P1"]') : null;
-  if (d9 && dgnd){
-    createWire(d9, document.querySelector(`#${led} [data-pin$="_A"]`));
-    createWire(dgnd, document.querySelector(`#${led} [data-pin$="_K"]`));
-  }
-  loadExampleCode('r4', 'fireworks_r4');
   ensureSimRunning();
   focusCanvasOn(BX, BY);
 }
