@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.3</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -42,9 +42,9 @@
 
   /* Header */
   header{
-    height:52px; flex:0 0 auto; background:var(--bg-panel);
+    min-height:52px; flex:0 0 auto; background:var(--bg-panel);
     border-bottom:1px solid var(--border);
-    display:flex; align-items:center; justify-content:space-between; padding:0 18px; z-index:20;
+    display:flex; align-items:center; justify-content:space-between; padding:8px 18px; z-index:20; flex-wrap:wrap; row-gap:6px;
   }
   .brand{display:flex; align-items:center; gap:10px;}
   .brand-mark{
@@ -55,7 +55,7 @@
   .brand-text{display:flex; flex-direction:column; line-height:1.15;}
   .brand-text b{font-size:.92rem; font-weight:600; letter-spacing:.2px;}
   .brand-text span{font-size:.68rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
-  .toolbar{display:flex; gap:8px; align-items:center;}
+  .toolbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; row-gap:6px;}
   .lang-select{
     background:var(--bg-panel-2); color:var(--text); border:1px solid var(--border-strong); border-radius:6px;
     padding:6px 8px; font-size:.78rem; cursor:pointer; font-family:inherit; margin-right:2px;
@@ -75,8 +75,8 @@
   .btn.ghost.active{background:var(--teal); color:#03191b; border-color:var(--teal);}
   .ds-menu-wrap{position:relative;}
   .ds-menu{
-    position:absolute; top:calc(100% + 4px); left:0; min-width:230px; background:var(--bg-panel-2);
-    border:1px solid var(--border-strong); border-radius:8px; padding:6px; z-index:60;
+    position:absolute; top:calc(100% + 4px); right:0; min-width:230px; background:var(--bg-panel-2);
+    border:1px solid var(--border-strong); border-radius:8px; padding:6px; z-index:500;
     box-shadow:0 10px 24px rgba(0,0,0,.45); display:flex; flex-direction:column; gap:2px;
   }
   .ds-menu a{display:block; padding:8px 10px; border-radius:5px; color:var(--text); text-decoration:none; font-size:.78rem;}
@@ -120,6 +120,8 @@
   .wire-path{fill:none; stroke-width:3; stroke-linecap:round; pointer-events:stroke; cursor:pointer; opacity:.92;}
   .wire-path:hover{opacity:1; filter:drop-shadow(0 0 3px rgba(255,255,255,.5));}
   .wire-path.wire-selected{opacity:1; filter:drop-shadow(0 0 5px rgba(255,255,255,.85));}
+  .wire-point-handle{fill:#12151a; stroke-width:2; cursor:grab; pointer-events:all;}
+  .wire-point-handle:hover{fill:#fff; r:6;}
 
   /* 전선 클릭 시 뜨는 색상 편집 팝오버 */
   .wire-editor{
@@ -138,6 +140,16 @@
     border-radius:5px; padding:4px 8px; cursor:pointer;
   }
   .wire-editor .we-del:hover{background:#3a1a17;}
+
+  /* 저장/불러오기 결과 등을 짧게 알려주는 토스트 메시지 */
+  .toast{
+    position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(8px);
+    background:var(--bg-panel-2); border:1px solid var(--border-strong); color:var(--text);
+    padding:9px 16px; border-radius:8px; font-size:.78rem; box-shadow:0 6px 20px rgba(0,0,0,.4);
+    z-index:999; opacity:0; transition:opacity .18s ease, transform .18s ease; pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast.error{border-color:#5a2620; color:#ff8f80;}
 
   .placed-component{position:absolute; z-index:3; cursor:move;}
   .placed-component.selected-comp{outline:2px dashed var(--focus); outline-offset:5px; border-radius:6px; z-index:4;}
@@ -606,7 +618,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.3</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -618,7 +630,6 @@
     <button class="btn primary" onclick="openBoardPopup('r4')">💻 <span data-i18n="toolbar.editor">코드 에디터 &amp; 컴파일러</span></button>
     <button class="btn ghost" onclick="clearSerial()" data-i18n="toolbar.clearConsole">콘솔 지우기</button>
     <button class="btn ghost" onclick="openBomList()" data-i18n="toolbar.bom">BOM List</button>
-    <button class="btn ghost" id="btnWireStyle" onclick="toggleWireRouteStyle()" data-i18n-title="toolbar.wireStyleTitle" title="전선을 직선으로 보거나, 5분할 직각선으로 깔끔하게 정리합니다" data-i18n="toolbar.wireStyleStraight">〰 직선 배선</button>
     <button class="btn ghost" id="btnGallery" onclick="toggleExampleGallery()" data-i18n="toolbar.gallery">🗂 예제 갤러리</button>
     <div class="ds-menu-wrap" id="dsMenuWrap">
       <button class="btn ghost" onclick="toggleDatasheetMenu(event)" data-i18n="toolbar.datasheet">📄 CPU 데이터시트</button>
@@ -627,6 +638,9 @@
         <a href="https://docs.arduino.cc/resources/datasheets/ra4m1-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r4">R4 (RA4M1) 데이터시트</a>
       </div>
     </div>
+    <button class="btn ghost" onclick="saveProjectToFile()" data-i18n="toolbar.save">💾 저장</button>
+    <button class="btn ghost" onclick="document.getElementById('projectFileInput').click()" data-i18n="toolbar.open">📂 열기</button>
+    <input type="file" id="projectFileInput" accept=".json,application/json" hidden onchange="handleProjectFileSelected(this)">
     <button class="btn primary" id="btnSim" onclick="toggleSimulation()" data-i18n="toolbar.simStart">▶ 시뮬레이션 시작</button>
   </div>
 </header>
@@ -766,6 +780,7 @@
       <b data-i18n="hint.title">동작 안내:</b><br>
       • <span data-i18n="hint.wire">핀을 클릭해 전선으로 연결합니다 (직선으로 연결됨).</span><br>
       • <span data-i18n="hint.wireColor">전선을 클릭하면 색상을 바로 바꾸거나 삭제할 수 있습니다.</span><br>
+      • <span data-i18n="hint.wirePoint">전선을 더블클릭하면 그 자리에 점이 생겨 원하는 위치로 끌어서 구부릴 수 있고, 점을 다시 더블클릭하면 없앨 수 있습니다. 옆 점과 수평·수직으로 가까워지면 자동으로 딱 맞춰지고(Shift를 누르면 자유롭게), 이렇게 직각으로도 자유롭게도 배선을 정리할 수 있습니다.</span><br>
       • <span data-i18n="hint.delete">부품 선택 후 <b>Delete</b> 키를 누르면 삭제됩니다.</span><br>
       • <span data-i18n="hint.resistor">저항/파워케이블은 값을 입력하면 실제로 전압이 분배되어 LED 밝기 등에 반영됩니다.</span><br>
       • <span data-i18n="hint.compile"><b>[▶ 컴파일 &amp; 빌드 업로드]</b> 후 시뮬레이션을 시작하세요.</span>
@@ -824,11 +839,9 @@
     <div class="popup-body">
       <div class="example-buttons">
         <button class="btn primary" id="btnCompileR4" onclick="executeCompilerPipeline('r4')" data-i18n="popup.compile">▶ 컴파일 &amp; 빌드 업로드</button>
-        <button class="btn ghost" onclick="loadExampleCode('r4','counter')" data-i18n="popup.exCounterD13">카운터 &amp; D13 점멸</button>
-        <button class="btn ghost" onclick="loadExampleCode('r4','analog')" data-i18n="popup.exAnalog">A0 가변저항 &amp; D9 PWM</button>
-        <button class="btn ghost" onclick="loadExampleCode('r4','register')" data-i18n="popup.exRegister">DDR/PORT 레지스터 직접제어</button>
-        <button class="btn ghost" onclick="loadExampleCode('r4','api_vs_register')" data-i18n="popup.exApiVsReg">13번(API) vs 12번(레지스터)</button>
-        <button class="btn ghost" onclick="loadExampleCode('r4','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','counter')" data-i18n="popup.exCounterD13">카운터 &amp; D13 점멸</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','analog')" data-i18n="popup.exAnalog">A0 가변저항 &amp; D9 PWM</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR4">1</div>
@@ -881,10 +894,10 @@ void loop() {
     <div class="popup-body">
       <div class="example-buttons">
         <button class="btn primary" id="btnCompileR3" onclick="executeCompilerPipeline('r3')" data-i18n="popup.compile">▶ 컴파일 &amp; 빌드 업로드</button>
-        <button class="btn ghost" onclick="loadExampleCode('r3','counter')" data-i18n="popup.exCounter">카운터 예제</button>
-        <button class="btn ghost" onclick="loadExampleCode('r3','register')" data-i18n="popup.exRegister">DDR/PORT 레지스터 직접제어</button>
-        <button class="btn ghost" onclick="loadExampleCode('r3','api_vs_register')" data-i18n="popup.exApiVsReg">13번(API) vs 12번(레지스터)</button>
-        <button class="btn ghost" onclick="loadExampleCode('r3','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','counter')" data-i18n="popup.exCounter">카운터 예제</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','register')" data-i18n="popup.exRegister">DDR/PORT 레지스터 직접제어</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','api_vs_register')" data-i18n="popup.exApiVsReg">13번(API) vs 12번(레지스터)</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR3">1</div>
@@ -949,7 +962,7 @@ const STRINGS = {
   "bom.wifiap": { ko: "무선 AP (신호 발생)", en: "Wireless AP (signal gen)" },
   "bom.wireCount": { ko: "연결된 전선", en: "Wires connected" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.3", en: "K's Simulator Ver0.3" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9", en: "K's Simulator Ver0.9" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -957,7 +970,8 @@ const STRINGS = {
   "comp.bldcdriver.title": { ko: "BLDC 전자변속기<br>(ESC / 드라이버)", en: "BLDC Electronic Speed Controller<br>(ESC / Driver)" },
   "comp.bldcmotor.label": { ko: "BLDC 모터", en: "BLDC Motor" },
   "comp.bt.remoteSend": { ko: "원격 명령 전송", en: "Send remote command" },
-  "comp.bt.txdTitle": { ko: "TXD → 보드 디지털 핀", en: "TXD → board digital pin" },
+  "comp.bt.txdTitle": { ko: "TXD → 보드 RX (보드가 받는 데이터)", en: "TXD → board RX (data the board receives)" },
+  "comp.bt.rxdTitle": { ko: "RXD ← 보드 TX (보드가 보내는 데이터)", en: "RXD ← board TX (data the board sends)" },
   "comp.dac.dc": { ko: "DC 레벨", en: "DC Level" },
   "comp.dac.outTitle": { ko: "DAC 출력", en: "DAC output" },
   "comp.dac.ramp": { ko: "램프파", en: "Ramp" },
@@ -1030,8 +1044,8 @@ const STRINGS = {
   "gallery.title": { ko: "예제 갤러리", en: "Example Gallery" },
   "comm.wifiApR4.title": { ko: "무선 AP ↔ R4 메시지 예제", en: "Wireless AP ↔ R4 Messaging" },
   "comm.wifiApR4.desc": { ko: "무선 AP의 신호를 R4의 D2로 받아, 메시지가 올 때마다 시리얼 콘솔에 로그를 남기고 내장 LED를 반전시킵니다. (단순화된 예제)", en: "R4 reads the Wireless AP's signal on D2, logging each message to the serial console and flipping the built-in LED. (Simplified example)" },
-  "comm.btR3R4.title": { ko: "R3(+블루투스) ↔ R4 블루투스 통신", en: "R3 (+Bluetooth) ↔ R4 over Bluetooth" },
-  "comm.btR3R4.desc": { ko: "R3에 붙은 블루투스 모듈의 원격 명령 토글을 읽어 R4로 전달해 LED를 켜고 끕니다. (무선 RF 페어링은 단순화됨)", en: "R3 reads its Bluetooth module's remote-command toggle and relays it to R4 to switch an LED. (RF pairing is simplified)" },
+  "comm.btR3R4.title": { ko: "R3 ↔ R4 블루투스 통신 (모듈 2개)", en: "R3 ↔ R4 over Bluetooth (2 modules)" },
+  "comm.btR3R4.desc": { ko: "두 보드에 각각 블루투스 모듈을 달고, 오직 그 모듈들을 통해서만 PING/PONG을 주고받으며 서로의 LED를 반전시킵니다. (무선 RF 신호 자체만 단순화됨)", en: "Each board gets its own Bluetooth module, and PING/PONG travels only through those modules, flipping each other's LED. (Only the RF signal itself is simplified)" },
   "comm.serialR3R4.title": { ko: "R3 ↔ R4 시리얼 통신 예제", en: "R3 ↔ R4 Serial Communication" },
   "comm.serialR3R4.desc": { ko: "TX/RX를 서로 엇갈리게 배선해, 실제 바이트 단위로 메시지와 ACK 응답을 주고받습니다. (단순화 없음)", en: "Cross-wired TX/RX exchange real byte-level messages and ACK replies. (Not simplified)" },
   "toolbar.datasheet": { ko: "📄 CPU 데이터시트", en: "📄 CPU Datasheet" },
@@ -1051,6 +1065,7 @@ const STRINGS = {
   "hint.title": { ko: "동작 안내:", en: "How to use:" },
   "hint.wire": { ko: "핀을 클릭해 전선으로 연결합니다 (직선으로 연결됨).", en: "Click pins to connect them with a wire (drawn as a straight line)." },
   "hint.wireColor": { ko: "전선을 클릭하면 색상을 바로 바꾸거나 삭제할 수 있습니다.", en: "Click a wire to change its color or delete it." },
+  "hint.wirePoint": { ko: "전선을 더블클릭하면 그 자리에 점이 생겨 원하는 위치로 끌어서 구부릴 수 있고, 점을 다시 더블클릭하면 없앨 수 있습니다. 옆 점과 수평·수직으로 가까워지면 자동으로 딱 맞춰지고(Shift를 누르면 자유롭게), 이렇게 직각으로도 자유롭게도 배선을 정리할 수 있습니다.", en: "Double-click a wire to add a point you can drag anywhere to bend it; double-click a point again to remove it. Dragging a point near horizontal/vertical alignment with its neighbor snaps it into place (hold Shift to place it freely) -- so you can route wires with clean right angles or fully freehand." },
   "legend.empty": { ko: "연결된 전선이 없습니다.", en: "No wires connected." },
   "legend.title": { ko: "연결 현황", en: "Connections" },
   "err.braceMismatch": { ko: "중괄호 '{', '}' 짝이 맞지 않습니다.", en: "Mismatched braces '{' '}'." },
@@ -1144,15 +1159,17 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.3", en: "K's Arduino Simulator Ver0.3" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9", en: "K's Arduino Simulator Ver0.9" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.clearConsole": { ko: "콘솔 지우기", en: "Clear Console" },
   "toolbar.editor": { ko: "코드 에디터 &amp; 컴파일러", en: "Code Editor &amp; Compiler" },
   "toolbar.gallery": { ko: "🗂 예제 갤러리", en: "🗂 Example Gallery" },
+  "toolbar.save": { ko: "💾 저장", en: "💾 Save" },
+  "toolbar.open": { ko: "📂 열기", en: "📂 Open" },
   "toolbar.simStart": { ko: "▶ 시뮬레이션 시작", en: "▶ Start Simulation" },
-  "toolbar.wireStyleOrtho": { ko: "▤ 정리(5분할)", en: "▤ Tidy (5-segment)" },
-  "toolbar.wireStyleStraight": { ko: "〰 직선 배선", en: "〰 Straight wires" },
-  "toolbar.wireStyleTitle": { ko: "전선을 직선으로 보거나, 5분할 직각선으로 깔끔하게 정리합니다", en: "Show wires as straight lines, or tidy them into 5-segment right-angle routing" },
+  "toast.saved": { ko: "작업 내용을 파일로 저장했습니다.", en: "Your work has been saved to a file." },
+  "toast.loaded": { ko: "파일을 불러왔습니다.", en: "File loaded." },
+  "toast.loadError": { ko: "파일을 불러오지 못했습니다 (올바른 저장 파일이 맞는지 확인해 주세요).", en: "Couldn't load the file (make sure it's a valid save file)." },
   "wire.colorLabel": { ko: "전선 색상", en: "Wire color" },
   "wire.customLabel": { ko: "직접 선택", en: "Custom" },
   "wire.deleteBtn": { ko: "🗑 전선 삭제", en: "🗑 Delete wire" },
@@ -1199,8 +1216,6 @@ function refreshDynamicI18nText(){
   document.querySelectorAll('.scope-hold-btn').forEach(btn => {
     btn.textContent = btn.classList.contains('held') ? tr('scope.resumeBtn') : tr('comp.scope.holdBtn');
   });
-  const wireStyleBtn = document.getElementById('btnWireStyle');
-  if (wireStyleBtn) wireStyleBtn.textContent = tr(wireRouteStyle === 'ortho5' ? 'toolbar.wireStyleOrtho' : 'toolbar.wireStyleStraight');
   if (typeof renderGalleryBody === 'function' && document.getElementById('galleryBody')) renderGalleryBody();
 }
 function setLanguage(lang){
@@ -1974,13 +1989,36 @@ document.getElementById('canvasInner').addEventListener('mousedown', (e) => {
 });
 
 document.getElementById('canvasInner').addEventListener('mousemove', (e) => {
-  if (!activeDrag) return;
   const canvasRect = document.getElementById('canvasInner').getBoundingClientRect();
+  if (draggingWirePoint){
+    const { wireObj, index } = draggingWirePoint;
+    if (wireObj.points[index]){
+      let x = (e.clientX - canvasRect.left) / canvasZoom;
+      let y = (e.clientY - canvasRect.top) / canvasZoom;
+      // 바로 앞/뒤 점(또는 핀)과 수평·수직으로 거의 일치하면 정확히 맞춰서, 깔끔하게 직각으로
+      // 꺾인 배선을 손쉽게 만들 수 있게 합니다. Shift를 누른 채 드래그하면 스냅 없이 완전히
+      // 자유로운 위치에 놓을 수 있습니다.
+      if (!e.shiftKey){
+        const prevPt = index === 0 ? pinCenter(wireObj.from) : wireObj.points[index - 1];
+        const nextPt = index === wireObj.points.length - 1 ? pinCenter(wireObj.to) : wireObj.points[index + 1];
+        const SNAP = 10 / canvasZoom;
+        [prevPt, nextPt].forEach(p => {
+          if (!p) return;
+          if (Math.abs(x - p.x) < SNAP) x = p.x;
+          if (Math.abs(y - p.y) < SNAP) y = p.y;
+        });
+      }
+      wireObj.points[index] = { x, y };
+      updateWirePosition(wireObj);
+    }
+    return;
+  }
+  if (!activeDrag) return;
   activeDrag.style.left = ((e.clientX - canvasRect.left) / canvasZoom - dragOffset.x) + 'px';
   activeDrag.style.top = ((e.clientY - canvasRect.top) / canvasZoom - dragOffset.y) + 'px';
   updateAllWires();
 });
-document.addEventListener('mouseup', () => { activeDrag = null; });
+document.addEventListener('mouseup', () => { activeDrag = null; draggingWirePoint = null; });
 
 // ---- 부품 상자(팔레트)에서 마우스로 부품을 끌어다 캔버스의 원하는 위치에 놓기 ----
 // (기존의 "클릭하면 기본 위치에 생성"은 그대로 유지하고, 일정 거리 이상 드래그했을 때만
@@ -2077,21 +2115,41 @@ document.addEventListener('keydown', (e) => {
 function deleteComponent(el){
   if (!el) return;
   const removedWires = wires.filter(w => el.contains(w.from) || el.contains(w.to));
-  removedWires.forEach(w => w.element.remove());
+  removedWires.forEach(w => { w.element.remove(); (w.pointEls || []).forEach(c => c.remove()); });
   wires = wires.filter(w => !removedWires.includes(w));
-  // 보드 자체를 지우는 경우: 그 보드의 실행 루프를 멈추고(gen 무효화), 딸려있던 코드 에디터
-  // 팝업도 함께 제거하고, 레지스트리(boardInstances/boardDomId)에서도 빼서 이후의 순회
-  // 작업(runTick의 매트릭스/L13 LED/사이클 readout 갱신 등)이 삭제된 보드를 건드리지 않게 합니다.
+  // 보드 자체를 지우는 경우: 그 보드의 실행 루프를 멈추고(gen 무효화), 레지스트리(boardInstances/
+  // boardDomId)에서도 빼서 이후의 순회 작업(runTick의 매트릭스/D13 LED/사이클 readout 갱신 등)이
+  // 삭제된 보드를 건드리지 않게 합니다. "r4" 키만 하나뿐인 기본 내장 보드(#arduinoBoard)를
+  // 가리키므로(never re-spawnable) 항상 보호합니다. "r3"는 처음 한 번만 정적 팝업(popupR3)을
+  // 재사용할 뿐 다른 보드와 똑같이 지워질 수 있는 보드이므로(지워지면 이후 spawnBoard('r3')는
+  // 새 키로 새로 만들어집니다), 실행루프/레지스트리는 똑같이 정리하고 정적 팝업만 삭제 대신
+  // 숨김 처리합니다(완전히 지우면 DOM에서 코드 에디터 등이 통째로 사라져 버립니다).
   if (el.classList.contains('board')){
     const key = el.dataset.board;
-    if (key && key !== 'r4' && key !== 'r3' && mcuVM[key]) mcuVM[key].gen = (mcuVM[key].gen || 0) + 1;
+    const isBaseR4 = key === 'r4';
+    if (key && !isBaseR4 && mcuVM[key]) mcuVM[key].gen = (mcuVM[key].gen || 0) + 1;
     const popup = document.getElementById(`popup${key ? key.toUpperCase() : ''}`);
-    if (popup && key !== 'r4' && key !== 'r3') popup.remove(); // 기본 내장 보드의 정적 팝업은 남겨둡니다.
-    if (key && key !== 'r4' && key !== 'r3') delete boardInstances[key];
+    if (popup){
+      if (isBaseR4 || key === 'r3') popup.hidden = true;
+      else popup.remove();
+    }
+    if (key && !isBaseR4) delete boardInstances[key];
   }
-  el.remove();
+  if (el.id !== 'arduinoBoard') el.remove(); // 기본 내장 R4 보드 DOM 자체는 항상 남겨둡니다.
   updateAllWires();
   updateLegend();
+}
+
+// 캔버스에 현재 놓여있는 모든 부품(기본 내장 R4 보드는 제외)과 전선을 지워, 예제를 새로 고를
+// 때마다 깨끗한 캔버스에서 그 예제만 새로 배치되게 합니다.
+function clearCanvasAll(){
+  document.querySelectorAll('.placed-component').forEach(el => {
+    if (el.id === 'arduinoBoard') return; // 기본 내장 R4 보드는 항상 남겨둡니다.
+    deleteComponent(el);
+  });
+  wires.slice().forEach(w => deleteWire(w)); // 혹시 남아있는 보드-보드 직결 전선까지 마저 정리
+  Object.keys(commWireTags).forEach(k => { commWireTags[k] = []; });
+  closeWireEditor();
 }
 
 const SENSOR_DEFS = {
@@ -2306,7 +2364,8 @@ function spawnComponent(type, dropX, dropY){
       <div class="comp-pin-row">
         <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
         <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
-        <div class="pin-mini" data-pin="${id}_TXD" data-i18n-title="comp.bt.txdTitle" title="TXD → 보드 디지털 핀"></div>
+        <div class="pin-mini" data-pin="${id}_RXD" data-i18n-title="comp.bt.rxdTitle" title="RXD ← 보드 TX (보드가 보내는 데이터)"></div>
+        <div class="pin-mini" data-pin="${id}_TXD" data-i18n-title="comp.bt.txdTitle" title="TXD → 보드 RX (보드가 받는 데이터)"></div>
       </div>`;
   } else if (type === 'wifiap'){
     div.classList.add('comp-wifiap');
@@ -2936,10 +2995,13 @@ function bindPinEvents(){
 }
 bindPinEvents();
 
+// 캔버스가 확대/축소(canvasZoom)되어 있어도 항상 canvasInner의 "원래(비확대) 좌표계" 기준
+// 좌표를 돌려줍니다 — wireCanvas(SVG)는 canvasInner의 자식이라 그 변환(scale)을 함께 받으므로,
+// path의 좌표는 이 비확대 좌표계로 넣어야 화면에 정확히 겹쳐 그려집니다.
 function pinCenter(pinEl){
   const r = pinEl.getBoundingClientRect();
   const c = document.getElementById('canvasInner').getBoundingClientRect();
-  return { x: r.left + r.width/2 - c.left, y: r.top + r.height/2 - c.top };
+  return { x: (r.left + r.width/2 - c.left) / canvasZoom, y: (r.top + r.height/2 - c.top) / canvasZoom };
 }
 
 const WIRE_DEFAULT_COLOR = '#3fd0d6';
@@ -2949,49 +3011,114 @@ function createWire(pinA, pinB){
   path.setAttribute('class', 'wire-path');
   path.setAttribute('stroke', WIRE_DEFAULT_COLOR);
   svg.appendChild(path);
-  const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR };
+  // points: 사용자가 더블클릭으로 추가한 "꺾임점"들 — from → points[0] → points[1] → ... → to
+  // 순서대로 이어 그립니다. 각 점은 canvasInner의 비확대 좌표계 기준 절대 좌표({x,y})이고,
+  // 부품이 움직여도 점 자체는 그 자리에 고정됩니다(양 끝 핀만 부품을 따라갑니다).
+  const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR, points: [], pointEls: [] };
   wires.push(wireObj);
   updateWirePosition(wireObj);
+  // 한 번 클릭 = 색상 편집기, 더블클릭 = 그 위치에 꺾임점 추가. 브라우저는 더블클릭 시
+  // click을 먼저 두 번 쏘고 이어서 dblclick을 쏘므로, click 처리를 살짝 지연시켰다가
+  // 곧바로 dblclick이 들어오면 취소하는 방식으로 두 동작이 서로 안 걸리게 합니다.
+  let clickTimer = null;
   path.onclick = (e) => {
     e.stopPropagation();
-    openWireEditor(wireObj, e.clientX, e.clientY);
+    if (clickTimer){ clearTimeout(clickTimer); clickTimer = null; return; }
+    const cx = e.clientX, cy = e.clientY;
+    clickTimer = setTimeout(() => { clickTimer = null; openWireEditor(wireObj, cx, cy); }, 240);
   };
+  path.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    if (clickTimer){ clearTimeout(clickTimer); clickTimer = null; }
+    const canvasRect = document.getElementById('canvasInner').getBoundingClientRect();
+    const localX = (e.clientX - canvasRect.left) / canvasZoom;
+    const localY = (e.clientY - canvasRect.top) / canvasZoom;
+    addWirePoint(wireObj, localX, localY);
+  });
   updateLegend();
   return wireObj;
 }
 
-// 기본은 핀과 핀 사이를 곡선으로 꼬이지 않는 직선으로 그리지만("straight"), 부품이 많아지면
-// 대각선들이 서로 겹쳐 지저분해 보일 수 있습니다. wireRouteStyle을 "ortho5"로 바꾸면 실제 회로도
-// 처럼 가로/세로 선분 5개로만 꺾어 다니는 "깔끔하게 정리된" 배선으로 전부 다시 그립니다.
-let wireRouteStyle = 'straight'; // 'straight' | 'ortho5'
-function wirePathD(p1, p2){
-  if (wireRouteStyle !== 'ortho5') return `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
-  const stub = 16; // 핀에서 곧장 빠져나오는 짧은 구간의 길이
-  const midY = (p1.y + p2.y) / 2;
-  const x1 = p1.x + (p2.x >= p1.x ? stub : -stub);
-  const x2 = p2.x + (p2.x >= p1.x ? -stub : stub);
-  // 5개 선분: (핀1→스텁) → (세로로 중간높이까지) → (가로로 가로지르기) → (세로로 핀2 높이까지) → (스텁→핀2)
-  return `M ${p1.x} ${p1.y} L ${x1} ${p1.y} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${p2.y} L ${p2.x} ${p2.y}`;
+function wirePathD(w){
+  const p1 = pinCenter(w.from), p2 = pinCenter(w.to);
+  const pts = [p1, ...w.points, p2];
+  return 'M ' + pts.map(p => `${p.x} ${p.y}`).join(' L ');
 }
 function updateWirePosition(w){
-  const p1 = pinCenter(w.from), p2 = pinCenter(w.to);
-  w.element.setAttribute('d', wirePathD(p1, p2));
+  w.element.setAttribute('d', wirePathD(w));
+  syncWirePointHandles(w);
 }
 function updateAllWires(){ wires.forEach(updateWirePosition); }
-// 도구모음의 "선 정리(5분할)" 버튼: 직선 ↔ 5분할 정리 스타일을 전환하고 모든 전선을 다시 그립니다.
-function toggleWireRouteStyle(){
-  wireRouteStyle = wireRouteStyle === 'straight' ? 'ortho5' : 'straight';
-  updateAllWires();
-  const btn = document.getElementById('btnWireStyle');
-  if (btn){
-    btn.classList.toggle('active', wireRouteStyle === 'ortho5');
-    btn.textContent = tr(wireRouteStyle === 'ortho5' ? 'toolbar.wireStyleOrtho' : 'toolbar.wireStyleStraight');
+
+// 각 꺾임점마다 화면에 작은 원(핸들)을 그려서 드래그로 옮기거나 더블클릭으로 지울 수 있게
+// 합니다. points 배열과 개수가 항상 맞도록, 부족하면 새로 만들고 남으면 지웁니다.
+function syncWirePointHandles(w){
+  const svg = document.getElementById('wireCanvas');
+  while (w.pointEls.length < w.points.length){
+    const idx = w.pointEls.length;
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('class', 'wire-point-handle');
+    circle.setAttribute('r', 5);
+    svg.appendChild(circle);
+    bindWirePointHandle(w, circle, idx);
+    w.pointEls.push(circle);
   }
+  while (w.pointEls.length > w.points.length){
+    const circle = w.pointEls.pop();
+    circle.remove();
+  }
+  w.pointEls.forEach((circle, i) => {
+    circle.setAttribute('cx', w.points[i].x);
+    circle.setAttribute('cy', w.points[i].y);
+    circle.setAttribute('stroke', w.color);
+  });
+}
+
+let draggingWirePoint = null; // { wireObj, index }
+function bindWirePointHandle(wireObj, circle, index){
+  circle.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    draggingWirePoint = { wireObj, index: circle.__idx };
+  });
+  circle.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    removeWirePoint(wireObj, circle.__idx);
+  });
+  circle.__idx = index;
+}
+// 전선 위의 클릭 지점에 가장 가까운 선분을 찾아, 그 선분 사이에 새 점을 끼워 넣습니다
+// (여러 번 더블클릭하면 점을 여러 개 이어서 원하는 모양으로 자유롭게 구부릴 수 있습니다).
+function addWirePoint(wireObj, x, y){
+  const p1 = pinCenter(wireObj.from), p2 = pinCenter(wireObj.to);
+  const pts = [p1, ...wireObj.points, p2];
+  let bestIdx = 0, bestDist = Infinity;
+  for (let i = 0; i < pts.length - 1; i++){
+    const d = pointToSegmentDistance({x,y}, pts[i], pts[i+1]);
+    if (d < bestDist){ bestDist = d; bestIdx = i; }
+  }
+  wireObj.points.splice(bestIdx, 0, { x, y });
+  // 핸들 인덱스가 밀렸으므로 다시 매겨줍니다.
+  updateWirePosition(wireObj);
+  wireObj.pointEls.forEach((el, i) => { el.__idx = i; });
+}
+function removeWirePoint(wireObj, index){
+  wireObj.points.splice(index, 1);
+  updateWirePosition(wireObj);
+  wireObj.pointEls.forEach((el, i) => { el.__idx = i; });
+}
+function pointToSegmentDistance(p, a, b){
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const lenSq = dx*dx + dy*dy;
+  let t = lenSq === 0 ? 0 : ((p.x - a.x) * dx + (p.y - a.y) * dy) / lenSq;
+  t = Math.max(0, Math.min(1, t));
+  const cx = a.x + t * dx, cy = a.y + t * dy;
+  return Math.hypot(p.x - cx, p.y - cy);
 }
 
 function deleteWire(wireObj){
   const svg = document.getElementById('wireCanvas');
   if (wireObj.element && wireObj.element.parentNode === svg) svg.removeChild(wireObj.element);
+  (wireObj.pointEls || []).forEach(el => el.remove());
   wires = wires.filter(w => w !== wireObj);
   closeWireEditor();
   updateLegend();
@@ -3000,6 +3127,7 @@ function deleteWire(wireObj){
 function setWireColor(wireObj, color){
   wireObj.color = color;
   wireObj.element.setAttribute('stroke', color);
+  (wireObj.pointEls || []).forEach(el => el.setAttribute('stroke', color));
   updateLegend();
 }
 
@@ -3621,9 +3749,26 @@ function updateMultimeter(id){
 // (실제 UART처럼 바이트 단위 FIFO를 완벽히 재현하진 않지만, JS 문자열을 큐처럼 써서
 //  Serial.available()/read()/readString()이 동작하는 데는 충분합니다.)
 const serialRxBuffer = {};
+// 어떤 보드의 D0(RX) 핀이 배선을 통해 연결되어 있는 보드를 찾아 그 key를 돌려줍니다
+// (netOf 순회 도중 D0 핀을 만나면 사용). rxNet: 이미 계산해 둔 net 집합.
+function boardOfRxPinInNet(rxNet){
+  for (const el of rxNet){
+    if (el.dataset && el.dataset.pin === 'D0'){
+      const b = el.closest('.board');
+      if (b && b.dataset.board) return b.dataset.board;
+    }
+  }
+  return null;
+}
 // boardKey 보드의 TX(D1) 핀이 배선(전선)을 통해 실제로 어느 "다른" 보드의 RX(D0) 핀과
-// 연결되어 있는지 찾습니다. netOf()로 도달 가능한 모든 노드를 모으고, 그중 자기 자신이
-// 아닌 다른 보드의 D0 핀을 찾으면 그 보드의 key를 돌려줍니다(못 찾으면 null).
+// 연결되어 있는지 찾습니다. 두 가지 경로를 지원합니다:
+//  1) 보드-보드 직결(D1→D0 그대로 배선) — "시리얼 통신" 예제처럼 단순화 없이 UART로 직접 연결.
+//  2) 블루투스 모듈을 통한 무선 경로 — 보드 TX가 자신의 BT 모듈 RXD로 들어가면, 그 모듈과
+//     "페어링"(dataset.pairId가 같은) 되어 있는 다른 BT 모듈의 TXD가 어느 보드의 RX(D0)에
+//     연결되어 있는지를 찾습니다. 실제 두 HC-05가 페어링되면 서로의 UART를 무선으로
+//     이어주는 투명한 통로처럼 동작하는 것과 같은 방식입니다.
+// netOf()로 도달 가능한 모든 노드를 모으고, 그중 자기 자신이 아닌 다른 보드의 D0 핀(또는
+// 페어링된 BT 모듈 너머의 D0 핀)을 찾으면 그 보드의 key를 돌려줍니다(못 찾으면 null).
 function findWiredSerialPeer(boardKey){
   const domId = boardDomId[boardKey];
   const boardEl = domId && document.getElementById(domId);
@@ -3635,6 +3780,18 @@ function findWiredSerialPeer(boardKey){
     if (el.dataset.pin === 'D0'){
       const otherBoard = el.closest('.board');
       if (otherBoard && otherBoard.dataset.board && otherBoard.dataset.board !== boardKey) return otherBoard.dataset.board;
+    }
+    if (el.dataset.pin && el.dataset.pin.endsWith('_RXD')){
+      const myModule = el.closest('.comp-btmodule');
+      const pairId = myModule?.dataset.pairId;
+      if (myModule && pairId){
+        const peerModule = Array.from(document.querySelectorAll('.comp-btmodule')).find(m => m !== myModule && m.dataset.pairId === pairId);
+        const peerTxd = peerModule?.querySelector('[data-pin$="_TXD"]');
+        if (peerTxd){
+          const peerBoard = boardOfRxPinInNet(netOf(peerTxd));
+          if (peerBoard && peerBoard !== boardKey) return peerBoard;
+        }
+      }
     }
   }
   return null;
@@ -4255,14 +4412,15 @@ function buildBoardPopupHTML(key, type){
   const suffix = key.includes('_') ? ' #' + key.split('_')[1] : '';
   const targetLine = isR3 ? 'Target: ATmega328P (8-bit AVR @ 16MHz)' : 'Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)';
   const toolchain = isR3 ? 'AVR-GCC' : 'C/C++ GCC';
+  // DDRx/PORTx/PINx 직접제어 예제는 AVR(ATmega328P, R3)에만 있는 개념입니다 — R4(RA4M1,
+  // ARM Cortex-M4)는 레지스터 구성이 전혀 달라(PODR/PDR 등) 같은 이름의 레지스터가 없으므로,
+  // 이 두 예제는 R3에만 제공합니다.
   const extraButtons = isR3
-    ? `<button class="btn ghost" onclick="loadExampleCode('${key}','register')">${tr('popup.exRegister')}</button>
-        <button class="btn ghost" onclick="loadExampleCode('${key}','api_vs_register')">${tr('popup.exApiVsReg')}</button>
-        <button class="btn ghost" onclick="loadExampleCode('${key}','relay')">${tr('popup.exRelay')}</button>`
-    : `<button class="btn ghost" onclick="loadExampleCode('${key}','analog')">${tr('popup.exAnalog')}</button>
-        <button class="btn ghost" onclick="loadExampleCode('${key}','register')">${tr('popup.exRegister')}</button>
-        <button class="btn ghost" onclick="loadExampleCode('${key}','api_vs_register')">${tr('popup.exApiVsReg')}</button>
-        <button class="btn ghost" onclick="loadExampleCode('${key}','relay')">${tr('popup.exRelay')}</button>`;
+    ? `<button class="btn ghost" onclick="runCodeExample('${key}','register')">${tr('popup.exRegister')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','api_vs_register')">${tr('popup.exApiVsReg')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`
+    : `<button class="btn ghost" onclick="runCodeExample('${key}','analog')">${tr('popup.exAnalog')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`;
   const defaultCode = `// Arduino ${label}${suffix} sketch\nint count = 0;\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Board ${key} Tick: ");\n  Serial.println(count);\n  delay(200);\n}`;
 
   const div = document.createElement('div');
@@ -4290,7 +4448,7 @@ function buildBoardPopupHTML(key, type){
     <div class="popup-body">
       <div class="example-buttons">
         <button class="btn primary" id="btnCompile${KEY}" onclick="executeCompilerPipeline('${key}')">${tr('popup.compile')}</button>
-        <button class="btn ghost" onclick="loadExampleCode('${key}','counter')">${tr('popup.exCounterD13')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','counter')">${tr('popup.exCounterD13')}</button>
         ${extraButtons}
       </div>
       <div class="code-editor-wrap">
@@ -4443,12 +4601,12 @@ function loadExampleCode(board, type){
   } else if (type === 'bt_link'){
     if (board === 'r3'){
       editor.value = currentLang === 'en'
-        ? `// Reads the HC-05 Bluetooth module's "remote command" toggle (wired to D2) and sends\n// it to R4 "over Bluetooth". This simulator does not implement real RF pairing between\n// two HC-05 modules, so the wireless link between R3 and R4 is simplified to a direct\n// D1(TX)-D0(RX) UART wire -- which is in fact exactly how a real paired HC-05 pair\n// behaves internally: a transparent serial pipe.\n\nconst int btCmdPin = 2; // pin wired to the BT module's TXD (remote command toggle)\nint lastCmd = -1;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(btCmdPin, INPUT);\n  Serial.println("R3: Bluetooth link ready");\n}\n\nvoid loop() {\n  int cmd = digitalRead(btCmdPin);\n  if (cmd != lastCmd) {\n    if (cmd == HIGH) Serial.println("LED_ON");\n    else Serial.println("LED_OFF");\n    lastCmd = cmd;\n  }\n  delay(100);\n}`
-        : `// R3에 붙은 HC-05 블루투스 모듈의 "원격 명령" 토글(D2에 배선됨)을 읽어, R4에게 "블루투스로"\n// 그 값을 보내는 예제입니다. 이 시뮬레이터는 HC-05 두 대의 실제 RF 페어링을 구현하지 않으므로,\n// R3-R4 사이의 무선 링크는 D1(TX)-D0(RX) 직결 UART 배선으로 단순화했습니다 — 실제로도 페어링된\n// HC-05 두 대는 내부적으로 이런 투명한 시리얼 통로처럼 동작합니다.\n\nconst int btCmdPin = 2; // 블루투스 모듈 TXD(원격 명령 토글)가 연결된 핀\nint lastCmd = -1;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(btCmdPin, INPUT);\n  Serial.println("R3: 블루투스 링크 준비 완료");\n}\n\nvoid loop() {\n  int cmd = digitalRead(btCmdPin);\n  if (cmd != lastCmd) {\n    if (cmd == HIGH) Serial.println("LED_ON");\n    else Serial.println("LED_OFF");\n    lastCmd = cmd;\n  }\n  delay(100);\n}`;
+        ? `// R3 <-> R4 Bluetooth example -- R3 side. Each board has its own HC-05 Bluetooth\n// module (wired TX->RXD, TXD->RX), and the two modules are paired -- all data passes\n// through the Bluetooth modules themselves, never through a direct wire between the\n// boards. R3 sends "PING" once a second and toggles its own LED each time it gets a\n// "PONG" reply back.\n\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n  Serial.println("R3: Bluetooth module ready, pinging R4...");\n}\n\nvoid loop() {\n  Serial.println("PING");\n  delay(1000);\n\n  if (Serial.available() > 0) {\n    String reply = Serial.readStringUntil('\\n');\n    if (reply == "PONG") {\n      digitalWrite(ledPin, !digitalRead(ledPin));\n      Serial.println("[Bluetooth] got PONG from R4");\n    }\n  }\n}`
+        : `// R3 ↔ R4 블루투스 예제 — R3 쪽. 두 보드에 각각 HC-05 블루투스 모듈이 하나씩 달려 있고\n// (보드 TX→모듈 RXD, 모듈 TXD→보드 RX), 두 모듈은 서로 페어링되어 있습니다 — 모든 데이터가\n// 보드끼리 직접 연결된 선이 아니라 반드시 블루투스 모듈을 거쳐서 오갑니다. R3는 1초마다\n// "PING"을 보내고, R4로부터 "PONG" 응답을 받을 때마다 자기 LED를 반전시킵니다.\n\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n  Serial.println("R3: 블루투스 모듈 준비 완료, R4에 PING 전송 시작");\n}\n\nvoid loop() {\n  Serial.println("PING");\n  delay(1000);\n\n  if (Serial.available() > 0) {\n    String reply = Serial.readStringUntil('\\n');\n    if (reply == "PONG") {\n      digitalWrite(ledPin, !digitalRead(ledPin));\n      Serial.println("[블루투스] R4로부터 PONG 수신");\n    }\n  }\n}`;
     } else {
       editor.value = currentLang === 'en'
-        ? `// Receives commands sent "over Bluetooth" from the R3 + HC-05 module pair and\n// controls the built-in LED (D13) accordingly.\n\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n  Serial.println("R4: waiting for a command over the Bluetooth link...");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String cmd = Serial.readStringUntil('\\n');\n    if (cmd == "LED_ON") {\n      digitalWrite(ledPin, HIGH);\n      Serial.println("[BT received] LED_ON -> built-in LED on");\n    } else if (cmd == "LED_OFF") {\n      digitalWrite(ledPin, LOW);\n      Serial.println("[BT received] LED_OFF -> built-in LED off");\n    }\n  }\n  delay(100);\n}`
-        : `// R3 + HC-05 블루투스 모듈 쪽에서 "블루투스로" 보낸 명령을 받아 내장 LED(D13)를 제어합니다.\n\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n  Serial.println("R4: 블루투스 링크로부터 명령 대기 중...");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String cmd = Serial.readStringUntil('\\n');\n    if (cmd == "LED_ON") {\n      digitalWrite(ledPin, HIGH);\n      Serial.println("[BT 수신] LED_ON -> 내장 LED 켬");\n    } else if (cmd == "LED_OFF") {\n      digitalWrite(ledPin, LOW);\n      Serial.println("[BT 수신] LED_OFF -> 내장 LED 끔");\n    }\n  }\n  delay(100);\n}`;
+        ? `// R3 <-> R4 Bluetooth example -- R4 side. Waits for "PING" to arrive through its own\n// Bluetooth module (paired with R3's module), replies "PONG" the same way, and toggles\n// its LED on every ping received.\n\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n  Serial.println("R4: Bluetooth module ready, waiting for R3...");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String msg = Serial.readStringUntil('\\n');\n    if (msg == "PING") {\n      digitalWrite(ledPin, !digitalRead(ledPin));\n      Serial.println("[Bluetooth] got PING from R3, replying PONG");\n      Serial.println("PONG");\n    }\n  }\n  delay(100);\n}`
+        : `// R3 ↔ R4 블루투스 예제 — R4 쪽. R3와 페어링된 자신의 블루투스 모듈을 통해 "PING"이\n// 도착하기를 기다렸다가, 같은 방식으로 "PONG"을 되돌려 보내고, 받을 때마다 LED를 반전시킵니다.\n\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n  Serial.println("R4: 블루투스 모듈 준비 완료, R3 대기 중...");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String msg = Serial.readStringUntil('\\n');\n    if (msg == "PING") {\n      digitalWrite(ledPin, !digitalRead(ledPin));\n      Serial.println("[블루투스] R3로부터 PING 수신, PONG 응답");\n      Serial.println("PONG");\n    }\n  }\n  delay(100);\n}`;
     }
   } else if (type === 'serial_link'){
     if (board === 'r3'){
@@ -4573,11 +4731,10 @@ const EXPERIMENT_DEFS = [
   { key: 'rlc-phase', icon: ICO_RLC, titleKey: 'exp.rlcPhase.title', descKey: 'exp.rlcPhase.desc' },
   { key: 'relay-switch', icon: ICO_RELAY, titleKey: 'exp.relaySwitch.title', descKey: 'exp.relaySwitch.desc' },
 ];
+// DDRx/PORTx 레지스터 직접제어 예제는 AVR(ATmega328P) 전용 개념이라 R4(RA4M1)에는 없습니다.
 const R4_EXAMPLE_DEFS = [
   { key: 'counter', titleKey: 'popup.exCounterD13' },
   { key: 'analog', titleKey: 'popup.exAnalog' },
-  { key: 'register', titleKey: 'popup.exRegister' },
-  { key: 'api_vs_register', titleKey: 'popup.exApiVsReg' },
   { key: 'relay', titleKey: 'popup.exRelay' },
 ];
 const R3_EXAMPLE_DEFS = [
@@ -4637,14 +4794,21 @@ function renderGalleryBody(){
 // 코딩 예제 카드: 해당 보드가 캔버스에 아직 없으면(R3는 기본 미배치) 하나 만들고, 예제 코드를
 // 불러온 뒤 그 보드의 코드 에디터 팝업을 열어줍니다.
 function runCodeExample(board, key){
+  // 기본 내장 보드(r4/r3)의 예제를 고르면 "예제만 새로" 보이도록 캔버스를 완전히 비우고
+  // 시작합니다. 사용자가 직접 여러 대 추가해 둔 보드(r4_2, r3_2, ...)는 예제 갤러리의 대상이
+  // 아니라 사용자가 직접 구성한 회로이므로, 그 보드의 팝업 버튼을 눌렀을 때는 캔버스를
+  // 비우지 않고 그 보드의 코드만 바꿔 올립니다.
+  const isDefaultBoard = board === 'r4' || board === 'r3';
+  if (isDefaultBoard) clearCanvasAll();
   if (board === 'r3' && !boardInstances['r3']) spawnBoard('r3');
   loadExampleCode(board, key);
   openBoardPopup(board);
+  ensureSimRunning(); // 이미 시뮬레이션 중이었다면 새로 올라간 코드로 자동 재시작합니다.
 }
 
 // 전기 실험 카드: 필요한 부품을 캔버스의 정해진 자리에 자동으로 배치·배선하고 시뮬레이션을
-// 시작합니다. 같은 실험을 다시 누르면(data-experiment 태그로) 이전 것을 지우고 새로 깔끔하게
-// 다시 만들어, 여러 번 눌러도 부품이 계속 쌓이지 않습니다.
+// 시작합니다. 예제를 고를 때마다 캔버스를 완전히 비우고 그 예제만 새로 배치해, 이전 예제의
+// 부품·전선이 남아 뒤엉키지 않게 합니다.
 function clearExperiment(key){
   document.querySelectorAll(`.placed-component[data-experiment="${key}"]`).forEach(el => deleteComponent(el));
 }
@@ -4662,11 +4826,18 @@ function focusCanvasOn(x, y){
   area.scrollLeft = Math.max(0, x - 260);
   area.scrollTop = Math.max(0, y - 160);
 }
+// 실험/예제를 고를 때는 배선을 놓고 코드를 컴파일·업로드하는 것까지만 자동으로 하고, 시뮬레이션
+// 자체는 사용자가 툴바의 "▶ 시뮬레이션 시작" 버튼을 눌러야 시작되게 합니다. 다만 이미 시뮬레이션이
+// 실행 중인 상태에서 다른 예제를 고르면(=배선/코드가 바뀌었으면) 자동으로 한 번 재시작해서 새
+// 배선·코드가 곧바로 반영되게 합니다.
 function ensureSimRunning(){
-  if (!isSimulating) toggleSimulation();
+  if (isSimulating){
+    toggleSimulation();
+    toggleSimulation();
+  }
 }
 function runElectricalExperiment(key){
-  clearExperiment(key);
+  clearCanvasAll();
   if (key === 'res-parallel') runResParallelExperiment();
   else if (key === 'divider') runDividerExperiment();
   else if (key === 'rlc-phase') runRlcPhaseExperiment();
@@ -4822,8 +4993,7 @@ function elCanvasPos(el){
 }
 
 function runCommExample(key){
-  clearExperiment(key);
-  clearCommWires(key);
+  clearCanvasAll();
   if (key === 'wifi-ap-r4') runWifiApR4Example();
   else if (key === 'bt-r3-r4') runBtR3R4Example();
   else if (key === 'serial-r3-r4') runSerialR3R4Example();
@@ -4856,36 +5026,43 @@ function runWifiApR4Example(){
   focusCanvasOn(AX, AY);
 }
 
-// 통신 예제 2: R3(+블루투스 모듈) ↔ R4 블루투스 통신 — R3에 HC-05 블루투스 모듈을 붙이고,
-// 모듈의 "원격 명령 전송" 토글을 R3의 D2로 읽어 R4에 LED_ON/LED_OFF 명령을 보냅니다.
-// ※ 이 시뮬레이터는 실제 무선 RF 페어링(HC-05↔HC-05)을 구현하지 않으므로, R3와 R4 사이의
-//   블루투스 무선 링크는 D1(TX)-D0(RX) 직결 배선(UART)으로 단순화했습니다 — 실제 HC-05 두 대도
-//   일단 페어링되면 내부적으로는 이렇게 투명한 UART 통로처럼 동작합니다.
+// 통신 예제 2: R3 ↔ R4 블루투스 통신 — 두 보드에 각각 HC-05 블루투스 모듈을 하나씩 달고,
+// "오직 블루투스 모듈을 통해서만" 서로 통신합니다(보드끼리 직접 잇는 전선은 전혀 없습니다).
+//   보드 TX(D1) → 그 보드의 BT 모듈 RXD (보드가 보내는 데이터가 모듈로 들어감)
+//   그 보드의 BT 모듈 TXD → 보드 RX(D0) (모듈이 받은 데이터가 보드로 들어옴)
+// 두 모듈은 같은 pairId로 "페어링"되어 있어서, 한쪽 모듈의 RXD로 들어온 데이터가 무선으로
+// 반대쪽 모듈의 TXD로 나갑니다 — 실제 HC-05 두 대를 페어링했을 때와 같은 개념입니다
+// (findWiredSerialPeer가 이 페어링 경로를 인식합니다). 실제 RF 신호 자체를 시뮬레이션하는
+// 것은 아니라는 점만 단순화이고, 나머지는 두 모듈을 실제로 거쳐서 오가는 통신입니다.
 function runBtR3R4Example(){
   const key = 'bt-r3-r4';
   if (!boardInstances['r3']) spawnBoard('r3');
   const r3El = document.getElementById(boardDomId['r3']);
   const r4El = document.getElementById(boardDomId['r4']);
   if (!r3El || !r4El) return;
-  const pos = elCanvasPos(r3El);
-  const BX = pos.x + 260, BY = pos.y + 10;
-  const bt = placeExp('btmodule', key, BX, BY);
-  const r3d2 = r3El.querySelector('[data-pin="D2"]');
-  const r3_5v = r3El.querySelector('[data-pin="5V"]');
-  const r3_gnd = r3El.querySelector('[data-pin="GND_P1"]');
-  if (r3d2 && r3_5v && r3_gnd){
-    createWire(r3_5v, document.querySelector(`#${bt} [data-pin$="_V"]`));
-    createWire(r3_gnd, document.querySelector(`#${bt} [data-pin$="_G"]`));
-    createWire(r3d2, document.querySelector(`#${bt} [data-pin$="_TXD"]`));
-  }
-  const r3TX = r3El.querySelector('[data-pin="D1"]'), r3RX = r3El.querySelector('[data-pin="D0"]');
-  const r4TX = r4El.querySelector('[data-pin="D1"]'), r4RX = r4El.querySelector('[data-pin="D0"]');
-  taggedWire(key, r3TX, r4RX);
-  taggedWire(key, r4TX, r3RX);
+  const pairId = 'bt-pair-' + key;
+  const r3Pos = elCanvasPos(r3El);
+  const r4Pos = elCanvasPos(r4El);
+  const btR3 = placeExp('btmodule', key, r3Pos.x + 260, r3Pos.y + 10);
+  const btR4 = placeExp('btmodule', key, r4Pos.x + 260, r4Pos.y + 10);
+  document.getElementById(btR3).dataset.pairId = pairId;
+  document.getElementById(btR4).dataset.pairId = pairId;
+
+  [{ boardEl: r3El, bt: btR3 }, { boardEl: r4El, bt: btR4 }].forEach(({ boardEl, bt }) => {
+    const tx = boardEl.querySelector('[data-pin="D1"]');
+    const rx = boardEl.querySelector('[data-pin="D0"]');
+    const v5 = boardEl.querySelector('[data-pin="5V"]');
+    const gnd = boardEl.querySelector('[data-pin="GND_P1"]');
+    if (v5) createWire(v5, document.querySelector(`#${bt} [data-pin$="_V"]`));
+    if (gnd) createWire(gnd, document.querySelector(`#${bt} [data-pin$="_G"]`));
+    if (tx) createWire(tx, document.querySelector(`#${bt} [data-pin$="_RXD"]`));
+    if (rx) createWire(document.querySelector(`#${bt} [data-pin$="_TXD"]`), rx);
+  });
+
   loadExampleCode('r3', 'bt_link');
   loadExampleCode('r4', 'bt_link');
   ensureSimRunning();
-  focusCanvasOn(BX, BY);
+  focusCanvasOn(r3Pos.x, r3Pos.y);
 }
 
 // 통신 예제 3: R3 ↔ R4 시리얼(UART, D1=TX/D0=RX) 통신 — 두 보드의 TX/RX를 서로 엇갈리게
@@ -4906,6 +5083,216 @@ function runSerialR3R4Example(){
   ensureSimRunning();
   const pos = elCanvasPos(r3El);
   focusCanvasOn(pos.x, pos.y);
+}
+
+/* ============ 작업 저장/불러오기 (현재 캔버스 상태를 JSON 파일로) ============ */
+let toastTimer = null;
+function showToast(msg, isError){
+  let box = document.getElementById('appToast');
+  if (!box){
+    box = document.createElement('div');
+    box.id = 'appToast';
+    box.className = 'toast';
+    document.body.appendChild(box);
+  }
+  box.textContent = msg;
+  box.classList.toggle('error', !!isError);
+  box.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => box.classList.remove('show'), 2600);
+}
+
+// 부품 하나(보드 제외)의 <input>/<select> 값을 DOM에 나오는 순서 그대로 저장/복원합니다. 이 시뮬레이터의
+// 부품 템플릿은 spawnComponent(type)로 다시 만들면 input/select가 항상 같은 순서로 생기므로, 값을
+// 이름이 아니라 "몇 번째 입력칸인지"로 저장해도 안전하게 다시 맞춰 넣을 수 있습니다.
+function serializeComponentFields(compEl){
+  return Array.from(compEl.querySelectorAll('input, select')).map(el => (
+    el.type === 'checkbox' ? { t: 'checkbox', v: el.checked } : { t: 'value', v: el.value }
+  ));
+}
+function restoreComponentFields(compEl, fields){
+  const els = compEl.querySelectorAll('input, select');
+  (fields || []).forEach((f, i) => {
+    const el = els[i];
+    if (!el) return;
+    if (f.t === 'checkbox') el.checked = f.v; else el.value = f.v;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+// 전원 스위치(psu-switch)·전원 토글(ap-switch, bt-toggle)처럼 <input>이 아니라 class="on" 여부로
+// 켜짐 상태를 나타내는 요소들도 같은 방식(순서 기준)으로 저장해 두었다가, 저장 당시 켜져 있었는데
+// 새로 만든 부품은 기본이 꺼짐 상태라면 실제로 클릭해서(그 요소의 onclick 로직을 그대로 태워) 다시 켭니다.
+function serializeComponentSwitches(compEl){
+  return Array.from(compEl.querySelectorAll('[id$="_switch"], [id$="_toggle"]')).map(el => el.classList.contains('on'));
+}
+function restoreComponentSwitches(compEl, states){
+  const els = compEl.querySelectorAll('[id$="_switch"], [id$="_toggle"]');
+  (states || []).forEach((wasOn, i) => {
+    const el = els[i];
+    if (el && wasOn && !el.classList.contains('on')) el.click();
+  });
+}
+
+// 전선의 한쪽 끝(핀 엘리먼트)을 "보드의 어느 핀"인지 또는 "몇 번째로 저장된 부품의 어느 핀"인지로
+// 표현합니다. data-pin 값은 보드끼리는(예: "D13") 전부 같고 부품끼리도 접두어(부품 id)만 다르므로,
+// 반드시 가장 가까운 보드/부품 엘리먼트로 범위를 좁혀서 식별해야 합니다.
+function pinDescriptorFor(pinEl, boardIndexByDomId, compIndexById){
+  const boardEl = pinEl.closest('.board');
+  if (boardEl){
+    const key = boardEl.dataset.board;
+    return key === 'r4'
+      ? { kind: 'board', board: 'base', pin: pinEl.dataset.pin }
+      : { kind: 'board', board: boardIndexByDomId[boardEl.id], pin: pinEl.dataset.pin };
+  }
+  const compEl = pinEl.closest('.placed-component');
+  if (!compEl) return null;
+  return { kind: 'component', comp: compIndexById[compEl.id], pinSuffix: pinEl.dataset.pin.slice(compEl.id.length) };
+}
+function resolvePinDescriptor(desc, boardDomIdByIndex, compIdByIndex){
+  if (!desc) return null;
+  if (desc.kind === 'board'){
+    const domId = desc.board === 'base' ? 'arduinoBoard' : boardDomIdByIndex[desc.board];
+    const boardEl = domId ? document.getElementById(domId) : null;
+    return boardEl ? boardEl.querySelector(`[data-pin="${desc.pin}"]`) : null;
+  }
+  const compId = compIdByIndex[desc.comp];
+  const compEl = compId ? document.getElementById(compId) : null;
+  return compEl ? compEl.querySelector(`[data-pin$="${desc.pinSuffix}"]`) : null;
+}
+
+function serializeProject(){
+  const extraBoards = Object.values(boardInstances).filter(b => b.key !== 'r4');
+  const boardIndexByDomId = {};
+  extraBoards.forEach((b, i) => { boardIndexByDomId[b.domId] = i; });
+  const boards = extraBoards.map(b => {
+    const editor = document.getElementById(`codeEditor${b.key.toUpperCase()}`);
+    const el = document.getElementById(b.domId);
+    return { type: b.type, left: el ? el.style.left : '', top: el ? el.style.top : '', code: editor ? editor.value : '' };
+  });
+
+  const compEls = Array.from(document.querySelectorAll('.placed-component')).filter(el => !el.classList.contains('board'));
+  const compIndexById = {};
+  compEls.forEach((el, i) => { compIndexById[el.id] = i; });
+  const components = compEls.map(el => ({
+    type: el.id.replace(/^comp_/, '').replace(/_\d+$/, ''),
+    left: el.style.left,
+    top: el.style.top,
+    experiment: el.dataset.experiment || null,
+    pairId: el.dataset.pairId || null,
+    fields: serializeComponentFields(el),
+    switches: serializeComponentSwitches(el),
+  }));
+
+  const wireList = wires.map(w => {
+    const from = pinDescriptorFor(w.from, boardIndexByDomId, compIndexById);
+    const to = pinDescriptorFor(w.to, boardIndexByDomId, compIndexById);
+    if (!from || !to) return null;
+    return { from, to, color: w.color, points: (w.points || []).map(p => ({ x: p.x, y: p.y })) };
+  }).filter(Boolean);
+
+  return {
+    app: 'k-arduino-sim', version: 1, savedAt: new Date().toISOString(), lang: currentLang,
+    baseR4Code: document.getElementById('codeEditorR4') ? document.getElementById('codeEditorR4').value : '',
+    boards, components, wires: wireList,
+  };
+}
+
+function saveProjectToFile(){
+  try {
+    const data = serializeProject();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const ts = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 16);
+    a.href = url;
+    a.download = `k-arduino-sim-${ts}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    showToast(tr('toast.saved'));
+  } catch (err) {
+    console.error(err);
+    showToast(tr('toast.loadError'), true);
+  }
+}
+
+function restoreProjectState(data){
+  clearCanvasAll();
+  if (data.lang && data.lang !== currentLang) setLanguage(data.lang);
+
+  const boardDomIdByIndex = [];
+  (data.boards || []).forEach(b => {
+    const newKey = spawnBoard(b.type);
+    const inst = boardInstances[newKey];
+    const el = inst ? document.getElementById(inst.domId) : null;
+    if (el){ if (b.left) el.style.left = b.left; if (b.top) el.style.top = b.top; }
+    const editor = document.getElementById(`codeEditor${newKey.toUpperCase()}`);
+    if (editor && b.code){
+      editor.value = b.code;
+      refreshLineNumbers(editor, document.getElementById(`lineNum${newKey.toUpperCase()}`));
+      executeCompilerPipeline(newKey);
+    }
+    boardDomIdByIndex.push(inst ? inst.domId : null);
+  });
+
+  if (data.baseR4Code){
+    const editor = document.getElementById('codeEditorR4');
+    if (editor){
+      editor.value = data.baseR4Code;
+      refreshLineNumbers(editor, document.getElementById('lineNumR4'));
+      executeCompilerPipeline('r4');
+    }
+  }
+
+  const compIdByIndex = [];
+  (data.components || []).forEach(c => {
+    const newId = spawnComponent(c.type);
+    const el = document.getElementById(newId);
+    if (el){
+      if (c.left) el.style.left = c.left;
+      if (c.top) el.style.top = c.top;
+      if (c.experiment) el.dataset.experiment = c.experiment;
+      if (c.pairId) el.dataset.pairId = c.pairId;
+      restoreComponentFields(el, c.fields);
+      restoreComponentSwitches(el, c.switches);
+    }
+    compIdByIndex.push(newId);
+  });
+
+  (data.wires || []).forEach(w => {
+    const fromEl = resolvePinDescriptor(w.from, boardDomIdByIndex, compIdByIndex);
+    const toEl = resolvePinDescriptor(w.to, boardDomIdByIndex, compIdByIndex);
+    if (!fromEl || !toEl) return;
+    const wireObj = createWire(fromEl, toEl);
+    setWireColor(wireObj, w.color || WIRE_DEFAULT_COLOR);
+    wireObj.points = Array.isArray(w.points) ? w.points.map(p => ({ x: p.x, y: p.y })) : [];
+    updateWirePosition(wireObj);
+  });
+
+  updateAllWires();
+  updateLegend();
+}
+
+function handleProjectFileSelected(inputEl){
+  const file = inputEl.files && inputEl.files[0];
+  inputEl.value = ''; // 같은 파일을 다시 골라도 change 이벤트가 나도록 초기화
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || data.app !== 'k-arduino-sim') throw new Error('not a project file');
+      restoreProjectState(data);
+      showToast(tr('toast.loaded'));
+    } catch (err) {
+      console.error(err);
+      showToast(tr('toast.loadError'), true);
+    }
+  };
+  reader.onerror = () => showToast(tr('toast.loadError'), true);
+  reader.readAsText(file);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
