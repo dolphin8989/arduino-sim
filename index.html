@@ -1,0 +1,3216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K군의 아두이노 시뮬레이터 Ver0.3</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg-app:#10141a;
+    --bg-panel:#161b22;
+    --bg-panel-2:#1c222b;
+    --bg-canvas:#0b0e12;
+    --grid-dot:#232b35;
+    --border:#28313c;
+    --border-strong:#39434f;
+    --text:#e8edf3;
+    --text-dim:#8b96a5;
+    --text-faint:#565f6c;
+    --teal:#12a4ab;
+    --teal-strong:#3fd0d6;
+    --teal-deep:#0b5d61;
+    --amber:#f2a53d;
+    --wire-power:#e6584a;
+    --wire-gnd:#6b7684;
+    --danger:#ff5f56;
+    --pcb:#131b28;
+    --pcb-dark:#070a10;
+    --gold:#d8b25c;
+    --focus:#5aa9e6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  *:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+  body{
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    background:var(--bg-app); color:var(--text);
+    height:100vh; overflow:hidden; display:flex; flex-direction:column;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+
+  /* Header */
+  header{
+    height:52px; flex:0 0 auto; background:var(--bg-panel);
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; padding:0 18px; z-index:20;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:26px; height:26px; border-radius:6px; background:linear-gradient(135deg,var(--teal),var(--teal-deep));
+    display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; font-weight:700;
+    box-shadow:0 0 0 1px rgba(255,255,255,.08) inset;
+  }
+  .brand-text{display:flex; flex-direction:column; line-height:1.15;}
+  .brand-text b{font-size:.92rem; font-weight:600; letter-spacing:.2px;}
+  .brand-text span{font-size:.68rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+  .toolbar{display:flex; gap:8px; align-items:center;}
+  .btn{
+    background:var(--bg-panel-2); color:var(--text); border:1px solid var(--border-strong);
+    padding:7px 14px; border-radius:6px; cursor:pointer; font-size:.8rem; font-weight:500;
+    display:flex; align-items:center; gap:6px; transition:background .12s, border-color .12s;
+  }
+  .btn:hover{background:#242c37; border-color:var(--teal);}
+  .btn.primary{background:var(--teal); border-color:var(--teal); color:#04262a; font-weight:600;}
+  .btn.primary:hover{background:var(--teal-strong); border-color:var(--teal-strong);}
+  .btn.stop{background:var(--danger); border-color:var(--danger); color:#2a0605; font-weight:600;}
+  .btn.ghost{background:transparent; border-color:transparent; color:var(--text-dim);}
+  .btn.ghost:hover{color:var(--text); background:var(--bg-panel-2);}
+
+  /* Workspace */
+  .workspace{flex:1; display:flex; min-height:0; position:relative;}
+
+  /* Palette */
+  .palette{
+    width:216px; flex:0 0 auto; background:var(--bg-panel); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; z-index:8;
+  }
+  .palette-title{padding:14px 16px 8px; font-size:.68rem; font-weight:600; color:var(--text-faint);
+    text-transform:uppercase; letter-spacing:1px;}
+  .palette-items{flex:1; overflow-y:auto; padding:6px 12px 16px; display:flex; flex-direction:column; gap:8px;}
+  .palette-item{
+    background:var(--bg-panel-2); border:1px solid var(--border); border-radius:8px; padding:12px 10px;
+    display:flex; flex-direction:column; align-items:center; gap:8px; cursor:grab; text-align:center;
+    transition:border-color .12s, transform .12s;
+  }
+  .palette-item:hover{border-color:var(--teal); transform:translateY(-1px);}
+  .palette-item:active{cursor:grabbing;}
+  .palette-item .swatch{width:30px; height:30px; display:flex; align-items:center; justify-content:center;}
+  .palette-item span{font-size:.72rem; color:var(--text-dim); line-height:1.3;}
+  .palette-hint{padding:10px 16px 16px; font-size:.68rem; color:var(--text-faint); line-height:1.5; border-top:1px solid var(--border);}
+  .palette-hint b{color:var(--text-dim);}
+
+  /* Canvas */
+  .canvas-area{
+    flex:1; position:relative; overflow:auto; background:var(--bg-canvas);
+    background-image:radial-gradient(circle,var(--grid-dot) 1px, transparent 1.2px);
+    background-size:22px 22px;
+  }
+  .canvas-inner{position:relative; width:2300px; height:1600px;}
+  svg#wireCanvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5; overflow:visible;}
+  .wire-path{fill:none; stroke-width:3; stroke-linecap:round; pointer-events:stroke; cursor:pointer; opacity:.92;}
+  .wire-path:hover{opacity:1; filter:drop-shadow(0 0 3px rgba(255,255,255,.5));}
+  .wire-path.wire-selected{opacity:1; filter:drop-shadow(0 0 5px rgba(255,255,255,.85));}
+
+  /* 전선 클릭 시 뜨는 색상 편집 팝오버 */
+  .wire-editor{
+    position:fixed; z-index:200; background:linear-gradient(160deg,#2c3038,#1c1f25); border:1px solid #3a3f47;
+    border-radius:10px; padding:9px; box-shadow:0 12px 28px rgba(0,0,0,.5); display:flex; flex-direction:column; gap:7px;
+  }
+  .wire-editor .we-swatches{display:flex; gap:5px; flex-wrap:wrap; max-width:150px;}
+  .wire-editor .we-swatch{width:20px; height:20px; border-radius:50%; cursor:pointer; border:2px solid rgba(255,255,255,.15);}
+  .wire-editor .we-swatch:hover{border-color:#fff;}
+  .wire-editor .we-swatch.we-active{border-color:#fff; box-shadow:0 0 0 2px var(--teal);}
+  .wire-editor .we-row{display:flex; align-items:center; gap:7px;}
+  .wire-editor input[type=color]{width:26px; height:22px; border:none; background:none; cursor:pointer; padding:0;}
+  .wire-editor .we-label{font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:var(--text-dim);}
+  .wire-editor .we-del{
+    font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:#ff6b5e; background:#2a1414; border:1px solid #5a2620;
+    border-radius:5px; padding:4px 8px; cursor:pointer;
+  }
+  .wire-editor .we-del:hover{background:#3a1a17;}
+
+  .placed-component{position:absolute; z-index:3; cursor:move;}
+  .placed-component.selected-comp{outline:2px dashed var(--focus); outline-offset:5px; border-radius:6px; z-index:4;}
+
+  /* Legend */
+  .legend{
+    position:absolute; left:236px; bottom:20px; width:270px; max-height:220px;
+    background:rgba(22,27,34,.92); border:1px solid var(--border); border-radius:10px;
+    z-index:6; backdrop-filter:blur(6px); overflow:hidden; display:flex; flex-direction:column;
+  }
+  .legend h4{padding:10px 12px 6px; font-size:.68rem; text-transform:uppercase; letter-spacing:.6px; color:var(--text-faint); font-weight:600;}
+  .legend-list{list-style:none; padding:0 12px 12px; overflow-y:auto; display:flex; flex-direction:column; gap:5px;}
+  .legend-list li{font-size:.74rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; display:flex; align-items:center; gap:7px;}
+  .legend-dot{width:8px; height:8px; border-radius:50%; flex:0 0 auto;}
+  .legend-empty{padding:0 12px 12px; font-size:.72rem; color:var(--text-faint);}
+
+  /* Arduino Board */
+  .board{
+    width:600px; height:400px; position:relative;
+    background:
+      linear-gradient(160deg, rgba(255,255,255,.05), transparent 40%),
+      linear-gradient(135deg, var(--pcb), var(--pcb-dark));
+    border-radius:14px; border:1px solid #000306;
+    box-shadow:0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.03) inset;
+  }
+  .silk{position:absolute; color:#eafdff; opacity:.92;}
+  .silk-word{top:44px; left:26px; font-family:'IBM Plex Mono',monospace; font-size:.62rem; letter-spacing:2.5px; color:#a7ecef;}
+  .silk-title{top:58px; left:26px; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:1.28rem; color:#fff;}
+  .silk-sub{top:90px; left:26px; font-family:'IBM Plex Mono',monospace; font-size:.63rem; color:#8fdfe3; letter-spacing:.4px;}
+  .board-art{position:absolute; inset:0; z-index:0; pointer-events:none;}
+
+  .chip{position:absolute; background:#1a1d1f; border-radius:3px; box-shadow:0 2px 4px rgba(0,0,0,.6), 0 0 0 1px #000; z-index:1;}
+  .chip-mcu{width:60px; height:60px; top:64px; left:392px;}
+  .chip-mcu .chip-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:.52rem; color:#9aa0a6; text-align:center; line-height:1.3;}
+  .chip-wifi{
+    width:150px; height:74px; top:200px; left:36px; border-radius:3px; border:1px solid #3f444b;
+    background:repeating-linear-gradient(45deg,#767c85 0 3px, #5c6169 3px 6px);
+  }
+  .chip-wifi .chip-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:.46rem; color:#e4e7ea; text-align:center; line-height:1.35; padding:0 6px;}
+
+  .reset-btn{
+    position:absolute; top:44px; right:26px; width:26px; height:26px; border-radius:5px;
+    background:#111417; border:1px solid #000; box-shadow:0 2px 3px rgba(0,0,0,.5), 0 0 0 1px #333 inset;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .reset-btn .cap{width:14px; height:14px; border-radius:3px; background:#3a4048;}
+  .reset-caption{position:absolute; top:72px; right:22px; font-family:'IBM Plex Mono',monospace; font-size:.55rem; color:#9adfe3;}
+
+  .power-led{position:absolute; top:44px; left:190px; width:7px; height:7px; border-radius:50%; background:#0f3d16; box-shadow:0 0 0 1px #000;}
+  .power-led.on{background:#3ddc84; box-shadow:0 0 6px #3ddc84;}
+  .power-cap{position:absolute; top:52px; left:184px; font-family:'IBM Plex Mono',monospace; font-size:.5rem; color:#7fb; opacity:.8;}
+
+  .matrix-box{
+    position:absolute; top:184px; left:344px; padding:10px 12px; background:#08090a; border-radius:8px;
+    border:1px solid #000; box-shadow:inset 0 2px 8px rgba(0,0,0,.85), 0 0 0 1px #26282a;
+  }
+  .matrix-grid{display:grid; grid-template-columns:repeat(12, 14px); grid-template-rows:repeat(8, 14px); gap:2px;}
+  .matrix-dot{width:14px; height:14px; border-radius:2px; background:#2a1414;}
+  .matrix-dot.on{background:#ff3b30; box-shadow:0 0 5px #ff3b30, 0 0 1px #ffb3ac inset;}
+
+  .header-row{position:absolute; display:flex; z-index:4;}
+  .header-row.top{top:-15px; left:34px; right:34px; justify-content:space-between;}
+  .header-row.power{bottom:-15px; left:26px; gap:14px;}
+  .header-row.analog{bottom:-15px; right:26px; gap:14px;}
+  .pin{
+    width:15px; height:15px; background:#15181a; border:2px solid var(--gold); border-radius:2px;
+    display:flex; align-items:center; justify-content:center; cursor:crosshair; position:relative; flex:0 0 auto;
+  }
+  .pin:hover{background:var(--gold);}
+  .pin.selected{background:var(--focus)!important; box-shadow:0 0 0 3px rgba(90,169,230,.35);}
+  .pin-name{position:absolute; font-size:.56rem; font-family:'IBM Plex Mono',monospace; color:#d7f7f8; white-space:nowrap; pointer-events:none;}
+  .header-row.top .pin-name{top:19px; left:50%; transform:translateX(-50%);}
+  .header-row.power .pin-name, .header-row.analog .pin-name{bottom:19px; left:50%; transform:translateX(-50%);}
+  .header-caption{position:absolute; font-family:'IBM Plex Mono',monospace; font-size:.52rem; color:#6fd1d5; letter-spacing:1px; text-transform:uppercase;}
+  .cap-power{bottom:-46px; left:26px;}
+  .cap-analog{bottom:-46px; right:26px;}
+
+  /* Peripheral components */
+  .comp-led{width:70px; display:flex; flex-direction:column; align-items:center; gap:5px;}
+  .led-dome{
+    width:26px; height:26px; border-radius:50% 50% 46% 46%; background:radial-gradient(circle at 35% 30%, #ff8f80, #a11a10 70%, #4a0906);
+    border:1px solid #6b0e08; position:relative; box-shadow:0 2px 4px rgba(0,0,0,.4);
+    transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+  }
+  .led-dome.on{box-shadow:0 0 16px 4px rgba(255,80,40,.85);}
+  .led-val{font-family:'IBM Plex Mono',monospace; font-size:.56rem; color:var(--teal-strong); min-height:1em;}
+  .led-color-select{
+    width:100%; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px;
+    font-size:.58rem; padding:1px 2px; cursor:pointer; font-family:'IBM Plex Mono',monospace;
+  }
+  .comp-pin-row{display:flex; gap:10px; justify-content:center;}
+  .comp-label{font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--text-dim); text-align:center;}
+
+  .comp-pot{
+    width:112px; padding:10px 12px 12px; background:var(--bg-panel-2); border:1px solid var(--border-strong);
+    border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);
+  }
+  .comp-pot .pot-title{font-size:.66rem; color:var(--text-dim); margin-bottom:6px; font-family:'IBM Plex Mono',monospace;}
+  .comp-pot input[type=range]{width:100%; accent-color:var(--teal); cursor:pointer; margin:2px 0 4px;}
+  .comp-pot .pot-value{font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:var(--teal-strong); margin-bottom:8px;}
+
+  .comp-btn{
+    width:64px; height:64px; background:#e7e4dc; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    border:1px solid #a9a396; box-shadow:0 6px 14px rgba(0,0,0,.35);
+  }
+  .btn-cap{width:34px; height:34px; border-radius:50%; background:#e6493d; box-shadow:0 4px 0 #a52e24; cursor:pointer; transition:transform .05s;}
+  .btn-cap:active, .btn-cap.pressed{transform:translateY(3px); box-shadow:0 1px 0 #a52e24;}
+
+  .pin-mini{width:12px; height:12px; background:#15181a; border:2px solid var(--gold); border-radius:2px; cursor:crosshair;}
+  .pin-mini.selected{background:var(--focus)!important;}
+  .pin-mini.probe-ch1{border-color:#ffd23f;}
+  .pin-mini.probe-ch2{border-color:#5ad0e6;}
+  .pin-mini.probe-ch3{border-color:#ff5ac8;}
+  .pin-mini.probe-ch4{border-color:#7cfc8a;}
+  .pin-mini.probe-gnd{border-color:#8b93a1;}
+
+  /* Scope (실제 4채널 오실로스코프처럼 화면을 가로로 넓게, CH1~CH4를 색으로 구분) */
+  .comp-scope{
+    width:800px; background:linear-gradient(160deg,#2c3038,#1c1f25); border:1px solid #3a3f47; border-radius:11px;
+    padding:12px; box-shadow:0 10px 24px rgba(0,0,0,.45);
+  }
+  .scope-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;}
+  .scope-head span{font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--text-dim); letter-spacing:.04em;}
+  .scope-hold-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--text-dim); background:#1a1e24;
+    border:1px solid var(--border-strong); border-radius:4px; padding:3px 8px; cursor:pointer;
+  }
+  .scope-hold-btn:hover{border-color:var(--teal);}
+  .scope-hold-btn.held{background:#3a2f0d; color:#f2a53d; border-color:#f2a53d;}
+  .scope-screen{background:#03150c; border:2px solid #0a0c0e; border-radius:5px; padding:3px;}
+  .comp-scope canvas{display:block; width:100%; height:150px;}
+  .scope-controls{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:5px 12px; margin:9px 0; padding:9px 0;
+    border-top:1px solid #34383f; border-bottom:1px solid #34383f;
+  }
+  .scope-controls label{display:flex; justify-content:space-between; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--text-dim);}
+  .scope-controls label.timediv-label{grid-column:1 / -1;}
+  .scope-controls select{background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.66rem; padding:2px 4px; cursor:pointer;}
+  .scope-readout{display:grid; grid-template-columns:1fr 1fr; gap:5px 14px; margin:9px 2px;}
+  .scope-readout div{display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:.64rem; color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ch-dot{width:7px; height:7px; border-radius:50%; flex:0 0 auto;}
+  .ch-dot.ch1{background:#ffd23f; box-shadow:0 0 4px #ffd23f;}
+  .ch-dot.ch2{background:#5ad0e6; box-shadow:0 0 4px #5ad0e6;}
+  .ch-dot.ch3{background:#ff5ac8; box-shadow:0 0 4px #ff5ac8;}
+  .ch-dot.ch4{background:#7cfc8a; box-shadow:0 0 4px #7cfc8a;}
+  .scope-probe-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; padding-top:6px; border-top:1px solid #34383f;}
+  .scope-probe-row .probe-wrap{display:flex; flex-direction:column; align-items:center; gap:3px;}
+  .scope-probe-row .probe-cap{font-family:'IBM Plex Mono',monospace; font-size:.55rem; color:var(--text-faint);}
+
+  /* Breadboard */
+  .comp-breadboard{
+    padding:14px 12px; background:linear-gradient(160deg,#efe9d8,#ddd5bd); border:1px solid #b8ae90; border-radius:8px;
+    box-shadow:0 10px 24px rgba(0,0,0,.4);
+  }
+  .bb-rail{display:flex; flex-direction:column; gap:4px; padding:5px 6px; position:relative;}
+  .bb-rail-top{margin-bottom:8px;} .bb-rail-bot{margin-top:8px;}
+  .bb-rail-line{display:grid; grid-template-columns:repeat(20,14px); gap:3px;}
+  .bb-bank{display:grid; grid-template-columns:repeat(20,14px); grid-template-rows:repeat(5,14px); gap:3px; padding:5px 6px;}
+  .bb-gutter{height:10px; background:repeating-linear-gradient(90deg,#c8bf9f 0 2px, transparent 2px 6px); margin:2px 0; opacity:.6;}
+  .bb-hole{width:9px; height:9px; border-radius:50%; background:#33312c; border:1px solid #17150f; cursor:crosshair;}
+
+  /* Servo, Motor, Ultrasonic, etc */
+  .comp-servo{width:88px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .comp-servo select.servo-rated-v{width:100%; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.62rem; padding:2px; cursor:pointer;}
+  .servo-body{position:relative; width:44px; height:44px;}
+  .servo-base{position:absolute; inset:6px; background:linear-gradient(160deg,#2a6fc4,#0d2f5c); border-radius:4px;}
+  .servo-arm{position:absolute; left:50%; top:50%; width:3px; height:20px; background:#e8d38a; transform-origin:50% 100%; transform:translate(-50%,-100%) rotate(0deg); transition:transform .12s ease;}
+  .servo-arm-tip{position:absolute; top:-4px; left:50%; width:8px; height:8px; margin-left:-4px; border-radius:50%; background:#f2d98f;}
+
+  .comp-dcmotor{width:70px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .motor-body{width:40px; height:40px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#5c646c,#2a2e33 70%); border:2px solid #1a1d1f; display:flex; align-items:center; justify-content:center;}
+  .motor-fan{width:30px; height:30px; border-radius:50%; background:conic-gradient(#8b93a1 0deg 90deg, #3a4048 90deg 180deg, #8b93a1 180deg 270deg, #3a4048 270deg 360deg);}
+  @keyframes motorSpin{to{transform:rotate(360deg);}}
+
+  .comp-ultrasonic{width:118px; padding:10px; background:#2a3038; border:1px solid #444c56; border-radius:9px; text-align:center;}
+  .us-body{display:flex; justify-content:center; gap:8px; margin-bottom:6px;}
+  .us-eye{width:24px; height:24px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#cfd6dc,#8a939c 65%,#5c646c);}
+
+  /* ---------- RGB LED ---------- */
+  .comp-rgbled{width:50px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .rgb-dome{width:26px; height:26px; border-radius:50% 50% 46% 46%; background:radial-gradient(circle at 35% 30%,#3a3a3a,#141414 70%); border:1px solid #050505; box-shadow:0 2px 4px rgba(0,0,0,.4);}
+  .rgb-pin-row{display:flex; gap:6px; justify-content:center;}
+  .pin-mini.probe-r{border-color:#ff5c5c;} .pin-mini.probe-g{border-color:#4ee06a;}
+  .pin-mini.probe-b{border-color:#5aa9e6;} .pin-mini.probe-gndrgb{border-color:#8b93a1;}
+
+  /* ---------- Power supply ---------- */
+  .comp-psu{width:150px; padding:10px; background:linear-gradient(160deg,#2c3038,#1c1f25); border:1px solid #3a3f47; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .comp-psu .psu-title{font-size:.62rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:8px;}
+  .psu-switch{width:34px; height:18px; border-radius:9px; background:#3a3f47; margin:0 auto 8px; position:relative; cursor:pointer; border:1px solid #4a5057;}
+  .psu-switch .knob{position:absolute; top:1px; left:1px; width:14px; height:14px; border-radius:50%; background:#8b93a1; transition:transform .15s;}
+  .psu-switch.on{background:#0b5d3e;} .psu-switch.on .knob{transform:translateX(16px); background:#3ddc84;}
+
+  /* ---------- Bluetooth module ---------- */
+  .comp-btmodule{width:120px; padding:10px; background:linear-gradient(160deg,#1c3a6b,#0d1f42); border:1px solid #2a4d8f; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .bt-body{position:relative; margin-bottom:8px;}
+  .bt-title{font-size:.6rem; color:#9cc2ff; font-family:'IBM Plex Mono',monospace; line-height:1.35;}
+  .bt-led{position:absolute; top:-4px; right:6px; width:7px; height:7px; border-radius:50%; background:#0f2a4d; box-shadow:0 0 0 1px #000;}
+  .bt-led.on{background:#5aa9e6; box-shadow:0 0 6px #5aa9e6;}
+  .bt-switch-row{display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;}
+  .bt-toggle{width:30px; height:16px; border-radius:8px; background:#2a4d8f; position:relative; cursor:pointer; border:1px solid #3a5da0; flex:0 0 auto;}
+  .bt-toggle .knob{position:absolute; top:1px; left:1px; width:12px; height:12px; border-radius:50%; background:#8fb4e6; transition:transform .15s;}
+  .bt-toggle.on{background:#0b5d3e;} .bt-toggle.on .knob{transform:translateX(14px); background:#3ddc84;}
+  .bt-switch-label{font-size:.56rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- WiFi AP (wireless signal generator) ---------- */
+  .comp-wifiap{width:120px; padding:10px; background:linear-gradient(160deg,#2c3038,#1c1f25); border:1px solid #3a3f47; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .ap-body{position:relative; height:56px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; margin-bottom:6px;}
+  .ap-antenna{position:absolute; top:0; left:38%; width:2px; height:20px; background:#6b7684; transform:rotate(-18deg); transform-origin:bottom;}
+  .ap-antenna.a2{left:58%; transform:rotate(18deg);}
+  .ap-rings{position:absolute; top:2px; left:50%; width:1px; height:1px;}
+  .ap-rings span{position:absolute; top:0; left:0; width:10px; height:10px; margin:-5px 0 0 -5px; border-radius:50%; border:1px solid var(--teal-strong); opacity:0;}
+  .comp-wifiap.on .ap-rings span{animation:apPing 1.8s ease-out infinite;}
+  .comp-wifiap.on .ap-rings span:nth-child(2){animation-delay:.5s;}
+  .comp-wifiap.on .ap-rings span:nth-child(3){animation-delay:1s;}
+  @keyframes apPing{0%{width:10px;height:10px;margin:-5px 0 0 -5px;opacity:.7;} 100%{width:56px;height:56px;margin:-28px 0 0 -28px;opacity:0;}}
+  .ap-title{font-size:.6rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; line-height:1.3;}
+  .ap-status{font-size:.58rem; color:var(--text-faint); font-family:'IBM Plex Mono',monospace; margin-top:2px;}
+  .comp-wifiap.on .ap-status{color:#3ddc84;}
+  .ap-switch-row{display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;}
+  .ap-switch{width:30px; height:16px; border-radius:8px; background:#3a3f47; position:relative; cursor:pointer; border:1px solid #4a5057; flex:0 0 auto;}
+  .ap-switch .knob{position:absolute; top:1px; left:1px; width:12px; height:12px; border-radius:50%; background:#8b93a1; transition:transform .15s;}
+  .ap-switch.on{background:#0b5d3e;} .ap-switch.on .knob{transform:translateX(14px); background:#3ddc84;}
+  .ap-switch-label{font-size:.56rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- DAC signal generator ---------- */
+  .comp-dac{width:130px; padding:10px; background:var(--bg-panel-2); border:1px solid var(--border-strong); border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .comp-dac .dac-title{font-size:.62rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:6px; line-height:1.4;}
+  .comp-dac select{width:100%; margin-bottom:6px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.68rem; padding:3px;}
+  .comp-dac input[type=range]{width:100%; accent-color:var(--teal); cursor:pointer; margin:2px 0 4px;}
+
+  /* ---------- Motor driver (L298N style) ---------- */
+  .comp-motordriver{width:150px; padding:10px; background:linear-gradient(160deg,#1e2a1e,#12180f); border:1px solid #3a4a35; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .md-title{font-size:.62rem; color:#9fd48a; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; line-height:1.35;}
+  .comp-motordriver .comp-pin-row span.pin-cap{display:block; font-size:.5rem; color:var(--text-faint); margin-top:2px;}
+  .md-out-row{margin-top:10px; padding-top:8px; border-top:1px dashed #3a4a35;}
+
+  /* ---------- Resistor (Ω/kΩ/MΩ 선택) ---------- */
+  .comp-resistor{width:98px; display:flex; flex-direction:column; align-items:center; gap:5px; padding:4px 0;}
+  .resistor-body{width:74px; height:22px; border-radius:9px; background:linear-gradient(180deg,#e6cfa0,#c9a86a 55%,#a9884f); position:relative; box-shadow:0 3px 6px rgba(0,0,0,.35); margin:10px 0 2px;}
+  .resistor-body::before, .resistor-body::after{content:''; position:absolute; top:50%; width:14px; height:2px; background:#9aa0a6; transform:translateY(-50%);}
+  .resistor-body::before{left:-14px;} .resistor-body::after{right:-14px;}
+  .resistor-band{position:absolute; top:1px; width:5px; height:20px; border-radius:1px; transition:background .1s;}
+  .resistor-band-gold{background:#c9a227;}
+  .resistor-controls{display:flex; gap:4px; width:100%;}
+  .res-value{width:56%; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.64rem; padding:2px 3px; font-family:'IBM Plex Mono',monospace;}
+  .res-unit{width:44%; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.62rem; padding:2px 1px; cursor:pointer;}
+  .res-display{color:var(--teal-strong);}
+
+  /* ---------- 파워케이블 (저항이 있는 전선) ---------- */
+  .comp-powercable{width:112px; display:flex; flex-direction:column; align-items:center; gap:5px; padding:4px 0;}
+  .cable-body{width:88px; height:14px; border-radius:7px; background:repeating-linear-gradient(90deg,#2a2a2a,#2a2a2a 6px,#161616 6px,#161616 9px); position:relative; box-shadow:0 3px 6px rgba(0,0,0,.35); margin:10px 0 2px;}
+  .cable-body::before, .cable-body::after{content:''; position:absolute; top:50%; width:12px; height:12px; border-radius:50%; background:#c9a227; transform:translateY(-50%); box-shadow:0 0 0 2px #7a6a1a;}
+  .cable-body::before{left:-6px;} .cable-body::after{right:-6px;}
+  .cable-controls{display:flex; align-items:center; gap:5px; width:100%; justify-content:center;}
+  .cable-controls input{width:52px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.62rem; padding:2px 3px; font-family:'IBM Plex Mono',monospace;}
+  .cable-controls span{font-size:.58rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- 전원 공급 장치 (DC 다전압 / AC 단상·3상) ---------- */
+  .comp-psu select.psu-mode, .comp-psu select.psu-dc-volt{
+    width:100%; margin-bottom:7px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong);
+    border-radius:4px; font-size:.66rem; padding:3px; cursor:pointer;
+  }
+  .psu-ac-badge{font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:#ffd23f; line-height:1.4; margin-bottom:6px;}
+  .psu-ac3-panel{flex-direction:column; align-items:center;}
+  .psu-ac3-panel:not([hidden]){display:flex;}
+  .psu-3ph-legend{display:flex; gap:8px; justify-content:center; margin-bottom:4px;}
+  .psu-3ph-legend span{font-family:'IBM Plex Mono',monospace; font-size:.56rem;}
+  .pin-mini.psu-r{border-color:#ff5c5c;} .pin-mini.psu-s{border-color:#ffd23f;} .pin-mini.psu-t{border-color:#5aa9e6;}
+
+  /* ---------- 3상 유도전동기 ---------- */
+  .comp-motor3ph{width:96px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .comp-motor3ph .motor-body{width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#5a6068,#2a2e33 75%); border:3px solid #1a1c1f; position:relative; box-shadow:0 6px 14px rgba(0,0,0,.4);}
+  .comp-motor3ph .motor-fan{position:absolute; inset:8px; border-radius:50%; background:conic-gradient(#8b93a1 0deg 90deg,#3a4048 90deg 180deg,#8b93a1 180deg 270deg,#3a4048 270deg 360deg);}
+  .m3ph-badge{font-family:'IBM Plex Mono',monospace; font-size:.56rem; color:#ffd23f; background:#2a2410; border:1px solid #5a4c1a; border-radius:3px; padding:1px 6px;}
+
+  /* ---------- BLDC 모터 & 드라이버 ---------- */
+  .comp-bldcmotor{width:88px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .comp-bldcmotor .motor-body{width:56px; height:56px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#3f6fae,#152743 75%); border:3px solid #0d1a2c; position:relative; box-shadow:0 6px 14px rgba(0,0,0,.4);}
+  .comp-bldcmotor .motor-fan{position:absolute; inset:7px; border-radius:50%; background:conic-gradient(#9cc2ff 0deg 90deg,#3a5a8f 90deg 180deg,#9cc2ff 180deg 270deg,#3a5a8f 270deg 360deg);}
+  .comp-bldcdriver{width:150px; padding:10px; background:linear-gradient(160deg,#1e2436,#12141f); border:1px solid #364a6a; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .bldc-title{font-size:.62rem; color:#9cc2ff; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; line-height:1.35;}
+  .comp-bldcdriver .md-out-row{margin-top:10px; padding-top:8px; border-top:1px dashed #364a6a;}
+
+  /* ---------- 엔코더가 달린 DC 모터 ---------- */
+  .comp-dcmotor-enc{width:80px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .comp-dcmotor-enc .motor-body{width:52px; height:52px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#6a6a6a,#2a2a2a 75%); border:3px solid #1a1a1a; position:relative; box-shadow:0 6px 14px rgba(0,0,0,.4);}
+  .comp-dcmotor-enc .motor-fan{position:absolute; inset:6px; border-radius:50%; background:conic-gradient(#8b93a1 0deg 90deg,#3a4048 90deg 180deg,#8b93a1 180deg 270deg,#3a4048 270deg 360deg);}
+  .enc-disk{position:absolute; inset:16px; border-radius:50%; background:repeating-conic-gradient(#e8d38a 0deg 15deg, #2a2a2a 15deg 30deg); border:1px solid #000; opacity:.9;}
+  .enc-badge{font-family:'IBM Plex Mono',monospace; font-size:.54rem; color:#3ddc84;}
+
+  /* ---------- 디지털 멀티미터 ---------- */
+  .comp-multimeter{width:132px; padding:12px 10px; background:linear-gradient(160deg,#3a3f37,#23261f); border:1px solid #4a4f3f; border-radius:12px; text-align:center; box-shadow:0 8px 18px rgba(0,0,0,.4);}
+  .mm-title{font-size:.6rem; color:#c9d4b8; font-family:'IBM Plex Mono',monospace; margin-bottom:7px; letter-spacing:.03em;}
+  .mm-screen{background:#b9c9a4; border-radius:4px; padding:7px 6px; margin-bottom:8px; display:flex; align-items:baseline; justify-content:center; gap:5px; box-shadow:inset 0 2px 4px rgba(0,0,0,.35); min-height:1.3em;}
+  .mm-screen .mm-value{font-family:'IBM Plex Mono',monospace; font-size:1.05rem; font-weight:700; color:#1c2418; letter-spacing:.02em;}
+  .mm-unit{font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:#3a4a2e;}
+  .comp-multimeter select.mm-mode{width:100%; margin-bottom:9px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.66rem; padding:3px; cursor:pointer;}
+  .mm-probe-row{display:flex; gap:18px; justify-content:center;}
+  .pin-mini.mm-probe-red{border-color:#ff3b3b;}
+  .pin-mini.mm-probe-blk{border-color:#6b7684; background:#1a1a1a;}
+
+  /* ---------- Character LCD (16x2) ---------- */
+  .comp-lcd{width:200px; padding:10px; background:linear-gradient(160deg,#2a3038,#181c22); border:1px solid var(--border-strong); border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .lcd-title{font-size:.6rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:6px;}
+  .lcd-screen{
+    background:#2c6b4a; border:2px solid #173a27; border-radius:3px; padding:6px 8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.72rem; line-height:1.55; color:#0c2416;
+    text-align:left; white-space:pre; letter-spacing:.5px; box-shadow:inset 0 0 6px rgba(0,0,0,.4);
+  }
+  .comp-lcd .comp-pin-row{margin-top:8px; flex-wrap:wrap; gap:4px 6px;}
+
+  /* ---------- OLED module (I2C, text-only emulation) ---------- */
+  .comp-oled{width:170px; padding:10px; background:linear-gradient(160deg,#22262c,#14171b); border:1px solid var(--border-strong); border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .oled-title{font-size:.6rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:6px;}
+  .oled-screen{
+    background:#000; border:2px solid #333; border-radius:3px; padding:5px 7px;
+    font-family:'IBM Plex Mono',monospace; font-size:.62rem; line-height:1.5; color:#eaf6ff;
+    text-align:left; white-space:pre; min-height:56px; box-shadow:inset 0 0 8px rgba(255,255,255,.05);
+  }
+  .comp-oled .comp-pin-row{margin-top:8px;}
+
+  /* ---------- BOM List modal ---------- */
+  .bom-row{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--border); font-size:.78rem;}
+  .bom-row span:last-child{color:var(--teal-strong); font-weight:600; font-family:'IBM Plex Mono',monospace;}
+  .bom-empty{color:var(--text-dim); font-size:.78rem; padding:10px 0;}
+  .bom-wire-count{margin-top:12px; padding-top:10px; border-top:1px dashed var(--border); font-size:.72rem; color:var(--text-dim);}
+
+  .board.board-r3{
+    background:linear-gradient(160deg, rgba(255,255,255,.05), transparent 40%), linear-gradient(135deg, #0f9297, #053e42);
+    height:236px;
+  }
+  .onboard-led{position:absolute; width:8px; height:8px; border-radius:50%; background:#3a0d0d; box-shadow:0 0 0 1px #000;}
+  .onboard-led.on{background:#ff4433; box-shadow:0 0 7px #ff4433;}
+  .onboard-cap{position:absolute; font-family:'IBM Plex Mono',monospace; font-size:.5rem; color:#bfe0ff;}
+
+  /* Floating Popups */
+  .board-popup{
+    position:absolute; width:540px; height:620px; background:var(--bg-panel);
+    border:1px solid var(--border); border-radius:10px; display:flex; flex-direction:column;
+    z-index:20; box-shadow:0 18px 40px rgba(0,0,0,.45);
+    resize:both; overflow:auto; min-width:420px; min-height:360px; max-width:min(96vw,980px); max-height:92vh;
+  }
+  .board-popup[hidden]{display:none;}
+  .popup-head{padding:11px 14px; background:var(--bg-panel-2); border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center; flex:0 0 auto; cursor:move; user-select:none;}
+  .popup-head b{font-size:.82rem; font-weight:600;}
+  .popup-body{flex:1; display:flex; flex-direction:column; min-height:0;}
+
+  .build-status-bar{
+    padding:6px 14px; background:#0e1217; border-bottom:1px solid var(--border); font-family:'IBM Plex Mono',monospace;
+    font-size:.7rem; color:var(--text-dim); display:flex; justify-content:space-between; align-items:center;
+  }
+  .status-tag{padding:2px 6px; border-radius:4px; font-weight:600;}
+  .status-tag.ready{background:#1a2332; color:#5aa9e6;}
+  .status-tag.building{background:#3a2f0d; color:#f2a53d;}
+  .status-tag.success{background:#0d331a; color:#3ddc84;}
+  .status-tag.error{background:#3d1110; color:#ff5f56;}
+
+  .cycle-stats{
+    padding:5px 14px; background:#0a0d12; border-bottom:1px solid var(--border); font-family:'IBM Plex Mono',monospace;
+    font-size:.68rem; color:var(--text-dim); display:flex; gap:16px; flex-wrap:wrap;
+  }
+  .cycle-stats b{color:#f2a53d; font-weight:600;}
+  .cycle-stats .reg-stat b{color:#3ddc84;}
+
+  .code-editor{
+    flex:1; margin:10px 14px 10px; background:#0a0d12; color:#cde6ff; font-family:'IBM Plex Mono',monospace;
+    font-size:.82rem; padding:14px; border:1px solid var(--border); border-radius:8px; outline:none; resize:none; line-height:1.55;
+  }
+  .serial-panel{height:220px; border-top:1px solid var(--border); display:flex; flex-direction:column; flex:0 0 auto;}
+  .serial-head{padding:8px 14px; font-size:.68rem; font-weight:600; color:var(--text-dim); background:var(--bg-panel-2);
+    display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; letter-spacing:.5px;}
+  .serial-logs{flex:1; padding:8px 14px; font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:#63e07a;
+    overflow-y:auto; white-space:pre-wrap; background:#07090c;}
+  .example-buttons{display:flex; gap:8px; margin:10px 14px 0; flex:0 0 auto;}
+  .example-buttons .btn{font-size:.72rem; padding:6px 12px;}
+
+  .compile-progress{height:3px; width:100%; background:transparent;}
+  .compile-progress.active{background:linear-gradient(90deg, #12a4ab 0%, #3fd0d6 50%, #12a4ab 100%); background-size:200% 100%; animation:moveProgress 1s linear infinite;}
+  @keyframes moveProgress{0%{background-position:100% 0;} 100%{background-position:-100% 0;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">U4</div>
+    <div class="brand-text">
+      <b>K군의 시뮬레이터 Ver0.3</b>
+      <span>Arduino GCC Toolchain &amp; Embedded Engine</span>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button class="btn primary" onclick="openBoardPopup('r4')">💻 코드 에디터 &amp; 컴파일러</button>
+    <button class="btn ghost" onclick="clearSerial()">콘솔 지우기</button>
+    <button class="btn ghost" onclick="openBomList()">BOM List</button>
+    <button class="btn primary" id="btnSim" onclick="toggleSimulation()">▶ 시뮬레이션 시작</button>
+  </div>
+</header>
+
+<div class="workspace">
+  <div class="palette">
+    <div class="palette-title">부품 상자</div>
+    <div class="palette-items">
+      <div class="palette-item" onclick="spawnComponent('led')">
+        <div class="swatch"><div style="width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8f80,#a11a10 70%);"></div></div>
+        <span>LED</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('pot')">
+        <div class="swatch"><div style="width:26px;height:12px;background:#3a4048;border-radius:3px;"></div></div>
+        <span>가변저항 (Pot)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('btn')">
+        <div class="swatch"><div style="width:18px;height:18px;border-radius:50%;background:#e6493d;"></div></div>
+        <span>푸시 버튼</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('scope')">
+        <div class="swatch">
+          <svg width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="20" rx="3" fill="#2c3038"/><polyline points="2,14 8,14 11,4 15,17 19,10 28,10" fill="none" stroke="#ffd23f" stroke-width="1.4"/></svg>
+        </div>
+        <span>오실로스코프</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('breadboard')">
+        <div class="swatch"><div style="width:28px;height:18px;border-radius:2px;background:linear-gradient(160deg,#efe9d8,#ddd5bd);border:1px solid #b8ae90;"></div></div>
+        <span>브레드보드</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('servo')">
+        <div class="swatch"><div style="width:20px;height:20px;border-radius:3px;background:linear-gradient(160deg,#2a6fc4,#0d2f5c);position:relative;"><div style="position:absolute;top:2px;left:9px;width:2px;height:10px;background:#e8d38a;"></div></div></div>
+        <span>DC 서보모터<br>(전압 선택)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('dcmotor')">
+        <div class="swatch"><div style="width:22px;height:22px;border-radius:50%;background:conic-gradient(#8b93a1 0deg 90deg,#3a4048 90deg 180deg,#8b93a1 180deg 270deg,#3a4048 270deg 360deg);"></div></div>
+        <span>DC 모터</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('ultrasonic')">
+        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:#2a3038;display:flex;align-items:center;justify-content:center;gap:2px;"><div style="width:7px;height:7px;border-radius:50%;background:#9aa0a6;"></div><div style="width:7px;height:7px;border-radius:50%;background:#9aa0a6;"></div></div></div>
+        <span>초음파 센서</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('rgbled')">
+        <div class="swatch"><div style="width:18px;height:18px;border-radius:50%;background:conic-gradient(#ff5c5c,#4ee06a,#5aa9e6,#ff5c5c);"></div></div>
+        <span>3색 LED (RGB)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('psu')">
+        <div class="swatch"><div style="width:22px;height:16px;border-radius:2px;background:#3a3f47;border:1px solid #555;"></div></div>
+        <span>전원 공급 장치</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('sensor-ldr')">
+        <div class="swatch"><div style="width:16px;height:16px;border-radius:50%;background:#e8d38a;box-shadow:inset 0 0 0 3px #7a6a3a;"></div></div>
+        <span>조도 센서 (LDR)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('sensor-temp')">
+        <div class="swatch"><div style="width:8px;height:20px;border-radius:4px;background:linear-gradient(0deg,#e6493d,#3a4048 60%);"></div></div>
+        <span>온도 센서</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('btmodule')">
+        <div class="swatch"><div style="width:22px;height:16px;border-radius:2px;background:linear-gradient(160deg,#1c3a6b,#0d1f42);border:1px solid #2a4d8f;"></div></div>
+        <span>블루투스 모듈</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('wifiap')">
+        <div class="swatch"><svg width="24" height="20" viewBox="0 0 24 20"><path d="M12 2 L4 18 M12 2 L20 18" stroke="#3fd0d6" stroke-width="1.6" fill="none"/><circle cx="12" cy="18" r="1.6" fill="#3fd0d6"/></svg></div>
+        <span>무선 AP<br>(신호 발생)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('dac')">
+        <div class="swatch"><svg width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="20" rx="3" fill="#2c3038"/><path d="M2,16 L10,16 L14,4 L18,16 L28,16" fill="none" stroke="#3ddc84" stroke-width="1.4"/></svg></div>
+        <span>DAC 신호 발생기</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('motordriver')">
+        <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#1e2a1e,#12180f);border:1px solid #3a4a35;"></div></div>
+        <span>모터 드라이버<br>(L298N)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('lcd')">
+        <div class="swatch"><div style="width:28px;height:16px;border-radius:2px;background:linear-gradient(160deg,#3a6b8a,#173347);border:1px solid #2a4d63;"></div></div>
+        <span>캐릭터 LCD<br>(16x2)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('oled')">
+        <div class="swatch"><div style="width:26px;height:16px;border-radius:2px;background:#0a0a0a;border:1px solid #444;"></div></div>
+        <span>OLED 모듈<br>(I2C)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('resistor')">
+        <div class="swatch"><div style="width:26px;height:11px;border-radius:5px;background:linear-gradient(180deg,#e6cfa0,#a9884f);box-shadow:inset -6px 0 0 -3px #d43b3b, inset 0px 0 0 -3px #e08a2a;"></div></div>
+        <span>저항 (Ω/kΩ/MΩ)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('powercable')">
+        <div class="swatch"><div style="width:26px;height:8px;border-radius:4px;background:repeating-linear-gradient(90deg,#2a2a2a,#2a2a2a 4px,#161616 4px,#161616 6px);"></div></div>
+        <span>파워케이블<br>(저항 있음)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('motor3ph')">
+        <div class="swatch"><div style="width:22px;height:22px;border-radius:50%;background:conic-gradient(#ff5c5c 0deg 120deg,#ffd23f 120deg 240deg,#5aa9e6 240deg 360deg);"></div></div>
+        <span>3상 유도전동기</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('bldcmotor')">
+        <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:conic-gradient(#9cc2ff 0deg 90deg,#3a5a8f 90deg 180deg,#9cc2ff 180deg 270deg,#3a5a8f 270deg 360deg);"></div></div>
+        <span>BLDC 모터</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('bldcdriver')">
+        <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#1e2436,#12141f);border:1px solid #364a6a;"></div></div>
+        <span>BLDC 드라이버</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('dcmotor-enc')">
+        <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:repeating-conic-gradient(#e8d38a 0deg 15deg,#2a2a2a 15deg 30deg);"></div></div>
+        <span>DC 모터<br>(엔코더 포함)</span>
+      </div>
+      <div class="palette-item" onclick="spawnComponent('multimeter')">
+        <div class="swatch"><div style="width:24px;height:18px;border-radius:3px;background:linear-gradient(160deg,#3a3f37,#23261f);border:1px solid #4a4f3f;display:flex;align-items:center;justify-content:center;"><div style="width:16px;height:8px;background:#b9c9a4;border-radius:1px;"></div></div></div>
+        <span>디지털 멀티미터</span>
+      </div>
+      <div class="palette-item" onclick="spawnBoard('r4')">
+        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#232f42,#070a10);border:1px solid #2a4d63;"></div></div>
+        <span>Uno R4 WiFi 보드 추가</span>
+      </div>
+      <div class="palette-item" onclick="spawnBoard('r3')">
+        <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#12a2a8,#054145);"></div></div>
+        <span>Uno R3 보드 추가</span>
+      </div>
+    </div>
+    <div class="palette-hint">
+      <b>동작 안내:</b><br>
+      • 핀을 클릭해 전선으로 연결합니다 (직선으로 연결됨).<br>
+      • 전선을 클릭하면 색상을 바로 바꾸거나 삭제할 수 있습니다.<br>
+      • 부품 선택 후 <b>Delete</b> 키를 누르면 삭제됩니다.<br>
+      • 저항/파워케이블은 값을 입력하면 실제로 전압이 분배되어 LED 밝기 등에 반영됩니다.<br>
+      • <b>[▶ 컴파일 &amp; 빌드 업로드]</b> 후 시뮬레이션을 시작하세요.
+    </div>
+  </div>
+
+  <div class="canvas-area" id="canvasArea">
+    <div class="canvas-inner" id="canvasInner">
+      <svg id="wireCanvas"></svg>
+      <div class="placed-component board" id="arduinoBoard" data-board="r4" style="left:480px; top:360px;"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <h4>연결 현황</h4>
+    <ul class="legend-list" id="legendList"></ul>
+    <div class="legend-empty" id="legendEmpty" hidden>연결된 전선이 없습니다.</div>
+  </div>
+
+  <!-- R4 Code & Toolchain Popup -->
+  <div class="board-popup" id="popupR4" style="left:58%; top:60px;">
+    <div class="popup-head" data-drag-handle>
+      <b>Uno R4 WiFi — C/C++ GCC Toolchain &amp; Serial</b>
+      <button class="btn ghost" onclick="closeBoardPopup('r4')">닫기 ✕</button>
+    </div>
+    <div class="compile-progress" id="progressR4"></div>
+    <div class="build-status-bar">
+      <span>Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)</span>
+      <span class="status-tag ready" id="statusTagR4">IDLE</span>
+    </div>
+    <div class="cycle-stats" id="cycleStatsR4">
+      <span>API 호출(pinMode/digitalWrite 등): <b>0</b> cycles (<b>0.00µs</b>)</span>
+      <span class="reg-stat">레지스터 직접제어(DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)</span>
+    </div>
+    <div class="popup-body">
+      <div class="example-buttons">
+        <button class="btn primary" id="btnCompileR4" onclick="executeCompilerPipeline('r4')">▶ 컴파일 &amp; 빌드 업로드</button>
+        <button class="btn ghost" onclick="loadExampleCode('r4','counter')">카운터 &amp; D13 점멸</button>
+        <button class="btn ghost" onclick="loadExampleCode('r4','analog')">A0 가변저항 &amp; D9 PWM</button>
+        <button class="btn ghost" onclick="loadExampleCode('r4','register')">DDR/PORT 레지스터 직접제어</button>
+        <button class="btn ghost" onclick="loadExampleCode('r4','api_vs_register')">13번(API) vs 12번(레지스터)</button>
+      </div>
+      <textarea id="codeEditorR4" class="code-editor" spellcheck="false">// Arduino Uno R4 WiFi 스케치
+int loopCounter = 0;
+const int ledPin = 13;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+  Serial.println("System Boot: RA4M1 Core Ready.");
+}
+
+void loop() {
+  loopCounter++;
+  
+  if (loopCounter % 2 == 0) {
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+
+  Serial.print("MCU Loop Tick: ");
+  Serial.println(loopCounter);
+  delay(200);
+}</textarea>
+      <div class="serial-panel">
+        <div class="serial-head"><span>빌드 콘솔 / 시리얼 모니터</span><span>9600 baud</span></div>
+        <div class="serial-logs" id="serialLogsR4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- R3 Code & Toolchain Popup -->
+  <div class="board-popup" id="popupR3" hidden style="left:55%; top:100px;">
+    <div class="popup-head" data-drag-handle>
+      <b>Uno R3 — AVR-GCC Toolchain &amp; Serial</b>
+      <button class="btn ghost" onclick="closeBoardPopup('r3')">닫기 ✕</button>
+    </div>
+    <div class="compile-progress" id="progressR3"></div>
+    <div class="build-status-bar">
+      <span>Target: ATmega328P (8-bit AVR @ 16MHz)</span>
+      <span class="status-tag ready" id="statusTagR3">IDLE</span>
+    </div>
+    <div class="cycle-stats" id="cycleStatsR3">
+      <span>API 호출(pinMode/digitalWrite 등): <b>0</b> cycles (<b>0.00µs</b>)</span>
+      <span class="reg-stat">레지스터 직접제어(DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)</span>
+    </div>
+    <div class="popup-body">
+      <div class="example-buttons">
+        <button class="btn primary" id="btnCompileR3" onclick="executeCompilerPipeline('r3')">▶ 컴파일 &amp; 빌드 업로드</button>
+        <button class="btn ghost" onclick="loadExampleCode('r3','counter')">카운터 예제</button>
+        <button class="btn ghost" onclick="loadExampleCode('r3','register')">DDR/PORT 레지스터 직접제어</button>
+        <button class="btn ghost" onclick="loadExampleCode('r3','api_vs_register')">13번(API) vs 12번(레지스터)</button>
+      </div>
+      <textarea id="codeEditorR3" class="code-editor" spellcheck="false">// Arduino Uno R3 스케치
+int cnt = 0;
+const int ledPin = 13;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  cnt++;
+  digitalWrite(ledPin, cnt % 2 == 0 ? HIGH : LOW);
+  Serial.print("R3 Tick: ");
+  Serial.println(cnt);
+  delay(300);
+}</textarea>
+      <div class="serial-panel">
+        <div class="serial-head"><span>빌드 콘솔 / 시리얼 모니터</span><span>9600 baud</span></div>
+        <div class="serial-logs" id="serialLogsR3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="board-popup" id="bomModal" hidden style="left:36%; top:120px; width:380px; height:440px; resize:both;">
+    <div class="popup-head" data-drag-handle>
+      <b>BOM List (부품 목록)</b>
+      <button class="btn ghost" onclick="closeBomList()">닫기 ✕</button>
+    </div>
+    <div class="popup-body" style="padding:14px 16px; overflow-y:auto;">
+      <div id="bomListBody"></div>
+      <div class="bom-wire-count" id="bomWireCount"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ Pin Definitions ============ */
+const DIGITAL_PINS = [
+  {id:'AREF', label:'AREF'}, {id:'GND_D', label:'GND'},
+  {id:'D13', label:'13'}, {id:'D12', label:'12'},
+  {id:'D11', label:'~11'}, {id:'D10', label:'~10'},
+  {id:'D9', label:'~9'}, {id:'D8', label:'8'},
+  {id:'D7', label:'7'}, {id:'D6', label:'~6'},
+  {id:'D5', label:'~5'}, {id:'D4', label:'4'},
+  {id:'D3', label:'~3'}, {id:'D2', label:'2'},
+  {id:'D1', label:'TX'}, {id:'D0', label:'RX'}
+];
+const POWER_PINS = [
+  {id:'IOREF', label:'IOREF'}, {id:'RST', label:'RST'},
+  {id:'3V3', label:'3V3'}, {id:'5V', label:'5V'},
+  {id:'GND_P1', label:'GND'}, {id:'GND_P2', label:'GND'},
+  {id:'VIN', label:'VIN'}
+];
+const ANALOG_PINS = [
+  {id:'A0', label:'A0'}, {id:'A1', label:'A1'},
+  {id:'A2', label:'A2'}, {id:'A3', label:'A3'},
+  {id:'A4', label:'A4'}, {id:'A5', label:'A5'}
+];
+const POWER_KIND_PINS = new Set(['IOREF', '3V3', '5V', 'VIN']);
+const GND_KIND_PINS = new Set(['GND_D', 'GND_P1', 'GND_P2']);
+const PIN_KIND = {};
+[...DIGITAL_PINS, ...POWER_PINS, ...ANALOG_PINS].forEach(p => {
+  PIN_KIND[p.id] = POWER_KIND_PINS.has(p.id) ? 'power' : GND_KIND_PINS.has(p.id) ? 'gnd' : 'signal';
+});
+
+// AVR 8비트 레지스터(DDRx/PORTx) <-> 아두이노 핀 번호 매핑. R3(ATmega328P)의 실제 배선과 동일.
+const AVR_PORT_PIN_MAP = {
+  B: {0:'D8', 1:'D9', 2:'D10', 3:'D11', 4:'D12', 5:'D13'},
+  D: {0:'D0', 1:'D1', 2:'D2', 3:'D3', 4:'D4', 5:'D5', 6:'D6', 7:'D7'},
+  C: {0:'A0', 1:'A1', 2:'A2', 3:'A3', 4:'A4', 5:'A5'},
+};
+
+/* ============ Embedded MCU Execution & GCC Compiler VM ============ */
+// API 호출(pinMode/digitalWrite 등)과 DDRx/PORTx 레지스터 직접 접근의 실행 비용 차이를
+// 실제 어셈블리 수준에 가깝게 반영하기 위한 사이클 모델입니다.
+// digitalWrite()는 내부적으로 핀->포트/비트마스크 테이블 조회 + 인터럽트 disable/enable +
+// read-modify-write를 수행하므로 여러 사이클이 걸리지만(자주 인용되는 수치가 약 50~60 사이클),
+// PORTx/DDRx 직접 조작은 sbi/cbi/out 명령 한두 개(약 1~2 사이클)로 끝납니다.
+const API_CALL_CYCLES = 56;
+const REG_ACCESS_CYCLES = 2;
+// 보드를 여러 개(R4 여러 대, R3 여러 대) 놓을 수 있도록, 보드 하나의 실행 상태를 만드는 함수로
+// 분리해뒀습니다. 새 보드를 추가할 때(spawnBoard)마다 이 함수로 mcuVM[새 키]를 채워 넣습니다.
+function createMcuState(clockHz){
+  return { intervalId: null, gen: 0, pinState: {}, loopFn: null, isCompiled: false, clockHz, apiCycles: 0, regCycles: 0,
+    edgeLog: {}, cycleOffsetNs: 0, lcdText: ['', ''], lcdCursor: { row: 0, col: 0 }, oledLines: ['', '', '', ''], oledCursor: { line: 0, col: 0 },
+    ledMatrix: Array.from({length:8}, () => new Array(12).fill(0)) };
+}
+const mcuVM = {
+  r4: createMcuState(48e6),
+  r3: createMcuState(16e6),
+};
+// 보드 인스턴스 키(예: 'r4', 'r4_2', 'r3', 'r3_2') -> 그 보드의 실제 DOM 엘리먼트 id.
+// digitalRead()/analogRead() 등 코드 실행 샌드박스 안에서 "내 보드 자신의 핀"을 찾을 때 사용합니다.
+const boardDomId = { r4: 'arduinoBoard', r3: 'arduinoBoard_r3' };
+// 보드 인스턴스 키 -> { key, type('r3'|'r4'), domId } — 여러 보드에 걸친 공통 작업(캐릭터 LED,
+// 매트릭스, 사이클 readout 갱신 등)을 순회할 때 사용하는 레지스트리입니다.
+const boardInstances = {
+  r4: { key: 'r4', type: 'r4', domId: 'arduinoBoard' },
+};
+// 타입별로 지금까지 몇 대를 만들었는지(기본 내장 보드 포함) 세어 다음 인스턴스 키를 정합니다.
+const boardSpawnCount = { r4: 1, r3: 0 };
+
+// C/C++ 변수 선언문을 JS 런타임 호환 형태로 변환
+function transpileCppToJs(cppCode) {
+  let js = cppCode;
+  js = js.replace(/\/\/[^\n]*/g, '');
+  js = js.replace(/\/\*[\s\S]*?\*\//g, '');
+  js = js.replace(/#include[^\n]*/g, '');
+  // #define NAME VALUE 형태의 전처리 매크로를 간단히 상수 선언으로 바꿔줍니다.
+  // (OLED 예제에서 흔한 SCREEN_WIDTH/SCREEN_HEIGHT/OLED_RESET 등의 정의를 지원하기 위함)
+  js = js.replace(/#define\s+(\w+)\s+(\S.*)$/gm, 'const $1 = $2;');
+  js = js.replace(/#define\s+(\w+)\s*$/gm, '');
+
+  // LiquidCrystal/Adafruit_SSD1306 객체 선언(C++ 생성자 호출 문법)을 JS의 `new` 호출로 치환합니다.
+  // 이 시뮬레이터는 두 클래스를 아래 sandboxPrefix에서 제공합니다.
+  // "&Wire"처럼 I2C 버스 객체의 주소를 넘기는 C++ 관용구는 JS에 없는 문법이므로(단항 & 연산자
+  // 없음), 포인터 없이 그냥 Wire 객체 자체를 넘기는 것으로 단순화합니다.
+  js = js.replace(/&Wire\b/g, 'Wire');
+  js = js.replace(/\bLiquidCrystal\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new LiquidCrystal($2);');
+  js = js.replace(/\bAdafruit_SSD1306\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new Adafruit_SSD1306($2);');
+
+  // DDRx/PORTx/PINx 레지스터 직접 접근을 __regs 프록시 객체 참조로 치환 — digitalWrite() 등의
+  // API 호출 없이도 실제로 동작(핀 상태에 반영)하도록 합니다.
+  ['B', 'C', 'D'].forEach(letter => {
+    js = js.replace(new RegExp(`\\bDDR${letter}\\b`, 'g'), `__regs.DDR${letter}`);
+    js = js.replace(new RegExp(`\\bPORT${letter}\\b`, 'g'), `__regs.PORT${letter}`);
+    js = js.replace(new RegExp(`\\bPIN${letter}\\b`, 'g'), `__regs.PIN${letter}`);
+  });
+
+  // R4 내장 12x8 LED 매트릭스(Arduino_LED_Matrix.h)의 "ArduinoLEDMatrix 변수명;" 선언(괄호 없는
+  // 기본 생성자 호출)을 JS의 `new` 호출로 치환합니다. 이 클래스는 아래 sandboxPrefix에서 제공합니다.
+  js = js.replace(/\bArduinoLEDMatrix\s+(\w+)\s*(?:\(\s*\))?\s*;/g, 'let $1 = new ArduinoLEDMatrix();');
+
+  // C 스타일 배열 선언(초기화 포함)을 JS 배열 리터럴로 치환합니다.
+  //   byte frame[8][12] = { {1,0,...}, {1,0,...}, ... };        ->  let frame = [ [1,0,...], [1,0,...], ... ];
+  //   const uint32_t heart[] = {0x3184a444, 0x44042081, ...};   ->  const heart = [0x3184a444, 0x44042081, ...];
+  // (LED 매트릭스 예제에서 static/const 배열이 매우 흔해서 둘 다 지원합니다.)
+  // 중첩 배열 초기화의 {}는 JS 배열 리터럴이 아니라 문법 오류이므로, 값만 들어있는 초기화 블록
+  // 안의 {}를 통째로 []로 바꿔줍니다(변수 타입/배열 크기 목록은 버리고 값만 남깁니다).
+  // LED 매트릭스 예제처럼 여러 줄에 걸친 초기화도 [\s\S]*?로 함께 매칭됩니다.
+  js = js.replace(
+    /\b(?:static\s+)?(const\s+)?(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte)\s+(\w+)\s*(?:\[\s*\d*\s*\])+\s*=\s*(\{[\s\S]*?\})\s*;/g,
+    (_m, isConst, name, body) => `${isConst ? 'const' : 'let'} ${name} = ${body.replace(/\{/g, '[').replace(/\}/g, ']')};`
+  );
+  // 초기화 없이 크기만 선언하는 경우 (예: byte frame[8][12];) — 0으로 채운 배열을 만들어둡니다.
+  js = js.replace(
+    /\b(?:static\s+)?(?:const\s+)?(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte)\s+(\w+)\s*\[\s*(\d+)\s*\]\s*\[\s*(\d+)\s*\]\s*;/g,
+    'let $1 = Array.from({length:$2}, () => new Array($3).fill(0));'
+  );
+  js = js.replace(
+    /\b(?:static\s+)?(?:const\s+)?(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte)\s+(\w+)\s*\[\s*(\d+)\s*\]\s*;/g,
+    'let $1 = new Array($2).fill(0);'
+  );
+
+  js = js.replace(/\bconst\s+(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte)\s+(\w+)/g, 'const $1');
+  js = js.replace(/\b(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte)\s+(\w+)/g, 'let $1');
+
+  js = js.replace(/\bA0\b/g, '"A0"').replace(/\bA1\b/g, '"A1"').replace(/\bA2\b/g, '"A2"')
+         .replace(/\bA3\b/g, '"A3"').replace(/\bA4\b/g, '"A4"').replace(/\bA5\b/g, '"A5"');
+
+  // delay()/delayMicroseconds()가 실제로 시간을 멈추도록(Promise 기반) 만들기 위해,
+  // 호출부에 await를 붙여줍니다. setup()/loop()는 아래에서 async 함수로 감싸집니다.
+  js = js.replace(/\bdelay\s*\(/g, 'await delay(');
+  js = js.replace(/\bdelayMicroseconds\s*\(/g, 'await delayMicroseconds(');
+  return js;
+}
+
+// 보드별 AVR 레지스터 상태 + PORTx 쓰기를 실제 아두이노 핀 상태로 반영하는 프록시 객체.
+// (DDRx/PINx는 값만 보존하고, 방향/토글 효과는 이 단순 모델에서는 시각적으로 재현하지 않습니다.)
+//
+// 또한 각 레지스터 접근마다 mcu.cycleOffsetNs(이번 loop() 호출 안에서 지금까지 누적된
+// "가상 실행 시간")를 함께 늘리고, 실제로 핀 값이 바뀌는 순간 mcu.edgeLog에 그 시점의
+// 타임스탬프와 함께 기록합니다 — 오실로스코프를 아주 작은 TIME/DIV(µs 단위)로 확대했을 때
+// API 호출과 레지스터 직접 접근 사이의 사이클 차이만큼 실제로 파형 엣지가 어긋나 보이게 하기 위함입니다.
+function pushEdge(board, pinName, v){
+  const mcu = mcuVM[board];
+  if (!mcu.edgeLog[pinName]) mcu.edgeLog[pinName] = [];
+  const arr = mcu.edgeLog[pinName];
+  const last = arr[arr.length - 1];
+  if (last && last.v === v) return; // 값이 실제로 바뀐 경우에만 엣지를 기록합니다.
+  // 주의: 매번 performance.now()를 새로 호출하면 안 됩니다 — 크롬은 핑거프린팅 방지를 위해
+  // performance.now()의 해상도를 일부러 뭉개서(수 마이크로초~수십 마이크로초 단위로 반올림)
+  // 반환하기 때문에, 같은 loop() 호출 안에서 연속으로 호출하면 우리가 계산한 사이클 단위의
+  // 미세한 시간차(수십~수백 나노초)가 그 반올림 잡음에 완전히 묻혀버립니다. 그래서 이 loop()
+  // 호출이 시작될 때 딱 한 번 잡아둔 기준 시각(mcu.loopStartPerf)에 가상 사이클 오프셋만
+  // 더해서 타임스탬프를 계산합니다 — 그래야 엣지들 사이의 상대적 순서/간격이 오직 우리
+  // 사이클 모델에 의해서만 결정됩니다.
+  const t = (mcu.loopStartPerf || performance.now()) + mcu.cycleOffsetNs / 1e6;
+  arr.push({ t, v });
+  if (arr.length > 4000) arr.splice(0, arr.length - 3000);
+}
+
+function makeRegs(board){
+  const raw = { DDRB:0, DDRC:0, DDRD:0, PORTB:0, PORTC:0, PORTD:0, PINB:0, PINC:0, PIND:0 };
+  const nsPerCycle = () => 1e9 / mcuVM[board].clockHz;
+  const bump = (cost) => { mcuVM[board].regCycles += cost; mcuVM[board].cycleOffsetNs += cost * nsPerCycle(); };
+  const regs = {};
+  ['B', 'C', 'D'].forEach(letter => {
+    Object.defineProperty(regs, 'DDR' + letter, {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw['DDR' + letter]; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw['DDR' + letter] = v; }
+    });
+    Object.defineProperty(regs, 'PIN' + letter, {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw['PIN' + letter]; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw['PIN' + letter] = v; }
+    });
+    Object.defineProperty(regs, 'PORT' + letter, {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw['PORT' + letter]; },
+      set: (v) => {
+        bump(REG_ACCESS_CYCLES);
+        raw['PORT' + letter] = v;
+        const map = AVR_PORT_PIN_MAP[letter];
+        Object.entries(map).forEach(([bit, pinName]) => {
+          const newV = (v >> bit) & 1;
+          mcuVM[board].pinState[pinName] = { type: 'digital', v: newV };
+          pushEdge(board, pinName, newV);
+        });
+      }
+    });
+  });
+  return regs;
+}
+
+function executeCompilerPipeline(board) {
+  const editor = document.getElementById(`codeEditor${board.toUpperCase()}`);
+  if (!editor) return;
+  const rawCode = editor.value;
+  const targetTag = document.getElementById(`statusTag${board.toUpperCase()}`);
+  const progressBar = document.getElementById(`progress${board.toUpperCase()}`);
+  const btn = document.getElementById(`btnCompile${board.toUpperCase()}`);
+
+  targetTag.className = 'status-tag building';
+  targetTag.textContent = 'BUILDING';
+  progressBar.classList.add('active');
+  btn.disabled = true;
+
+  logSerial(`\n================ [ GCC Compiler Toolchain: ${board.toUpperCase()} ] ================`, board);
+  const mcuTarget = board.startsWith('r3') ? 'atmega328p' : 'renesas_ra4m1';
+  logSerial(`avr-g++ -c -g -Os -Wall -Wextra -std=gnu++17 -fno-exceptions -mmcu=${mcuTarget} sketch.cpp -o sketch.o`, board);
+
+  // 구문 검증
+  const errors = [];
+  const openB = (rawCode.match(/\{/g) || []).length;
+  const closeB = (rawCode.match(/\}/g) || []).length;
+  if (openB !== closeB) {
+    errors.push(`sketch.ino: error: 중괄호 '{', '}' 짝이 맞지 않습니다. (여는 괄호 ${openB}개, 닫는 괄호 ${closeB}개)`);
+  }
+  if (!/void\s+setup\s*\(\s*\)/.test(rawCode)) {
+    errors.push(`sketch.ino:(.text+0x0): error: undefined reference to 'setup()'`);
+  }
+  if (!/void\s+loop\s*\(\s*\)/.test(rawCode)) {
+    errors.push(`sketch.ino:(.text+0x2): error: undefined reference to 'loop()'`);
+  }
+
+  const lines = rawCode.split('\n');
+  // 괄호/중괄호/대괄호 깊이를 줄 단위로 누적 추적합니다. 세미콜론 누락 검사는 "이 줄이 시작할 때도
+  // 끝날 때도 depth가 0인" 줄, 즉 그 줄 하나로 완결된 문장에만 적용합니다 — 그렇지 않으면
+  //   byte frame[8][12] = {
+  //     { 1, 1, 1, ... },   <- 세미콜론 없이 콤마로 끝나는 게 정상인데, 예전 방식은 이런 줄을
+  //     ...                    전부 "expected ';'" 오류로 오탐했습니다 (다중 행 배열/구조체 초기화,
+  //   };                       여러 줄에 걸친 함수 호출 등 실제 C++에서 매우 흔한 패턴).
+  let bracketDepth = 0;
+  lines.forEach((l, idx) => {
+    const t = l.trim();
+    if (!t || t.startsWith('//') || t.startsWith('#')) return;
+    // 줄 끝의 "// 주석"은 세미콜론 검사 대상에서 제외합니다 — 실제 코드에서 매우 흔하고,
+    // 이걸 무시하지 않으면 "코드; // 설명" 같은 정상적인 줄까지 오류로 오탐합니다.
+    const codePart = t.replace(/\/\/.*$/, '').trim();
+    const startDepth = bracketDepth;
+    const opens = (codePart.match(/[{(\[]/g) || []).length;
+    const closes = (codePart.match(/[})\]]/g) || []).length;
+    bracketDepth = Math.max(0, bracketDepth + opens - closes);
+    if (!codePart) return;
+    if (startDepth > 0 || bracketDepth > 0) return; // 여러 줄에 걸친 구문(배열/구조체 초기화, 다중 행 호출 등) 도중이면 건너뜁니다.
+    if (codePart.endsWith('{') || codePart.endsWith('}') || codePart.startsWith('if') || codePart.startsWith('for') || codePart.startsWith('while') || codePart.startsWith('else')) return;
+    if (!codePart.endsWith(';') && !codePart.endsWith(':')) {
+      errors.push(`sketch.ino:${idx + 1}:${codePart.length}: error: expected ';' before end of line`);
+    }
+  });
+
+  // 타입 키워드 뒤에 변수 이름 없이 바로 '='가 오는 경우 (예: "int = value;") — 실제
+  // 컴파일러라면 "expected unqualified-id before '=' token" 으로 거부합니다.
+  lines.forEach((l, idx) => {
+    const badDeclRe = /\b(?:unsigned\s+)?(int|float|double|char|bool|long|byte|short|uint8_t|uint16_t|uint32_t)\s*=(?!=)/g;
+    let bm;
+    while ((bm = badDeclRe.exec(l))) {
+      errors.push(`sketch.ino:${idx + 1}: error: expected unqualified-id before '=' token ('${bm[1]}' 뒤에 변수 이름이 없습니다. 예: ${bm[1]} value = 0;)`);
+    }
+  });
+
+  // const로 선언된 변수에 값을 대입하는 경우 (예: "const int ledPin = 9;" 이후 "ledPin = 1;")
+  const constNames = new Set();
+  const constDeclRe = /\bconst\s+(?:unsigned\s+)?(?:int|long|float|double|char|bool|byte|short|uint8_t|uint16_t|uint32_t)\s+(\w+)\s*=/g;
+  let cm;
+  while ((cm = constDeclRe.exec(rawCode))) constNames.add(cm[1]);
+  if (constNames.size) {
+    lines.forEach((l, idx) => {
+      if (/\bconst\b/.test(l)) return; // 선언 라인 자체는 제외
+      const assignRe = /\b(\w+)\s*=\s*(?!=)/g;
+      let am;
+      while ((am = assignRe.exec(l))) {
+        if (constNames.has(am[1])) {
+          errors.push(`sketch.ino:${idx + 1}: error: assignment of read-only variable '${am[1]}' (const로 선언된 변수입니다 — digitalWrite(${am[1]}, ...) 처럼 함수를 사용하세요.)`);
+        }
+      }
+    });
+  }
+
+  if (errors.length > 0) {
+    setTimeout(() => {
+      progressBar.classList.remove('active');
+      targetTag.className = 'status-tag error';
+      targetTag.textContent = 'BUILD FAILED';
+      btn.disabled = false;
+      errors.forEach(err => logSerial(err, board));
+      logSerial(`\nexit status 1: 컴파일 에러 발생으로 빌드가 중단되었습니다.`, board);
+    }, 350);
+    return;
+  }
+
+  // 빌드 콘솔 연출
+  setTimeout(() => {
+    logSerial(`[1/3] Parsing Abstract Syntax Tree & Symbol Table... OK`, board);
+  }, 250);
+
+  setTimeout(() => {
+    logSerial(`[2/3] Linking objects: avr-gcc -mmcu=${mcuTarget} sketch.o -o firmware.elf`, board);
+  }, 500);
+
+  setTimeout(() => {
+    logSerial(`[3/3] Generating Hex Binary: avr-objcopy -O ihex -R .eeprom firmware.elf firmware.hex`, board);
+
+    const flashBase = board.startsWith('r3') ? 1420 : 3840;
+    const flashSize = flashBase + rawCode.length * 4;
+    const maxFlash = board.startsWith('r3') ? 32256 : 262144;
+    const ramSize = 180 + Math.floor(rawCode.length * 0.3);
+    const maxRam = board.startsWith('r3') ? 2048 : 32768;
+
+    logSerial(`\nProgram storage: ${flashSize} bytes (${((flashSize/maxFlash)*100).toFixed(1)}%) of maximum ${maxFlash} bytes.`, board);
+    logSerial(`Dynamic memory:  ${ramSize} bytes (${((ramSize/maxRam)*100).toFixed(1)}%) of maximum ${maxRam} bytes.`, board);
+    logSerial(`Flashing target device: [########################################] 100%`);
+    logSerial(`[SUCCESS] 펌웨어가 MCU 플래시 메모리에 업로드되었습니다. 타겟이 실행을 시작합니다.\n`, board);
+
+    progressBar.classList.remove('active');
+    targetTag.className = 'status-tag success';
+    targetTag.textContent = 'SUCCESS';
+    btn.disabled = false;
+
+    deployToMCU(board, rawCode);
+  }, 850);
+}
+
+// new Function()은 async 함수를 만들 수 없으므로, 그 비동기 버전인 AsyncFunction 생성자를
+// 얻어둡니다. 이 생성자로 만든 함수 안에서는 setup()/loop()가 실제로 await delay(...)에서
+// 멈췄다가 그 시간이 지난 뒤에 이어서 실행됩니다 — 즉 delay()가 더 이상 더미(no-op)가 아닙니다.
+const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+
+function deployToMCU(board, rawCode) {
+  const mcu = mcuVM[board];
+  mcu.gen = (mcu.gen || 0) + 1;          // 이전에 실행 중이던 setup()/loop() 루프를 무효화합니다.
+  const myGen = mcu.gen;
+  mcu.pinState = {};
+  mcu.apiCycles = 0;
+  mcu.regCycles = 0;
+  mcu.edgeLog = {};
+  mcu.cycleOffsetNs = 0;
+  mcu.lcdText = ['', ''];
+  mcu.lcdCursor = { row: 0, col: 0 };
+  mcu.oledLines = ['', '', '', ''];
+  mcu.oledCursor = { line: 0, col: 0 };
+  mcu.ledMatrix = Array.from({length:8}, () => new Array(12).fill(0));
+  updateCycleStats(board);
+
+  try {
+    const transpiled = transpileCppToJs(rawCode);
+
+    const setupMatch = transpiled.match(/void\s+setup\s*\(\s*\)\s*\{([\s\S]*?)\}\s*(?=void|$)/);
+    const loopMatch = transpiled.match(/void\s+loop\s*\(\s*\)\s*\{([\s\S]*?)\}\s*$/);
+    const setupBody = setupMatch ? setupMatch[1] : '';
+    const loopBody = loopMatch ? loopMatch[1] : '';
+
+    let globalVars = transpiled.replace(/void\s+setup[\s\S]*?\}\s*(?=void|$)/, '').replace(/void\s+loop[\s\S]*?\}\s*$/, '');
+    globalVars = globalVars.replace(/#include[^\n]*/g, '');
+
+    const sandboxPrefix = `
+      const Serial = {
+        begin: function() {},
+        print: function(v) { logSerial(String(v), '${board}'); },
+        println: function(v) { logSerial(String(v !== undefined ? v : ''), '${board}'); }
+      };
+      const HIGH = 1, LOW = 0, OUTPUT = 1, INPUT = 0, INPUT_PULLUP = 2;
+      // AVR 레지스터 비트 상수 (PBn/PCn/PDn) — DDRx/PORTx 직접 제어 코드에서 사용됩니다.
+      const PB0=0,PB1=1,PB2=2,PB3=3,PB4=4,PB5=5,PB6=6,PB7=7;
+      const PC0=0,PC1=1,PC2=2,PC3=3,PC4=4,PC5=5;
+      const PD0=0,PD1=1,PD2=2,PD3=3,PD4=4,PD5=5,PD6=6,PD7=7;
+      // API 호출(pinMode/digitalWrite/analogWrite/digitalRead/analogRead)은 실제 AVR에서도
+      // 핀 번호->포트/비트마스크 조회, 인터럽트 disable/enable, read-modify-write를 거치는
+      // 만큼 매번 ${API_CALL_CYCLES}사이클의 비용이 드는 것으로 계산합니다. (아래 makeRegs의
+      // DDRx/PORTx 직접 접근은 ${REG_ACCESS_CYCLES}사이클로 그보다 훨씬 저렴합니다.)
+      //
+      // 실제 AVR에서 digitalWrite(13, ...)는 내부적으로 "PORTB의 5번 비트만" read-modify-write
+      // 합니다 — 같은 PORTB에 속한 다른 핀(예: 12번=PB4)의 비트는 건드리지 않습니다. 이 시뮬레이터도
+      // 그 사실과 일치시키기 위해, API로 핀을 쓸 때 대응하는 DDRx/PORTx 레지스터 비트를 함께
+      // 갱신합니다. 이렇게 하지 않으면 13번(API)과 12번(레지스터)처럼 같은 포트(PORTB)의 다른
+      // 비트를 API/레지스터 두 방식으로 섞어 쓸 때, 레지스터 접근이 레지스터의 나머지 비트를
+      // (API가 갱신한 적 없는) 옛 값으로 되돌려버려 API 쪽 핀 상태가 사라지는 문제가 생깁니다.
+      const PIN_TO_AVR_BIT = {
+        D8:['B',0], D9:['B',1], D10:['B',2], D11:['B',3], D12:['B',4], D13:['B',5],
+        D0:['D',0], D1:['D',1], D2:['D',2], D3:['D',3], D4:['D',4], D5:['D',5], D6:['D',6], D7:['D',7],
+        A0:['C',0], A1:['C',1], A2:['C',2], A3:['C',3], A4:['C',4], A5:['C',5],
+      };
+      // API 호출 1회 = ${API_CALL_CYCLES}사이클 비용을 누적 카운터(apiCycles, readout용)와
+      // cycleOffsetNs(이번 loop() 안에서의 가상 실행 시간, 오실로스코프 정밀 모드용)에 모두 반영합니다.
+      function __bumpApi() {
+        mcuVM['${board}'].apiCycles += ${API_CALL_CYCLES};
+        mcuVM['${board}'].cycleOffsetNs += ${API_CALL_CYCLES} * (1e9 / mcuVM['${board}'].clockHz);
+      }
+      function pinMode(p, m) {
+        __bumpApi();
+        let pn = String(p);
+        if (/^\\d+$/.test(pn)) pn = 'D' + pn;
+        const avrBit = PIN_TO_AVR_BIT[pn];
+        if (avrBit) {
+          const letter = avrBit[0], bit = avrBit[1];
+          const cur = __regs['DDR' + letter];
+          __regs['DDR' + letter] = (m === OUTPUT) ? (cur | (1 << bit)) : (cur & ~(1 << bit));
+        }
+      }
+      function digitalWrite(pin, val) {
+        __bumpApi();
+        let p = String(pin);
+        if (/^\\d+$/.test(p)) p = 'D' + p;
+        mcuVM['${board}'].pinState[p] = { type: 'digital', v: val ? 1 : 0 };
+        const avrBit = PIN_TO_AVR_BIT[p];
+        if (avrBit) {
+          const letter = avrBit[0], bit = avrBit[1];
+          const cur = __regs['PORT' + letter];
+          __regs['PORT' + letter] = val ? (cur | (1 << bit)) : (cur & ~(1 << bit));
+        }
+      }
+      function analogWrite(pin, val) {
+        __bumpApi();
+        let p = String(pin);
+        if (/^\\d+$/.test(p)) p = 'D' + p;
+        mcuVM['${board}'].pinState[p] = { type: 'pwm', v: Math.max(0, Math.min(255, val)) / 255 };
+      }
+      function digitalRead(pin) {
+        __bumpApi();
+        let p = String(pin);
+        if (/^\\d+$/.test(p)) p = 'D' + p;
+        const reading = boardPinReading(boardDomId['${board}'], p);
+        return reading ? (reading.v >= 0.5 ? 1 : 0) : 1;
+      }
+      function analogRead(pin) {
+        __bumpApi();
+        let p = String(pin);
+        if (/^\\d+$/.test(p)) p = 'A' + p;
+        const reading = boardPinReading(boardDomId['${board}'], p);
+        return reading ? Math.floor(reading.v * 1023) : 0;
+      }
+      // delay()/delayMicroseconds()는 이제 진짜로 시간을 멈춥니다 (Promise + setTimeout).
+      // transpileCppToJs가 호출부에 await를 붙여주고, setup()/loop()는 async 함수로 실행되므로
+      // 여기서 실제 지연이 일어나는 동안 다른 코드는 이어서 실행되지 않고 정확히 그 시점에 멈춥니다.
+      function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, Math.max(0, ms)));
+      }
+      function delayMicroseconds(us) {
+        return new Promise(resolve => setTimeout(resolve, Math.max(0, us / 1000)));
+      }
+      function millis() { return Math.round(performance.now() - mcuVM['${board}'].bootTimeMs); }
+      function micros() { return Math.round((performance.now() - mcuVM['${board}'].bootTimeMs) * 1000); }
+      function map(x, in_min, in_max, out_min, out_max) {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+      }
+      // I2C Wire 라이브러리 자리표시자 (begin() 등 호출만 무시하고 넘어갑니다).
+      const Wire = { begin: function(){}, beginTransmission: function(){}, endTransmission: function(){}, write: function(){}, requestFrom: function(){} };
+      const SSD1306_SWITCHCAPVCC = 2, SSD1306_EXTERNALVCC = 1, WHITE = 1, BLACK = 0;
+      // 캐릭터 LCD(HD44780, LiquidCrystal 라이브러리) 에뮬레이션 — 화면 내용을
+      // mcuVM['${board}'].lcdText 배열(줄 단위 문자열)에 그대로 기록합니다.
+      // 캔버스에 놓인 LCD 부품은 이 배열을 읽어 화면에 표시합니다(핀 배선의 RS/E/D4~7 역할
+      // 하나하나까지 검증하지는 않는 단순화된 모델입니다).
+      class LiquidCrystal {
+        constructor() {
+          mcuVM['${board}'].lcdText = ['', ''];
+          mcuVM['${board}'].lcdCursor = { row: 0, col: 0 };
+        }
+        begin(cols, rows) {
+          mcuVM['${board}'].lcdText = new Array(rows || 2).fill('');
+          mcuVM['${board}'].lcdCursor = { row: 0, col: 0 };
+        }
+        clear() {
+          mcuVM['${board}'].lcdText = mcuVM['${board}'].lcdText.map(() => '');
+          mcuVM['${board}'].lcdCursor = { row: 0, col: 0 };
+        }
+        home() { mcuVM['${board}'].lcdCursor = { row: 0, col: 0 }; }
+        setCursor(col, row) { mcuVM['${board}'].lcdCursor = { row, col }; }
+        print(text) {
+          const st = mcuVM['${board}'];
+          const { row, col } = st.lcdCursor;
+          const s = String(text);
+          let line = (st.lcdText[row] || '').padEnd(col, ' ');
+          line = line.slice(0, col) + s + line.slice(col + s.length);
+          st.lcdText[row] = line.slice(0, 16);
+          st.lcdCursor = { row, col: col + s.length };
+        }
+        println(text) { this.print(text); }
+      }
+      // 0.96" OLED(SSD1306, I2C) 에뮬레이션 — 실제 픽셀 그래픽은 재현하지 않고, 텍스트를
+      // 줄/칸 단위로만 흉내 낸 단순화된 모델입니다 (drawPixel/drawLine 등은 지원하지 않습니다).
+      class Adafruit_SSD1306 {
+        constructor() {
+          mcuVM['${board}'].oledLines = ['', '', '', ''];
+          mcuVM['${board}'].oledCursor = { line: 0, col: 0 };
+        }
+        begin() { return true; }
+        clearDisplay() {
+          mcuVM['${board}'].oledLines = mcuVM['${board}'].oledLines.map(() => '');
+          mcuVM['${board}'].oledCursor = { line: 0, col: 0 };
+        }
+        setTextSize() {}
+        setTextColor() {}
+        setCursor(x, y) {
+          const line = Math.max(0, Math.min(3, Math.round(y / 16)));
+          const col = Math.max(0, Math.round(x / 6));
+          mcuVM['${board}'].oledCursor = { line, col };
+        }
+        print(text) {
+          const st = mcuVM['${board}'];
+          const { line, col } = st.oledCursor;
+          const s = String(text);
+          let cur = (st.oledLines[line] || '').padEnd(col, ' ');
+          cur = cur.slice(0, col) + s;
+          st.oledLines[line] = cur.slice(0, 21);
+          st.oledCursor = { line, col: col + s.length };
+        }
+        println(text) {
+          this.print(text);
+          const st = mcuVM['${board}'];
+          st.oledCursor = { line: Math.min(3, st.oledCursor.line + 1), col: 0 };
+        }
+        display() {}
+      }
+      // Uno R4 보드에 내장된 12x8 LED 매트릭스(Arduino_LED_Matrix.h) 에뮬레이션.
+      // mcuVM['${board}'].ledMatrix (8행 x 12열, 0/1) 버퍼에 기록하면 runTick()이 그 값을 읽어
+      // 보드 위 매트릭스 그래픽(#m_행_열 각 점의 on 클래스)에 그대로 반영합니다.
+      class ArduinoLEDMatrix {
+        begin() {
+          mcuVM['${board}'].ledMatrix = Array.from({ length: 8 }, () => new Array(12).fill(0));
+          return true;
+        }
+        // 2차원 배열(byte frame[8][12] 스타일)을 그대로 표시합니다. rows/cols는 생략 가능합니다.
+        renderBitmap(frame) {
+          const grid = Array.from({ length: 8 }, () => new Array(12).fill(0));
+          if (Array.isArray(frame)) {
+            for (let r = 0; r < Math.min(8, frame.length); r++) {
+              const row = frame[r];
+              if (!Array.isArray(row)) continue;
+              for (let c = 0; c < Math.min(12, row.length); c++) grid[r][c] = row[c] ? 1 : 0;
+            }
+          }
+          mcuVM['${board}'].ledMatrix = grid;
+        }
+        // 실제 라이브러리의 loadFrame()은 두 형태를 받습니다:
+        //  1) 8x12 2차원 배열 (renderBitmap과 동일하게 처리)
+        //  2) uint32_t[3] 형태로 96비트를 꽉 채워 담은 정적 비트맵(자주 쓰이는 "heart" 예제 등) —
+        //     이 경우 각 워드의 최상위 비트부터 순서대로 8x12 격자에 채워 넣습니다.
+        loadFrame(frame) {
+          if (Array.isArray(frame) && Array.isArray(frame[0])) { this.renderBitmap(frame); return; }
+          if (Array.isArray(frame) && frame.length && typeof frame[0] === 'number') {
+            const grid = Array.from({ length: 8 }, () => new Array(12).fill(0));
+            for (let i = 0; i < 96; i++) {
+              const word = frame[Math.floor(i / 32)] || 0;
+              const bit = (word >>> (31 - (i % 32))) & 1;
+              grid[Math.floor(i / 12)][i % 12] = bit;
+            }
+            mcuVM['${board}'].ledMatrix = grid;
+            return;
+          }
+        }
+        clear() { mcuVM['${board}'].ledMatrix = Array.from({ length: 8 }, () => new Array(12).fill(0)); }
+      }
+    `;
+
+    const fullExecution = `
+      ${sandboxPrefix}
+      ${globalVars}
+      async function __user_setup() { ${setupBody} }
+      async function __user_loop() { ${loopBody} }
+      return { setup: __user_setup, loop: __user_loop };
+    `;
+
+    const runner = new AsyncFunction('mcuVM', 'logSerial', 'boardPinReading', '__regs', 'boardDomId', fullExecution);
+    mcu.bootTimeMs = performance.now();
+
+    runner(mcuVM, logSerial, boardPinReading, makeRegs(board), boardDomId).then(instance => {
+      if (mcu.gen !== myGen) return; // 그 사이 재컴파일/재배포되었으면 이 결과는 버립니다.
+      mcu.loopFn = instance.loop;
+      mcu.isCompiled = true;
+      runMcuLifecycle(board, instance, myGen);
+    }).catch(err => {
+      logSerial(`[Runtime Compile Error] ${err.message}`, board);
+    });
+
+  } catch (err) {
+    logSerial(`[Runtime Compile Error] ${err.message}`, board);
+  }
+}
+
+// setup()을 한 번 await로 실행한 뒤, loop()를 계속 await로 반복 실행합니다.
+// delay()가 실제 Promise 기반이므로 loop() 안의 시간 흐름이 실제 경과 시간과 일치합니다.
+// mcu.gen을 매 반복마다 확인해 재컴파일/시뮬레이션 정지 시 이전 실행이 자연스럽게 멈추도록 합니다.
+async function runMcuLifecycle(board, instance, myGen) {
+  const mcu = mcuVM[board];
+  mcu.cycleOffsetNs = 0;
+  mcu.loopStartPerf = performance.now();
+  try {
+    await instance.setup();
+  } catch (e) {
+    if (mcu.gen === myGen) logSerial(`[MCU Runtime Exception] ${e.message}`, board);
+    return;
+  }
+  while (mcu.gen === myGen) {
+    if (isSimulating) {
+      // loop() 호출 하나 안에서 일어나는 API/레지스터 접근들의 "가상 실행 시간"을 0부터 다시 쌓기
+      // 시작합니다 — 오실로스코프 정밀(µs) 모드에서 그 순간의 상대적 타이밍 차이를 보여주기 위함이며,
+      // 실제 delay()로 인한 wall-clock 진행과는 별개입니다. loopStartPerf는 이번 loop() 호출의
+      // 모든 엣지가 공유하는 단 하나의 기준 시각입니다(pushEdge 참고).
+      mcu.cycleOffsetNs = 0;
+      mcu.loopStartPerf = performance.now();
+      try {
+        await instance.loop();
+      } catch (e) {
+        logSerial(`[MCU Runtime Exception] ${e.message}`, board);
+        break;
+      }
+      // 지연 호출이 전혀 없는 무한 루프(delay 미사용)여도 브라우저가 멈추지 않도록 최소한으로 양보합니다.
+      await new Promise(r => setTimeout(r, 1));
+    } else {
+      await new Promise(r => setTimeout(r, 50));
+    }
+  }
+}
+
+function updateCycleStats(board){
+  const mcu = mcuVM[board];
+  const el = document.getElementById(`cycleStats${board.toUpperCase()}`);
+  if (!el) return;
+  const apiUs = (mcu.apiCycles / mcu.clockHz) * 1e6;
+  const regUs = (mcu.regCycles / mcu.clockHz) * 1e6;
+  const spans = el.querySelectorAll('span');
+  if (spans[0]) spans[0].innerHTML = `API 호출(pinMode/digitalWrite 등): <b>${mcu.apiCycles}</b> cycles (<b>${apiUs.toFixed(2)}µs</b>)`;
+  if (spans[1]) spans[1].innerHTML = `레지스터 직접제어(DDRx/PORTx): <b>${mcu.regCycles}</b> cycles (<b>${regUs.toFixed(2)}µs</b>)`;
+}
+
+/* ============ Board HTML Builders ============ */
+// key: 이 보드 인스턴스의 고유 키('r4', 'r4_2', 'r4_3', ...) — 같은 화면에 R4를 여러 대 놓을 수
+// 있도록, 내부 엘리먼트 id를 전부 이 key로 구분합니다.
+function buildR4BoardHTML(key){
+  return `
+    <svg class="board-art" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="pcbGrad_${key}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#232f42"/><stop offset="55%" stop-color="#131b28"/><stop offset="100%" stop-color="#070a10"/>
+        </linearGradient>
+      </defs>
+      <rect x="1" y="1" width="598" height="398" rx="14" fill="url(#pcbGrad_${key})" stroke="#000406" stroke-width="1.5"/>
+      <rect x="-8" y="150" width="20" height="26" rx="5" fill="#96a0a7" stroke="#6d7580"/>
+      <rect x="12" y="296" width="46" height="40" rx="4" fill="#15181c" stroke="#000"/>
+    </svg>
+    <div class="silk silk-word" style="top:58px;">ARDUINO</div>
+    <div class="silk silk-title" style="top:72px;">UNO R4 WiFi${key !== 'r4' ? ' #' + key.split('_')[1] : ''}</div>
+    <div class="silk silk-sub" style="top:104px;">RENESAS RA4M1 · ARM CORTEX-M4</div>
+
+    <div class="power-led" id="powerLed_${key}" style="top:58px; left:190px;"></div>
+    <div class="power-cap" style="top:66px; left:184px;">ON</div>
+    <div class="onboard-led" id="l13Led_${key}" style="top:58px; left:220px;"></div>
+    <div class="onboard-cap" style="top:66px; left:210px;">L</div>
+
+    <div class="chip chip-mcu"><div class="chip-label">RA4M1<br>32bit MCU</div></div>
+    <div class="chip chip-wifi"><div class="chip-label">ESPRESSIF<br>ESP32-S3</div></div>
+
+    <div class="reset-btn" onclick="resetBoard('${key}')" title="리셋" style="top:6px; left:26px; width:22px; height:22px;"><div class="cap"></div></div>
+    <div class="reset-caption" style="top:30px; left:20px;">RESET</div>
+
+    <div class="matrix-box"><div class="matrix-grid" id="matrixGrid_${key}"></div></div>
+
+    <div class="header-row top" id="rowDigital_${key}"></div>
+    <div class="header-row power" id="rowPower_${key}"></div>
+    <div class="header-row analog" id="rowAnalog_${key}"></div>
+    <div class="header-caption cap-power">POWER</div>
+    <div class="header-caption cap-analog">ANALOG IN</div>
+  `;
+}
+
+function rebuildMatrixGrid(gridId){
+  const matrixGrid = document.getElementById(gridId);
+  if (!matrixGrid || matrixGrid.children.length) return;
+  for (let r = 0; r < 8; r++){
+    for (let c = 0; c < 12; c++){
+      const d = document.createElement('div');
+      d.className = 'matrix-dot';
+      d.id = `${gridId}_m_${r}_${c}`;
+      matrixGrid.appendChild(d);
+    }
+  }
+}
+
+function buildHeader(containerId, pins){
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  pins.forEach(p => {
+    const pin = document.createElement('div');
+    pin.className = 'pin';
+    pin.dataset.pin = p.id;
+    pin.title = p.id;
+    const name = document.createElement('span');
+    name.className = 'pin-name';
+    name.textContent = p.label;
+    pin.appendChild(name);
+    el.appendChild(pin);
+  });
+}
+
+document.getElementById('arduinoBoard').innerHTML = buildR4BoardHTML('r4');
+buildHeader('rowDigital_r4', DIGITAL_PINS);
+buildHeader('rowPower_r4', POWER_PINS);
+buildHeader('rowAnalog_r4', ANALOG_PINS);
+rebuildMatrixGrid('matrixGrid_r4');
+
+/* ============ Component Spawning & Draggables ============ */
+let activeDrag = null, dragOffset = {x:0,y:0};
+let selectedComponent = null;
+
+function selectComponent(el){
+  if (selectedComponent && selectedComponent !== el) selectedComponent.classList.remove('selected-comp');
+  selectedComponent = el;
+  el.classList.add('selected-comp');
+}
+function deselectComponent(){
+  if (selectedComponent) selectedComponent.classList.remove('selected-comp');
+  selectedComponent = null;
+}
+
+function makeDraggable(el){
+  el.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.pin, .pin-mini, input, select, .btn-cap, .reset-btn')) return;
+    selectComponent(el);
+    activeDrag = el;
+    const rect = el.getBoundingClientRect();
+    dragOffset.x = e.clientX - rect.left;
+    dragOffset.y = e.clientY - rect.top;
+    e.stopPropagation();
+  });
+  if (el.classList.contains('board')){
+    el.addEventListener('dblclick', () => openBoardPopup(el.dataset.board));
+  }
+}
+document.querySelectorAll('.placed-component').forEach(makeDraggable);
+
+document.getElementById('canvasInner').addEventListener('mousedown', (e) => {
+  if (e.target.id === 'canvasInner') deselectComponent();
+});
+
+document.getElementById('canvasInner').addEventListener('mousemove', (e) => {
+  if (!activeDrag) return;
+  const canvasRect = document.getElementById('canvasInner').getBoundingClientRect();
+  activeDrag.style.left = (e.clientX - canvasRect.left - dragOffset.x) + 'px';
+  activeDrag.style.top = (e.clientY - canvasRect.top - dragOffset.y) + 'px';
+  updateAllWires();
+});
+document.addEventListener('mouseup', () => { activeDrag = null; });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+  const activeTag = document.activeElement?.tagName;
+  if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+  if (!selectedComponent) return;
+  e.preventDefault();
+  deleteComponent(selectedComponent);
+  selectedComponent = null;
+});
+
+function deleteComponent(el){
+  if (!el) return;
+  const removedWires = wires.filter(w => el.contains(w.from) || el.contains(w.to));
+  removedWires.forEach(w => w.element.remove());
+  wires = wires.filter(w => !removedWires.includes(w));
+  // 보드 자체를 지우는 경우: 그 보드의 실행 루프를 멈추고(gen 무효화), 딸려있던 코드 에디터
+  // 팝업도 함께 제거하고, 레지스트리(boardInstances/boardDomId)에서도 빼서 이후의 순회
+  // 작업(runTick의 매트릭스/L13 LED/사이클 readout 갱신 등)이 삭제된 보드를 건드리지 않게 합니다.
+  if (el.classList.contains('board')){
+    const key = el.dataset.board;
+    if (key && key !== 'r4' && key !== 'r3' && mcuVM[key]) mcuVM[key].gen = (mcuVM[key].gen || 0) + 1;
+    const popup = document.getElementById(`popup${key ? key.toUpperCase() : ''}`);
+    if (popup && key !== 'r4' && key !== 'r3') popup.remove(); // 기본 내장 보드의 정적 팝업은 남겨둡니다.
+    if (key && key !== 'r4' && key !== 'r3') delete boardInstances[key];
+  }
+  el.remove();
+  updateAllWires();
+  updateLegend();
+}
+
+const SENSOR_DEFS = {
+  ldr: { title: '조도 센서 (LDR)', min: 0, max: 1000, start: 500, unit: ' lux' },
+  temp: { title: '온도 센서', min: -10, max: 50, start: 24, unit: '°C' }
+};
+let compCount = 0;
+function spawnComponent(type){
+  compCount++;
+  const id = `comp_${type}_${compCount}`;
+  const div = document.createElement('div');
+  div.className = 'placed-component';
+  div.id = id;
+  div.style.left = (520 + compCount * 22) + 'px';
+  div.style.top = (720 + compCount * 14) + 'px';
+
+  if (type === 'led'){
+    div.classList.add('comp-led');
+    div.innerHTML = `
+      <div class="led-dome" id="${id}_bulb"></div>
+      <div class="led-val" id="${id}_val">0%</div>
+      <select class="led-color-select" id="${id}_color" title="LED 색상 선택">
+        <option value="red" selected>Red</option>
+        <option value="green">Green</option>
+        <option value="blue">Blue</option>
+        <option value="yellow">Yellow</option>
+        <option value="white">White</option>
+      </select>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_A" title="Anode (+)"></div>
+        <div class="pin-mini" data-pin="${id}_K" title="Cathode (-)"></div>
+      </div>
+      <div class="comp-label">LED</div>`;
+  } else if (type === 'pot'){
+    div.classList.add('comp-pot');
+    div.innerHTML = `
+      <div class="pot-title">가변저항 10kΩ</div>
+      <input type="range" min="0" max="1023" value="512" id="${id}_slider">
+      <div class="pot-value" id="${id}_val">512</div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
+        <div class="pin-mini" data-pin="${id}_W" title="Wiper (Signal)"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+      </div>`;
+  } else if (type === 'btn'){
+    div.classList.add('comp-btn');
+    div.innerHTML = `
+      <div class="btn-cap" id="${id}_cap" data-pressed="0"></div>
+      <div class="pin-mini" data-pin="${id}_T1" style="position:absolute; left:-7px; top:26px;" title="Terminal 1"></div>
+      <div class="pin-mini" data-pin="${id}_T2" style="position:absolute; right:-7px; top:26px;" title="Terminal 2"></div>`;
+  } else if (type === 'scope'){
+    div.classList.add('comp-scope');
+    div.innerHTML = `
+      <div class="scope-head"><span>4CH OSCILLOSCOPE</span><button class="scope-hold-btn" id="${id}_holdbtn" onclick="toggleScopeHold('${id}')" title="화면을 정지/재개합니다 (실제 스코프의 RUN/STOP)">⏸ 정지</button></div>
+      <div class="scope-screen"><canvas id="${id}_canvas" width="700" height="150"></canvas></div>
+      <div class="scope-controls">
+        <label class="timediv-label">TIME/DIV<select id="${id}_timediv" onchange="drawScope('${id}')">
+          <option value="0.001">1 µs</option>
+          <option value="0.002">2 µs</option>
+          <option value="0.005">5 µs</option>
+          <option value="0.01">10 µs</option>
+          <option value="0.02">20 µs</option>
+          <option value="0.05">50 µs</option>
+          <option value="0.1">100 µs</option>
+          <option value="0.2">200 µs</option>
+          <option value="0.5">500 µs</option>
+          <option value="1">1 ms</option>
+          <option value="5">5 ms</option>
+          <option value="10">10 ms</option>
+          <option value="20">20 ms</option>
+          <option value="50" selected>50 ms</option>
+          <option value="100">100 ms</option>
+          <option value="200">200 ms</option>
+          <option value="500">500 ms</option>
+          <option value="1000">1 s</option>
+          <option value="2000">2 s</option>
+        </select></label>
+        <label><span class="ch-dot ch1"></span>CH1 V/DIV<select id="${id}_voltsdiv1" onchange="drawScope('${id}')">
+          <option value="0.2">0.2 V</option>
+          <option value="0.5">0.5 V</option>
+          <option value="1" selected>1 V</option>
+          <option value="2">2 V</option>
+          <option value="5">5 V</option>
+        </select></label>
+        <label><span class="ch-dot ch2"></span>CH2 V/DIV<select id="${id}_voltsdiv2" onchange="drawScope('${id}')">
+          <option value="0.2">0.2 V</option>
+          <option value="0.5">0.5 V</option>
+          <option value="1" selected>1 V</option>
+          <option value="2">2 V</option>
+          <option value="5">5 V</option>
+        </select></label>
+        <label><span class="ch-dot ch3"></span>CH3 V/DIV<select id="${id}_voltsdiv3" onchange="drawScope('${id}')">
+          <option value="0.2">0.2 V</option>
+          <option value="0.5">0.5 V</option>
+          <option value="1" selected>1 V</option>
+          <option value="2">2 V</option>
+          <option value="5">5 V</option>
+        </select></label>
+        <label><span class="ch-dot ch4"></span>CH4 V/DIV<select id="${id}_voltsdiv4" onchange="drawScope('${id}')">
+          <option value="0.2">0.2 V</option>
+          <option value="0.5">0.5 V</option>
+          <option value="1" selected>1 V</option>
+          <option value="2">2 V</option>
+          <option value="5">5 V</option>
+        </select></label>
+      </div>
+      <div class="scope-readout">
+        <div><span class="ch-dot ch1"></span><span id="${id}_ch1label">CH1: 미연결</span></div>
+        <div><span class="ch-dot ch2"></span><span id="${id}_ch2label">CH2: 미연결</span></div>
+        <div><span class="ch-dot ch3"></span><span id="${id}_ch3label">CH3: 미연결</span></div>
+        <div><span class="ch-dot ch4"></span><span id="${id}_ch4label">CH4: 미연결</span></div>
+      </div>
+      <div class="scope-probe-row">
+        <div class="probe-wrap"><div class="pin-mini probe-ch1" data-pin="${id}_CH1" title="CH1"></div><span class="probe-cap">CH1</span></div>
+        <div class="probe-wrap"><div class="pin-mini probe-ch2" data-pin="${id}_CH2" title="CH2"></div><span class="probe-cap">CH2</span></div>
+        <div class="probe-wrap"><div class="pin-mini probe-ch3" data-pin="${id}_CH3" title="CH3"></div><span class="probe-cap">CH3</span></div>
+        <div class="probe-wrap"><div class="pin-mini probe-ch4" data-pin="${id}_CH4" title="CH4"></div><span class="probe-cap">CH4</span></div>
+        <div class="probe-wrap"><div class="pin-mini probe-gnd" data-pin="${id}_GND" title="GND"></div><span class="probe-cap">GND</span></div>
+      </div>`;
+  } else if (type === 'breadboard'){
+    div.classList.add('comp-breadboard');
+    div.innerHTML = `
+      <div class="bb-rail bb-rail-top"><div class="bb-rail-line bb-plus" data-row="railTopPos"></div><div class="bb-rail-line bb-minus" data-row="railTopNeg"></div></div>
+      <div class="bb-bank" data-bank="top"></div>
+      <div class="bb-gutter"></div>
+      <div class="bb-bank" data-bank="bot"></div>
+      <div class="bb-rail bb-rail-bot"><div class="bb-rail-line bb-plus" data-row="railBotPos"></div><div class="bb-rail-line bb-minus" data-row="railBotNeg"></div></div>`;
+    populateBreadboard(div, id);
+  } else if (type === 'servo'){
+    div.classList.add('comp-servo');
+    div.innerHTML = `
+      <div class="servo-body"><div class="servo-base"></div><div class="servo-arm" id="${id}_arm"><div class="servo-arm-tip"></div></div></div>
+      <div class="comp-label">DC 서보모터<span id="${id}_angle">90°</span></div>
+      <select class="servo-rated-v" title="정격 전압 (VCC 핀에 이 전압 이상이 공급되어야 정상 동작)">
+        <option value="3.3">3.3V</option>
+        <option value="5" selected>5V</option>
+        <option value="6">6V</option>
+        <option value="7.4">7.4V</option>
+      </select>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+        <div class="pin-mini" data-pin="${id}_SIG" title="Signal"></div>
+      </div>`;
+  } else if (type === 'dcmotor'){
+    div.classList.add('comp-dcmotor');
+    div.innerHTML = `
+      <div class="motor-body"><div class="motor-fan" id="${id}_fan"></div></div>
+      <div class="comp-label">DC 모터<span id="${id}_speed">정지</span></div>
+      <div class="comp-pin-row"><div class="pin-mini" data-pin="${id}_TA"></div><div class="pin-mini" data-pin="${id}_TB"></div></div>`;
+  } else if (type === 'ultrasonic'){
+    div.classList.add('comp-ultrasonic');
+    div.innerHTML = `
+      <div class="us-body"><div class="us-eye"></div><div class="us-eye"></div></div>
+      <div class="comp-label">초음파 센서<span id="${id}_val">100cm</span></div>
+      <input type="range" min="2" max="400" value="100" id="${id}_slider" style="width:100%;accent-color:var(--teal);margin:4px 0;">
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
+        <div class="pin-mini" data-pin="${id}_TRIG" title="TRIG"></div>
+        <div class="pin-mini" data-pin="${id}_ECHO" title="ECHO"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+      </div>`;
+  } else if (type === 'rgbled'){
+    div.classList.add('comp-rgbled');
+    div.innerHTML = `
+      <div class="rgb-dome" id="${id}_bulb"></div>
+      <div class="rgb-pin-row">
+        <div class="pin-mini probe-r" data-pin="${id}_R" title="Red"></div>
+        <div class="pin-mini probe-g" data-pin="${id}_G" title="Green"></div>
+        <div class="pin-mini probe-b" data-pin="${id}_B" title="Blue"></div>
+        <div class="pin-mini probe-gndrgb" data-pin="${id}_GND" title="GND"></div>
+      </div>
+      <div class="comp-label">RGB LED</div>`;
+  } else if (type === 'psu'){
+    div.classList.add('comp-psu');
+    div.dataset.mode = 'dc';
+    div.innerHTML = `
+      <div class="psu-title">전원 공급 장치</div>
+      <select class="psu-mode" onchange="psuModeChanged('${id}')">
+        <option value="dc" selected>DC</option>
+        <option value="ac1">AC 단상 (220V)</option>
+        <option value="ac3">AC 3상 (380V/220V)</option>
+      </select>
+      <div class="psu-dc-panel">
+        <select class="psu-dc-volt">
+          <option value="0.9">0.9 V</option>
+          <option value="1.2">1.2 V</option>
+          <option value="3.3">3.3 V</option>
+          <option value="5" selected>5 V</option>
+          <option value="12">12 V</option>
+          <option value="13">13 V</option>
+          <option value="18">18 V</option>
+          <option value="19">19 V</option>
+          <option value="24">24 V</option>
+          <option value="48">48 V</option>
+        </select>
+      </div>
+      <div class="psu-ac-panel" hidden>
+        <div class="psu-ac-badge">⎓ AC 220V · 60Hz<br>(대한민국 표준 단상)</div>
+      </div>
+      <div class="psu-ac3-panel" hidden>
+        <div class="psu-3ph-legend"><span style="color:#ff5c5c">■R</span><span style="color:#ffd23f">■S</span><span style="color:#5aa9e6">■T</span></div>
+        ${make3PhaseSvg()}
+        <div class="psu-ac-badge">3φ 380V(선간) / 220V(상)<br>60Hz</div>
+      </div>
+      <div class="psu-switch" id="${id}_switch" onclick="togglePsu('${id}')"><div class="knob"></div></div>
+      <div class="comp-pin-row" id="${id}_pins">${psuPinsHTML(id, 'dc')}</div>`;
+  } else if (type === 'btmodule'){
+    div.classList.add('comp-btmodule');
+    div.dataset.state = '0';
+    div.innerHTML = `
+      <div class="bt-body">
+        <div class="bt-title">HC-05<br>BLUETOOTH</div>
+        <div class="bt-led" id="${id}_led"></div>
+      </div>
+      <div class="bt-switch-row">
+        <div class="bt-toggle" id="${id}_toggle" onclick="toggleBtRemote('${id}')"><div class="knob"></div></div>
+        <span class="bt-switch-label">원격 명령 전송</span>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+        <div class="pin-mini" data-pin="${id}_TXD" title="TXD → 보드 디지털 핀"></div>
+      </div>`;
+  } else if (type === 'wifiap'){
+    div.classList.add('comp-wifiap');
+    div.innerHTML = `
+      <div class="ap-body">
+        <div class="ap-antenna"></div>
+        <div class="ap-antenna a2"></div>
+        <div class="ap-rings"><span></span><span></span><span></span></div>
+        <div class="ap-title">무선 AP<br>Signal Gen</div>
+      </div>
+      <div class="ap-status" id="${id}_status">전원 꺼짐</div>
+      <div class="ap-switch-row">
+        <div class="ap-switch" id="${id}_switch" onclick="toggleApPower('${id}')"><div class="knob"></div></div>
+        <span class="ap-switch-label">전원</span>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+        <div class="pin-mini" data-pin="${id}_SIG" title="SIG → 보드 디지털 핀 (수신 신호)"></div>
+      </div>`;
+  } else if (type === 'dac'){
+    div.classList.add('comp-dac');
+    div.innerHTML = `
+      <div class="dac-title">DAC 신호 발생기<br>(R4 A0 DAC 대응)</div>
+      <select class="dac-mode">
+        <option value="dc">DC 레벨</option>
+        <option value="ramp">램프파</option>
+        <option value="sine">사인파</option>
+      </select>
+      <input type="range" min="0" max="255" value="128" class="dac-level">
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_OUT" title="DAC 출력"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+      </div>`;
+  } else if (type === 'motordriver'){
+    div.classList.add('comp-motordriver');
+    div.innerHTML = `
+      <div class="md-title">L298N<br>모터 드라이버</div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_V" title="모터 전원 VCC"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+        <div class="pin-mini" data-pin="${id}_IN1" title="방향 제어 (디지털)"></div>
+        <div class="pin-mini" data-pin="${id}_ENA" title="속도 제어 (PWM)"></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-mini" data-pin="${id}_OUT1" title="모터 출력 1"></div>
+        <div class="pin-mini" data-pin="${id}_OUT2" title="모터 출력 2"></div>
+      </div>`;
+  } else if (type === 'lcd'){
+    div.classList.add('comp-lcd');
+    div.innerHTML = `
+      <div class="lcd-title">캐릭터 LCD 16x2 (HD44780, 4-bit)</div>
+      <div class="lcd-screen" id="${id}_screen">                \n                </div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_VSS" title="VSS (GND)"></div>
+        <div class="pin-mini" data-pin="${id}_VDD" title="VDD (5V)"></div>
+        <div class="pin-mini" data-pin="${id}_RS" title="RS"></div>
+        <div class="pin-mini" data-pin="${id}_E" title="Enable"></div>
+        <div class="pin-mini" data-pin="${id}_D4" title="D4"></div>
+        <div class="pin-mini" data-pin="${id}_D5" title="D5"></div>
+        <div class="pin-mini" data-pin="${id}_D6" title="D6"></div>
+        <div class="pin-mini" data-pin="${id}_D7" title="D7"></div>
+      </div>`;
+  } else if (type === 'oled'){
+    div.classList.add('comp-oled');
+    div.innerHTML = `
+      <div class="oled-title">OLED 0.96" (SSD1306, I2C, 텍스트 전용 모델)</div>
+      <div class="oled-screen" id="${id}_screen"></div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_VCC" title="VCC (3V3/5V)"></div>
+        <div class="pin-mini" data-pin="${id}_GND" title="GND"></div>
+        <div class="pin-mini" data-pin="${id}_SCL" title="SCL → 보드 A5"></div>
+        <div class="pin-mini" data-pin="${id}_SDA" title="SDA → 보드 A4"></div>
+      </div>`;
+  } else if (type.startsWith('sensor-')){
+    const key = type.split('-')[1];
+    const def = SENSOR_DEFS[key];
+    div.classList.add('comp-pot');
+    div.innerHTML = `
+      <div class="pot-title">${def.title}</div>
+      <input type="range" min="${def.min}" max="${def.max}" value="${def.start}" id="${id}_slider">
+      <div class="pot-value" id="${id}_val">${def.start}${def.unit}</div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
+        <div class="pin-mini" data-pin="${id}_W" title="Wiper (Signal)"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+      </div>`;
+  } else if (type === 'resistor'){
+    div.classList.add('comp-resistor', 'resistive-2pin');
+    div.dataset.ohms = '220';
+    div.innerHTML = `
+      <div class="resistor-body">
+        <div class="resistor-band" style="left:12px;"></div>
+        <div class="resistor-band" style="left:19px;"></div>
+        <div class="resistor-band" style="left:26px;"></div>
+        <div class="resistor-band resistor-band-gold" style="left:35px;"></div>
+      </div>
+      <div class="resistor-controls">
+        <input type="number" class="res-value" value="220" min="0" step="any" oninput="updateResistor('${id}')">
+        <select class="res-unit" onchange="updateResistor('${id}')">
+          <option value="1" selected>Ω</option>
+          <option value="1000">kΩ</option>
+          <option value="1000000">MΩ</option>
+        </select>
+      </div>
+      <div class="comp-label">저항 <span class="res-display">220 Ω</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_A" title="Leg A"></div>
+        <div class="pin-mini" data-pin="${id}_B" title="Leg B"></div>
+      </div>`;
+  } else if (type === 'powercable'){
+    div.classList.add('comp-powercable', 'resistive-2pin');
+    div.dataset.ohms = '0.5';
+    div.innerHTML = `
+      <div class="cable-body"></div>
+      <div class="cable-controls">
+        <input type="number" class="res-value" value="0.5" min="0" step="0.01" oninput="updateResistor('${id}')">
+        <span>Ω</span>
+      </div>
+      <div class="comp-label">파워케이블 <span class="res-display">0.5 Ω</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_A" title="A"></div>
+        <div class="pin-mini" data-pin="${id}_B" title="B"></div>
+      </div>`;
+  } else if (type === 'motor3ph'){
+    div.classList.add('comp-motor3ph');
+    div.innerHTML = `
+      <div class="motor-body"><div class="motor-fan" id="${id}_fan"></div></div>
+      <div class="m3ph-badge">3φ IM</div>
+      <div class="comp-label">3상 유도전동기<span id="${id}_speed">정지</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-mini psu-r" data-pin="${id}_L1" title="R상 (L1)"></div>
+        <div class="pin-mini psu-s" data-pin="${id}_L2" title="S상 (L2)"></div>
+        <div class="pin-mini psu-t" data-pin="${id}_L3" title="T상 (L3)"></div>
+      </div>`;
+  } else if (type === 'bldcmotor'){
+    div.classList.add('comp-bldcmotor');
+    div.innerHTML = `
+      <div class="motor-body"><div class="motor-fan" id="${id}_fan"></div></div>
+      <div class="comp-label">BLDC 모터<span id="${id}_speed">정지</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_U" title="U상"></div>
+        <div class="pin-mini" data-pin="${id}_V" title="V상"></div>
+        <div class="pin-mini" data-pin="${id}_W" title="W상"></div>
+      </div>`;
+  } else if (type === 'bldcdriver'){
+    div.classList.add('comp-bldcdriver');
+    div.innerHTML = `
+      <div class="bldc-title">BLDC 전자변속기<br>(ESC / 드라이버)</div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_V" title="배터리/전원 VCC"></div>
+        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+        <div class="pin-mini" data-pin="${id}_IN1" title="방향 제어 (디지털)"></div>
+        <div class="pin-mini" data-pin="${id}_ENA" title="속도 제어 (PWM)"></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-mini" data-pin="${id}_U" title="U상 출력"></div>
+        <div class="pin-mini" data-pin="${id}_V_OUT" title="V상 출력"></div>
+        <div class="pin-mini" data-pin="${id}_W" title="W상 출력"></div>
+      </div>`;
+  } else if (type === 'dcmotor-enc'){
+    div.classList.add('comp-dcmotor-enc');
+    div.innerHTML = `
+      <div class="motor-body"><div class="motor-fan" id="${id}_fan"></div><div class="enc-disk"></div></div>
+      <div class="comp-label">DC 모터+엔코더<span id="${id}_speed">정지</span></div>
+      <div class="enc-badge" id="${id}_pulsehz">0 Hz</div>
+      <div class="comp-pin-row"><div class="pin-mini" data-pin="${id}_TA" title="모터 단자 A"></div><div class="pin-mini" data-pin="${id}_TB" title="모터 단자 B"></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_ENCA" title="엔코더 A상 펄스 출력 → 보드 디지털 핀"></div>
+        <div class="pin-mini" data-pin="${id}_ENCG" title="엔코더 GND"></div>
+      </div>`;
+  } else if (type === 'multimeter'){
+    div.classList.add('comp-multimeter');
+    div.innerHTML = `
+      <div class="mm-title">디지털 멀티미터</div>
+      <div class="mm-screen"><span class="mm-value" id="${id}_val">0.00</span><span class="mm-unit" id="${id}_unit">V DC</span></div>
+      <select class="mm-mode">
+        <option value="dcv" selected>DC V (직류 전압)</option>
+        <option value="acv">AC V (교류 전압)</option>
+        <option value="ohm">Ω (저항)</option>
+        <option value="dca">DC A (전류, mA 추정치)</option>
+      </select>
+      <div class="mm-probe-row">
+        <div class="probe-wrap"><div class="pin-mini mm-probe-red" data-pin="${id}_PROBE_P" title="+ 프로브 (빨강)"></div><span class="probe-cap">+</span></div>
+        <div class="probe-wrap"><div class="pin-mini mm-probe-blk" data-pin="${id}_PROBE_N" title="COM 프로브 (검정)"></div><span class="probe-cap">COM</span></div>
+      </div>`;
+  }
+
+  document.getElementById('canvasInner').appendChild(div);
+  makeDraggable(div);
+  bindPinEvents();
+
+  if (type === 'pot'){
+    const slider = document.getElementById(`${id}_slider`);
+    const val = document.getElementById(`${id}_val`);
+    slider.addEventListener('input', () => { val.textContent = slider.value; });
+  } else if (type === 'btn'){
+    const cap = document.getElementById(`${id}_cap`);
+    cap.addEventListener('mousedown', (e) => { e.stopPropagation(); cap.dataset.pressed = '1'; cap.classList.add('pressed'); });
+    const release = () => { cap.dataset.pressed = '0'; cap.classList.remove('pressed'); };
+    cap.addEventListener('mouseup', release);
+    cap.addEventListener('mouseleave', release);
+  } else if (type === 'ultrasonic'){
+    const slider = document.getElementById(`${id}_slider`);
+    const val = document.getElementById(`${id}_val`);
+    slider.addEventListener('input', () => { val.textContent = slider.value + 'cm'; });
+  } else if (type.startsWith('sensor-')){
+    const def = SENSOR_DEFS[type.split('-')[1]];
+    const slider = document.getElementById(`${id}_slider`);
+    const val = document.getElementById(`${id}_val`);
+    slider.addEventListener('input', () => { val.textContent = slider.value + def.unit; });
+  } else if (type === 'resistor' || type === 'powercable'){
+    updateResistor(id); // 초기 색띠/표시값 렌더링
+  }
+  return id;
+}
+
+function populateBreadboard(container, bbId){
+  const bbHole = (pId, bId) => {
+    const d = document.createElement('div');
+    d.className = 'pin-mini bb-hole';
+    d.dataset.pin = pId; d.dataset.bus = bId;
+    return d;
+  };
+  const railTopPos = container.querySelector('[data-row="railTopPos"]');
+  const railTopNeg = container.querySelector('[data-row="railTopNeg"]');
+  const railBotPos = container.querySelector('[data-row="railBotPos"]');
+  const railBotNeg = container.querySelector('[data-row="railBotNeg"]');
+  for (let c = 1; c <= 20; c++){
+    railTopPos.appendChild(bbHole(`${bbId}_railTopPos_${c}`, `${bbId}_railTopPos`));
+    railTopNeg.appendChild(bbHole(`${bbId}_railTopNeg_${c}`, `${bbId}_railTopNeg`));
+    railBotPos.appendChild(bbHole(`${bbId}_railBotPos_${c}`, `${bbId}_railBotPos`));
+    railBotNeg.appendChild(bbHole(`${bbId}_railBotNeg_${c}`, `${bbId}_railBotNeg`));
+  }
+  const bankTop = container.querySelector('.bb-bank[data-bank="top"]');
+  const bankBot = container.querySelector('.bb-bank[data-bank="bot"]');
+  ['a','b','c','d','e'].forEach(row => {
+    for (let c = 1; c <= 20; c++) bankTop.appendChild(bbHole(`${bbId}_top_${row}${c}`, `${bbId}_top_col${c}`));
+  });
+  ['f','g','h','i','j'].forEach(row => {
+    for (let c = 1; c <= 20; c++) bankBot.appendChild(bbHole(`${bbId}_bot_${row}${c}`, `${bbId}_bot_col${c}`));
+  });
+}
+
+/* ============ Bluetooth / WiFi AP / PSU controls ============ */
+function togglePsu(id){
+  document.getElementById(`${id}_switch`).classList.toggle('on');
+}
+function toggleBtRemote(id){
+  const el = document.getElementById(id);
+  const wasOn = el.dataset.state === '1';
+  el.dataset.state = wasOn ? '0' : '1';
+  document.getElementById(`${id}_toggle`).classList.toggle('on', !wasOn);
+  logSerial(`[블루투스] ${id} 원격 명령 전송: ${!wasOn ? 'HIGH (1)' : 'LOW (0)'}`);
+}
+function toggleApPower(id){
+  const sw = document.getElementById(`${id}_switch`);
+  sw.classList.toggle('on');
+  logSerial(`[무선 AP] ${id} 전원 ${sw.classList.contains('on') ? 'ON' : 'OFF'}`);
+}
+function apSignalValue(apEl){
+  if (!apEl || !isSimulating) return 0;
+  const sw = apEl.querySelector('.ap-switch');
+  if (!sw || !sw.classList.contains('on')) return 0;
+  return Math.floor(Date.now() / 400) % 2;
+}
+function dacReading(dacEl){
+  const mode = dacEl.querySelector('.dac-mode')?.value || 'dc';
+  if (mode === 'dc'){
+    const slider = dacEl.querySelector('.dac-level');
+    const v = slider ? parseFloat(slider.value) / 255 : 0;
+    return { type:'dac', wave:'dc', v };
+  }
+  const t = Date.now();
+  if (mode === 'ramp') return { type:'dac', wave:'ramp', v: (t / 900) % 1 };
+  return { type:'dac', wave:'sine', v: (Math.sin(t / 260) + 1) / 2 };
+}
+function ultrasonicReading(sensorEl){
+  const slider = sensorEl.querySelector('input[type=range]');
+  const dist = slider ? parseFloat(slider.value) : 100;
+  return { type:'echo', v: Math.min(1, dist / 400) };
+}
+function driveMotor(motorId, speed, dir){
+  const el = document.getElementById(motorId);
+  const fan = document.getElementById(`${motorId}_fan`);
+  const label = document.getElementById(`${motorId}_speed`);
+  if (el){ el.dataset.speed = String(speed); el.dataset.dir = String(dir); } // 엔코더 펄스 등 다른 로직이 재사용
+  if (speed > 0.03){
+    const duration = Math.max(0.15, 1.3 * (1 - speed) + 0.12);
+    if (fan) fan.style.animation = `motorSpin ${duration}s linear infinite ${dir < 0 ? 'reverse' : 'normal'}`;
+    if (label) label.textContent = `${Math.round(speed * 100)}% · ${dir < 0 ? '역방향' : '정방향'}`;
+  } else {
+    if (fan) fan.style.animation = 'none';
+    if (label) label.textContent = '정지';
+  }
+}
+
+// 엔코더 DC 모터: 현재 회전 속도(dataset.speed, driveMotor가 기록)에 비례하는 펄스를 만들고,
+// 배지(Hz) 표시도 함께 갱신합니다. 배선 여부와 무관하게 매 틱 갱신되어야 하므로 runTick에서도
+// 직접 호출하고, 보드/스코프가 이 핀을 읽을 때(externalSourceOnNet)도 같은 함수를 재사용합니다.
+function encoderPulseReading(motorEl){
+  const speed = parseFloat(motorEl.dataset.speed || '0');
+  const pulseLabel = document.getElementById(`${motorEl.id}_pulsehz`);
+  if (!isSimulating || speed <= 0.03){
+    if (pulseLabel) pulseLabel.textContent = '0 Hz';
+    return { type: 'digital', v: 0 };
+  }
+  const freq = 5 + speed * 95; // 엔코더 슬릿 수에 비례하는 펄스 주파수(예시로 5~100Hz)
+  if (pulseLabel) pulseLabel.textContent = `${Math.round(freq)} Hz`;
+  const period = 1000 / freq;
+  const v = Math.floor(Date.now() / (period / 2)) % 2;
+  return { type: 'digital', v };
+}
+
+/* ============ 저항 / 파워케이블 (Ω·kΩ·MΩ) ============ */
+// 표준 저항 색띠(4-band) 색상표를 실제 값에 맞춰 계산합니다: 2자리 유효숫자 + 승수.
+function ohmsToBands(ohms){
+  if (!isFinite(ohms) || ohms <= 0) return null;
+  const COLORS = ['#1a1a1a','#7a4a2a','#d43b3b','#e08a2a','#e8d23f','#3ea34a','#3a6fd4','#8a4fd4','#8a8a8a','#f5f5f5'];
+  let exp = Math.floor(Math.log10(ohms));
+  let mantissa = ohms / Math.pow(10, exp);
+  let twoDig = Math.round(mantissa * 10);
+  if (twoDig >= 100){ twoDig = Math.round(twoDig / 10); exp += 1; }
+  if (twoDig < 10) twoDig = 10;
+  const d1 = Math.floor(twoDig / 10), d2 = twoDig % 10;
+  const multExp = exp - 1;
+  let multColor;
+  if (multExp >= 0 && multExp <= 9) multColor = COLORS[multExp];
+  else if (multExp === -1) multColor = '#c9a227';
+  else if (multExp === -2) multColor = '#c9c9c9';
+  else multColor = '#555555';
+  return { colors: [COLORS[d1], COLORS[d2], multColor] };
+}
+function formatOhms(ohms){
+  if (!isFinite(ohms)) return '0 Ω';
+  if (ohms >= 1e6) return (Math.round((ohms/1e6)*100)/100) + ' MΩ';
+  if (ohms >= 1e3) return (Math.round((ohms/1e3)*100)/100) + ' kΩ';
+  return (Math.round(ohms*100)/100) + ' Ω';
+}
+// 저항/파워케이블 공용: 입력값(+단위)이 바뀔 때마다 dataset.ohms·색띠·표시 텍스트를 갱신합니다.
+function updateResistor(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const valInput = el.querySelector('.res-value');
+  const val = parseFloat(valInput?.value) || 0;
+  const unitSel = el.querySelector('.res-unit');
+  const mult = unitSel ? parseFloat(unitSel.value) : 1;
+  const ohms = Math.max(0, val * mult);
+  el.dataset.ohms = String(ohms);
+  const disp = el.querySelector('.res-display');
+  if (disp) disp.textContent = formatOhms(ohms);
+  if (el.classList.contains('comp-resistor')){
+    const bands = ohmsToBands(ohms);
+    const bandEls = el.querySelectorAll('.resistor-band:not(.resistor-band-gold)');
+    if (bands && bandEls.length === 3){
+      bandEls[0].style.background = bands.colors[0];
+      bandEls[1].style.background = bands.colors[1];
+      bandEls[2].style.background = bands.colors[2];
+    }
+  }
+}
+
+/* ============ 전원 공급 장치: DC 다전압 / AC 단상·3상 ============ */
+// 3상 그래픽: 위상이 120°씩 어긋난 사인파 3개를 R/S/T 색으로 그립니다.
+function sineWavePolylinePoints(width, height, cycles, phaseDeg, samples){
+  const amp = height * 0.4, mid = height / 2;
+  const pts = [];
+  for (let i = 0; i <= samples; i++){
+    const x = (i / samples) * width;
+    const theta = (i / samples) * cycles * 2 * Math.PI + phaseDeg * Math.PI / 180;
+    const y = mid - Math.sin(theta) * amp;
+    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+  return pts.join(' ');
+}
+function make3PhaseSvg(){
+  const w = 96, h = 34;
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="margin-bottom:4px;">
+    <polyline points="${sineWavePolylinePoints(w,h,2,0,40)}" fill="none" stroke="#ff5c5c" stroke-width="1.3"/>
+    <polyline points="${sineWavePolylinePoints(w,h,2,-120,40)}" fill="none" stroke="#ffd23f" stroke-width="1.3"/>
+    <polyline points="${sineWavePolylinePoints(w,h,2,-240,40)}" fill="none" stroke="#5aa9e6" stroke-width="1.3"/>
+  </svg>`;
+}
+function psuPinsHTML(id, mode){
+  if (mode === 'ac1') return `
+    <div class="pin-mini" data-pin="${id}_L" title="Hot / 활선 (L, 220V)"></div>
+    <div class="pin-mini" data-pin="${id}_N" title="Neutral / 중성선 (N)"></div>
+    <div class="pin-mini" data-pin="${id}_G" title="접지 (PE)"></div>`;
+  if (mode === 'ac3') return `
+    <div class="pin-mini psu-r" data-pin="${id}_L1" title="R상 (L1)"></div>
+    <div class="pin-mini psu-s" data-pin="${id}_L2" title="S상 (L2)"></div>
+    <div class="pin-mini psu-t" data-pin="${id}_L3" title="T상 (L3)"></div>
+    <div class="pin-mini" data-pin="${id}_N" title="중성선 (N)"></div>
+    <div class="pin-mini" data-pin="${id}_G" title="접지 (PE)"></div>`;
+  return `
+    <div class="pin-mini" data-pin="${id}_V" title="DC + (선택한 전압)"></div>
+    <div class="pin-mini" data-pin="${id}_G" title="GND (0V)"></div>`;
+}
+function psuModeChanged(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const mode = el.querySelector('.psu-mode').value;
+  el.dataset.mode = mode;
+  el.querySelector('.psu-dc-panel').hidden = mode !== 'dc';
+  el.querySelector('.psu-ac-panel').hidden = mode !== 'ac1';
+  el.querySelector('.psu-ac3-panel').hidden = mode !== 'ac3';
+  const pinsWrap = document.getElementById(`${id}_pins`);
+  // 핀 구성이 바뀌므로, 지금 이 부품에 연결된 전선은 끊어진 핀을 참조하지 않도록 먼저 제거합니다.
+  const oldPins = Array.from(pinsWrap.querySelectorAll('.pin-mini'));
+  wires.filter(w => oldPins.includes(w.from) || oldPins.includes(w.to)).forEach(w => deleteWire(w));
+  pinsWrap.innerHTML = psuPinsHTML(id, mode);
+  bindPinEvents();
+}
+function psuDcReading(psuEl){
+  const on = psuEl.querySelector('.psu-switch')?.classList.contains('on');
+  if (!on) return null;
+  const sel = psuEl.querySelector('.psu-dc-volt');
+  const v = sel ? parseFloat(sel.value) : 5;
+  return { type: 'volt', v };
+}
+function psuAcReading(psuEl, suffix){
+  const on = psuEl.querySelector('.psu-switch')?.classList.contains('on');
+  if (!on) return null;
+  const mode = psuEl.dataset.mode;
+  const phaseMap = { _L: 0, _L1: 0, _L2: -120, _L3: -240 };
+  const phaseDeg = phaseMap[suffix] != null ? phaseMap[suffix] : 0;
+  const rms = 220; // 상전압 220V (3상은 선간 380V — 멀티미터에서 별도 계산)
+  const vPeak = rms * Math.SQRT2;
+  const t = Date.now();
+  const instant = vPeak * Math.sin((t / 1000) * 2 * Math.PI * 60 + phaseDeg * Math.PI / 180);
+  return { type: 'ac', v: instant, rms, phaseDeg, wave: 'ac' };
+}
+
+/* ============ Wires Engine & Electrical Net ============ */
+let selectedPin = null, wires = [];
+function bindPinEvents(){
+  document.querySelectorAll('.pin, .pin-mini').forEach(pin => {
+    pin.onclick = (e) => {
+      e.stopPropagation();
+      if (!selectedPin){
+        selectedPin = pin;
+        pin.classList.add('selected');
+      } else if (selectedPin !== pin){
+        createWire(selectedPin, pin);
+        selectedPin.classList.remove('selected');
+        selectedPin = null;
+      } else {
+        pin.classList.remove('selected');
+        selectedPin = null;
+      }
+    };
+  });
+}
+bindPinEvents();
+
+function pinCenter(pinEl){
+  const r = pinEl.getBoundingClientRect();
+  const c = document.getElementById('canvasInner').getBoundingClientRect();
+  return { x: r.left + r.width/2 - c.left, y: r.top + r.height/2 - c.top };
+}
+
+const WIRE_DEFAULT_COLOR = '#3fd0d6';
+function createWire(pinA, pinB){
+  const svg = document.getElementById('wireCanvas');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('class', 'wire-path');
+  path.setAttribute('stroke', WIRE_DEFAULT_COLOR);
+  svg.appendChild(path);
+  const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR };
+  wires.push(wireObj);
+  updateWirePosition(wireObj);
+  path.onclick = (e) => {
+    e.stopPropagation();
+    openWireEditor(wireObj, e.clientX, e.clientY);
+  };
+  updateLegend();
+  return wireObj;
+}
+
+// 실제 배선처럼 곡선으로 꼬이지 않도록, 핀과 핀 사이를 항상 직선으로 그립니다.
+function updateWirePosition(w){
+  const p1 = pinCenter(w.from), p2 = pinCenter(w.to);
+  w.element.setAttribute('d', `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`);
+}
+function updateAllWires(){ wires.forEach(updateWirePosition); }
+
+function deleteWire(wireObj){
+  const svg = document.getElementById('wireCanvas');
+  if (wireObj.element && wireObj.element.parentNode === svg) svg.removeChild(wireObj.element);
+  wires = wires.filter(w => w !== wireObj);
+  closeWireEditor();
+  updateLegend();
+}
+
+function setWireColor(wireObj, color){
+  wireObj.color = color;
+  wireObj.element.setAttribute('stroke', color);
+  updateLegend();
+}
+
+// 전선을 클릭(또는 연결 현황 목록에서 색상 점을 클릭)하면 뜨는 색상 선택 팝오버.
+const WIRE_COLOR_PRESETS = ['#3fd0d6', '#ff3b3b', '#3b82f6', '#31d158', '#ffd23f', '#ff8c1f', '#ffffff', '#8b93a1', '#000000'];
+let activeWireEditor = null;
+function closeWireEditor(){
+  if (activeWireEditor){ activeWireEditor.remove(); activeWireEditor = null; }
+  document.querySelectorAll('.wire-path.wire-selected').forEach(p => p.classList.remove('wire-selected'));
+}
+function openWireEditor(wireObj, clientX, clientY){
+  closeWireEditor();
+  wireObj.element.classList.add('wire-selected');
+  const box = document.createElement('div');
+  box.className = 'wire-editor';
+  box.innerHTML = `
+    <div class="we-label">전선 색상</div>
+    <div class="we-swatches">${WIRE_COLOR_PRESETS.map(c => `<div class="we-swatch${c === wireObj.color ? ' we-active' : ''}" style="background:${c}" data-color="${c}"></div>`).join('')}</div>
+    <div class="we-row"><span class="we-label">직접 선택</span><input type="color" value="${wireObj.color}"></div>
+    <button class="we-del">🗑 전선 삭제</button>`;
+  document.body.appendChild(box);
+  // 화면 밖으로 나가지 않도록 위치 보정
+  const bw = 178, bh = 150;
+  box.style.left = Math.min(clientX + 8, window.innerWidth - bw - 8) + 'px';
+  box.style.top = Math.min(clientY + 8, window.innerHeight - bh - 8) + 'px';
+  box.querySelectorAll('.we-swatch').forEach(sw => {
+    sw.onclick = (e) => { e.stopPropagation(); setWireColor(wireObj, sw.dataset.color); box.querySelectorAll('.we-swatch').forEach(s => s.classList.toggle('we-active', s === sw)); };
+  });
+  box.querySelector('input[type=color]').oninput = (e) => setWireColor(wireObj, e.target.value);
+  box.querySelector('.we-del').onclick = (e) => { e.stopPropagation(); deleteWire(wireObj); };
+  box.onclick = (e) => e.stopPropagation();
+  activeWireEditor = box;
+}
+document.addEventListener('click', () => closeWireEditor());
+
+// LCD/OLED처럼 "값"이 아니라 텍스트 화면 버퍼를 표시하는 부품이, 자신의 어떤 핀이든 net을 통해
+// 어느 보드에 연결되어 있는지 찾습니다. (특정 핀의 역할(RS/E/D4~7 등)까지는 검증하지 않고,
+// "이 LCD/OLED가 R3/R4 중 어느 보드 회로에 물려 있는가"만 판정하는 단순화된 모델입니다.)
+function boardOfComponent(compEl){
+  const pins = compEl.querySelectorAll('.pin-mini');
+  for (const p of pins){
+    const net = netOf(p);
+    for (const el of net){
+      const boardEl = el.closest('.board');
+      if (boardEl) return boardEl.dataset.board;
+    }
+  }
+  return null;
+}
+
+function netOf(startEl){
+  const visited = new Set();
+  const stack = [startEl];
+  while (stack.length){
+    const el = stack.pop();
+    if (!el || visited.has(el)) continue;
+    visited.add(el);
+    if (el.dataset && el.dataset.bus){
+      document.querySelectorAll(`[data-bus="${el.dataset.bus}"]`).forEach(m => {
+        if (!visited.has(m)) stack.push(m);
+      });
+    }
+    wires.forEach(w => {
+      if (w.from === el && !visited.has(w.to)) stack.push(w.to);
+      if (w.to === el && !visited.has(w.from)) stack.push(w.from);
+    });
+  }
+  return visited;
+}
+
+// 부품(가변저항/센서/버튼/블루투스/무선AP/DAC/초음파)이 net(전선+브레드보드 버스)을 통해
+// 이 핀에 신호를 공급하고 있는지 검사합니다. pinEl 자기 자신은 제외합니다.
+function externalSourceOnNet(pinEl){
+  const net = netOf(pinEl);
+  for (const el of net){
+    if (el === pinEl) continue;
+    const pid = el.dataset.pin || '';
+    if (pid.endsWith('_W')){
+      const compId = pid.replace(/_W$/, '');
+      const slider = document.getElementById(`${compId}_slider`);
+      if (slider) return { type: 'analog', v: (parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min)) };
+    }
+    if (/_T[12]$/.test(pid)){
+      const compId = pid.replace(/_T[12]$/, '');
+      const cap = document.getElementById(`${compId}_cap`);
+      if (cap) return { type: 'digital', v: cap.dataset.pressed === '1' ? 0 : 1 }; // INPUT_PULLUP: 눌림=LOW
+    }
+    if (pid.endsWith('_TXD')){
+      const module = el.closest('.comp-btmodule');
+      if (module) return { type: 'digital', v: module.dataset.state === '1' ? 1 : 0 };
+    }
+    if (pid.endsWith('_SIG')){
+      const ap = el.closest('.comp-wifiap');
+      if (ap) return { type: 'digital', v: apSignalValue(ap) };
+    }
+    if (pid.endsWith('_OUT')){
+      const dac = el.closest('.comp-dac');
+      if (dac) return dacReading(dac);
+    }
+    if (pid.endsWith('_ECHO')){
+      const sensor = el.closest('.comp-ultrasonic');
+      if (sensor) return ultrasonicReading(sensor);
+    }
+    if (pid.endsWith('_V') || /_L1$|_L2$|_L3$|_L$/.test(pid)){
+      const psu = el.closest('.comp-psu');
+      if (psu){
+        if (psu.dataset.mode === 'dc' && pid.endsWith('_V')) return psuDcReading(psu);
+        const m = pid.match(/(_L1|_L2|_L3|_L)$/);
+        if (m && psu.dataset.mode !== 'dc') return psuAcReading(psu, m[1]);
+      }
+    }
+    if (pid.endsWith('_N') || pid.endsWith('_G')){
+      const psu = el.closest('.comp-psu');
+      if (psu && psu.dataset.mode !== 'dc') return { type: 'volt', v: 0 }; // 중성선/접지는 항상 0V 기준
+      if (psu && psu.dataset.mode === 'dc' && pid.endsWith('_G')) return { type: 'volt', v: 0 };
+    }
+    if (pid.endsWith('_ENCA')){
+      const motorEl = el.closest('.comp-dcmotor-enc');
+      if (motorEl) return encoderPulseReading(motorEl);
+    }
+  }
+  return null;
+}
+// 어떤 핀(보드 핀이든 부품 핀이든)의 net 전체를 훑어 "지금 이 net에 흐르는 값"을 찾습니다:
+// 1) 위 부품 신호원이 우선, 2) 없으면 net에 포함된 보드 핀의 실제 실행 결과(mcuVM.pinState),
+// 3) 전원/GND 고정 레일. 아무것도 없으면 null (LED/서보/스코프 등에서 "미연결"로 처리하기 위함).
+function netReading(pinEl){
+  const external = externalSourceOnNet(pinEl);
+  if (external) return external;
+  const net = netOf(pinEl);
+  for (const el of net){
+    const board = el.closest('.board');
+    if (!board) continue;
+    const pid = el.dataset.pin;
+    const bKey = board.dataset.board;
+    const r = mcuVM[bKey]?.pinState?.[pid];
+    if (r) return r;
+    if (PIN_KIND[pid] === 'power') return { type: 'digital', v: 1 };
+    if (PIN_KIND[pid] === 'gnd') return { type: 'digital', v: 0 };
+  }
+  return null;
+}
+/* ============ 저항 회로망 (Resistor/PowerCable) 전압 계산 ============ */
+// 저항/파워케이블은 두 다리가 직접 union(0Ω)되지 않고, "그 부품 하나만큼의 저항"으로 이어진
+// 별도의 net으로 남습니다. 이 그래프를 다익스트라 방식으로 훑어 저항 경로를 계산합니다.
+function resistiveEdges(){
+  return Array.from(document.querySelectorAll('.resistive-2pin')).map(el => {
+    const legA = el.querySelector('[data-pin$="_A"]');
+    const legB = el.querySelector('[data-pin$="_B"]');
+    const ohms = parseFloat(el.dataset.ohms || '0');
+    return { legA, legB, ohms: isFinite(ohms) ? Math.max(0, ohms) : 0 };
+  }).filter(e => e.legA && e.legB);
+}
+// startPinEl의 net(대표 원소로 관리)에서 출발해 저항 엣지를 하나씩 건너며 도달 가능한 모든
+// net과 "그 net까지의 최소 누적 저항"을 구합니다. 회로 규모가 매우 작으므로(교육용 시뮬레이터)
+// 정교한 우선순위 큐 없이 라운드 릴렉스만으로 충분합니다.
+function resistiveBFS(startPinEl){
+  const edges = resistiveEdges();
+  const visited = [{ rep: startPinEl, net: netOf(startPinEl), distR: 0 }];
+  if (!edges.length) return visited;
+  const findIdx = (el) => visited.findIndex(v => v.net.has(el));
+  let changed = true, guard = 0;
+  while (changed && guard++ < 60){
+    changed = false;
+    for (const e of edges){
+      const iA = findIdx(e.legA), iB = findIdx(e.legB);
+      if (iA >= 0 && iB < 0){ visited.push({ rep: e.legB, net: netOf(e.legB), distR: visited[iA].distR + e.ohms }); changed = true; }
+      else if (iB >= 0 && iA < 0){ visited.push({ rep: e.legA, net: netOf(e.legA), distR: visited[iB].distR + e.ohms }); changed = true; }
+      else if (iA >= 0 && iB >= 0){
+        if (visited[iB].distR > visited[iA].distR + e.ohms){ visited[iB].distR = visited[iA].distR + e.ohms; changed = true; }
+        if (visited[iA].distR > visited[iB].distR + e.ohms){ visited[iA].distR = visited[iB].distR + e.ohms; changed = true; }
+      }
+    }
+  }
+  return visited;
+}
+// 어떤 reading이든 "실제 볼트"로 환산합니다. digital/analog/pwm/dac/echo는 이 시뮬레이터 전체에서
+// 0~1이 0~5V(아두이노 로직 레벨)를 나타내는 기존 관례를 따르고, volt/ac 타입은 이미 실제 볼트입니다.
+function readingToVolts(reading){
+  if (!reading) return 0;
+  if (reading.type === 'volt') return reading.v;
+  if (reading.type === 'ac') return reading.rms != null ? reading.rms : Math.abs(reading.v) / Math.SQRT2;
+  return reading.v * 5;
+}
+// netReading()을 확장: 직결(0Ω) net에 신호원이 없을 때만 저항/파워케이블을 건너 뛰어 가장 가까운
+// (또는 두 개의) 신호원을 찾고, 저항값에 따라 감쇠된 값을 돌려줍니다. 저항이 전혀 없는 회로는
+// 위 direct 체크에서 그대로 return되므로 기존 동작과 100% 동일합니다(회귀 없음).
+function resistiveReading(pinEl){
+  const direct = netReading(pinEl);
+  if (direct) return direct;
+  const visited = resistiveBFS(pinEl);
+  if (visited.length <= 1) return null;
+  const sources = [];
+  for (const v of visited){
+    if (v.rep === pinEl) continue;
+    const r = netReading(v.rep);
+    if (r) sources.push({ reading: r, distR: v.distR });
+  }
+  if (!sources.length) return null;
+  sources.sort((a, b) => a.distR - b.distR);
+  const ASSUMED_LOAD_OHMS = 150; // LED 등 "부하"의 대략적인 저항 근사값(체감용, 실측 아님)
+  if (sources.length === 1 || sources[0].distR < sources[1].distR){
+    const s = sources[0];
+    const ratio = ASSUMED_LOAD_OHMS / (ASSUMED_LOAD_OHMS + s.distR);
+    const out = { ...s.reading, v: s.reading.v * ratio };
+    if (out.rms != null) out.rms = out.rms * ratio;
+    return out;
+  }
+  // 저항 경로가 같은 거리에서 서로 다른(전형적으로 VCC/GND) 두 신호원을 만난 경우 —
+  // 실제 전압분배 회로처럼 두 경로 저항의 비로 보간합니다.
+  const [a, b] = sources;
+  const totalR = a.distR + b.distR;
+  const va = readingToVolts(a.reading), vb = readingToVolts(b.reading);
+  const vNode = totalR > 0 ? va + (vb - va) * (a.distR / totalR) : va;
+  return { type: 'volt', v: vNode };
+}
+// 저항계(Ω) 측정용: 전원 유무와 무관하게 두 핀 사이의 순수 저항 경로 합을 구합니다.
+function resistancePathBetween(pinA, pinB){
+  if (!pinA || !pinB) return null;
+  if (netOf(pinA).has(pinB)) return 0;
+  const visited = resistiveBFS(pinA);
+  const target = visited.find(v => v.net.has(pinB));
+  return target ? target.distR : null;
+}
+
+/* ============ 디지털 멀티미터 ============ */
+// reading을 배율(mode에 맞는 실제 볼트)로 환산 — AC 모드에서는 실효값(rms), 그 외에는 순시값 기반.
+function readingToDisplayVolts(reading, mode){
+  if (!reading) return 0;
+  if (reading.type === 'ac') return mode === 'acv' ? (reading.rms != null ? reading.rms : Math.abs(reading.v)/Math.SQRT2) : reading.v;
+  return readingToVolts(reading);
+}
+function updateMultimeter(id){
+  const mm = document.getElementById(id);
+  if (!mm) return;
+  const valEl = document.getElementById(`${id}_val`);
+  const unitEl = document.getElementById(`${id}_unit`);
+  const mode = mm.querySelector('.mm-mode')?.value || 'dcv';
+  const pRed = mm.querySelector('[data-pin$="_PROBE_P"]');
+  const pBlk = mm.querySelector('[data-pin$="_PROBE_N"]');
+  if (!pRed || !pBlk || !valEl || !unitEl) return;
+
+  if (!isSimulating){ valEl.textContent = '0.00'; unitEl.textContent = mode === 'ohm' ? 'Ω' : mode === 'dca' ? 'mA' : mode === 'acv' ? 'V AC' : 'V DC'; return; }
+
+  const netRed = netOf(pRed), netBlk = netOf(pBlk);
+  const sameNet = netRed.has(pBlk);
+
+  if (mode === 'ohm'){
+    if (sameNet){ valEl.textContent = '0.00'; unitEl.textContent = 'Ω (도통)'; return; }
+    const r = resistancePathBetween(pRed, pBlk);
+    if (r == null){ valEl.textContent = 'OL'; unitEl.textContent = ''; return; }
+    valEl.textContent = (Math.round(r * 100) / 100).toString();
+    unitEl.textContent = 'Ω';
+    return;
+  }
+
+  // 3상 라인간(선간) 전압 특수 케이스: 두 프로브가 서로 다른 상(L1/L2/L3)에 직접 연결된 경우 380V
+  const phaseOf = (net) => { for (const el of net){ const m = (el.dataset.pin || '').match(/_(L1|L2|L3)$/); if (m) return m[1]; } return null; };
+  const ph1 = phaseOf(netRed), ph2 = phaseOf(netBlk);
+  if (mode === 'acv' && ph1 && ph2 && ph1 !== ph2 && isSimulating){
+    valEl.textContent = '380.0'; unitEl.textContent = 'V AC (선간)'; return;
+  }
+
+  if (mode === 'dcv' || mode === 'acv'){
+    const rRed = resistiveReading(pRed), rBlk = resistiveReading(pBlk);
+    const vRed = readingToDisplayVolts(rRed, mode), vBlk = readingToDisplayVolts(rBlk, mode);
+    const diff = vRed - vBlk;
+    valEl.textContent = diff.toFixed(2);
+    unitEl.textContent = mode === 'dcv' ? 'V DC' : 'V AC';
+    return;
+  }
+
+  if (mode === 'dca'){
+    const r = resistancePathBetween(pRed, pBlk);
+    const rRed = resistiveReading(pRed), rBlk = resistiveReading(pBlk);
+    const vRed = readingToDisplayVolts(rRed, 'dcv'), vBlk = readingToDisplayVolts(rBlk, 'dcv');
+    if (r == null || r <= 0){ valEl.textContent = '0.00'; unitEl.textContent = 'mA'; return; }
+    const mA = Math.abs(vRed - vBlk) / r * 1000;
+    valEl.textContent = mA.toFixed(1);
+    unitEl.textContent = 'mA (추정치)';
+  }
+}
+
+// digitalRead()/analogRead() 내부에서 사용: 그 보드의 그 핀에 지금 어떤 값이 걸려 있는지.
+// 외부 배선이 최우선이며, 없으면 이 보드 스스로의 mcuVM 출력값을 그대로 읽어옵니다(자기
+// 자신이 OUTPUT으로 설정해 둔 값을 다시 읽는 것도 실제 아두이노와 동일하게 허용).
+function boardPinReading(boardId, pinId){
+  const boardEl = document.getElementById(boardId);
+  const pinEl = boardEl?.querySelector(`[data-pin="${pinId}"]`);
+  if (pinEl){
+    const r = netReading(pinEl);
+    if (r) return r;
+  }
+  return null;
+}
+
+/* ============ Simulation Loop & Scope Rendering ============ */
+let isSimulating = false, simTimer = null;
+const scopeBuffers = {};
+// 실제 오실로스코프의 RUN/STOP처럼, 화면을 그 순간에 정지시켜 자세히 들여다볼 수 있게 합니다.
+// 정지 중에는 화면에 보이는 시간창(now)을 정지된 시점으로 고정하고(coarse/fine 모드 공통),
+// coarse 모드의 신규 샘플 적재도 멈춥니다 — DUT(MCU)는 계속 실행되고, 스코프만 멈춥니다.
+const heldScopes = new Map(); // id -> { perfNow, dateNow }
+function toggleScopeHold(id){
+  const btn = document.getElementById(`${id}_holdbtn`);
+  if (heldScopes.has(id)){
+    heldScopes.delete(id);
+    if (btn){ btn.textContent = '⏸ 정지'; btn.classList.remove('held'); }
+  } else {
+    heldScopes.set(id, { perfNow: performance.now(), dateNow: Date.now() });
+    if (btn){ btn.textContent = '▶ 재개'; btn.classList.add('held'); }
+  }
+  drawScope(id);
+}
+// 스코프 프로브가 net을 통해 어느 보드의 어느 핀에 직접 연결되어 있는지 찾습니다.
+// (오실로스코프 정밀(µs) 모드에서 mcuVM[board].edgeLog[pinId]를 조회하기 위해 사용합니다.
+// 전위차계/DAC처럼 보드 핀이 아닌 신호원은 이 함수로는 찾아지지 않고, coarse 모드로 표시됩니다.)
+function findBoardPinOnNet(pinEl){
+  if (!pinEl) return null;
+  const net = netOf(pinEl);
+  for (const el of net){
+    const boardEl = el.closest('.board');
+    if (boardEl && el.dataset.pin) return { boardKey: boardEl.dataset.board, pinId: el.dataset.pin };
+  }
+  return null;
+}
+
+function toggleSimulation(){
+  isSimulating = !isSimulating;
+  const btn = document.getElementById('btnSim');
+  if (isSimulating){
+    btn.textContent = '■ 시뮬레이션 중지';
+    btn.className = 'btn stop';
+    document.querySelectorAll('.power-led').forEach(led => led.classList.add('on'));
+    logSerial('--- 시뮬레이션 실행 중: MCU 클록 동작 시작 ---');
+    simTimer = setInterval(runTick, 100);
+  } else {
+    btn.textContent = '▶ 시뮬레이션 시작';
+    btn.className = 'btn primary';
+    document.querySelectorAll('.power-led').forEach(led => led.classList.remove('on'));
+    clearInterval(simTimer);
+    document.querySelectorAll('.led-dome, .onboard-led').forEach(el => { el.classList.remove('on'); el.style.boxShadow=''; el.style.background=''; el.style.transform=''; });
+    document.querySelectorAll('.led-val').forEach(el => { el.textContent = '0%'; });
+    document.querySelectorAll('.rgb-dome').forEach(el => { el.style.background=''; el.style.boxShadow=''; });
+    document.querySelectorAll('.bt-led').forEach(el => el.classList.remove('on'));
+    document.querySelectorAll('.comp-wifiap').forEach(ap => {
+      ap.classList.remove('on');
+      const st = document.getElementById(`${ap.id}_status`);
+      if (st) st.textContent = '시뮬레이션 중지됨';
+    });
+    document.querySelectorAll('.comp-servo').forEach(sv => {
+      const arm = document.getElementById(`${sv.id}_arm`);
+      if (arm) arm.style.transform = 'translate(-50%,-100%) rotate(0deg)';
+      const label = document.getElementById(`${sv.id}_angle`);
+      if (label) label.textContent = '90°';
+    });
+    document.querySelectorAll('.comp-dcmotor, .comp-dcmotor-enc, .comp-bldcmotor, .comp-motor3ph').forEach(m => driveMotor(m.id, 0, 1));
+    document.querySelectorAll('.comp-multimeter').forEach(mm => updateMultimeter(mm.id));
+    logSerial('--- 시뮬레이션 중지됨 ---');
+  }
+}
+
+// 외장 LED의 선택 가능한 색상 프리셋: on(점등)/off(소등) 각각 3-스톱 그라디언트 색과 글로우용 rgb.
+const LED_COLORS = {
+  red:    { on:['#fff3d0', '#ff3b1f', '#b3200f'], off:['#ff8f80', '#a11a10', '#4a0906'], glow:'255,80,40' },
+  green:  { on:['#eaffe0', '#31d158', '#0f7a2c'], off:['#8fdba0', '#2f7a44', '#0c3d17'], glow:'60,220,110' },
+  blue:   { on:['#e3f0ff', '#3b82f6', '#1a4fb0'], off:['#8fb3e8', '#2c5aa8', '#122a52'], glow:'70,140,255' },
+  yellow: { on:['#fffbe0', '#ffd23f', '#b8930f'], off:['#e8d998', '#a8901f', '#4a3d0a'], glow:'255,210,63' },
+  white:  { on:['#ffffff', '#f5f5f5', '#c9c9c9'], off:['#e8e8e8', '#b8b8b8', '#7a7a7a'], glow:'255,255,255' },
+};
+
+const SCOPE_TYPE_LABEL = { analog:'아날로그', pwm:'PWM', digital:'디지털', echo:'에코 펄스', dac:'DAC', volt:'전압(DC)', ac:'전압(AC)' };
+// 가장 느린 TIME/DIV(2s) x 10칸 = 20초 창을 항상 커버할 수 있도록 여유 있게 버퍼를 보존합니다.
+const SCOPE_MAX_BUFFER_MS = 25000;
+function formatReadingValue(reading){
+  if (!reading) return '';
+  const pct = Math.round(reading.v * 100);
+  switch (reading.type){
+    case 'analog': return `${reading.v.toFixed(2)} (${Math.round(reading.v * 1023)}/1023)`;
+    case 'pwm': return `${pct}% duty`;
+    case 'digital': return reading.v >= 0.5 ? 'HIGH' : 'LOW';
+    case 'echo': return `${pct}%`;
+    case 'dac': return `${reading.wave} · ${reading.v.toFixed(2)}`;
+    case 'volt': return `${reading.v.toFixed(2)} V`;
+    case 'ac': return `AC ${(reading.rms != null ? reading.rms : Math.abs(reading.v)/Math.SQRT2).toFixed(0)}V (순시 ${reading.v.toFixed(1)}V)`;
+    default: return `${reading.v}`;
+  }
+}
+// 실제 오실로스코프처럼 TIME/DIV·VOLTS/DIV를 조절할 수 있도록, 각 샘플에 실제 타임스탬프(ms)와
+// 전압값(V, 0~5V 기준)을 함께 저장합니다. runTick은 100ms마다 한 번씩 불리지만, 한 틱 안에서도
+// PWM/DAC 파형의 모양이 보이도록 그 100ms 구간에 고르게 분산된 여러 하위 샘플을 만들어 둡니다.
+function pushScopeSamples(key, reading){
+  if (!scopeBuffers[key]) scopeBuffers[key] = [];
+  const buf = scopeBuffers[key];
+  const now = Date.now();
+  const N = 8; // 이번 틱(약 100ms) 동안 만들어낼 하위 샘플 개수
+  let volts01; // 0~1 정규화 값의 배열
+  if (!reading){
+    volts01 = new Array(N).fill(0);
+  } else if (reading.type === 'pwm' || reading.type === 'echo'){
+    const highCount = Math.round(reading.v * N);
+    volts01 = new Array(N).fill(0).map((_, i) => i < highCount ? 1 : 0);
+  } else if (reading.type === 'dac'){
+    if (reading.wave === 'ramp') volts01 = new Array(N).fill(0).map((_, i) => (((now - (N - 1 - i) * 12)) / 900) % 1);
+    else if (reading.wave === 'sine') volts01 = new Array(N).fill(0).map((_, i) => (Math.sin((now - (N - 1 - i) * 12) / 260) + 1) / 2);
+    else volts01 = new Array(N).fill(reading.v);
+  } else if (reading.type === 'volt'){
+    volts01 = new Array(N).fill(reading.v / 5); // 실제 볼트를 이후 *5 파이프라인에 맞춰 역정규화
+  } else if (reading.type === 'ac'){
+    const vPeak = (reading.rms != null ? reading.rms : 220) * Math.SQRT2;
+    const phaseDeg = reading.phaseDeg || 0;
+    volts01 = new Array(N).fill(0).map((_, i) => {
+      const tt = now - (N - 1 - i) * (100 / N);
+      return (vPeak * Math.sin((tt / 1000) * 2 * Math.PI * 60 + phaseDeg * Math.PI / 180)) / 5;
+    });
+  } else {
+    volts01 = new Array(N).fill(reading.v);
+  }
+  volts01.forEach((v01, i) => {
+    buf.push({ t: now - (N - 1 - i) * (100 / N), v: v01 * 5 });
+  });
+  const cutoff = now - SCOPE_MAX_BUFFER_MS;
+  while (buf.length && buf[0].t < cutoff) buf.shift();
+}
+
+function runTick(){
+  // 0. API 호출 vs 레지스터 직접제어 누적 실행 사이클/시간 readout 갱신 (현재 놓여있는 보드 전부)
+  Object.keys(boardInstances).forEach(updateCycleStats);
+
+  // 1. 보드 D13 온보드 LED 제어 (배선이 없으면 그 보드 자신의 실행 결과를 그대로 사용) — 보드 전부
+  Object.values(boardInstances).forEach(({ key, domId }) => {
+    const ledEl = document.getElementById(`l13Led_${key}`);
+    if (!ledEl || !document.getElementById(domId)) return;
+    const r = boardPinReading(domId, 'D13');
+    ledEl.classList.toggle('on', !!r && r.v >= 0.5);
+  });
+
+  // 2. 외장 LED 발광 (보드뿐 아니라 DAC/버튼/센서 등 어떤 신호원에 연결되어도 net 전체를 검사)
+  // PWM 듀티비 / DAC 레벨에 따라 밝기(불투명도·발광 반경·스케일)와 숫자 표시(%, V)가 함께 바뀌고,
+  // 선택한 색상에 맞춰 돔 색·글로우 색이 실시간으로 바뀝니다.
+  document.querySelectorAll('.comp-led').forEach(led => {
+    const aPin = led.querySelector('[data-pin$="_A"]');
+    const bulb = led.querySelector('.led-dome');
+    if (!aPin || !bulb) return;
+    const r = resistiveReading(aPin);
+    const lit = !!r && r.v > 0.05;
+    const level = lit ? Math.max(0.12, Math.min(1, r.v)) : 0;
+    const colorSel = led.querySelector('.led-color-select');
+    const col = LED_COLORS[colorSel ? colorSel.value : 'red'] || LED_COLORS.red;
+    const [c1, c2, c3] = lit ? col.on : col.off;
+    bulb.classList.toggle('on', lit);
+    bulb.style.background = `radial-gradient(circle at 35% 30%, ${c1}, ${c2} 55%, ${c3})`;
+    bulb.style.boxShadow = lit
+      ? `0 0 ${Math.floor(level * 18)}px ${Math.floor(3 + level * 4)}px rgba(${col.glow},${Math.min(1, level + 0.15)})`
+      : '0 2px 4px rgba(0,0,0,.4)';
+    bulb.style.transform = `scale(${lit ? (1 + level * 0.22).toFixed(2) : 1})`;
+    const valEl = led.querySelector('.led-val');
+    if (valEl) valEl.textContent = lit ? `${Math.round(level * 100)}% · ${readingToVolts(r).toFixed(1)}V` : '0%';
+  });
+
+  // 3. RGB LED: R/G/B 다리가 각각 연결된 net의 값을 섞어 색을 만듭니다.
+  document.querySelectorAll('.comp-rgbled').forEach(rgb => {
+    const chVal = (suffix) => {
+      const legEl = rgb.querySelector(`[data-pin$="_${suffix}"]`);
+      const r = legEl ? resistiveReading(legEl) : null;
+      return r ? r.v : 0;
+    };
+    const r = chVal('R'), g = chVal('G'), b = chVal('B');
+    const bulb = document.getElementById(`${rgb.id}_bulb`);
+    if (bulb){
+      const rgbColor = `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+      const glow = Math.max(r, g, b);
+      bulb.style.background = (r+g+b > 0.02) ? `radial-gradient(circle at 35% 30%, #fff, ${rgbColor} 60%)` : '';
+      bulb.style.boxShadow = glow > 0.02 ? `0 0 ${Math.floor(glow*16)}px 3px ${rgbColor}` : '';
+    }
+  });
+
+  // 4. 서보 모터 각도 갱신 — VCC에 걸린 실제 전압이 정격의 70% 미만이면 "전원 부족"으로 멈춥니다.
+  document.querySelectorAll('.comp-servo').forEach(sv => {
+    const sig = sv.querySelector('[data-pin$="_SIG"]');
+    const vPin = sv.querySelector('[data-pin$="_V"]');
+    const ratedSel = sv.querySelector('.servo-rated-v');
+    const rated = ratedSel ? parseFloat(ratedSel.value) : 5;
+    const vReading = vPin ? resistiveReading(vPin) : null;
+    const suppliedV = vReading ? readingToVolts(vReading) : 0;
+    const label = document.getElementById(`${sv.id}_angle`);
+    const arm = document.getElementById(`${sv.id}_arm`);
+    if (isSimulating && vReading && suppliedV < rated * 0.7){
+      if (label) label.textContent = '전원 부족';
+      return;
+    }
+    const r = sig ? resistiveReading(sig) : null;
+    const angle = r ? Math.round(Math.max(0, Math.min(1, r.v)) * 180) : 90;
+    if (arm) arm.style.transform = `translate(-50%,-100%) rotate(${angle - 90}deg)`;
+    if (label) label.textContent = `${angle}°`;
+  });
+
+  // 5. DC 모터 + 모터 드라이버: ENA(속도)/IN1(방향) net을 읽어 OUT1에 연결된 모터를 구동
+  //    (엔코더가 달린 DC 모터도 같은 TA/TB 단자 규칙을 쓰므로 동일한 배선 로직을 그대로 씁니다)
+  document.querySelectorAll('.comp-dcmotor, .comp-dcmotor-enc').forEach(m => driveMotor(m.id, 0, 1));
+  document.querySelectorAll('.comp-motordriver').forEach(md => {
+    const legReading = (suffix) => {
+      const legEl = md.querySelector(`[data-pin$="_${suffix}"]`);
+      return legEl ? resistiveReading(legEl) : null;
+    };
+    const enaR = legReading('ENA');
+    const in1R = legReading('IN1');
+    const speed = enaR ? Math.max(0, Math.min(1, enaR.v)) : 0;
+    const dir = (in1R && in1R.v <= 0.5) ? -1 : 1;
+    const out1El = md.querySelector('[data-pin$="_OUT1"]');
+    if (out1El){
+      netOf(out1El).forEach(el => {
+        const pid = el.dataset.pin;
+        if (pid && /_T[AB]$/.test(pid)) driveMotor(pid.replace(/_T[AB]$/, ''), speed, dir);
+      });
+    }
+  });
+
+  // 5-1. BLDC 드라이버(ESC): ENA(PWM 속도)/IN1(방향) → U/V/W 3상 출력에 연결된 BLDC 모터를 구동
+  document.querySelectorAll('.comp-bldcmotor').forEach(m => driveMotor(m.id, 0, 1));
+  document.querySelectorAll('.comp-bldcdriver').forEach(bd => {
+    const legReading = (suffix) => {
+      const legEl = bd.querySelector(`[data-pin$="_${suffix}"]`);
+      return legEl ? resistiveReading(legEl) : null;
+    };
+    const enaR = legReading('ENA');
+    const in1R = legReading('IN1');
+    const speed = enaR ? Math.max(0, Math.min(1, enaR.v)) : 0;
+    const dir = (in1R && in1R.v <= 0.5) ? -1 : 1;
+    const uOut = bd.querySelector('[data-pin$="_U"]');
+    if (uOut){
+      netOf(uOut).forEach(el => {
+        const motorEl = el.closest('.comp-bldcmotor');
+        if (motorEl) driveMotor(motorEl.id, speed, dir);
+      });
+    }
+  });
+
+  // 5-2. 3상 유도전동기: R/S/T 세 상 모두에 (직접 또는 저항 경로로) AC 전원이 걸려 있으면 정속 회전
+  document.querySelectorAll('.comp-motor3ph').forEach(m3 => {
+    const l1 = m3.querySelector('[data-pin$="_L1"]');
+    const l2 = m3.querySelector('[data-pin$="_L2"]');
+    const l3 = m3.querySelector('[data-pin$="_L3"]');
+    const readings = [l1, l2, l3].map(p => p ? resistiveReading(p) : null);
+    const allPowered = isSimulating && readings.every(r => r && r.type === 'ac');
+    driveMotor(m3.id, allPowered ? 0.85 : 0, 1);
+  });
+
+  // 6. 블루투스 모듈 상태 LED (시뮬레이션 중 페어링된 것처럼 점멸) / 무선 AP 링 애니메이션
+  document.querySelectorAll('.comp-btmodule').forEach(bt => {
+    const led = document.getElementById(`${bt.id}_led`);
+    if (led) led.classList.toggle('on', Math.floor(Date.now()/500) % 2 === 0);
+  });
+  document.querySelectorAll('.comp-wifiap').forEach(ap => {
+    const powered = document.getElementById(`${ap.id}_switch`)?.classList.contains('on');
+    ap.classList.toggle('on', !!powered);
+    const status = document.getElementById(`${ap.id}_status`);
+    if (status) status.textContent = powered ? '신호 송출 중' : '전원 꺼짐';
+  });
+
+  // 7. 오실로스코프 파형 업데이트 (net에서 찾은 신호를 타입에 맞게 그려줍니다)
+  document.querySelectorAll('.comp-scope').forEach(sc => {
+    const held = heldScopes.has(sc.id);
+    ['CH1', 'CH2', 'CH3', 'CH4'].forEach(ch => {
+      const pEl = sc.querySelector(`[data-pin$="_${ch}"]`);
+      const r = pEl ? resistiveReading(pEl) : null;
+      let label = '미연결';
+      if (pEl && r){
+        const net = netOf(pEl);
+        let sourceName = null;
+        for (const el of net){ if (el !== pEl && el.dataset.pin){ sourceName = el.dataset.pin; break; } }
+        label = `${sourceName || '?'} · ${SCOPE_TYPE_LABEL[r.type] || r.type} · ${formatReadingValue(r)}`;
+      }
+      // 정지(HOLD) 중에는 화면 레이블/파형을 그 순간 그대로 유지합니다 (DUT는 계속 실행됩니다).
+      if (!held){
+        const labelEl = document.getElementById(`${sc.id}_${ch.toLowerCase()}label`);
+        if (labelEl) labelEl.textContent = `${ch}: ${label}`;
+        pushScopeSamples(`${sc.id}_${ch}`, r);
+      }
+    });
+    if (!held) drawScope(sc.id);
+  });
+
+  // 8. 캐릭터 LCD / OLED 화면 갱신 (자신이 연결된 보드의 lcdText/oledLines 버퍼를 그대로 표시)
+  document.querySelectorAll('.comp-lcd').forEach(lcd => {
+    const screen = document.getElementById(`${lcd.id}_screen`);
+    if (!screen) return;
+    const b = boardOfComponent(lcd);
+    const lines = (b && mcuVM[b].lcdText) ? mcuVM[b].lcdText : ['', ''];
+    screen.textContent = lines.map(l => (l || '').padEnd(16, ' ')).join('\n');
+  });
+  document.querySelectorAll('.comp-oled').forEach(oled => {
+    const screen = document.getElementById(`${oled.id}_screen`);
+    if (!screen) return;
+    const b = boardOfComponent(oled);
+    const lines = (b && mcuVM[b].oledLines) ? mcuVM[b].oledLines : ['', '', '', ''];
+    screen.textContent = lines.map(l => (l || '').padEnd(21, ' ')).join('\n');
+  });
+
+  // 9. R4 보드 내장 12x8 LED 매트릭스 갱신 (mcuVM[key].ledMatrix -> 그 보드의 매트릭스 점의 on
+  // 클래스) — 캔버스에 R4가 여러 대 있으면 각자 자기 자신의 ledMatrix 버퍼를 표시합니다.
+  Object.values(boardInstances).forEach(({ key, type }) => {
+    if (type !== 'r4') return;
+    const gridId = `matrixGrid_${key}`;
+    const grid = mcuVM[key]?.ledMatrix;
+    if (!grid || !document.getElementById(gridId)) return;
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 12; c++) {
+        const dot = document.getElementById(`${gridId}_m_${r}_${c}`);
+        if (dot) dot.classList.toggle('on', !!(grid[r] && grid[r][c]));
+      }
+    }
+  });
+
+  // 10. 디지털 멀티미터: 모드(DCV/ACV/Ω/DCA)에 맞춰 두 프로브 사이 값을 실시간으로 측정해 표시
+  document.querySelectorAll('.comp-multimeter').forEach(mm => updateMultimeter(mm.id));
+
+  // 11. 엔코더 DC 모터 펄스 배지(Hz) — 아직 아무 데도 연결되지 않았어도 회전 중이면 표시되어야 하므로
+  //     배선 여부와 무관하게 매 틱 갱신합니다.
+  document.querySelectorAll('.comp-dcmotor-enc').forEach(m => encoderPulseReading(m));
+}
+
+const SCOPE_HDIV = 10; // 화면 가로 칸 수 (실제 오실로스코프처럼 TIME/DIV x 10칸 = 전체 화면 시간)
+const SCOPE_VDIV = 8;  // 화면 세로 칸 수
+// TIME/DIV가 이 값(ms) 이하로 내려가면 "정밀(fine) 모드"로 전환합니다 — 100ms 주기 폴링 버퍼 대신,
+// digitalWrite()/PORTx 접근이 실제로 일어난 시점을 기록해둔 mcuVM[board].edgeLog를 직접 사용해
+// API 호출(56사이클)과 레지스터 직접 접근(2사이클)의 실행 시간 차이가 만드는 엣지의 미세한
+// 시간차를 그대로 그립니다. 굵은(coarse) 모드는 100ms마다 폴링한 값이라 이 차이가 보이지 않습니다.
+const SCOPE_FINE_THRESHOLD_MS = 1;
+function drawScope(id){
+  const cvs = document.getElementById(`${id}_canvas`);
+  if (!cvs) return;
+  const ctx = cvs.getContext('2d');
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+  const timeDivSel = document.getElementById(`${id}_timediv`);
+  const timeDivMs = timeDivSel ? parseFloat(timeDivSel.value) : 50;
+  const voltsDivs = ['1', '2', '3', '4'].map(n => {
+    const sel = document.getElementById(`${id}_voltsdiv${n}`);
+    return sel ? parseFloat(sel.value) : 1;
+  });
+  const isFine = timeDivMs <= SCOPE_FINE_THRESHOLD_MS;
+
+  const divW = cvs.width / SCOPE_HDIV;
+  const divH = cvs.height / SCOPE_VDIV;
+  // 0V 기준선을 아래에서 1칸 위에 두어(실제 스코프의 수직 위치 조정과 비슷하게),
+  // 0~5V 범위의 단극성(unipolar) 신호가 화면 위쪽 여백을 최대한 활용해 보이도록 합니다.
+  const zeroY = cvs.height - divH;
+
+  // 그리드 (칸 단위로 정렬)
+  ctx.strokeStyle = '#143823'; ctx.lineWidth = 1;
+  for (let i = 0; i <= SCOPE_HDIV; i++){ const x = Math.round(i * divW) + 0.5; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, cvs.height); ctx.stroke(); }
+  for (let i = 0; i <= SCOPE_VDIV; i++){ const y = Math.round(i * divH) + 0.5; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(cvs.width, y); ctx.stroke(); }
+  // 0V 기준선 강조
+  ctx.strokeStyle = '#2a5c3c'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, zeroY + 0.5); ctx.lineTo(cvs.width, zeroY + 0.5); ctx.stroke();
+
+  const held = heldScopes.get(id);
+  const windowMs = timeDivMs * SCOPE_HDIV;
+
+  // ---- Coarse 모드: 100ms 주기로 폴링해둔 scopeBuffers(Date.now() 기준)를 그립니다. ----
+  const drawCoarseTrace = (buf, voltsDiv, color) => {
+    if (!buf || !buf.length) return;
+    const now = held ? held.dateNow : Date.now();
+    const t0 = now - windowMs;
+    ctx.strokeStyle = color; ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    let started = false;
+    buf.forEach(pt => {
+      if (pt.t < t0 || pt.t > now) return;
+      const x = ((pt.t - t0) / windowMs) * cvs.width;
+      const y = zeroY - (pt.v / voltsDiv) * divH;
+      if (!started){ ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    });
+    if (started) ctx.stroke();
+  };
+
+  // ---- Fine 모드: mcuVM[board].edgeLog[pin](performance.now() 기준 계단파)를 그립니다. ----
+  const drawFineTrace = (edges, voltsDiv, color) => {
+    const now = held ? held.perfNow : performance.now();
+    const t0 = now - windowMs;
+    ctx.strokeStyle = color; ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    let lastV = 0, i = 0;
+    if (edges){
+      for (; i < edges.length; i++){ if (edges[i].t > t0) break; lastV = edges[i].v; }
+    }
+    let y = zeroY - (lastV * 5 / voltsDiv) * divH;
+    ctx.moveTo(0, y);
+    if (edges){
+      for (; i < edges.length && edges[i].t <= now; i++){
+        const x = Math.max(0, ((edges[i].t - t0) / windowMs) * cvs.width);
+        ctx.lineTo(x, y); // 이전 레벨을 이 시점까지 수평으로 유지
+        y = zeroY - (edges[i].v * 5 / voltsDiv) * divH;
+        ctx.lineTo(x, y); // 수직으로 새 레벨로 전환 (계단파)
+      }
+    }
+    ctx.lineTo(cvs.width, y);
+    ctx.stroke();
+  };
+
+  const SCOPE_CH_COLORS = ['#ffd23f', '#5ad0e6', '#ff5ac8', '#7cfc8a'];
+  ['CH1', 'CH2', 'CH3', 'CH4'].forEach((ch, idx) => {
+    const voltsDiv = voltsDivs[idx];
+    const color = SCOPE_CH_COLORS[idx];
+    const key = `${id}_${ch}`;
+    if (isFine){
+      const pEl = document.querySelector(`#${id} [data-pin$="_${ch}"]`);
+      const bp = findBoardPinOnNet(pEl);
+      if (bp){
+        drawFineTrace(mcuVM[bp.boardKey].edgeLog[bp.pinId], voltsDiv, color);
+        return;
+      }
+      // 보드 핀에 직접 연결되어 있지 않으면(전위차계/DAC 등) 정밀 모드에서는 표시할 엣지 기록이
+      // 없으므로, 마지막으로 알려진 coarse 값 하나로 평평한 선만 그려 "데이터 없음"을 나타냅니다.
+      drawCoarseTrace(scopeBuffers[key], voltsDiv, color);
+      return;
+    }
+    drawCoarseTrace(scopeBuffers[key], voltsDiv, color);
+  });
+}
+
+/* ============ Popups & UI Helpers ============ */
+let popupZTop = 25;
+function openBoardPopup(board){
+  const p = document.getElementById(`popup${board.toUpperCase()}`);
+  if (p) { p.hidden = false; p.style.zIndex = ++popupZTop; }
+}
+function closeBoardPopup(board){
+  const p = document.getElementById(`popup${board.toUpperCase()}`);
+  if (p) p.hidden = true;
+}
+
+function makePopupDraggable(popup){
+  const handle = popup.querySelector('[data-drag-handle]');
+  if (!handle) return;
+  let dragging = false, offX = 0, offY = 0;
+  handle.addEventListener('mousedown', (e) => {
+    if (e.target.closest('button')) return;
+    dragging = true;
+    popup.style.zIndex = ++popupZTop;
+    const rect = popup.getBoundingClientRect();
+    offX = e.clientX - rect.left;
+    offY = e.clientY - rect.top;
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    popup.style.left = Math.max(0, e.clientX - offX) + 'px';
+    popup.style.top = Math.max(0, e.clientY - offY) + 'px';
+  });
+  document.addEventListener('mouseup', () => { dragging = false; });
+}
+document.querySelectorAll('.board-popup').forEach(makePopupDraggable);
+
+const serialBuf = {};
+function logSerial(msg, target = 'r4'){
+  const tgt = target === 'both' ? Object.keys(boardInstances) : [target];
+  tgt.forEach(b => {
+    serialBuf[b] = (serialBuf[b] || '') + msg + '\n';
+    serialBuf[b] = serialBuf[b].split('\n').slice(-250).join('\n');
+    const el = document.getElementById(`serialLogs${b.toUpperCase()}`);
+    if (el) { el.textContent = serialBuf[b]; el.scrollTop = el.scrollHeight; }
+  });
+}
+function clearSerial(){
+  Object.keys(boardInstances).forEach(b => {
+    serialBuf[b] = '';
+    const el = document.getElementById(`serialLogs${b.toUpperCase()}`);
+    if (el) el.textContent = '';
+  });
+}
+
+function updateLegend(){
+  const list = document.getElementById('legendList');
+  const empty = document.getElementById('legendEmpty');
+  list.innerHTML = '';
+  if (wires.length === 0){ empty.hidden = false; return; }
+  empty.hidden = true;
+  wires.forEach(w => {
+    const li = document.createElement('li');
+    li.style.cssText = 'display:flex; align-items:center; gap:6px; cursor:pointer;';
+    li.innerHTML = `<span style="width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:${w.color};box-shadow:0 0 3px ${w.color};"></span><span>${w.from.dataset.pin} ↔ ${w.to.dataset.pin}</span>`;
+    li.onclick = (e) => { e.stopPropagation(); const r = li.getBoundingClientRect(); openWireEditor(w, r.left, r.bottom); };
+    list.appendChild(li);
+  });
+}
+
+function resetBoard(board = 'r4'){
+  logSerial('보드를 리셋합니다...', board);
+  executeCompilerPipeline(board);
+}
+
+// R3 보드(추가 인스턴스)의 시각적 마크업. buildR4BoardHTML과 마찬가지로 key로 내부 id를 구분합니다.
+function buildR3BoardHTML(key){
+  const suffix = key.includes('_') ? ' #' + key.split('_')[1] : '';
+  return `
+    <div class="silk silk-word" style="top:44px;left:26px;">ARDUINO</div>
+    <div class="silk silk-title" style="top:58px;left:26px;">UNO R3${suffix}</div>
+    <div class="onboard-led" id="l13Led_${key}" style="top:44px; left:220px;"></div>
+    <div class="header-row top" id="rowDigital_${key}"></div>
+    <div class="header-row power" id="rowPower_${key}"></div>
+    <div class="header-row analog" id="rowAnalog_${key}"></div>`;
+}
+
+// R4/R3 코드 에디터 & 빌드 콘솔 팝업을 새 인스턴스용으로 통째로 만들어 body에 붙입니다.
+// 기본 내장된 popupR4/popupR3(HTML에 이미 정적으로 있음)는 이 함수를 거치지 않고,
+// 그 이후에 추가되는 모든 보드(두 번째 R4, 두 번째 R3, ...)가 이 함수로 팝업을 얻습니다.
+function buildBoardPopupHTML(key, type){
+  const isR3 = type === 'r3';
+  const KEY = key.toUpperCase();
+  const label = isR3 ? 'Uno R3' : 'Uno R4 WiFi';
+  const suffix = key.includes('_') ? ' #' + key.split('_')[1] : '';
+  const targetLine = isR3 ? 'Target: ATmega328P (8-bit AVR @ 16MHz)' : 'Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)';
+  const toolchain = isR3 ? 'AVR-GCC' : 'C/C++ GCC';
+  const extraButtons = isR3
+    ? `<button class="btn ghost" onclick="loadExampleCode('${key}','register')">DDR/PORT 레지스터 직접제어</button>
+        <button class="btn ghost" onclick="loadExampleCode('${key}','api_vs_register')">13번(API) vs 12번(레지스터)</button>`
+    : `<button class="btn ghost" onclick="loadExampleCode('${key}','analog')">A0 가변저항 &amp; D9 PWM</button>
+        <button class="btn ghost" onclick="loadExampleCode('${key}','register')">DDR/PORT 레지스터 직접제어</button>
+        <button class="btn ghost" onclick="loadExampleCode('${key}','api_vs_register')">13번(API) vs 12번(레지스터)</button>`;
+  const defaultCode = `// Arduino ${label}${suffix} 스케치\nint count = 0;\nconst int ledPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Board ${key} Tick: ");\n  Serial.println(count);\n  delay(200);\n}`;
+
+  const div = document.createElement('div');
+  div.className = 'board-popup';
+  div.id = `popup${KEY}`;
+  // 팝업이 전부 같은 자리에 겹쳐 뜨지 않도록, 이미 열려있는 보드 팝업 수만큼 대각선으로
+  // 계단식 오프셋을 줍니다(6개마다 다시 처음 자리로 순환).
+  const cascade = Object.keys(boardInstances).length % 6;
+  div.style.left = `calc(58% + ${cascade * 28}px)`;
+  div.style.top = (60 + cascade * 34) + 'px';
+  div.innerHTML = `
+    <div class="popup-head" data-drag-handle>
+      <b>${label}${suffix} — ${toolchain} Toolchain &amp; Serial</b>
+      <button class="btn ghost" onclick="closeBoardPopup('${key}')">닫기 ✕</button>
+    </div>
+    <div class="compile-progress" id="progress${KEY}"></div>
+    <div class="build-status-bar">
+      <span>${targetLine}</span>
+      <span class="status-tag ready" id="statusTag${KEY}">IDLE</span>
+    </div>
+    <div class="cycle-stats" id="cycleStats${KEY}">
+      <span>API 호출(pinMode/digitalWrite 등): <b>0</b> cycles (<b>0.00µs</b>)</span>
+      <span class="reg-stat">레지스터 직접제어(DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)</span>
+    </div>
+    <div class="popup-body">
+      <div class="example-buttons">
+        <button class="btn primary" id="btnCompile${KEY}" onclick="executeCompilerPipeline('${key}')">▶ 컴파일 &amp; 빌드 업로드</button>
+        <button class="btn ghost" onclick="loadExampleCode('${key}','counter')">카운터 &amp; D13 점멸</button>
+        ${extraButtons}
+      </div>
+      <textarea id="codeEditor${KEY}" class="code-editor" spellcheck="false">${defaultCode}</textarea>
+      <div class="serial-panel">
+        <div class="serial-head"><span>빌드 콘솔 / 시리얼 모니터</span><span>9600 baud</span></div>
+        <div class="serial-logs" id="serialLogs${KEY}"></div>
+      </div>
+    </div>`;
+  document.body.appendChild(div);
+  makePopupDraggable(div);
+  return div;
+}
+
+// type: 'r4' 또는 'r3'. 호출할 때마다 그 타입의 보드를 새로 한 대 더 캔버스에 추가합니다
+// (기본 내장 R4, 최초 1회의 R3는 이미 만들어져 있는 마크업/팝업을 재사용하고, 그 이후부터는
+// 이 함수가 보드 그림 + 팝업(코드 에디터/빌드 콘솔)을 전부 새로 만들어 등록합니다).
+function spawnBoard(type){
+  const isFirstOfType = boardSpawnCount[type] === 0;
+  boardSpawnCount[type] = (boardSpawnCount[type] || 0) + 1;
+  const key = isFirstOfType ? type : `${type}_${boardSpawnCount[type]}`;
+
+  const el = document.createElement('div');
+  el.className = type === 'r3' ? 'placed-component board board-r3' : 'placed-component board';
+  el.id = `arduinoBoard_${key}`;
+  el.dataset.board = key;
+  const row = Object.keys(boardInstances).length; // 이미 놓여있는 보드 수만큼 아래로 계단식 배치
+  el.style.left = '480px';
+  el.style.top = (360 + row * 460) + 'px';
+  el.innerHTML = type === 'r3' ? buildR3BoardHTML(key) : buildR4BoardHTML(key);
+  document.getElementById('canvasInner').appendChild(el);
+
+  buildHeader(`rowDigital_${key}`, DIGITAL_PINS);
+  buildHeader(`rowPower_${key}`, POWER_PINS);
+  buildHeader(`rowAnalog_${key}`, ANALOG_PINS);
+  if (type === 'r4') rebuildMatrixGrid(`matrixGrid_${key}`);
+
+  if (!isFirstOfType) buildBoardPopupHTML(key, type); // r4의 첫 대, r3의 첫 대는 정적 팝업 재사용
+  if (!mcuVM[key]) mcuVM[key] = createMcuState(type === 'r3' ? 16e6 : 48e6);
+  boardDomId[key] = el.id;
+  boardInstances[key] = { key, type, domId: el.id };
+
+  makeDraggable(el);
+  bindPinEvents();
+  executeCompilerPipeline(key);
+  return key;
+}
+
+function loadExampleCode(board, type){
+  const editor = document.getElementById(`codeEditor${board.toUpperCase()}`);
+  if (!editor) return;
+  if (type === 'counter'){
+    editor.value = `int count = 0;\nconst int led = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(led, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(led, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Counter: ");\n  Serial.println(count);\n  delay(200);\n}`;
+  } else if (type === 'analog'){
+    editor.value = `const int potPin = A0;\nconst int ledPin = 9;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  int val = analogRead(potPin);\n  int pwm = map(val, 0, 1023, 0, 255);\n  analogWrite(ledPin, pwm);\n  Serial.print("A0: "); Serial.print(val);\n  Serial.print(" -> PWM: "); Serial.println(pwm);\n  delay(150);\n}`;
+  } else if (type === 'register'){
+    editor.value = `// DDRB/PORTB 레지스터로 D13(PB5)을 직접 제어하는 예제\n// digitalWrite() 호출 오버헤드 없이 포트를 바로 토글합니다.\nvoid setup() {\n  Serial.begin(9600);\n  DDRB |= (1 << PB5);   // D13(PB5)을 출력으로 설정\n}\n\nvoid loop() {\n  PORTB ^= (1 << PB5);  // 포트 비트를 직접 토글\n  delay(150);\n}`;
+  } else if (type === 'api_vs_register'){
+    editor.value = `// 같은 동작(핀 켜고 끄기)을 12번 핀은 DDR/PORT 레지스터로, 13번 핀은 표준 API로 구현해 비교합니다.\n// 13번 핀 = PB5, 12번 핀 = PB4 (Uno의 D8~D13은 모두 PORTB에 속해 있습니다).\n//\n// 일부러 "12번(레지스터) 먼저 -> 13번(API) 나중" 순서로 적었습니다: 레지스터 접근은 명령어\n// 1~2개(약 2사이클)로 거의 즉시 반응하지만, digitalWrite()는 핀->포트 조회 + 인터럽트\n// disable/enable까지 거치느라 약 56사이클이 더 걸립니다. 그래서 두 줄을 "동시에" 실행시켜도\n// 실제로 핀 전압이 바뀌는 시점은 미묘하게 어긋납니다 — 오실로스코프의 TIME/DIV를 아주 작게\n// (예: 10µs, 20µs) 줄이면 12번이 먼저 올라가고 13번이 살짝 늦게 따라 올라가는 게 보입니다.\n// (TIME/DIV를 5ms 이상으로 두면 100ms 주기로 값을 읽는 굵은 모드로 전환되어 이 미세한\n// 차이는 보이지 않고, 대신 실제 delay() 타이밍에 따른 500ms 사각파만 보입니다.)\n\nconst int ledApiPin = 13;  // API 방식으로 제어할 핀\n\nvoid setup() {\n  Serial.begin(9600);\n\n  // --- 12번 핀: DDR 레지스터 직접 제어 방식 ---\n  DDRB |= (1 << PB4);   // pinMode(12, OUTPUT)과 동일한 효과\n\n  // --- 13번 핀: 표준 Arduino API 방식 ---\n  pinMode(ledApiPin, OUTPUT);\n\n  Serial.println("12번=레지스터(먼저), 13번=API(나중)로 동시에 점멸합니다.");\n}\n\nvoid loop() {\n  // 12번 핀 ON: 레지스터 직접 제어 (거의 즉시 반응)\n  PORTB |= (1 << PB4);\n  // 13번 핀 ON: 표준 API (레지스터보다 ~56사이클 늦게 반응)\n  digitalWrite(ledApiPin, HIGH);\n\n  Serial.println("12(REG)=HIGH, 13(API)=HIGH");\n  delay(500);\n\n  // 12번 핀 OFF: 레지스터 직접 제어\n  PORTB &= ~(1 << PB4);\n  // 13번 핀 OFF: 표준 API\n  digitalWrite(ledApiPin, LOW);\n\n  Serial.println("12(REG)=LOW,  13(API)=LOW");\n  delay(500);\n}`;
+  }
+  executeCompilerPipeline(board);
+}
+
+/* ============ BOM (Bill of Materials) list ============ */
+const BOM_LABELS = {
+  led: 'LED', pot: '가변저항 (Potentiometer)', btn: '푸시 버튼', scope: '오실로스코프',
+  rgbled: '3색 LED (RGB)', psu: '전원 공급 장치', breadboard: '브레드보드',
+  btmodule: '블루투스 모듈', wifiap: '무선 AP (신호 발생)', dac: 'DAC 신호 발생기',
+  ultrasonic: '초음파 센서 (HC-SR04)', servo: 'DC 서보모터', dcmotor: 'DC 모터',
+  motordriver: '모터 드라이버 (L298N)', 'sensor-ldr': '조도 센서 (LDR)', 'sensor-temp': '온도 센서',
+  lcd: '캐릭터 LCD (16x2)', oled: 'OLED 모듈 (I2C)',
+  resistor: '저항 (Resistor)', powercable: '파워케이블 (저항 있음)', motor3ph: '3상 유도전동기',
+  bldcmotor: 'BLDC 모터', bldcdriver: 'BLDC 드라이버 (ESC)', 'dcmotor-enc': 'DC 모터 (엔코더 포함)',
+  multimeter: '디지털 멀티미터',
+};
+function openBomList(){
+  const counts = {};
+  document.querySelectorAll('.placed-component').forEach(el => {
+    let key, label;
+    if (el.classList.contains('board')){
+      key = el.dataset.board.startsWith('r3') ? 'board-r3' : 'board-r4';
+      label = el.dataset.board.startsWith('r3') ? 'Arduino Uno R3' : 'Arduino Uno R4 WiFi';
+    } else {
+      const m = el.id.match(/^comp_(.+)_\d+$/);
+      key = m ? m[1] : 'unknown';
+      label = BOM_LABELS[key] || key;
+    }
+    if (!counts[key]) counts[key] = { label, count: 0 };
+    counts[key].count++;
+  });
+  const rows = Object.values(counts).sort((a, b) => a.label.localeCompare(b.label));
+  const body = document.getElementById('bomListBody');
+  if (body){
+    body.innerHTML = rows.length
+      ? rows.map(r => `<div class="bom-row"><span>${r.label}</span><span>${r.count}개</span></div>`).join('')
+      : '<div class="bom-empty">캔버스에 부품이 없습니다.</div>';
+  }
+  const wireCountEl = document.getElementById('bomWireCount');
+  if (wireCountEl) wireCountEl.textContent = `연결된 전선: ${wires.length}개`;
+  const modal = document.getElementById('bomModal');
+  if (modal){ modal.hidden = false; modal.style.zIndex = ++popupZTop; }
+}
+function closeBomList(){
+  const modal = document.getElementById('bomModal');
+  if (modal) modal.hidden = true;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  executeCompilerPipeline('r4');
+});
+</script>
+</body>
+</html>
