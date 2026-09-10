@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.95</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.95b</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -29,6 +29,7 @@
     --pcb-dark:#070a10;
     --gold:#d8b25c;
     --focus:#5aa9e6;
+    --pwm:#b98af2;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   *:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
@@ -145,6 +146,12 @@
   svg#wireHandleCanvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5; overflow:visible;}
   .wire-point-handle{fill:#12151a; stroke-width:2; cursor:grab; pointer-events:all;}
   .wire-point-handle:hover{fill:#fff; r:6;}
+  /* 전선 양 끝에 붙는 색깔+번호 배지 — 배선이 화면을 가로질러 겹치고 꼬여도, 같은 번호(=같은
+     색)를 보고 어느 핀과 어느 핀이 연결됐는지 선을 눈으로 따라가지 않고 바로 알 수 있게
+     합니다. 핸들보다도 위(z-index:6)에 그려서 부품에 가려지지 않습니다. */
+  svg#wireLabelCanvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:6; overflow:visible;}
+  .wire-label-badge circle{stroke-width:1.4; fill:#12151a;}
+  .wire-label-badge text{font-family:'IBM Plex Mono',monospace; font-size:9.5px; font-weight:700; text-anchor:middle; dominant-baseline:central;}
 
   /* 전선 클릭 시 뜨는 색상 편집 팝오버 */
   .wire-editor{
@@ -290,6 +297,19 @@
   .header-caption{position:absolute; font-family:'IBM Plex Mono',monospace; font-size:.52rem; color:#6fd1d5; letter-spacing:1px; text-transform:uppercase;}
   .cap-power{bottom:-46px; left:26px;}
   .cap-analog{bottom:-46px; right:26px;}
+  .cap-digital{top:-46px; left:34px;}
+  /* 보드 헤더 핀에도 부품 핀(.pin-mini)과 같은 색으로 종류를 구분: PWM 가능 디지털(보라),
+     아날로그입력/ADC(청록), 전원(빨강), GND(회색) — 순수 디지털(DIO)은 기본 금색 그대로 둡니다.
+     이래야 "~" 표시만 보고 PWM인지 알아야 하는 부담 없이, 핀 테두리 색만 봐도 종류가 구분됩니다. */
+  .pin.role-pwm{border-color:var(--pwm);}
+  .pin.role-pwm .pin-name{color:var(--pwm);}
+  .pin.role-analog{border-color:var(--teal);}
+  .pin.role-analog .pin-name{color:var(--teal-strong);}
+  .pin.role-power{border-color:#ff4d4d;}
+  .pin.role-power .pin-name{color:#ff9a9a;}
+  .pin.role-gnd{border-color:#5a5a5a; background:#0a0a0a;}
+  .cap-digital .sw{display:inline-block; width:6px; height:6px; border-radius:1px; margin:0 2px 0 8px;}
+  .cap-digital .sw:first-of-type{margin-left:8px;}
 
   /* Peripheral components */
   .comp-led{width:70px; display:flex; flex-direction:column; align-items:center; gap:5px;}
@@ -348,6 +368,8 @@
   .pin-col .pin-cap.cap-gnd{color:var(--text-dim);}
   .pin-mini.role-sig{border-color:var(--teal);}
   .pin-col .pin-cap.cap-sig{color:var(--teal);}
+  .pin-mini.role-pwm{border-color:var(--pwm);}
+  .pin-col .pin-cap.cap-pwm{color:var(--pwm);}
 
   /* Scope (실제 4채널 오실로스코프처럼 화면을 가로로 넓게, CH1~CH4를 색으로 구분) */
   .comp-scope{
@@ -455,6 +477,7 @@
      완전히 동일하게 재사용하고(같은 클래스를 함께 붙임), 겉모습과 팔레트 항목만 분리했습니다. */
   .comp-ac220{border-color:#ffd23f;} .comp-ac220 .psu-title{color:#ffd23f;}
   .comp-ac3phase{border-color:#5aa9e6;} .comp-ac3phase .psu-title{color:#5aa9e6;}
+  .comp-psu .comp-pin-row{flex-wrap:wrap; gap:6px 8px;}
   .psu-switch{width:34px; height:18px; border-radius:9px; background:#3a3f47; margin:0 auto 8px; position:relative; cursor:pointer; border:1px solid #4a5057;}
   .psu-switch .knob{position:absolute; top:1px; left:1px; width:14px; height:14px; border-radius:50%; background:#8b93a1; transition:transform .15s;}
   .psu-switch.on{background:#0b5d3e;} .psu-switch.on .knob{transform:translateX(16px); background:#3ddc84;}
@@ -510,7 +533,6 @@
   /* ---------- Motor driver (L298N style) ---------- */
   .comp-motordriver{width:150px; padding:10px; background:linear-gradient(160deg,#1e2a1e,#12180f); border:1px solid #3a4a35; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
   .md-title{font-size:.62rem; color:#9fd48a; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; line-height:1.35;}
-  .comp-motordriver .comp-pin-row span.pin-cap{display:block; font-size:.5rem; color:var(--text-faint); margin-top:2px;}
   .md-out-row{margin-top:10px; padding-top:8px; border-top:1px dashed #3a4a35;}
 
   /* ---------- Resistor (Ω/kΩ/MΩ 선택) ---------- */
@@ -761,7 +783,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.95</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.95b</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -986,6 +1008,7 @@
     <div class="canvas-inner" id="canvasInner">
       <svg id="wireCanvas"></svg>
       <svg id="wireHandleCanvas"></svg>
+      <svg id="wireLabelCanvas"></svg>
     </div>
     <div class="zoom-badge">
       <button onclick="zoomCanvasBy(1/1.15)" data-i18n-title="zoom.outTitle" title="축소">−</button>
@@ -1046,6 +1069,7 @@
         <button class="btn primary" id="btnCompileR4" onclick="executeCompilerPipeline('r4')" data-i18n="popup.compile">▶ 컴파일 &amp; 빌드 업로드</button>
         <button class="btn ghost" onclick="runCodeExample('r4','counter')" data-i18n="popup.exCounterD13">카운터 &amp; D13 점멸</button>
         <button class="btn ghost" onclick="runCodeExample('r4','analog')" data-i18n="popup.exAnalog">A0 가변저항 &amp; D9 PWM</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','port_wide')" data-i18n="popup.exPortWideR4">R_PORT1 레지스터로 D2~D7 묶음 제어</button>
         <button class="btn ghost" onclick="runCodeExample('r4','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
       </div>
       <div class="code-editor-wrap">
@@ -1108,6 +1132,7 @@ void loop() {
         <button class="btn ghost" onclick="runCodeExample('r3','counter')" data-i18n="popup.exCounter">카운터 예제</button>
         <button class="btn ghost" onclick="runCodeExample('r3','register')" data-i18n="popup.exRegister">DDR/PORT 레지스터 직접제어</button>
         <button class="btn ghost" onclick="runCodeExample('r3','api_vs_register')" data-i18n="popup.exApiVsReg">13번(API) vs 12번(레지스터)</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','port_full')" data-i18n="popup.exPortFullR3">PORTD 전체 8핀 일괄 제어</button>
         <button class="btn ghost" onclick="runCodeExample('r3','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
       </div>
       <div class="code-editor-wrap">
@@ -1183,7 +1208,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.95", en: "K's Simulator Ver0.95" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.95b", en: "K's Simulator Ver0.95b" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -1199,14 +1224,16 @@ const STRINGS = {
   "comp.dac.sine": { ko: "사인파", en: "Sine" },
   "comp.dac.title": { ko: "DAC 신호 발생기<br>(R4 A0 DAC 대응)", en: "DAC Signal Generator<br>(supports R4 A0 DAC)" },
   "comp.dcmotor.label": { ko: "DC 모터", en: "DC Motor" },
+  "comp.dcmotor.taTitle": { ko: "단자 1 → 모터 드라이버 OUT1 (극성 무관)", en: "Terminal 1 → motor driver OUT1 (polarity doesn't matter)" },
+  "comp.dcmotor.tbTitle": { ko: "단자 2 → 모터 드라이버 OUT2 (극성 무관)", en: "Terminal 2 → motor driver OUT2 (polarity doesn't matter)" },
   "comp.dcmotorenc.label": { ko: "DC 모터+엔코더", en: "DC Motor + Encoder" },
   "comp.dirTitle": { ko: "방향 제어 (디지털)", en: "Direction control (digital)" },
   "comp.encaTitle": { ko: "엔코더 A상 펄스 출력 → 보드 디지털 핀", en: "Encoder A-phase pulse output → board digital pin" },
   "comp.encgTitle": { ko: "엔코더 GND", en: "Encoder GND" },
   "comp.lcd.title": { ko: "캐릭터 LCD 16x2 (HD44780, 4-bit)", en: "Character LCD 16x2 (HD44780, 4-bit)" },
   "comp.led.colorSelect": { ko: "LED 색상 선택", en: "LED color" },
-  "comp.md.out1Title": { ko: "모터 출력 1", en: "Motor output 1" },
-  "comp.md.out2Title": { ko: "모터 출력 2", en: "Motor output 2" },
+  "comp.md.out1Title": { ko: "모터 출력 1 → DC 모터 단자 1", en: "Motor output 1 → DC motor terminal 1" },
+  "comp.md.out2Title": { ko: "모터 출력 2 → DC 모터 단자 2", en: "Motor output 2 → DC motor terminal 2" },
   "comp.md.title": { ko: "모터 드라이버", en: "Motor Driver" },
   "comp.md.vccTitle": { ko: "모터 전원 VCC", en: "Motor power VCC" },
   "comp.mm.acv": { ko: "AC V (교류 전압)", en: "AC V (alternating voltage)" },
@@ -1413,6 +1440,8 @@ const STRINGS = {
   "popup.compile": { ko: "▶ 컴파일 &amp; 빌드 업로드", en: "▶ Compile &amp; Build Upload" },
   "popup.exAnalog": { ko: "A0 가변저항 &amp; D9 PWM", en: "A0 Potentiometer &amp; D9 PWM" },
   "popup.exApiVsReg": { ko: "13번(API) vs 12번(레지스터)", en: "Pin 13 (API) vs Pin 12 (Register)" },
+  "popup.exPortFullR3": { ko: "PORTD 전체 8핀 일괄 제어", en: "Full 8-Pin PORTD Control" },
+  "popup.exPortWideR4": { ko: "R_PORT1 레지스터로 D2~D7 묶음 제어", en: "R_PORT1 Register Bundle Control (D2~D7)" },
   "popup.exCounter": { ko: "카운터 예제", en: "Counter Example" },
   "popup.exCounterD13": { ko: "카운터 &amp; D13 점멸", en: "Counter &amp; D13 Blink" },
   "popup.exCounterGpio2": { ko: "카운터 &amp; GPIO2 점멸", en: "Counter &amp; GPIO2 Blink" },
@@ -1468,7 +1497,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.95", en: "K's Arduino Simulator Ver0.95" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.95b", en: "K's Arduino Simulator Ver0.95b" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -1641,6 +1670,20 @@ const AVR_PORT_PIN_MAP = {
   C: {0:'A0', 1:'A1', 2:'A2', 3:'A3', 4:'A4', 5:'A5'},
 };
 
+// R4(RA4M1) 포트 레지스터(R_PORTn->PODR/PDR/POSR/PORR/PIDR) <-> 아두이노 핀 번호 매핑.
+// R3(AVR)와 달리 R4는 D0~D13이 한 포트에 예쁘게 몰려 있지 않고 Port 0/1/3/4에 흩어져 있습니다
+// (보드 폼팩터를 R3와 맞추면서 실제 RA4M1 핀을 이리저리 끌어다 썼기 때문). 값은 Arduino의 공식
+// UNOWIFIR4 variant.cpp(arduino/ArduinoCore-renesas, g_pin_cfg[])에 정의된 실제 매핑을 그대로
+// 옮긴 것입니다: D0=P301, D1=P302, D2=P104, D3=P105(~), D4=P106, D5=P107(~), D6=P111(~),
+// D7=P112, D8=P304, D9=P303(~), D10=P103(~), D11=P411(~), D12=P410, D13=P102,
+// A0=P014, A1=P000, A2=P001, A3=P002, A4/SDA=P101, A5/SCL=P100.
+const R4_PORT_PIN_MAP = {
+  0: {0:'A1', 1:'A2', 2:'A3', 14:'A0'},
+  1: {0:'A5', 1:'A4', 2:'D13', 3:'D10', 4:'D2', 5:'D3', 6:'D4', 7:'D5', 11:'D6', 12:'D7'},
+  3: {1:'D0', 2:'D1', 3:'D9', 4:'D8'},
+  4: {10:'D12', 11:'D11'},
+};
+
 /* ============ Embedded MCU Execution & GCC Compiler VM ============ */
 // API 호출(pinMode/digitalWrite 등)과 DDRx/PORTx 레지스터 직접 접근의 실행 비용 차이를
 // 실제 어셈블리 수준에 가깝게 반영하기 위한 사이클 모델입니다.
@@ -1674,59 +1717,47 @@ const boardSpawnCount = { r4: 0, r3: 0 };
 // C/C++ 변수 선언문을 JS 런타임 호환 형태로 변환
 function transpileCppToJs(cppCode) {
   let js = cppCode;
-  js = js.replace(/\/\/[^\n]*/g, '');
+
+  // 1. 문자열 리터럴 및 주석 임시 보호 (Token Masking)
+  const strPool = [];
+  const maskStr = (s) => { strPool.push(s); return `__STR_TOKEN_${strPool.length - 1}__`; };
+
   js = js.replace(/\/\*[\s\S]*?\*\//g, '');
+  js = js.replace(/\/\/[^\n]*/g, '');
+  js = js.replace(/(["'])(?:(?=(\\?))\2[\s\S])*?\1/g, (m) => maskStr(m));
+
   js = js.replace(/#include[^\n]*/g, '');
-  // #define NAME VALUE 형태의 전처리 매크로를 간단히 상수 선언으로 바꿔줍니다.
-  // (OLED 예제에서 흔한 SCREEN_WIDTH/SCREEN_HEIGHT/OLED_RESET 등의 정의를 지원하기 위함)
   js = js.replace(/#define\s+(\w+)\s+(\S.*)$/gm, 'const $1 = $2;');
   js = js.replace(/#define\s+(\w+)\s*$/gm, '');
 
-  // LiquidCrystal/Adafruit_SSD1306 객체 선언(C++ 생성자 호출 문법)을 JS의 `new` 호출로 치환합니다.
-  // 이 시뮬레이터는 두 클래스를 아래 sandboxPrefix에서 제공합니다.
-  // "&Wire"처럼 I2C 버스 객체의 주소를 넘기는 C++ 관용구는 JS에 없는 문법이므로(단항 & 연산자
-  // 없음), 포인터 없이 그냥 Wire 객체 자체를 넘기는 것으로 단순화합니다.
   js = js.replace(/&Wire\b/g, 'Wire');
   js = js.replace(/\bLiquidCrystal\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new LiquidCrystal($2);');
   js = js.replace(/\bAdafruit_SSD1306\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new Adafruit_SSD1306($2);');
 
-  // TFT_eSPI/Adafruit_ST7789/Adafruit_ILI9341/Adafruit_ST7735 객체 선언(C++ 생성자 호출 문법,
-  // "= 클래스명(...)"으로 대입하는 형태와 괄호 없는 기본 선언 형태 둘 다)을 JS `new` 호출로
-  // 치환합니다. 실제 라이브러리는 생성자에 SPI 핀 번호(&SPI, TFT_CS, TFT_DC, TFT_RST 등)를
-  // 넘기지만, 이 시뮬레이터의 TFT_eSPI 클래스는 그 핀 배선 대신 항상 보드에 내장된 화면
-  // <canvas>를 그대로 사용하므로 생성자 인자는 그냥 버립니다.
-  ['TFT_eSPI', 'Adafruit_ST7789', 'Adafruit_ILI9341', 'Adafruit_ST7735', 'RS485Servo', 'Gyroscope', 'Accelerometer'].forEach(cls => {
-    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*=\\s*${cls}\\s*\\([^)]*\\)\\s*;`, 'g'), (_m, name) => `let ${name} = new ${cls}();`);
-    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*\\([^)]*\\)\\s*;`, 'g'), (_m, name) => `let ${name} = new ${cls}();`);
-    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*;`, 'g'), (_m, name) => `let ${name} = new ${cls}();`);
+  const supportedClasses = ['TFT_eSPI', 'Adafruit_ST7789', 'Adafruit_ILI9341', 'Adafruit_ST7735', 'RS485Servo', 'Gyroscope', 'Accelerometer'];
+  supportedClasses.forEach(cls => {
+    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*=\\s*${cls}\\s*\\([^)]*\\)\\s*;`, 'g'), `let $1 = new ${cls}();`);
+    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*\\([^)]*\\)\\s*;`, 'g'), `let $1 = new ${cls}();`);
+    js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*;`, 'g'), `let $1 = new ${cls}();`);
   });
-  // Preferences(NVS) 객체 선언 — 괄호 없는 기본 생성자 호출("Preferences prefs;")만 흔히 쓰입니다.
   js = js.replace(/\bPreferences\s+(\w+)\s*;/g, 'let $1 = new Preferences();');
+  js = js.replace(/\bArduinoLEDMatrix\s+(\w+)\s*(?:\(\s*\))?\s*;/g, 'let $1 = new ArduinoLEDMatrix();');
 
-  // DDRx/PORTx/PINx 레지스터 직접 접근을 __regs 프록시 객체 참조로 치환 — digitalWrite() 등의
-  // API 호출 없이도 실제로 동작(핀 상태에 반영)하도록 합니다.
   ['B', 'C', 'D'].forEach(letter => {
     js = js.replace(new RegExp(`\\bDDR${letter}\\b`, 'g'), `__regs.DDR${letter}`);
     js = js.replace(new RegExp(`\\bPORT${letter}\\b`, 'g'), `__regs.PORT${letter}`);
     js = js.replace(new RegExp(`\\bPIN${letter}\\b`, 'g'), `__regs.PIN${letter}`);
   });
+  // R4(RA4M1) 포트 레지스터 직접 접근: "R_PORT1->PODR" 같은 구조체 포인터 멤버 접근 문법을
+  // (R_PORTn은 실제로는 CMSIS 포인터지만) __regs의 평평한 프로퍼티 참조로 치환합니다 — R3의
+  // DDRx/PORTx/PINx와 같은 방식으로, makeRegs()가 보드가 R4일 때만 이 프로퍼티들을 실제로
+  // 만들어 둡니다(다른 보드에 이 코드를 올리면 그냥 조용히 아무 효과가 없습니다).
+  js = js.replace(/\bR_PORT(\d+)\s*->\s*(PODR|PDR|PIDR|POSR|PORR)\b/g, '__regs.RPORT$1_$2');
 
-  // R4 내장 12x8 LED 매트릭스(Arduino_LED_Matrix.h)의 "ArduinoLEDMatrix 변수명;" 선언(괄호 없는
-  // 기본 생성자 호출)을 JS의 `new` 호출로 치환합니다. 이 클래스는 아래 sandboxPrefix에서 제공합니다.
-  js = js.replace(/\bArduinoLEDMatrix\s+(\w+)\s*(?:\(\s*\))?\s*;/g, 'let $1 = new ArduinoLEDMatrix();');
-
-  // C 스타일 배열 선언(초기화 포함)을 JS 배열 리터럴로 치환합니다.
-  //   byte frame[8][12] = { {1,0,...}, {1,0,...}, ... };        ->  let frame = [ [1,0,...], [1,0,...], ... ];
-  //   const uint32_t heart[] = {0x3184a444, 0x44042081, ...};   ->  const heart = [0x3184a444, 0x44042081, ...];
-  // (LED 매트릭스 예제에서 static/const 배열이 매우 흔해서 둘 다 지원합니다.)
-  // 중첩 배열 초기화의 {}는 JS 배열 리터럴이 아니라 문법 오류이므로, 값만 들어있는 초기화 블록
-  // 안의 {}를 통째로 []로 바꿔줍니다(변수 타입/배열 크기 목록은 버리고 값만 남깁니다).
-  // LED 매트릭스 예제처럼 여러 줄에 걸친 초기화도 [\s\S]*?로 함께 매칭됩니다.
   js = js.replace(
     /\b(?:static\s+)?(const\s+)?(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte)\s+(\w+)\s*(?:\[\s*\d*\s*\])+\s*=\s*(\{[\s\S]*?\})\s*;/g,
     (_m, isConst, name, body) => `${isConst ? 'const' : 'let'} ${name} = ${body.replace(/\{/g, '[').replace(/\}/g, ']')};`
   );
-  // 초기화 없이 크기만 선언하는 경우 (예: byte frame[8][12];) — 0으로 채운 배열을 만들어둡니다.
   js = js.replace(
     /\b(?:static\s+)?(?:const\s+)?(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte)\s+(\w+)\s*\[\s*(\d+)\s*\]\s*\[\s*(\d+)\s*\]\s*;/g,
     'let $1 = Array.from({length:$2}, () => new Array($3).fill(0));'
@@ -1736,13 +1767,30 @@ function transpileCppToJs(cppCode) {
     'let $1 = new Array($2).fill(0);'
   );
 
-  // String(아두이노 String 클래스)도 스칼라 타입과 동일하게 지워줍니다. JS에는 이미 전역
-  // String(생성자) 객체가 있어서, 변수명으로 안 쓰이는 한 값 자체(Serial.readString() 결과 등,
-  // 이미 JS 문자열)는 그대로 잘 동작합니다.
-  // "const char* ssid = ...;" 처럼 문자열 리터럴을 가리키는 포인터 선언(ESP32 WiFi 예제에 흔함)도
-  // 타입만 지우고 평범한 변수로 취급합니다(이 시뮬레이터는 실제 포인터 연산을 지원하지 않으므로,
-  // 그냥 문자열 값 자체를 담는 변수로 단순화합니다). 포인터(별표) 버전을 먼저 지워야, 별표가 없는
-  // 일반 스칼라 타입 규칙과 충돌하지 않습니다.
+  // C++ 사용자 정의 함수 자동 async 변환
+  const customFuncNames = new Set();
+  const funcDeclRegex = /\b(?:void|int|bool|float|double|char|long|uint8_t|uint16_t|uint32_t|byte)\s+(\w+)\s*\(([^)]*)\)\s*\{/g;
+  let fm;
+  while ((fm = funcDeclRegex.exec(js))) {
+    const fnName = fm[1];
+    if (fnName !== 'setup' && fnName !== 'loop' && fnName !== 'if' && fnName !== 'while' && fnName !== 'for' && fnName !== 'switch') {
+      customFuncNames.add(fnName);
+    }
+  }
+
+  js = js.replace(/\b(?:void|int|bool|float|double|char|long|uint8_t|uint16_t|uint32_t|byte)\s+(\w+)\s*\(([^)]*)\)\s*\{/g, 
+    (match, fnName, params) => {
+      if (fnName === 'setup' || fnName === 'loop') return match;
+      const cleanParams = params.replace(/\b(?:const\s+)?(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte|String)\s*[\*&]?\s*/g, '').trim();
+      return `async function ${fnName}(${cleanParams}) {`;
+    }
+  );
+
+  customFuncNames.forEach(fn => {
+    const callRegex = new RegExp(`(?<!async\\s+function\\s+)\\b(${fn})\\s*\\(`, 'g');
+    js = js.replace(callRegex, 'await $1(');
+  });
+
   js = js.replace(/\bconst\s+char\s*\*\s*(\w+)/g, 'const $1');
   js = js.replace(/\b(?:unsigned\s+)?char\s*\*\s*(\w+)/g, 'let $1');
   js = js.replace(/\bconst\s+(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte|String)\s+(\w+)/g, 'const $1');
@@ -1751,10 +1799,13 @@ function transpileCppToJs(cppCode) {
   js = js.replace(/\bA0\b/g, '"A0"').replace(/\bA1\b/g, '"A1"').replace(/\bA2\b/g, '"A2"')
          .replace(/\bA3\b/g, '"A3"').replace(/\bA4\b/g, '"A4"').replace(/\bA5\b/g, '"A5"');
 
-  // delay()/delayMicroseconds()가 실제로 시간을 멈추도록(Promise 기반) 만들기 위해,
-  // 호출부에 await를 붙여줍니다. setup()/loop()는 아래에서 async 함수로 감싸집니다.
   js = js.replace(/\bdelay\s*\(/g, 'await delay(');
   js = js.replace(/\bdelayMicroseconds\s*\(/g, 'await delayMicroseconds(');
+
+  strPool.forEach((str, idx) => {
+    js = js.replace(`__STR_TOKEN_${idx}__`, str);
+  });
+
   return js;
 }
 
@@ -1814,6 +1865,67 @@ function makeRegs(board){
       }
     });
   });
+
+  // R4(RA4M1) 포트 레지스터 — 보드가 R4 계열일 때만 만들어 둡니다(R3/ESP32에서는 아무 프로퍼티도
+  // 없으므로 R4 전용 register 코드를 다른 보드에 올려도 조용히 무시될 뿐, 오류는 나지 않습니다).
+  // 실제 RA4M1처럼 포트별로 PODR(출력)/PDR(방향)/POSR·PORR(원자적 set/reset)/PIDR(입력)를
+  // 따로 흉내 냅니다. POSR/PORR는 실제 하드웨어에서도 쓰기 전용(레지스터를 읽으면 항상 0)이고,
+  // 내부적으로는 PODR과 같은 출력 래치를 원자적으로 켜고/끄는 것뿐이라 PODR에도 반영해 둡니다.
+  if (board.startsWith('r4')){
+    const rawPort = {};
+    Object.keys(R4_PORT_PIN_MAP).forEach(portNum => {
+      rawPort[portNum] = { PODR: 0, PDR: 0 };
+      const map = R4_PORT_PIN_MAP[portNum];
+      // PODR(또는 POSR/PORR로 갱신된 PODR) 값 하나를 그 포트에 물린 모든 핀에 실제로 반영합니다.
+      const applyOutput = (v) => {
+        Object.entries(map).forEach(([bit, pinName]) => {
+          const newV = (v >> bit) & 1;
+          mcuVM[board].pinState[pinName] = { type: 'digital', v: newV, volts: newV ? 5 : 0 };
+          pushEdge(board, pinName, newV);
+        });
+      };
+      Object.defineProperty(regs, `RPORT${portNum}_PDR`, {
+        get: () => { bump(REG_ACCESS_CYCLES); return rawPort[portNum].PDR; },
+        set: (v) => { bump(REG_ACCESS_CYCLES); rawPort[portNum].PDR = v; }
+      });
+      Object.defineProperty(regs, `RPORT${portNum}_PODR`, {
+        get: () => { bump(REG_ACCESS_CYCLES); return rawPort[portNum].PODR; },
+        set: (v) => { bump(REG_ACCESS_CYCLES); rawPort[portNum].PODR = v; applyOutput(v); }
+      });
+      Object.defineProperty(regs, `RPORT${portNum}_POSR`, {
+        get: () => 0, // 실제 하드웨어처럼 읽으면 항상 0(쓰기 전용)
+        set: (v) => {
+          bump(REG_ACCESS_CYCLES);
+          rawPort[portNum].PODR |= v;
+          applyOutput(rawPort[portNum].PODR);
+        }
+      });
+      Object.defineProperty(regs, `RPORT${portNum}_PORR`, {
+        get: () => 0,
+        set: (v) => {
+          bump(REG_ACCESS_CYCLES);
+          rawPort[portNum].PODR &= ~v;
+          applyOutput(rawPort[portNum].PODR);
+        }
+      });
+      // PIDR(입력 데이터 레지스터)는 실제로 그 순간 각 핀에 걸려 있는 전선/부품 상태를 읽어
+      // 비트로 조립합니다 — digitalRead()와 정확히 같은 방식(boardPinReading)을 그대로 씁니다.
+      Object.defineProperty(regs, `RPORT${portNum}_PIDR`, {
+        get: () => {
+          bump(REG_ACCESS_CYCLES);
+          let v = 0;
+          Object.entries(map).forEach(([bit, pinName]) => {
+            const r = boardPinReading(boardDomId[board], pinName);
+            const hi = r ? r.v >= 0.5 : true; // 아무것도 안 물려 있으면 digitalRead()처럼 HIGH로 취급
+            if (hi) v |= (1 << bit);
+          });
+          return v;
+        },
+        set: () => { bump(REG_ACCESS_CYCLES); } // 실제 하드웨어에서도 읽기 전용 — 쓰기는 조용히 무시
+      });
+    });
+  }
+
   return regs;
 }
 
@@ -2670,8 +2782,9 @@ function buildR4BoardHTML(key){
     <div class="header-row top" id="rowDigital_${key}"></div>
     <div class="header-row power" id="rowPower_${key}"></div>
     <div class="header-row analog" id="rowAnalog_${key}"></div>
+    ${pinMapCaptionHTML()}
     <div class="header-caption cap-power">POWER</div>
-    <div class="header-caption cap-analog">ANALOG IN</div>
+    <div class="header-caption cap-analog">ANALOG IN (ADC)</div>
   `;
 }
 
@@ -2688,12 +2801,37 @@ function rebuildMatrixGrid(gridId){
   }
 }
 
-function buildHeader(containerId, pins){
+// rowKind: 'digital' | 'power' | 'analog' — 핀 테두리 색으로 종류를 바로 구분할 수 있게
+// role-* 클래스를 붙입니다(핀맵). analog 줄은 전부 ADC 입력이라 role-analog로 통일하고,
+// power 줄은 PIN_KIND(전원/GND/기타)를 그대로 따르고, digital 줄은 라벨에 "~"가 붙은
+// PWM 가능 핀만 role-pwm으로 강조합니다(나머지는 기본 금색 = 순수 디지털 DIO).
+function pinRoleClass(p, rowKind){
+  if (rowKind === 'analog') return 'role-analog';
+  if (rowKind === 'power'){
+    const kind = PIN_KIND[p.id];
+    if (kind === 'power') return 'role-power';
+    if (kind === 'gnd') return 'role-gnd';
+    return '';
+  }
+  if (typeof p.label === 'string' && p.label.startsWith('~')) return 'role-pwm';
+  return '';
+}
+// 상단 디지털 핀 줄 위에 붙이는 "핀맵 범례" — PWM 가능 핀(보라 테두리)이 무엇을 뜻하는지
+// 매번 title(마우스 오버)을 확인하지 않아도 캡션만 보고 알 수 있게 합니다.
+function pinMapCaptionHTML(isEsp32){
+  if (isEsp32) return `<div class="header-caption cap-digital">GPIO
+    <span class="sw" style="background:var(--gold)"></span>DIO/PWM(analogWrite)</div>`;
+  return `<div class="header-caption cap-digital">DIGITAL I/O
+    <span class="sw" style="background:var(--gold)"></span>DIO
+    <span class="sw" style="background:var(--pwm)"></span>PWM(~)</div>`;
+}
+function buildHeader(containerId, pins, rowKind){
   const el = document.getElementById(containerId);
   if (!el) return;
   pins.forEach(p => {
     const pin = document.createElement('div');
-    pin.className = 'pin';
+    const role = pinRoleClass(p, rowKind);
+    pin.className = role ? `pin ${role}` : 'pin';
     pin.dataset.pin = p.id;
     pin.title = p.title || p.id;
     const name = document.createElement('span');
@@ -3094,7 +3232,9 @@ function spawnComponent(type, dropX, dropY){
     div.innerHTML = `
       <div class="btn-cap" id="${id}_cap" data-pressed="0"></div>
       <div class="pin-mini" data-pin="${id}_T1" style="position:absolute; left:-7px; top:26px;" title="Terminal 1"></div>
-      <div class="pin-mini" data-pin="${id}_T2" style="position:absolute; right:-7px; top:26px;" title="Terminal 2"></div>`;
+      <span class="pin-cap" style="position:absolute; left:-11px; top:44px; color:var(--text-faint);">T1</span>
+      <div class="pin-mini" data-pin="${id}_T2" style="position:absolute; right:-7px; top:26px;" title="Terminal 2"></div>
+      <span class="pin-cap" style="position:absolute; right:-11px; top:44px; color:var(--text-faint);">T2</span>`;
   } else if (type === 'scope'){
     div.classList.add('comp-scope');
     div.innerHTML = `
@@ -3226,7 +3366,10 @@ function spawnComponent(type, dropX, dropY){
     div.innerHTML = `
       <div class="motor-body"><div class="motor-fan" id="${id}_fan"></div></div>
       <div class="comp-label"><span data-i18n="comp.dcmotor.label">DC 모터</span><span id="${id}_speed" data-i18n="motor.stopped">정지</span></div>
-      <div class="comp-pin-row"><div class="pin-mini" data-pin="${id}_TA"></div><div class="pin-mini" data-pin="${id}_TB"></div></div>`;
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_TA" data-i18n-title="comp.dcmotor.taTitle" title="단자 1 → 모터 드라이버 OUT1 (극성 무관)"></div><span class="pin-cap" style="color:var(--text-faint)">T1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_TB" data-i18n-title="comp.dcmotor.tbTitle" title="단자 2 → 모터 드라이버 OUT2 (극성 무관)"></div><span class="pin-cap" style="color:var(--text-faint)">T2</span></div>
+      </div>`;
   } else if (type === 'ultrasonic'){
     div.classList.add('comp-ultrasonic');
     div.innerHTML = `
@@ -3457,14 +3600,14 @@ function spawnComponent(type, dropX, dropY){
     div.innerHTML = `
       <div class="md-title">L298N<br><span data-i18n="comp.md.title">모터 드라이버</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_V" data-i18n-title="comp.md.vccTitle" title="모터 전원 VCC"></div>
-        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
-        <div class="pin-mini" data-pin="${id}_IN1" data-i18n-title="comp.dirTitle" title="방향 제어 (디지털)"></div>
-        <div class="pin-mini" data-pin="${id}_ENA" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM)"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.md.vccTitle" title="모터 전원 VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN1" data-i18n-title="comp.dirTitle" title="방향 제어 (디지털)"></div><span class="pin-cap cap-sig">IN1</span></div>
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENA" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM)"></div><span class="pin-cap cap-pwm">ENA</span></div>
       </div>
       <div class="comp-pin-row md-out-row">
-        <div class="pin-mini" data-pin="${id}_OUT1" data-i18n-title="comp.md.out1Title" title="모터 출력 1"></div>
-        <div class="pin-mini" data-pin="${id}_OUT2" data-i18n-title="comp.md.out2Title" title="모터 출력 2"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT1" data-i18n-title="comp.md.out1Title" title="모터 출력 1 → DC 모터 단자 1"></div><span class="pin-cap" style="color:var(--text-faint)">OUT1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT2" data-i18n-title="comp.md.out2Title" title="모터 출력 2 → DC 모터 단자 2"></div><span class="pin-cap" style="color:var(--text-faint)">OUT2</span></div>
       </div>`;
   } else if (type === 'lcd'){
     div.classList.add('comp-lcd');
@@ -4059,18 +4202,18 @@ function make3PhaseSvg(){
 }
 function psuPinsHTML(id, mode){
   if (mode === 'ac1') return `
-    <div class="pin-mini" data-pin="${id}_L" title="${tr('psu.hotTitle')}"></div>
-    <div class="pin-mini" data-pin="${id}_N" title="${tr('psu.neutralTitle')}"></div>
-    <div class="pin-mini" data-pin="${id}_G" title="${tr('psu.groundTitle')}"></div>`;
+    <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_L" title="${tr('psu.hotTitle')}"></div><span class="pin-cap cap-vcc">L</span></div>
+    <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_N" title="${tr('psu.neutralTitle')}"></div><span class="pin-cap cap-sig">N</span></div>
+    <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="${tr('psu.groundTitle')}"></div><span class="pin-cap cap-gnd">G</span></div>`;
   if (mode === 'ac3') return `
-    <div class="pin-mini psu-r" data-pin="${id}_L1" data-i18n-title="comp.rPhase" title="R상 (L1)"></div>
-    <div class="pin-mini psu-s" data-pin="${id}_L2" data-i18n-title="comp.sPhase" title="S상 (L2)"></div>
-    <div class="pin-mini psu-t" data-pin="${id}_L3" data-i18n-title="comp.tPhase" title="T상 (L3)"></div>
-    <div class="pin-mini" data-pin="${id}_N" title="${tr('psu.neutralOnly')}"></div>
-    <div class="pin-mini" data-pin="${id}_G" title="${tr('psu.groundTitle')}"></div>`;
+    <div class="pin-col"><div class="pin-mini psu-r" data-pin="${id}_L1" data-i18n-title="comp.rPhase" title="R상 (L1)"></div><span class="pin-cap" style="color:#ff5c5c">R</span></div>
+    <div class="pin-col"><div class="pin-mini psu-s" data-pin="${id}_L2" data-i18n-title="comp.sPhase" title="S상 (L2)"></div><span class="pin-cap" style="color:#ffd23f">S</span></div>
+    <div class="pin-col"><div class="pin-mini psu-t" data-pin="${id}_L3" data-i18n-title="comp.tPhase" title="T상 (L3)"></div><span class="pin-cap" style="color:#5aa9e6">T</span></div>
+    <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_N" title="${tr('psu.neutralOnly')}"></div><span class="pin-cap cap-sig">N</span></div>
+    <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="${tr('psu.groundTitle')}"></div><span class="pin-cap cap-gnd">G</span></div>`;
   return `
-    <div class="pin-mini" data-pin="${id}_V" title="${tr('psu.dcPlusTitle')}"></div>
-    <div class="pin-mini" data-pin="${id}_G" title="GND (0V)"></div>`;
+    <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="${tr('psu.dcPlusTitle')}"></div><span class="pin-cap cap-vcc">V+</span></div>
+    <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND (0V)"></div><span class="pin-cap cap-gnd">GND</span></div>`;
 }
 function psuModeChanged(id){
   const el = document.getElementById(id);
@@ -4244,8 +4387,10 @@ function createWire(pinA, pinB){
     x: p1_0.x + (p2_0.x - p1_0.x) * (i / 4),
     y: p1_0.y + (p2_0.y - p1_0.y) * (i / 4),
   }));
-  const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR, points: initialPoints, pointEls: [] };
+  wireNetIdSeq = (wireNetIdSeq || 0) + 1;
+  const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR, points: initialPoints, pointEls: [], netId: wireNetIdSeq, labelEls: [] };
   wires.push(wireObj);
+  makeWireLabelBadge(wireObj);
   updateWirePosition(wireObj);
   // 한 번 클릭 = 색상 편집기, 더블클릭 = 그 위치에 꺾임점 추가. 브라우저는 더블클릭 시
   // click을 먼저 두 번 쏘고 이어서 dblclick을 쏘므로, click 처리를 살짝 지연시켰다가
@@ -4274,9 +4419,56 @@ function wirePathD(w){
   const pts = [p1, ...w.points, p2];
   return 'M ' + pts.map(p => `${p.x} ${p.y}`).join(' L ');
 }
+let wireNetIdSeq = 0;
+// 전선 한쪽 끝(circle+숫자)의 SVG 배지를 만듭니다. 같은 전선의 양 끝에 같은 번호·같은 색이
+// 붙으므로, 화면이 배선으로 복잡해져도 선을 눈으로 따라가지 않고 번호만 보고 짝을 찾을 수
+// 있습니다(색이 같으면 번호도 같음).
+function makeWireLabelBadge(w){
+  const svg = document.getElementById('wireLabelCanvas');
+  [0, 1].forEach(() => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'wire-label-badge');
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('r', 8);
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.textContent = w.netId;
+    g.appendChild(circle);
+    g.appendChild(text);
+    svg.appendChild(g);
+    w.labelEls.push(g);
+  });
+  applyWireLabelColor(w);
+}
+function applyWireLabelColor(w){
+  w.labelEls.forEach(g => {
+    g.querySelector('circle').setAttribute('stroke', w.color);
+    g.querySelector('text').setAttribute('fill', w.color);
+  });
+}
+// 배지를 핀 정중앙이 아니라 전선이 뻗어나가는 방향으로 살짝 띄워서 붙입니다 — 핀 위의 연결
+// 점(dot)과 겹치지 않으면서도, 그 핀에서 나가는 전선이 바로 옆에 있다는 게 한눈에 보입니다.
+const WIRE_LABEL_OFFSET = 13;
+function positionWireLabel(g, pinPos, towardPos){
+  const dx = towardPos.x - pinPos.x, dy = towardPos.y - pinPos.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const x = pinPos.x + (dx / len) * WIRE_LABEL_OFFSET;
+  const y = pinPos.y + (dy / len) * WIRE_LABEL_OFFSET;
+  g.querySelector('circle').setAttribute('cx', x);
+  g.querySelector('circle').setAttribute('cy', y);
+  const text = g.querySelector('text');
+  text.setAttribute('x', x);
+  text.setAttribute('y', y);
+}
 function updateWirePosition(w){
   w.element.setAttribute('d', wirePathD(w));
   syncWirePointHandles(w);
+  if (w.labelEls && w.labelEls.length === 2){
+    const p1 = pinCenter(w.from), p2 = pinCenter(w.to);
+    const firstBend = w.points && w.points.length ? w.points[0] : p2;
+    const lastBend = w.points && w.points.length ? w.points[w.points.length - 1] : p1;
+    positionWireLabel(w.labelEls[0], p1, firstBend);
+    positionWireLabel(w.labelEls[1], p2, lastBend);
+  }
 }
 function updateAllWires(){ wires.forEach(updateWirePosition); }
 
@@ -4353,6 +4545,7 @@ function deleteWire(wireObj){
   const svg = document.getElementById('wireCanvas');
   if (wireObj.element && wireObj.element.parentNode === svg) svg.removeChild(wireObj.element);
   (wireObj.pointEls || []).forEach(el => el.remove());
+  (wireObj.labelEls || []).forEach(el => el.remove());
   wires = wires.filter(w => w !== wireObj);
   closeWireEditor();
   updateLegend();
@@ -4362,6 +4555,7 @@ function setWireColor(wireObj, color){
   wireObj.color = color;
   wireObj.element.setAttribute('stroke', color);
   (wireObj.pointEls || []).forEach(el => el.setAttribute('stroke', color));
+  applyWireLabelColor(wireObj);
   updateLegend();
 }
 
@@ -5367,7 +5561,28 @@ function boardPinReading(boardId, pinId){
 }
 
 /* ============ Simulation Loop & Scope Rendering ============ */
-let isSimulating = false, simTimer = null;
+let isSimulating = false;
+let lastPhysicsTime = 0;
+const PHYSICS_STEP_MS = 25; // 40Hz 고정 물리 루프
+let animationFrameId = null;
+
+function simulationMasterLoop(currentTime) {
+  if (!isSimulating) return;
+
+  if (!lastPhysicsTime) lastPhysicsTime = currentTime;
+  let elapsed = currentTime - lastPhysicsTime;
+
+  if (elapsed > 200) elapsed = 200;
+
+  while (elapsed >= PHYSICS_STEP_MS) {
+    runTick();
+    elapsed -= PHYSICS_STEP_MS;
+    lastPhysicsTime += PHYSICS_STEP_MS;
+  }
+
+  animationFrameId = requestAnimationFrame(simulationMasterLoop);
+}
+
 const scopeBuffers = {};
 // 실제 오실로스코프의 RUN/STOP처럼, 화면을 그 순간에 정지시켜 자세히 들여다볼 수 있게 합니다.
 // 정지 중에는 화면에 보이는 시간창(now)을 정지된 시점으로 고정하고(coarse/fine 모드 공통),
@@ -5500,12 +5715,19 @@ function toggleSimulation(){
     btn.className = 'btn stop';
     document.querySelectorAll('.power-led').forEach(led => led.classList.add('on'));
     logSerial('--- ' + tr('sim.runningLog') + ' ---');
-    simTimer = setInterval(runTick, 100);
+    
+    lastPhysicsTime = performance.now();
+    animationFrameId = requestAnimationFrame(simulationMasterLoop);
   } else {
     btn.textContent = tr('toolbar.simStart');
     btn.className = 'btn primary';
     document.querySelectorAll('.power-led').forEach(led => led.classList.remove('on'));
-    clearInterval(simTimer);
+    
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+    
     document.querySelectorAll('.led-dome, .onboard-led').forEach(el => { el.classList.remove('on'); el.style.boxShadow=''; el.style.background=''; el.style.transform=''; });
     document.querySelectorAll('.led-val').forEach(el => { el.textContent = '0%'; });
     document.querySelectorAll('.rgb-dome').forEach(el => { el.style.background=''; el.style.boxShadow=''; });
@@ -5527,7 +5749,6 @@ function toggleSimulation(){
     logSerial('--- ' + tr('sim.stoppedTag') + ' ---');
   }
 }
-
 // 외장 LED의 선택 가능한 색상 프리셋: on(점등)/off(소등) 각각 3-스톱 그라디언트 색과 글로우용 rgb.
 const LED_COLORS = {
   red:    { on:['#fff3d0', '#ff3b1f', '#b3200f'], off:['#ff8f80', '#a11a10', '#4a0906'], glow:'255,80,40' },
@@ -5559,16 +5780,26 @@ function formatReadingValue(reading){
   }
 }
 // 실제 오실로스코프처럼 TIME/DIV·VOLTS/DIV를 조절할 수 있도록, 각 샘플에 실제 타임스탬프(ms)와
-// 전압값(V, 0~5V 기준)을 함께 저장합니다. runTick은 100ms마다 한 번씩 불리지만, 한 틱 안에서도
-// PWM/DAC 파형의 모양이 보이도록 그 100ms 구간에 고르게 분산된 여러 하위 샘플을 만들어 둡니다.
+// 전압값(V, 0~5V 기준)을 함께 저장합니다. 한 번의 runTick 호출 안에서도 PWM/DAC 파형의 모양이
+// 보이도록, 직전 호출 이후 실제로 흐른 시간(dt) 구간에 고르게 분산된 여러 하위 샘플을 만들어 둡니다.
+const scopeLastPushT = {};
 function pushScopeSamples(key, reading){
   if (!scopeBuffers[key]) scopeBuffers[key] = [];
   const buf = scopeBuffers[key];
   const now = Date.now();
-  // 이번 틱(약 100ms) 동안 만들어낼 하위 샘플 개수. 60Hz AC/전류 파형은 100ms 안에 6주기나
-  // 들어가므로, 기본 8개로는 너무 성기게 찍혀 사인파가 삼각파처럼 보입니다(에일리어싱).
-  // 실제 스코프처럼 매끈한 정현파·위상차가 보이도록 AC 계열(ac/current)만 샘플을 훨씬 촘촘히 찍습니다.
-  const N = (reading && (reading.type === 'ac' || reading.type === 'current')) ? 60 : 8;
+  // runTick이 항상 100ms마다 불린다고 가정하고 하드코딩했던 이전 버전과 달리, 지금은 물리
+  // 루프 주기가 달라질 수 있으므로(현재 40Hz≈25ms) 이 채널의 실제 직전 호출 이후 경과 시간을
+  // 그대로 씁니다. 그렇지 않으면 매 호출마다 "직전 100ms 구간"을 다시 그려 넣게 되어 버퍼에
+  // 시간이 거꾸로 가는 샘플이 섞이고(틱 주기 < 100ms일 때 구간이 크게 겹침), 오실로스코프
+  // 파형이 들쭉날쭉 튀어 보이는 문제가 생깁니다.
+  const lastT = scopeLastPushT[key];
+  const dt = lastT != null ? Math.min(200, Math.max(4, now - lastT)) : 100;
+  scopeLastPushT[key] = now;
+  // 이번 dt(ms) 동안 만들어낼 하위 샘플 개수. 예전 100ms당 기본 8개/AC·전류 60개였던 밀도를
+  // dt에 비례해 그대로 유지합니다(60Hz AC/전류 파형은 100ms 안에 6주기나 들어가므로, 기본
+  // 밀도로는 너무 성기게 찍혀 사인파가 삼각파처럼 보이기 때문에 AC 계열만 훨씬 촘촘합니다).
+  const N = Math.max(1, Math.round(((reading && (reading.type === 'ac' || reading.type === 'current')) ? 60 : 8) * dt / 100));
+  const step = dt / N;
   let volts01; // 0~1 정규화 값의 배열
   if (!reading){
     volts01 = new Array(N).fill(0);
@@ -5576,8 +5807,8 @@ function pushScopeSamples(key, reading){
     const highCount = Math.round(reading.v * N);
     volts01 = new Array(N).fill(0).map((_, i) => i < highCount ? 1 : 0);
   } else if (reading.type === 'dac'){
-    if (reading.wave === 'ramp') volts01 = new Array(N).fill(0).map((_, i) => (((now - (N - 1 - i) * 12)) / 900) % 1);
-    else if (reading.wave === 'sine') volts01 = new Array(N).fill(0).map((_, i) => (Math.sin((now - (N - 1 - i) * 12) / 260) + 1) / 2);
+    if (reading.wave === 'ramp') volts01 = new Array(N).fill(0).map((_, i) => (((now - (N - 1 - i) * step)) / 900) % 1);
+    else if (reading.wave === 'sine') volts01 = new Array(N).fill(0).map((_, i) => (Math.sin((now - (N - 1 - i) * step) / 260) + 1) / 2);
     else volts01 = new Array(N).fill(reading.v);
   } else if (reading.type === 'volt'){
     volts01 = new Array(N).fill(reading.v / 5); // 실제 볼트를 이후 *5 파이프라인에 맞춰 역정규화
@@ -5585,7 +5816,7 @@ function pushScopeSamples(key, reading){
     const vPeak = (reading.rms != null ? reading.rms : 220) * Math.SQRT2;
     const phaseDeg = reading.phaseDeg || 0;
     volts01 = new Array(N).fill(0).map((_, i) => {
-      const tt = now - (N - 1 - i) * (100 / N);
+      const tt = now - (N - 1 - i) * step;
       return (vPeak * Math.sin((tt / 1000) * 2 * Math.PI * 60 + phaseDeg * Math.PI / 180)) / 5;
     });
   } else if (reading.type === 'current'){
@@ -5593,14 +5824,14 @@ function pushScopeSamples(key, reading){
     // 순시 파형으로 재현합니다 — VOLTS/DIV 선택값을 그대로 AMPS/DIV로 재사용합니다.
     const amp = reading.amp || 0, phaseDeg = reading.phaseDeg || 0, omega = reading.omega || 0;
     volts01 = new Array(N).fill(0).map((_, i) => {
-      const tt = now - (N - 1 - i) * (100 / N);
+      const tt = now - (N - 1 - i) * step;
       return omega > 0 ? (amp * Math.sin((tt / 1000) * omega + phaseDeg * Math.PI / 180)) / 5 : amp / 5;
     });
   } else {
     volts01 = new Array(N).fill(reading.v);
   }
   volts01.forEach((v01, i) => {
-    buf.push({ t: now - (N - 1 - i) * (100 / N), v: v01 * 5 });
+    buf.push({ t: now - (N - 1 - i) * step, v: v01 * 5 });
   });
   const cutoff = now - SCOPE_MAX_BUFFER_MS;
   while (buf.length && buf[0].t < cutoff) buf.shift();
@@ -6025,7 +6256,7 @@ function updateLegend(){
     wires.forEach(w => {
       const li = document.createElement('li');
       li.style.cssText = 'display:flex; align-items:center; gap:6px; cursor:pointer;';
-      li.innerHTML = `<span style="width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:${w.color};box-shadow:0 0 3px ${w.color};"></span><span>${w.from.dataset.pin} ↔ ${w.to.dataset.pin}</span>`;
+      li.innerHTML = `<span style="width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:${w.color};box-shadow:0 0 3px ${w.color};"></span><span style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:${w.color};">#${w.netId != null ? w.netId : ''}</span><span>${w.from.dataset.pin} ↔ ${w.to.dataset.pin}</span>`;
       li.onclick = (e) => { e.stopPropagation(); const r = li.getBoundingClientRect(); openWireEditor(w, r.left, r.bottom); };
       list.appendChild(li);
     });
@@ -6068,7 +6299,10 @@ function buildR3BoardHTML(key){
     <div class="reset-caption" data-i18n="board.resetCaption">RESET</div>
     <div class="header-row top" id="rowDigital_${key}"></div>
     <div class="header-row power" id="rowPower_${key}"></div>
-    <div class="header-row analog" id="rowAnalog_${key}"></div>`;
+    <div class="header-row analog" id="rowAnalog_${key}"></div>
+    ${pinMapCaptionHTML()}
+    <div class="header-caption cap-power">POWER</div>
+    <div class="header-caption cap-analog">ANALOG IN (ADC)</div>`;
 }
 
 // ESP32 계열 3종의 보드 그림을 만듭니다.
@@ -6108,6 +6342,7 @@ function buildESP32BoardHTML(key, type){
     <div class="header-row top" id="rowDigital_${key}"></div>
     <div class="header-row power" id="rowPower_${key}"></div>
     <div class="header-row analog" id="rowAnalog_${key}"></div>
+    ${pinMapCaptionHTML(true)}
     <div class="header-caption cap-power">POWER</div>
     <div class="header-caption cap-analog">ADC (ADC1)</div>`;
 }
@@ -6140,13 +6375,14 @@ function buildBoardPopupHTML(key, type){
     : isEsp32 ? 'Target: ESP32-WROOM-32 (Xtensa LX6 dual-core @ 240MHz)'
     : 'Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)';
   const toolchain = type === 'r3' ? 'AVR-GCC' : isEsp32 ? 'Xtensa-GCC' : 'C/C++ GCC';
-  // DDRx/PORTx/PINx 직접제어 예제는 AVR(ATmega328P, R3)에만 있는 개념입니다 — R4/ESP32는 레지스터
-  // 구성이 전혀 달라 같은 이름의 레지스터가 없으므로, 이 두 예제는 R3에만 제공합니다.
+  // DDRx/PORTx/PINx 레지스터 이름은 AVR(ATmega328P, R3)만의 것이라 R4/ESP32는 같은 이름의
+  // 예제를 쓰지 않지만, R4는 R_PORTn->PDR/PODR/POSR/PORR로 그 자리를 대신하는 예제를 따로 둡니다.
   let counterButton, extraButtons;
   if (type === 'r3'){
     counterButton = `<button class="btn ghost" onclick="runCodeExample('${key}','counter')">${tr('popup.exCounterD13')}</button>`;
     extraButtons = `<button class="btn ghost" onclick="runCodeExample('${key}','register')">${tr('popup.exRegister')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','api_vs_register')">${tr('popup.exApiVsReg')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','port_full')">${tr('popup.exPortFullR3')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`;
   } else if (isEsp32){
     // 보드 종류(DevKit/디스플레이/터치)에 맞는 예제 목록 배열을 그대로 재사용해, 갤러리 탭과
@@ -6158,6 +6394,7 @@ function buildBoardPopupHTML(key, type){
   } else {
     counterButton = `<button class="btn ghost" onclick="runCodeExample('${key}','counter')">${tr('popup.exCounterD13')}</button>`;
     extraButtons = `<button class="btn ghost" onclick="runCodeExample('${key}','analog')">${tr('popup.exAnalog')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','port_wide')">${tr('popup.exPortWideR4')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`;
   }
   const ledPinValue = isEsp32 ? 'const int ledPin = 2;' : 'const int ledPin = 13;';
@@ -6249,9 +6486,9 @@ function spawnBoard(type, dropX, dropY){
   const topPins = isEsp32 ? ESP32_GPIO_PINS : DIGITAL_PINS;
   const powerPins = isEsp32 ? ESP32_POWER_PINS : POWER_PINS;
   const analogPins = isEsp32 ? ESP32_ADC_PINS : ANALOG_PINS;
-  buildHeader(`rowDigital_${key}`, topPins);
-  buildHeader(`rowPower_${key}`, powerPins);
-  buildHeader(`rowAnalog_${key}`, analogPins);
+  buildHeader(`rowDigital_${key}`, topPins, 'digital');
+  buildHeader(`rowPower_${key}`, powerPins, 'power');
+  buildHeader(`rowAnalog_${key}`, analogPins, 'analog');
   if (type === 'r4') rebuildMatrixGrid(`matrixGrid_${key}`);
 
   // 깨끗한 기본 키('r4' 또는 'r3')로 만들어질 때만 이미 HTML에 있는 정적 팝업(popupR4/popupR3)을
@@ -6357,6 +6594,14 @@ function loadExampleCode(board, type){
     editor.value = currentLang === 'en'
       ? `// Compares the same action (turning a pin on/off) implemented two ways:\n// pin 12 via the DDR/PORT registers, pin 13 via the standard API.\n// Pin 13 = PB5, Pin 12 = PB4 (Uno's D8-D13 all belong to PORTB).\n//\n// Deliberately written as "pin 12 (register) first -> pin 13 (API) second":\n// a register access is almost instant (1-2 instructions, ~2 cycles), while\n// digitalWrite() costs ~56 more cycles for the pin->port lookup and\n// interrupt disable/enable. So even though both lines run "at the same time",\n// the pin voltages actually change at slightly different moments -- zoom the\n// oscilloscope's TIME/DIV very small (e.g. 10us, 20us) and you'll see pin 12\n// rise first, with pin 13 following just after.\n// (At 5ms/div or slower it switches to the coarse 100ms polling mode, and\n// this tiny difference disappears -- you'll just see the 500ms square wave\n// from the real delay() timing.)\n\nconst int ledApiPin = 13;  // pin controlled via the API\n\nvoid setup() {\n  Serial.begin(9600);\n\n  // --- Pin 12: direct DDR register control ---\n  DDRB |= (1 << PB4);   // same effect as pinMode(12, OUTPUT)\n\n  // --- Pin 13: standard Arduino API ---\n  pinMode(ledApiPin, OUTPUT);\n\n  Serial.println("Pin12=register(first), Pin13=API(second), blinking together.");\n}\n\nvoid loop() {\n  // Pin 12 ON: direct register control (near-instant)\n  PORTB |= (1 << PB4);\n  // Pin 13 ON: standard API (~56 cycles slower than the register)\n  digitalWrite(ledApiPin, HIGH);\n\n  Serial.println("12(REG)=HIGH, 13(API)=HIGH");\n  delay(500);\n\n  // Pin 12 OFF: direct register control\n  PORTB &= ~(1 << PB4);\n  // Pin 13 OFF: standard API\n  digitalWrite(ledApiPin, LOW);\n\n  Serial.println("12(REG)=LOW,  13(API)=LOW");\n  delay(500);\n}`
       : `// 같은 동작(핀 켜고 끄기)을 12번 핀은 DDR/PORT 레지스터로, 13번 핀은 표준 API로 구현해 비교합니다.\n// 13번 핀 = PB5, 12번 핀 = PB4 (Uno의 D8~D13은 모두 PORTB에 속해 있습니다).\n//\n// 일부러 "12번(레지스터) 먼저 -> 13번(API) 나중" 순서로 적었습니다: 레지스터 접근은 명령어\n// 1~2개(약 2사이클)로 거의 즉시 반응하지만, digitalWrite()는 핀->포트 조회 + 인터럽트\n// disable/enable까지 거치느라 약 56사이클이 더 걸립니다. 그래서 두 줄을 "동시에" 실행시켜도\n// 실제로 핀 전압이 바뀌는 시점은 미묘하게 어긋납니다 — 오실로스코프의 TIME/DIV를 아주 작게\n// (예: 10µs, 20µs) 줄이면 12번이 먼저 올라가고 13번이 살짝 늦게 따라 올라가는 게 보입니다.\n// (TIME/DIV를 5ms 이상으로 두면 100ms 주기로 값을 읽는 굵은 모드로 전환되어 이 미세한\n// 차이는 보이지 않고, 대신 실제 delay() 타이밍에 따른 500ms 사각파만 보입니다.)\n\nconst int ledApiPin = 13;  // API 방식으로 제어할 핀\n\nvoid setup() {\n  Serial.begin(9600);\n\n  // --- 12번 핀: DDR 레지스터 직접 제어 방식 ---\n  DDRB |= (1 << PB4);   // pinMode(12, OUTPUT)과 동일한 효과\n\n  // --- 13번 핀: 표준 Arduino API 방식 ---\n  pinMode(ledApiPin, OUTPUT);\n\n  Serial.println("12번=레지스터(먼저), 13번=API(나중)로 동시에 점멸합니다.");\n}\n\nvoid loop() {\n  // 12번 핀 ON: 레지스터 직접 제어 (거의 즉시 반응)\n  PORTB |= (1 << PB4);\n  // 13번 핀 ON: 표준 API (레지스터보다 ~56사이클 늦게 반응)\n  digitalWrite(ledApiPin, HIGH);\n\n  Serial.println("12(REG)=HIGH, 13(API)=HIGH");\n  delay(500);\n\n  // 12번 핀 OFF: 레지스터 직접 제어\n  PORTB &= ~(1 << PB4);\n  // 13번 핀 OFF: 표준 API\n  digitalWrite(ledApiPin, LOW);\n\n  Serial.println("12(REG)=LOW,  13(API)=LOW");\n  delay(500);\n}`;
+  } else if (type === 'port_full'){
+    editor.value = currentLang === 'en'
+      ? `// R3 full-port control example -- one PORTD register write moves all 8 pins (D0~D7)\n// at once. ATmega328P lines D0~D7 up 1:1 with PORTD's 8 bits, so a single byte write\n// changes all 8 pins in exactly ONE clock cycle -- calling digitalWrite() 8 times would\n// take 8 separate ~56-cycle API calls instead. This is the advantage R4 can't fully\n// match, because its D0~D7 pins are scattered across two different ports (see the\n// R4 'port_wide' example).\n//\n// Wiring: an LED+resistor on every pin D0~D7, so the raw 8-bit value is directly\n// visible as a binary counter (D7 = most significant bit, D0 = least significant).\n// NOTE: D0/D1 normally double as Serial RX/TX -- this sketch deliberately skips\n// Serial.begin() so the full 8-bit port stays free for LED output.\n\nvoid setup() {\n  DDRD = 0xFF; // Set D0~D7 all to OUTPUT at once (same effect as calling pinMode() 8 times, but in 1 cycle)\n}\n\nvoid loop() {\n  for (int i = 0; i <= 255; i++) {\n    PORTD = i; // Write all 8 pins in a single instruction (0b00000000 ~ 0b11111111)\n    delay(120);\n  }\n}`
+      : `// R3 포트 전체 제어 예제 — PORTD 레지스터 딱 한 번 쓰기로 D0~D7 8개 핀이 전부 한꺼번에\n// 바뀝니다. ATmega328P는 D0~D7이 PORTD의 8개 비트에 1:1로 가지런히 배치되어 있어서,\n// 8비트 값 하나만 써넣으면 "단 1클록"에 8개 핀이 동시에 바뀝니다 — digitalWrite()를\n// 8번 따로 부르면 API 호출 8번(각 ~56사이클)이 걸리는 것과 대조적입니다. 이게 바로\n// R4가 그대로 따라 하기 어려운 R3만의 장점입니다 — R4는 D0~D7이 서로 다른 두 포트에\n// 흩어져 있기 때문입니다(R4의 'port_wide' 예제 참고).\n//\n// 배선: D0~D7 각 핀에 저항+LED를 하나씩 달아, 8비트 값이 그대로 "2진수 카운터"로\n// 눈에 보이게 했습니다(D7이 최상위 비트, D0이 최하위 비트).\n// 참고: D0/D1은 평소 시리얼 RX/TX와 겹쳐 쓰는 핀이라, 8비트를 전부 LED 출력으로 쓰기\n// 위해 이 예제는 일부러 Serial.begin()을 호출하지 않습니다.\n\nvoid setup() {\n  DDRD = 0xFF; // D0~D7을 한 번에 전부 출력으로 설정 (pinMode()를 8번 부르는 것과 같은 효과, 단 1클록)\n}\n\nvoid loop() {\n  for (int i = 0; i <= 255; i++) {\n    PORTD = i; // 명령어 하나로 8개 핀 전부에 값을 출력 (0b00000000 ~ 0b11111111)\n    delay(120);\n  }\n}`;
+  } else if (type === 'port_wide'){
+    editor.value = currentLang === 'en'
+      ? `// R4 port-bundle control example -- D2~D7 all happen to sit on Port 1, so they can be\n// moved together with R_PORT1->PODR/POSR/PORR in just 1~2 clock cycles.\n// (D0,D1,D8,D9,D13 belong to other ports -- Uno R4 pins are scattered across several\n// internal ports to keep the same header layout as R3, so R3's "PORTD = one byte for\n// all of D0~D7" trick doesn't carry over directly. Instead, whichever pins DO share a\n// port -- here, D2~D7 on Port 1 -- can still be bundled for a big speed win over calling\n// digitalWrite() six separate times.)\n//\n// Real bit positions (from the official Arduino Uno R4 variant.cpp):\n//   D2=P1.04  D3=P1.05  D4=P1.06  D5=P1.07  D6=P1.11  D7=P1.12\n\nconst uint32_t D2_BIT = (1 << 4);\nconst uint32_t D3_BIT = (1 << 5);\nconst uint32_t D4_BIT = (1 << 6);\nconst uint32_t D5_BIT = (1 << 7);\nconst uint32_t D6_BIT = (1 << 11);\nconst uint32_t D7_BIT = (1 << 12);\nconst uint32_t ALL_BITS = D2_BIT | D3_BIT | D4_BIT | D5_BIT | D6_BIT | D7_BIT;\n\nvoid setup() {\n  Serial.begin(9600);\n  R_PORT1->PDR |= ALL_BITS; // Set D2~D7 to OUTPUT together\n  Serial.println("R4: Port 1 bundle ready (D2~D7)");\n}\n\nvoid loop() {\n  // 1) POSR: turn all 6 pins ON at once (1 cycle, doesn't touch any other pin)\n  Serial.println("POSR -> D2~D7 all ON");\n  R_PORT1->POSR = ALL_BITS;\n  delay(500);\n\n  // 2) PORR: turn all 6 pins OFF at once (1 cycle)\n  Serial.println("PORR -> D2~D7 all OFF");\n  R_PORT1->PORR = ALL_BITS;\n  delay(500);\n\n  // 3) PODR: checkerboard pattern (alternate the even/odd-indexed pins)\n  Serial.println("PODR -> checkerboard pattern");\n  R_PORT1->PODR = D2_BIT | D4_BIT | D6_BIT;\n  delay(400);\n  R_PORT1->PODR = D3_BIT | D5_BIT | D7_BIT;\n  delay(400);\n  R_PORT1->PODR = 0;\n  delay(400);\n}`
+      : `// R4 포트 묶음 제어 예제 — D2~D7 여섯 핀이 마침 전부 Port 1에 몰려 있어서,\n// R_PORT1->PODR/POSR/PORR 레지스터 하나로 1~2클록 만에 한꺼번에 움직일 수 있습니다.\n// (D0,D1,D8,D9,D13은 다른 포트에 속해 있습니다 — Uno R4는 R3와 같은 헤더 배치를\n// 맞추다 보니 핀들이 내부 여러 포트에 흩어져 있어, R3처럼 "PORTD 한 바이트로\n// D0~D7 전부"라는 트릭이 그대로 통하지 않습니다. 대신 같은 포트에 모여 있는 핀들\n// — 여기서는 Port 1의 D2~D7 — 끼리는 digitalWrite() 6번 대신 레지스터 한 번으로\n// 묶어서 큰 속도 이득을 볼 수 있습니다.)\n//\n// 실제 비트 위치(공식 Arduino Uno R4 variant.cpp 기준):\n//   D2=P1.04  D3=P1.05  D4=P1.06  D5=P1.07  D6=P1.11  D7=P1.12\n\nconst uint32_t D2_BIT = (1 << 4);\nconst uint32_t D3_BIT = (1 << 5);\nconst uint32_t D4_BIT = (1 << 6);\nconst uint32_t D5_BIT = (1 << 7);\nconst uint32_t D6_BIT = (1 << 11);\nconst uint32_t D7_BIT = (1 << 12);\nconst uint32_t ALL_BITS = D2_BIT | D3_BIT | D4_BIT | D5_BIT | D6_BIT | D7_BIT;\n\nvoid setup() {\n  Serial.begin(9600);\n  R_PORT1->PDR |= ALL_BITS; // D2~D7을 한 번에 출력으로 설정\n  Serial.println("R4: Port 1 묶음 준비 완료 (D2~D7)");\n}\n\nvoid loop() {\n  // 1) POSR로 6개 핀 동시 HIGH (단 1클록, 다른 핀에는 영향 없음)\n  Serial.println("POSR -> D2~D7 전부 ON");\n  R_PORT1->POSR = ALL_BITS;\n  delay(500);\n\n  // 2) PORR로 6개 핀 동시 LOW (단 1클록)\n  Serial.println("PORR -> D2~D7 전부 OFF");\n  R_PORT1->PORR = ALL_BITS;\n  delay(500);\n\n  // 3) PODR로 체크무늬 패턴 (짝수/홀수 번째 핀을 번갈아 켜기)\n  Serial.println("PODR -> 체크무늬 패턴");\n  R_PORT1->PODR = D2_BIT | D4_BIT | D6_BIT;\n  delay(400);\n  R_PORT1->PODR = D3_BIT | D5_BIT | D7_BIT;\n  delay(400);\n  R_PORT1->PODR = 0;\n  delay(400);\n}`;
   } else if (type === 'relay'){
     editor.value = currentLang === 'en'
       ? `// Drive a 5V relay module from an Arduino digital pin to switch a HIGH-VOLTAGE\n// load (up to 48V DC / 220V AC) that never touches the Arduino itself.\n//\n// Wiring in the simulator:\n//   Board 5V  -> Relay VCC\n//   Board GND -> Relay GND\n//   Board D7  -> Relay IN\n//   Relay COM/NO (or COM/NC) -> the high-voltage load's switching path\n//     (e.g. AC PSU (ac1) L -> Relay COM, Relay NO -> motor3ph/lamp load -> PSU N)\n//\n// IN = HIGH energizes the coil -> COM connects to NO (normally-open closes).\n// IN = LOW  de-energizes it    -> COM connects to NC (normally-closed).\n// This mirrors a real opto-isolated relay module: the coil side (5V logic)\n// and the contact side (up to 48V DC / 220V AC) are electrically separate --\n// the Arduino only ever switches the small 5V coil current, never the load.\n\nconst int relayPin = 7;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(relayPin, OUTPUT);\n  digitalWrite(relayPin, LOW); // start de-energized (load on NC, if wired there)\n}\n\nvoid loop() {\n  Serial.println("Relay ON  (energized -> COM-NO closed)");\n  digitalWrite(relayPin, HIGH);\n  delay(2000);\n\n  Serial.println("Relay OFF (de-energized -> COM-NC closed)");\n  digitalWrite(relayPin, LOW);\n  delay(2000);\n}`
@@ -6909,10 +7154,12 @@ const EXPERIMENT_DEFS = [
   { key: 'rlc3-phase', icon: ICO_RLC, titleKey: 'exp.rlc3Phase.title', descKey: 'exp.rlc3Phase.desc' },
   { key: 'relay-switch', icon: ICO_RELAY, titleKey: 'exp.relaySwitch.title', descKey: 'exp.relaySwitch.desc' },
 ];
-// DDRx/PORTx 레지스터 직접제어 예제는 AVR(ATmega328P) 전용 개념이라 R4(RA4M1)에는 없습니다.
+// R4(RA4M1)는 DDRx/PORTx라는 이름의 레지스터는 없지만, R_PORTn->PDR/PODR/POSR/PORR로
+// 같은 포트에 몰린 핀들을 레지스터 차원에서 직접 제어할 수 있습니다('port_wide' 예제 참고).
 const R4_EXAMPLE_DEFS = [
   { key: 'counter', titleKey: 'popup.exCounterD13' },
   { key: 'analog', titleKey: 'popup.exAnalog' },
+  { key: 'port_wide', titleKey: 'popup.exPortWideR4' },
   { key: 'relay', titleKey: 'popup.exRelay' },
   { key: 'fireworks', titleKey: 'popup.exFireworksR4' },
 ];
@@ -6920,6 +7167,7 @@ const R3_EXAMPLE_DEFS = [
   { key: 'counter', titleKey: 'popup.exCounter' },
   { key: 'register', titleKey: 'popup.exRegister' },
   { key: 'api_vs_register', titleKey: 'popup.exApiVsReg' },
+  { key: 'port_full', titleKey: 'popup.exPortFullR3' },
   { key: 'relay', titleKey: 'popup.exRelay' },
 ];
 // ESP32 코딩 예제 — 보드 종류별로 갤러리 탭을 따로 두어(DevKit/디스플레이/터치) 각 보드가
@@ -7003,6 +7251,30 @@ function renderGalleryBody(){
 
 // 코딩 예제 카드: 해당 보드가 캔버스에 아직 없으면(R3는 기본 미배치) 하나 만들고, 예제 코드를
 // 불러온 뒤 그 보드의 코드 에디터 팝업을 열어줍니다.
+// 포트 일괄 제어 예제(R3 port_full, R4 port_wide) 전용 배선 도우미 — 지정된 핀들 각각에
+// 저항+LED를 달아, 레지스터 한 번의 쓰기가 여러 핀에 동시에 반영되는 모습이 눈으로 보이게
+// 합니다. runPeripheralExample과 같은 COL1/COL2(보드 오른쪽 640px/800px)를 재사용해 보드
+// 위에 겹치지 않게 배치합니다.
+function wirePortControlLeds(board, key, pinNames){
+  if (!boardInstances[board]) spawnBoard(board);
+  const boardEl = document.getElementById(boardDomId[board]);
+  if (!boardEl) return;
+  const pos = elCanvasPos(boardEl);
+  const COL1 = pos.x + 640, COL2 = pos.x + 800;
+  const gnds = (PERIPH_PINS[board] && PERIPH_PINS[board].gnds) || ['GND_D', 'GND_P1', 'GND_P2'];
+  let gi = 0;
+  const nextGnd = () => boardEl.querySelector(`[data-pin="${gnds[gi++ % gnds.length]}"]`);
+  pinNames.forEach((pinName, idx) => {
+    const y = pos.y - 10 + idx * 90;
+    const pin = boardEl.querySelector(`[data-pin="${pinName}"]`);
+    if (!pin) return;
+    const led = placeExp('led', key, COL1, y);
+    const res = placeExp('resistor', key, COL2, y);
+    taggedWire(key, pin, document.querySelector(`#${res} [data-pin$="_A"]`));
+    taggedWire(key, document.querySelector(`#${res} [data-pin$="_B"]`), document.querySelector(`#${led} [data-pin$="_A"]`));
+    taggedWire(key, document.querySelector(`#${led} [data-pin$="_K"]`), nextGnd());
+  });
+}
 function runCodeExample(board, key){
   // 기본 내장 보드(r4/r3)의 예제를 고르면 "예제만 새로" 보이도록 캔버스를 완전히 비우고
   // 시작합니다. 사용자가 직접 여러 대 추가해 둔 보드(r4_2, r3_2, ...)는 예제 갤러리의 대상이
@@ -7011,6 +7283,11 @@ function runCodeExample(board, key){
   const isDefaultBoard = board === 'r4' || board === 'r3' || ESP32_BOARD_TYPES.has(board);
   if (isDefaultBoard) clearCanvasAll();
   if (isDefaultBoard && !boardInstances[board]) spawnBoard(board);
+  if (key === 'port_full'){
+    wirePortControlLeds(board, key, ['D0','D1','D2','D3','D4','D5','D6','D7']);
+  } else if (key === 'port_wide'){
+    wirePortControlLeds(board, key, ['D2','D3','D4','D5','D6','D7']);
+  }
   loadExampleCode(board, key);
   openBoardPopup(board);
   ensureSimRunning(); // 이미 시뮬레이션 중이었다면 새로 올라간 코드로 자동 재시작합니다.
@@ -7552,9 +7829,15 @@ function runPeripheralExample(board){
   const in1Pin = boardEl.querySelector(`[data-pin="${P.in1}"]`);
   const enaPin = boardEl.querySelector(`[data-pin="${P.ena}"]`);
 
+  // 보드 그림(.board)은 모든 종류가 가로 600px로 동일합니다 — 부품을 보드 오른쪽으로 충분히
+  // 떨어뜨려(600px + 여유) 배치해야 부품이 보드 실크스크린 위에 겹쳐 놓이지 않고, 배선도 보드
+  // 테두리를 감아 도는 대신 오른쪽으로 곧게 뻗어 나가 훨씬 덜 헷갈립니다(피드백: "배치가 이게
+  // 뭔가... 배선을 알아볼 수 없다" → 부품이 보드 위에 겹쳐 있던 것이 가장 큰 원인이었습니다).
+  const COL1 = pos.x + 640, COL2 = pos.x + 800, COL3 = pos.x + 960;
+
   // 1) 풀업 버튼 — 신호선 T1을 보드 핀에, T2를 GND에 연결(내장 INPUT_PULLUP 사용, 평소 HIGH,
   //    누르면 LOW). 추가 저항이 필요 없는 가장 표준적인 버튼 배선입니다.
-  const btnUp = placeExp('btn', key, pos.x + 260, pos.y - 10);
+  const btnUp = placeExp('btn', key, COL1, pos.y - 10);
   taggedWire(key, btnUpPin, document.querySelector(`#${btnUp} [data-pin$="_T1"]`));
   taggedWire(key, document.querySelector(`#${btnUp} [data-pin$="_T2"]`), nextGnd());
 
@@ -7562,8 +7845,8 @@ function runPeripheralExample(board){
   //    버튼의 다른 쪽 다리를 VCC에 연결해 누르면 신호선이 VCC로 끌려 올라가 HIGH가 됩니다
   //    (AVR에는 내장 INPUT_PULLDOWN이 없으므로 실제 회로처럼 저항을 직접 답니다 — ESP32도
   //    동일한 배선으로 그대로 동작합니다).
-  const btnDown = placeExp('btn', key, pos.x + 260, pos.y + 90);
-  const pdRes = placeExp('resistor', key, pos.x + 420, pos.y + 90);
+  const btnDown = placeExp('btn', key, COL1, pos.y + 110);
+  const pdRes = placeExp('resistor', key, COL2, pos.y + 110);
   document.querySelector(`#${pdRes} .res-value`).value = '10';
   document.querySelector(`#${pdRes} .res-unit`).value = '1000';
   updateResistor(pdRes);
@@ -7573,25 +7856,26 @@ function runPeripheralExample(board){
   taggedWire(key, document.querySelector(`#${pdRes} [data-pin$="_B"]`), nextGnd());
 
   // 3) LED — 220Ω 직렬 저항과 함께 PWM 핀에 연결(analogWrite로 밝기 제어).
-  const led = placeExp('led', key, pos.x + 260, pos.y + 200);
-  const ledRes = placeExp('resistor', key, pos.x + 420, pos.y + 200);
+  const led = placeExp('led', key, COL1, pos.y + 230);
+  const ledRes = placeExp('resistor', key, COL2, pos.y + 230);
   taggedWire(key, ledPin, document.querySelector(`#${ledRes} [data-pin$="_A"]`));
   taggedWire(key, document.querySelector(`#${ledRes} [data-pin$="_B"]`), document.querySelector(`#${led} [data-pin$="_A"]`));
   taggedWire(key, document.querySelector(`#${led} [data-pin$="_K"]`), nextGnd());
 
   // 4) 조도 센서(LDR) — 아날로그 입력 핀으로 밝기를 읽습니다.
-  const ldr = placeExp('sensor-ldr', key, pos.x + 260, pos.y + 310);
+  const ldr = placeExp('sensor-ldr', key, COL1, pos.y + 350);
   taggedWire(key, vccPin, document.querySelector(`#${ldr} [data-pin$="_V"]`));
   taggedWire(key, document.querySelector(`#${ldr} [data-pin$="_W"]`), analogPin);
   taggedWire(key, document.querySelector(`#${ldr} [data-pin$="_G"]`), nextGnd());
 
   // 5) DC 모터 + 모터 드라이버(L298N) — 모터 쪽 전원(V)은 보드가 아니라 별도의 12V DC 전원
   //    공급 장치에서 받고(전원 소스 분리), 드라이버의 GND만 보드 GND와 공유해 기준 전위를
-  //    맞춥니다(로직 신호가 정상적으로 인식되려면 반드시 공통 접지가 필요합니다).
-  const psu = placeExp('psu', key, pos.x + 620, pos.y + 420);
+  //    맞춥니다(로직 신호가 정상적으로 인식되려면 반드시 공통 접지가 필요합니다). 배선 순서와
+  //    같은 좌→우 순서(모터 → 드라이버 → 전원)로 배치해 전선이 지그재그로 겹치지 않습니다.
+  const motor = placeExp('dcmotor', key, COL1, pos.y + 490);
+  const driver = placeExp('motordriver', key, COL2, pos.y + 490);
+  const psu = placeExp('psu', key, COL3, pos.y + 490);
   document.querySelector(`#${psu} .psu-dc-volt`).value = '12';
-  const driver = placeExp('motordriver', key, pos.x + 420, pos.y + 420);
-  const motor = placeExp('dcmotor', key, pos.x + 260, pos.y + 420);
   taggedWire(key, document.querySelector(`#${psu} [data-pin$="_V"]`), document.querySelector(`#${driver} [data-pin$="_V"]`));
   taggedWire(key, document.querySelector(`#${psu} [data-pin$="_G"]`), document.querySelector(`#${driver} [data-pin$="_G"]`));
   taggedWire(key, document.querySelector(`#${driver} [data-pin$="_G"]`), nextGnd()); // 공통 접지
@@ -7603,7 +7887,7 @@ function runPeripheralExample(board){
 
   loadExampleCode(board, 'peripherals');
   ensureSimRunning();
-  focusCanvasOn(pos.x + 260, pos.y + 100);
+  focusCanvasOn(pos.x + 200, pos.y + 200);
 }
 
 /* ============ 작업 저장/불러오기 (현재 캔버스 상태를 JSON 파일로) ============ */
