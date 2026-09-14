@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.99a</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.99b</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -57,6 +57,16 @@
   .brand-text b{font-size:.92rem; font-weight:600; letter-spacing:.2px;}
   .brand-text span{font-size:.68rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
   .toolbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; row-gap:6px;}
+
+  /* Footer (legal / disclaimer bar) */
+  .app-footer{
+    flex:0 0 auto; background:var(--bg-panel); border-top:1px solid var(--border);
+    padding:5px 18px; font-size:.66rem; line-height:1.5; color:var(--text-faint);
+    display:flex; align-items:center; justify-content:center; text-align:center; flex-wrap:wrap; gap:4px 10px; z-index:20;
+  }
+  .app-footer a{color:var(--text-dim); text-decoration:none;}
+  .app-footer a:hover{color:var(--teal-strong); text-decoration:underline;}
+  .app-footer .footer-sep{color:var(--border-strong);}
   .lang-select{
     background:var(--bg-panel-2); color:var(--text); border:1px solid var(--border-strong); border-radius:6px;
     padding:6px 8px; font-size:.78rem; cursor:pointer; font-family:inherit; margin-right:2px;
@@ -1021,7 +1031,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.99a</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.99b</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1559,6 +1569,14 @@ void loop() {
 
 </div>
 
+<footer class="app-footer">
+  <span data-i18n="footer.copyright">본 프로그램의 저작권은 개발자에게 있으며, 교육 목적으로만 사용할 수 있습니다.</span>
+  <span class="footer-sep">|</span>
+  <span data-i18n="footer.disclaimer">이 시뮬레이터의 계산 및 동작 결과는 실제 회로와 다를 수 있습니다.</span>
+  <span class="footer-sep">|</span>
+  <span data-i18n="footer.bugReport">버그 신고: <a href="mailto:dolphin89.cad@gmail.com">dolphin89.cad@gmail.com</a></span>
+</footer>
+
 <script>
 /* ============ i18n (Korean/English) ============ */
 const STRINGS = {
@@ -1601,7 +1619,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.99a", en: "K's Simulator Ver0.99a" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.99b", en: "K's Simulator Ver0.99b" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -2059,7 +2077,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.99a", en: "K's Arduino Simulator Ver0.99a" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.99b", en: "K's Arduino Simulator Ver0.99b" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -2103,6 +2121,9 @@ const STRINGS = {
   "zoom.inTitle": { ko: "확대", en: "Zoom in" },
   "zoom.outTitle": { ko: "축소", en: "Zoom out" },
   "zoom.resetTitle": { ko: "100%로 초기화", en: "Reset to 100%" },
+  "footer.copyright": { ko: "본 프로그램의 저작권은 개발자에게 있으며, 교육 목적으로만 사용할 수 있습니다.", en: "This program is copyrighted by its developer and may be used for educational purposes only." },
+  "footer.disclaimer": { ko: "이 시뮬레이터의 계산 및 동작 결과는 실제 회로와 다를 수 있습니다.", en: "This simulator's calculations and behavior may differ from a real circuit." },
+  "footer.bugReport": { ko: "버그 신고: <a href=\"mailto:dolphin89.cad@gmail.com\">dolphin89.cad@gmail.com</a>", en: "Report bugs: <a href=\"mailto:dolphin89.cad@gmail.com\">dolphin89.cad@gmail.com</a>" },
 };
 let currentLang = 'ko';
 function tr(key){
