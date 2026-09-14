@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.97c</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.98a</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -368,6 +368,14 @@
   }
   .btn-cap{width:34px; height:34px; border-radius:50%; background:#e6493d; box-shadow:0 4px 0 #a52e24; cursor:pointer; transition:transform .05s;}
   .btn-cap:active, .btn-cap.pressed{transform:translateY(3px); box-shadow:0 1px 0 #a52e24;}
+
+  /* ---------- 토글 스위치 (기계식, 눌러서 ON/OFF가 계속 유지됨 — 푸시 버튼과 달리 손을 떼도
+     상태가 그대로 남습니다) ---------- */
+  .comp-toggleswitch{width:88px; padding:10px 8px; background:#2a2f37; border:1px solid #454c57; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .ts-title{font-size:.62rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:8px;}
+  .comp-toggleswitch .psu-switch{margin:0 auto 6px;}
+  .ts-state{font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:#9fb0c4; margin-bottom:8px;}
+  .comp-toggleswitch .comp-pin-row{justify-content:center; gap:18px;}
 
   .pin-mini{position:relative; width:12px; height:12px; background:#15181a; border:2px solid var(--gold); border-radius:2px; cursor:crosshair;}
   .pin-mini.selected{background:var(--focus)!important;}
@@ -938,6 +946,14 @@
     resize:both; overflow:auto; min-width:420px; min-height:360px; max-width:min(96vw,980px); max-height:92vh;
   }
   .board-popup[hidden]{display:none;}
+  /* 최대화 상태에서는 기본 max-width(96vw와 980px 중 작은 값)를 벗어나 실제로 화면을 거의
+     가득 채워야 하므로, 클래스 하나 더 붙는 이 규칙으로 위 기본값을 덮어씁니다(그냥 인라인
+     style만으로는 이 max-width/max-height 규칙을 이길 수 없어서 별도 규칙이 필요합니다). */
+  /* position:fixed로 바꿔야 top/left/width/height의 vw·vh 값이 (툴바 높이만큼 아래로 밀려
+     있는) .workspace 기준이 아니라 실제 브라우저 화면 기준으로 계산되어, 진짜로 화면을
+     가득 채웁니다. */
+  .board-popup.maximized{position:fixed; max-width:96vw; max-height:92vh;}
+  .popup-max-btn{font-size:.8rem; padding:5px 9px; line-height:1;}
   .popup-head{padding:11px 14px; background:var(--bg-panel-2); border-bottom:1px solid var(--border);
     display:flex; justify-content:space-between; align-items:center; flex:0 0 auto; cursor:move; user-select:none;}
   .popup-head b{font-size:.82rem; font-weight:600;}
@@ -978,8 +994,9 @@
     display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; letter-spacing:.5px;}
   .serial-logs{flex:1; padding:8px 14px; font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:#63e07a;
     overflow-y:auto; white-space:pre-wrap; background:#07090c;}
-  .example-buttons{display:flex; gap:8px; margin:10px 14px 0; flex:0 0 auto;}
+  .example-buttons{display:flex; flex-wrap:wrap; gap:8px; margin:10px 14px 0; flex:0 0 auto;}
   .example-buttons .btn{font-size:.72rem; padding:6px 12px;}
+  .example-section-label{flex-basis:100%; font-size:.62rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; letter-spacing:.5px; margin:4px 0 -2px;}
 
   .compile-progress{height:3px; width:100%; background:transparent;}
   .compile-progress.active{background:linear-gradient(90deg, #12a4ab 0%, #3fd0d6 50%, #12a4ab 100%); background-size:200% 100%; animation:moveProgress 1s linear infinite;}
@@ -992,7 +1009,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.97c</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.98a</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1065,7 +1082,7 @@
       </div>
       <div class="palette-group" data-group="io">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.io">기본 입출력</span><span class="pg-count">5</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.io">기본 입출력</span><span class="pg-count">6</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('led')">
@@ -1079,6 +1096,10 @@
           <div class="palette-item" onclick="spawnComponent('btn')">
             <div class="swatch"><div style="width:18px;height:18px;border-radius:50%;background:#e6493d;"></div></div>
             <span data-i18n="palette.btn">푸시 버튼</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('toggleswitch')">
+            <div class="swatch"><div style="width:26px;height:14px;border-radius:7px;background:#0b5d3e;position:relative;"><div style="position:absolute;top:1px;left:13px;width:11px;height:11px;border-radius:50%;background:#3ddc84;"></div></div></div>
+            <span data-i18n="palette.toggleswitch">토글 스위치</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('rgbled')">
             <div class="swatch"><div style="width:18px;height:18px;border-radius:50%;background:conic-gradient(#ff5c5c,#4ee06a,#5aa9e6,#ff5c5c);"></div></div>
@@ -1403,6 +1424,7 @@
         <button class="btn ghost export-btn" onclick="exportBoardCode('r4','c')" data-i18n="popup.exportC">.c</button>
         <button class="btn ghost export-btn" onclick="exportBoardCode('r4','txt')" data-i18n="popup.exportTxt">.txt</button>
       </div>
+      <button class="btn ghost popup-max-btn" id="maxBtnR4" onclick="toggleBoardPopupMaximize('r4')" data-i18n-title="popup.maximizeTitle" title="최대화 (창을 화면 가득 채우기)">⛶</button>
       <button class="btn ghost" onclick="closeBoardPopup('r4')" data-i18n="popup.close">닫기 ✕</button>
     </div>
     <div class="compile-progress" id="progressR4"></div>
@@ -1421,7 +1443,13 @@
         <button class="btn ghost" onclick="runCodeExample('r4','analog')" data-i18n="popup.exAnalog">A0 가변저항 &amp; D9 PWM</button>
         <button class="btn ghost" onclick="runCodeExample('r4','port_wide')" data-i18n="popup.exPortWideR4">R_PORT1 레지스터로 D2~D7 묶음 제어</button>
         <button class="btn ghost" onclick="runCodeExample('r4','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
+        <div class="example-section-label" data-i18n="popup.motorSectionTitle">— 모터 예제 —</div>
+        <button class="btn ghost" onclick="runCodeExample('r4','dcmotor')" data-i18n="popup.exDcMotor">DC모터: L298N 드라이버로 방향·속도 제어</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','servo')" data-i18n="popup.exServo">서보모터: 각도 제어</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','encoder')" data-i18n="popup.exEncoder">DC모터+엔코더: 회전 속도(Hz) 피드백</button>
         <button class="btn ghost" onclick="runCodeExample('r4','stepper')" data-i18n="popup.exStepper">A4988로 스텝모터 각도 제어</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','acmotor')" data-i18n="popup.exAcMotor">AC모터: 릴레이로 ON/OFF</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','rs485_servo_single')" data-i18n="popup.exRs485Motor">RS-485 버스 서보모터</button>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR4">1</div>
@@ -1466,6 +1494,7 @@ void loop() {
         <button class="btn ghost export-btn" onclick="exportBoardCode('r3','c')" data-i18n="popup.exportC">.c</button>
         <button class="btn ghost export-btn" onclick="exportBoardCode('r3','txt')" data-i18n="popup.exportTxt">.txt</button>
       </div>
+      <button class="btn ghost popup-max-btn" id="maxBtnR3" onclick="toggleBoardPopupMaximize('r3')" data-i18n-title="popup.maximizeTitle" title="최대화 (창을 화면 가득 채우기)">⛶</button>
       <button class="btn ghost" onclick="closeBoardPopup('r3')" data-i18n="popup.close">닫기 ✕</button>
     </div>
     <div class="compile-progress" id="progressR3"></div>
@@ -1485,7 +1514,13 @@ void loop() {
         <button class="btn ghost" onclick="runCodeExample('r3','api_vs_register')" data-i18n="popup.exApiVsReg">13번(API) vs 12번(레지스터)</button>
         <button class="btn ghost" onclick="runCodeExample('r3','port_full')" data-i18n="popup.exPortFullR3">PORTD 전체 8핀 일괄 제어</button>
         <button class="btn ghost" onclick="runCodeExample('r3','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
+        <div class="example-section-label" data-i18n="popup.motorSectionTitle">— 모터 예제 —</div>
+        <button class="btn ghost" onclick="runCodeExample('r3','dcmotor')" data-i18n="popup.exDcMotor">DC모터: L298N 드라이버로 방향·속도 제어</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','servo')" data-i18n="popup.exServo">서보모터: 각도 제어</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','encoder')" data-i18n="popup.exEncoder">DC모터+엔코더: 회전 속도(Hz) 피드백</button>
         <button class="btn ghost" onclick="runCodeExample('r3','stepper')" data-i18n="popup.exStepper">A4988로 스텝모터 각도 제어</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','acmotor')" data-i18n="popup.exAcMotor">AC모터: 릴레이로 ON/OFF</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','rs485_servo_single')" data-i18n="popup.exRs485Motor">RS-485 버스 서보모터</button>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR3">1</div>
@@ -1539,6 +1574,7 @@ const STRINGS = {
   "bom.breadboard": { ko: "브레드보드", en: "Breadboard" },
   "bom.btmodule": { ko: "블루투스 모듈", en: "Bluetooth Module" },
   "bom.btn": { ko: "푸시 버튼", en: "Push Button" },
+  "bom.toggleswitch": { ko: "토글 스위치", en: "Toggle Switch" },
   "bom.dcmotorenc": { ko: "DC 모터 (엔코더 포함)", en: "DC Motor (with encoder)" },
   "bom.empty": { ko: "캔버스에 부품이 없습니다.", en: "No components on the canvas." },
   "bom.acmotor": { ko: "단상 AC 모터(220V)", en: "Single-Phase AC Motor (220V)" },
@@ -1565,7 +1601,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.97c", en: "K's Simulator Ver0.97c" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.98a", en: "K's Simulator Ver0.98a" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -1645,6 +1681,21 @@ const STRINGS = {
   "comp.capacitorE.label": { ko: "전해 커패시터", en: "Electrolytic Cap." },
   "comp.inductor.label": { ko: "인덕터", en: "Inductor" },
   "comp.relay.title": { ko: "릴레이 모듈", en: "Relay Module" },
+  "comp.toggleswitch.title": { ko: "토글 스위치", en: "Toggle Switch" },
+  "comp.toggleswitch.termTitle": { ko: "스위치 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)", en: "Switch terminal (no polarity — pairs with the other terminal)" },
+  "switch.on": { ko: "ON (닫힘)", en: "ON (closed)" },
+  "switch.off": { ko: "OFF (열림)", en: "OFF (open)" },
+  "comp.btn.termTitle": { ko: "버튼 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)", en: "Button terminal (no polarity — pairs with the other terminal)" },
+  "pin.legA": { ko: "리드 A (극성 무관)", en: "Lead A (no polarity)" },
+  "pin.legB": { ko: "리드 B (극성 무관)", en: "Lead B (no polarity)" },
+  "pin.anode": { ko: "애노드 (+, 양극)", en: "Anode (+)" },
+  "pin.cathode": { ko: "캐소드 (−, 음극)", en: "Cathode (−)" },
+  "pin.wiperSignal": { ko: "와이퍼 (신호 출력)", en: "Wiper (signal output)" },
+  "pin.signal": { ko: "신호", en: "Signal" },
+  "pin.colorR": { ko: "빨강 (R)", en: "Red (R)" },
+  "pin.colorG": { ko: "초록 (G)", en: "Green (G)" },
+  "pin.colorB": { ko: "파랑 (B)", en: "Blue (B)" },
+  "comp.lcd.eTitle": { ko: "E (Enable — 데이터를 읽어들이는 래치 신호)", en: "E (Enable — latches the data lines)" },
   "comp.benchpsu.title": { ko: "2채널 가변 전원 공급기 (0~48V)", en: "2-Channel Variable Power Supply (0-48V)" },
   "comp.benchpsu.v1Title": { ko: "CH1 V+ (0~48V, CH1 스위치로 켬/끔)", en: "CH1 V+ (0-48V, toggled by the CH1 switch)" },
   "comp.benchpsu.v2Title": { ko: "CH2 V+ (0~48V, CH2 스위치로 켬/끔, CH1과 완전히 분리된 별도 출력)", en: "CH2 V+ (0-48V, toggled by the CH2 switch — fully isolated from CH1)" },
@@ -1901,6 +1952,7 @@ const STRINGS = {
   "palette.breadboard": { ko: "브레드보드", en: "Breadboard" },
   "palette.bt": { ko: "블루투스 모듈", en: "Bluetooth Module" },
   "palette.btn": { ko: "푸시 버튼", en: "Push Button" },
+  "palette.toggleswitch": { ko: "토글 스위치", en: "Toggle Switch" },
   "palette.dac": { ko: "DAC 신호 발생기", en: "DAC Signal Generator" },
   "palette.dcmotor": { ko: "DC 모터", en: "DC Motor" },
   "palette.dcmotorenc": { ko: "DC 모터<br>(엔코더 포함)", en: "DC Motor<br>(with encoder)" },
@@ -1929,6 +1981,8 @@ const STRINGS = {
   "popup.apiCyclesPrefix": { ko: "API 호출(pinMode/digitalWrite 등)", en: "API calls (pinMode/digitalWrite, etc.)" },
   "popup.regCyclesPrefix": { ko: "레지스터 직접제어(DDRx/PORTx)", en: "Direct register control (DDRx/PORTx)" },
   "popup.close": { ko: "닫기 ✕", en: "Close ✕" },
+  "popup.maximizeTitle": { ko: "최대화 (창을 화면 가득 채우기)", en: "Maximize (fill the screen)" },
+  "popup.restoreTitle": { ko: "원래 크기로 되돌리기", en: "Restore to previous size" },
   "popup.compile": { ko: "▶ 컴파일 &amp; 빌드 업로드", en: "▶ Compile &amp; Build Upload" },
   "popup.exAnalog": { ko: "A0 가변저항 &amp; D9 PWM", en: "A0 Potentiometer &amp; D9 PWM" },
   "popup.exApiVsReg": { ko: "13번(API) vs 12번(레지스터)", en: "Pin 13 (API) vs Pin 12 (Register)" },
@@ -1955,6 +2009,12 @@ const STRINGS = {
   "popup.exRegister": { ko: "DDR/PORT 레지스터 직접제어", en: "Direct DDR/PORT Register Control" },
   "popup.exRelay": { ko: "5V 릴레이로 220V 부하 스위칭", en: "Switch a 220V Load with a 5V Relay" },
   "popup.exStepper": { ko: "A4988로 스텝모터 각도 제어", en: "Control a Stepper Motor with A4988" },
+  "popup.motorSectionTitle": { ko: "— 모터 예제 —", en: "— Motor Examples —" },
+  "popup.exDcMotor": { ko: "DC모터: L298N 드라이버로 방향·속도 제어", en: "DC Motor: Direction & Speed via L298N Driver" },
+  "popup.exServo": { ko: "서보모터: 각도 제어", en: "Servo Motor: Angle Control" },
+  "popup.exEncoder": { ko: "DC모터+엔코더: 회전 속도(Hz) 피드백", en: "DC Motor+Encoder: Rotation Speed Feedback (Hz)" },
+  "popup.exAcMotor": { ko: "AC모터: 릴레이로 ON/OFF", en: "AC Motor: ON/OFF via Relay" },
+  "popup.exRs485Motor": { ko: "RS-485 버스 서보모터", en: "RS-485 Bus Servo Motor" },
   "popup.regCycles0": { ko: "레지스터 직접제어(DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)", en: "Direct register control (DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)" },
   "popup.serialHead": { ko: "빌드 콘솔 / 시리얼 모니터", en: "Build Console / Serial Monitor" },
   "psu.dcPlusTitle": { ko: "DC + (선택한 전압)", en: "DC + (selected voltage)" },
@@ -1991,7 +2051,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.97c", en: "K's Arduino Simulator Ver0.97c" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.98a", en: "K's Arduino Simulator Ver0.98a" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -2071,6 +2131,11 @@ function refreshDynamicI18nText(){
     const enabled = el.dataset.enabled === '1';
     const angle = parseFloat(el.dataset.angle || '0');
     label.textContent = enabled ? `${(Math.round(angle * 10) / 10)}°` : tr('stepper.idle');
+  });
+  document.querySelectorAll('.comp-toggleswitch').forEach(el => {
+    const sw = el.querySelector('.psu-switch');
+    const label = el.querySelector('[id$="_state"]');
+    if (label) label.textContent = (sw && sw.classList.contains('on')) ? tr('switch.on') : tr('switch.off');
   });
   document.querySelectorAll('.comp-wifiap [id$="_status"]').forEach(el => {
     const sw = el.closest('.comp-wifiap')?.querySelector('.ap-switch');
@@ -3800,8 +3865,8 @@ function spawnComponent(type, dropX, dropY){
         <option value="white">White</option>
       </select>
       <div class="comp-pin-row">
-        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" title="Anode (+)"></div><span class="pin-cap cap-vcc">+</span></div>
-        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_K" title="Cathode (-)"></div><span class="pin-cap cap-gnd">−</span></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" title="Anode (+)" data-i18n-title="pin.anode"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_K" title="Cathode (-)" data-i18n-title="pin.cathode"></div><span class="pin-cap cap-gnd">−</span></div>
       </div>
       <div class="comp-label">LED</div>`;
   } else if (type === 'pot'){
@@ -3812,17 +3877,27 @@ function spawnComponent(type, dropX, dropY){
       <div class="pot-value" id="${id}_val">512</div>
       <div class="comp-pin-row">
         <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
-        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_W" title="Wiper (Signal)"></div><span class="pin-cap cap-sig">SIG</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_W" title="Wiper (Signal)" data-i18n-title="pin.wiperSignal"></div><span class="pin-cap cap-sig">SIG</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
       </div>`;
   } else if (type === 'btn'){
     div.classList.add('comp-btn');
     div.innerHTML = `
       <div class="btn-cap" id="${id}_cap" data-pressed="0"></div>
-      <div class="pin-mini" data-pin="${id}_T1" style="position:absolute; left:-7px; top:26px;" title="Terminal 1"></div>
+      <div class="pin-mini" data-pin="${id}_T1" style="position:absolute; left:-7px; top:26px;" data-i18n-title="comp.btn.termTitle" title="버튼 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)"></div>
       <span class="pin-cap" style="position:absolute; left:-11px; top:44px; color:var(--text-faint);">T1</span>
-      <div class="pin-mini" data-pin="${id}_T2" style="position:absolute; right:-7px; top:26px;" title="Terminal 2"></div>
+      <div class="pin-mini" data-pin="${id}_T2" style="position:absolute; right:-7px; top:26px;" data-i18n-title="comp.btn.termTitle" title="버튼 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)"></div>
       <span class="pin-cap" style="position:absolute; right:-11px; top:44px; color:var(--text-faint);">T2</span>`;
+  } else if (type === 'toggleswitch'){
+    div.classList.add('comp-toggleswitch');
+    div.innerHTML = `
+      <div class="ts-title" data-i18n="comp.toggleswitch.title">토글 스위치</div>
+      <div class="psu-switch" id="${id}_switch" onclick="toggleSwitchClick('${id}')"><div class="knob"></div></div>
+      <div class="ts-state" id="${id}_state" data-i18n="switch.off">OFF (열림)</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_T1" data-i18n-title="comp.toggleswitch.termTitle" title="스위치 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)"></div><span class="pin-cap" style="color:var(--text-faint)">T1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_T2" data-i18n-title="comp.toggleswitch.termTitle" title="스위치 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)"></div><span class="pin-cap" style="color:var(--text-faint)">T2</span></div>
+      </div>`;
   } else if (type === 'scope'){
     div.classList.add('comp-scope');
     div.innerHTML = `
@@ -3916,7 +3991,7 @@ function spawnComponent(type, dropX, dropY){
       <div class="comp-pin-row">
         <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
-        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SIG" title="Signal"></div><span class="pin-cap cap-sig">SIG</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SIG" title="Signal" data-i18n-title="pin.signal"></div><span class="pin-cap cap-sig">SIG</span></div>
       </div>`;
   } else if (type === 'rs485servo'){
     // RS-485(다이나믹셀 스타일) 버스 서보: VCC/GND/DATA 세 선을 그대로 이어받는 IN/OUT 두 포트가
@@ -4010,9 +4085,9 @@ function spawnComponent(type, dropX, dropY){
     div.innerHTML = `
       <div class="rgb-dome" id="${id}_bulb"></div>
       <div class="rgb-pin-row">
-        <div class="pin-col"><div class="pin-mini probe-r" data-pin="${id}_R" title="Red"></div><span class="pin-cap" style="color:#ff6b6b;">R</span></div>
-        <div class="pin-col"><div class="pin-mini probe-g" data-pin="${id}_G" title="Green"></div><span class="pin-cap" style="color:#5ad06a;">G</span></div>
-        <div class="pin-col"><div class="pin-mini probe-b" data-pin="${id}_B" title="Blue"></div><span class="pin-cap" style="color:#5aa9e6;">B</span></div>
+        <div class="pin-col"><div class="pin-mini probe-r" data-pin="${id}_R" title="Red" data-i18n-title="pin.colorR"></div><span class="pin-cap" style="color:#ff6b6b;">R</span></div>
+        <div class="pin-col"><div class="pin-mini probe-g" data-pin="${id}_G" title="Green" data-i18n-title="pin.colorG"></div><span class="pin-cap" style="color:#5ad06a;">G</span></div>
+        <div class="pin-col"><div class="pin-mini probe-b" data-pin="${id}_B" title="Blue" data-i18n-title="pin.colorB"></div><span class="pin-cap" style="color:#5aa9e6;">B</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_GND" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
       </div>
       <div class="comp-label">RGB LED</div>`;
@@ -4447,7 +4522,7 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-mini" data-pin="${id}_VSS" title="VSS (GND)"></div>
         <div class="pin-mini" data-pin="${id}_VDD" title="VDD (5V)"></div>
         <div class="pin-mini" data-pin="${id}_RS" title="RS"></div>
-        <div class="pin-mini" data-pin="${id}_E" title="Enable"></div>
+        <div class="pin-mini" data-pin="${id}_E" title="Enable" data-i18n-title="comp.lcd.eTitle"></div>
         <div class="pin-mini" data-pin="${id}_D4" title="D4"></div>
         <div class="pin-mini" data-pin="${id}_D5" title="D5"></div>
         <div class="pin-mini" data-pin="${id}_D6" title="D6"></div>
@@ -4474,7 +4549,7 @@ function spawnComponent(type, dropX, dropY){
       <div class="pot-value" id="${id}_val">${def.start}${def.unit}</div>
       <div class="comp-pin-row">
         <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
-        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_W" title="Wiper (Signal)"></div><span class="pin-cap cap-sig">SIG</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_W" title="Wiper (Signal)" data-i18n-title="pin.wiperSignal"></div><span class="pin-cap cap-sig">SIG</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
       </div>`;
   } else if (type === 'resistor'){
@@ -4497,8 +4572,8 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="comp-label"><span data-i18n="comp.resistor.label">저항</span> <span class="res-display">220 Ω</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" title="Leg A"></div>
-        <div class="pin-mini" data-pin="${id}_B" title="Leg B"></div>
+        <div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div>
+        <div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div>
       </div>`;
   } else if (type === 'powercable'){
     div.classList.add('comp-powercable', 'resistive-2pin');
@@ -4529,8 +4604,8 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="comp-label"><span data-i18n="comp.capacitor.label">커패시터</span> <span class="cap-display">100 nF</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" title="Leg A"></div>
-        <div class="pin-mini" data-pin="${id}_B" title="Leg B"></div>
+        <div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div>
+        <div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div>
       </div>`;
   } else if (type === 'capacitor-e'){
     div.classList.add('comp-capacitor-e', 'capacitive-2pin');
@@ -4577,8 +4652,8 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="comp-label"><span data-i18n="comp.inductor.label">인덕터</span> <span class="ind-display">10 mH</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" title="Leg A"></div>
-        <div class="pin-mini" data-pin="${id}_B" title="Leg B"></div>
+        <div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div>
+        <div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div>
       </div>`;
   } else if (type === 'relay'){
     div.classList.add('comp-relay');
@@ -4843,6 +4918,17 @@ function populateBreadboard(container, bbId){
 /* ============ Bluetooth / WiFi AP / PSU controls ============ */
 function togglePsu(id){
   document.getElementById(`${id}_switch`).classList.toggle('on');
+}
+// 토글 스위치: 누를 때마다 ON/OFF가 계속 유지됩니다(푸시 버튼과 달리 손을 떼도 상태가 그대로
+// 남음). 실제 접점 개폐는 toggleSwitchContactEdges()가 resistiveEdges()/buildAcNetworkGraph()/
+// acReachablePsu() 세 곳 모두에 가상 0Ω(닫힘)/개방(열림) 엣지로 반영합니다 — 릴레이 접점과
+// 완전히 같은 방식이라, 보드 없이 배터리+LED+스위치만으로도 실제로 켜고 끌 수 있습니다.
+function toggleSwitchClick(id){
+  const sw = document.getElementById(`${id}_switch`);
+  if (!sw) return;
+  sw.classList.toggle('on');
+  const label = document.getElementById(`${id}_state`);
+  if (label) label.textContent = sw.classList.contains('on') ? tr('switch.on') : tr('switch.off');
 }
 function toggleBtRemote(id){
   const el = document.getElementById(id);
@@ -5122,6 +5208,21 @@ function relayContactEdges(){
     if (!com) return;
     if (energized && no) out.push({ legA: com, legB: no, ohms: 0 });
     if (!energized && nc) out.push({ legA: com, legB: nc, ohms: 0 });
+  });
+  return out;
+}
+// 토글 스위치(comp-toggleswitch)의 T1-T2를 릴레이 접점과 완전히 같은 방식의 가상 0Ω(ON)/
+// 개방(OFF) 엣지로 변환합니다. 스위치 상태는 별도 dataset 없이 그냥 .psu-switch 손잡이의
+// 'on' 클래스로만 판정합니다(psu 전원 스위치와 동일한 관례 — 프로젝트 저장/불러오기도
+// "_switch"로 끝나는 id는 자동으로 이 클래스를 저장/복원해 주므로 별도 처리가 필요 없습니다).
+function toggleSwitchContactEdges(){
+  const out = [];
+  document.querySelectorAll('.comp-toggleswitch').forEach(el => {
+    const sw = el.querySelector('.psu-switch');
+    if (!sw || !sw.classList.contains('on')) return;
+    const t1 = el.querySelector('[data-pin$="_T1"]');
+    const t2 = el.querySelector('[data-pin$="_T2"]');
+    if (t1 && t2) out.push({ legA: t1, legB: t2, ohms: 0 });
   });
   return out;
 }
@@ -6343,7 +6444,7 @@ function resistiveEdges(){
     const legB = el.querySelector('[data-pin$="_B"]');
     return { legA, legB, ohms: 0 };
   }).filter(e => e.legA && e.legB);
-  return base.concat(relayContactEdges(), motorCtrlContactEdges(), transistorContactEdges(), inductorEdges);
+  return base.concat(relayContactEdges(), motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges(), inductorEdges);
 }
 // startPinEl의 net(대표 원소로 관리)에서 출발해 저항 엣지를 하나씩 건너며 도달 가능한 모든
 // net과 "그 net까지의 최소 누적 저항"을 구합니다. 회로 규모가 매우 작으므로(교육용 시뮬레이터)
@@ -6567,7 +6668,7 @@ function buildAcNetworkGraph(){
     const farads = Math.max(0, parseFloat(el.dataset.farads || '0')) || 0;
     edges.push({ i: nodeIdFor(a), j: nodeIdFor(b), type: 'C', value: farads, ref: el });
   });
-  relayContactEdges().concat(motorCtrlContactEdges(), transistorContactEdges()).forEach(e => {
+  relayContactEdges().concat(motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges()).forEach(e => {
     if (!e.legA || !e.legB) return;
     edges.push({ i: nodeIdFor(e.legA), j: nodeIdFor(e.legB), type: 'R', value: 0, ref: null });
   });
@@ -6789,7 +6890,7 @@ function acReachablePsu(startEl){
     const a = el.querySelector('[data-pin$="_A"]'), b = el.querySelector('[data-pin$="_B"]');
     if (a && b) allEdgePins.push([a, b]);
   });
-  relayContactEdges().concat(motorCtrlContactEdges(), transistorContactEdges()).forEach(e => { if (e.legA && e.legB) allEdgePins.push([e.legA, e.legB]); });
+  relayContactEdges().concat(motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges()).forEach(e => { if (e.legA && e.legB) allEdgePins.push([e.legA, e.legB]); });
 
   const seenNets = [netOf(startEl)];
   let idx = 0;
@@ -8083,6 +8184,40 @@ function closeBoardPopup(board){
   const p = document.getElementById(`popup${board.toUpperCase()}`);
   if (p) p.hidden = true;
 }
+// 코드 에디터 팝업 최대화/원래크기 토글 — 처음 최대화하는 순간의 위치·크기를 그 팝업의
+// dataset에 저장해 두고, 되돌릴 때 그 값을 그대로 복원합니다(사용자가 드래그로 옮기거나
+// 모서리로 늘려둔 크기가 있었다면 그 크기로 정확히 돌아옵니다). 최대화 중에는 리사이즈
+// 손잡이와 헤더 드래그를 잠시 막아, 크기가 화면 가득 찬 상태와 사용자의 드래그/리사이즈가
+// 서로 충돌하지 않게 합니다.
+function toggleBoardPopupMaximize(board){
+  const KEY = board.toUpperCase();
+  const p = document.getElementById(`popup${KEY}`);
+  if (!p) return;
+  const btn = document.getElementById(`maxBtn${KEY}`);
+  if (p.classList.contains('maximized')){
+    p.classList.remove('maximized');
+    p.style.left = p.dataset.preMaxLeft || '';
+    p.style.top = p.dataset.preMaxTop || '';
+    p.style.width = p.dataset.preMaxWidth || '';
+    p.style.height = p.dataset.preMaxHeight || '';
+    p.style.resize = 'both';
+    if (btn){ btn.textContent = '⛶'; btn.title = tr('popup.maximizeTitle'); btn.dataset.i18nTitle = 'popup.maximizeTitle'; }
+  } else {
+    const rect = p.getBoundingClientRect();
+    p.dataset.preMaxLeft = p.style.left || (rect.left + 'px');
+    p.dataset.preMaxTop = p.style.top || (rect.top + 'px');
+    p.dataset.preMaxWidth = p.style.width || (rect.width + 'px');
+    p.dataset.preMaxHeight = p.style.height || (rect.height + 'px');
+    p.classList.add('maximized');
+    p.style.left = '2vw';
+    p.style.top = '2vh';
+    p.style.width = '96vw';
+    p.style.height = '92vh';
+    p.style.resize = 'none';
+    if (btn){ btn.textContent = '🗗'; btn.title = tr('popup.restoreTitle'); btn.dataset.i18nTitle = 'popup.restoreTitle'; }
+  }
+  p.style.zIndex = ++popupZTop;
+}
 // 툴바의 "코드 에디터 & 컴파일러" 버튼: R4가 이제 처음부터 캔버스에 있지 않으므로, 없으면
 // 먼저 만들어준 뒤 그 팝업을 엽니다.
 function openMainEditor(){
@@ -8096,6 +8231,7 @@ function makePopupDraggable(popup){
   let dragging = false, offX = 0, offY = 0;
   handle.addEventListener('mousedown', (e) => {
     if (e.target.closest('button')) return;
+    if (popup.classList.contains('maximized')) return; // 최대화 중엔 드래그로 옮기지 않음
     dragging = true;
     popup.style.zIndex = ++popupZTop;
     const rect = popup.getBoundingClientRect();
@@ -8267,7 +8403,13 @@ function buildBoardPopupHTML(key, type){
         <button class="btn ghost" onclick="runCodeExample('${key}','api_vs_register')">${tr('popup.exApiVsReg')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','port_full')">${tr('popup.exPortFullR3')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>
-        <button class="btn ghost" onclick="runCodeExample('${key}','stepper')">${tr('popup.exStepper')}</button>`;
+        <div class="example-section-label">${tr('popup.motorSectionTitle')}</div>
+        <button class="btn ghost" onclick="runCodeExample('${key}','dcmotor')">${tr('popup.exDcMotor')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','servo')">${tr('popup.exServo')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','encoder')">${tr('popup.exEncoder')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','stepper')">${tr('popup.exStepper')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','acmotor')">${tr('popup.exAcMotor')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','rs485_servo_single')">${tr('popup.exRs485Motor')}</button>`;
   } else if (isEsp32){
     // 보드 종류(DevKit/디스플레이/터치)에 맞는 예제 목록 배열을 그대로 재사용해, 갤러리 탭과
     // 팝업의 빠른 실행 버튼이 항상 같은 예제 세트를 보여주게 합니다.
@@ -8280,7 +8422,13 @@ function buildBoardPopupHTML(key, type){
     extraButtons = `<button class="btn ghost" onclick="runCodeExample('${key}','analog')">${tr('popup.exAnalog')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','port_wide')">${tr('popup.exPortWideR4')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>
-        <button class="btn ghost" onclick="runCodeExample('${key}','stepper')">${tr('popup.exStepper')}</button>`;
+        <div class="example-section-label">${tr('popup.motorSectionTitle')}</div>
+        <button class="btn ghost" onclick="runCodeExample('${key}','dcmotor')">${tr('popup.exDcMotor')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','servo')">${tr('popup.exServo')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','encoder')">${tr('popup.exEncoder')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','stepper')">${tr('popup.exStepper')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','acmotor')">${tr('popup.exAcMotor')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','rs485_servo_single')">${tr('popup.exRs485Motor')}</button>`;
   }
   const ledPinValue = isEsp32 ? 'const int ledPin = 2;' : 'const int ledPin = 13;';
   const defaultCode = `// ${label}${suffix} sketch\nint count = 0;\n${ledPinValue}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Board ${key} Tick: ");\n  Serial.println(count);\n  delay(200);\n}`;
@@ -8302,6 +8450,7 @@ function buildBoardPopupHTML(key, type){
         <button class="btn ghost export-btn" onclick="exportBoardCode('${key}','c')">.c</button>
         <button class="btn ghost export-btn" onclick="exportBoardCode('${key}','txt')">.txt</button>
       </div>
+      <button class="btn ghost popup-max-btn" id="maxBtn${KEY}" onclick="toggleBoardPopupMaximize('${key}')" data-i18n-title="popup.maximizeTitle" title="${tr('popup.maximizeTitle')}">⛶</button>
       <button class="btn ghost" onclick="closeBoardPopup('${key}')" data-i18n="popup.close">닫기 ✕</button>
     </div>
     <div class="compile-progress" id="progress${KEY}"></div>
@@ -8498,6 +8647,33 @@ function loadExampleCode(board, type){
     editor.value = currentLang === 'en'
       ? `// Turn a bipolar stepper motor through an A4988 driver: every STEP pulse moves it\n// one step, and DIR sets the rotation direction. This simulator counts one step per\n// rising edge (LOW->HIGH) on STEP, just like a real A4988.\n//\n// Wiring in the simulator (already placed and wired for you by this example):\n//   Board ${P.vcc}    -> A4988 VDD  (logic power)\n//   Board GND   -> A4988 GND\n//   Board ${P.step}  -> A4988 STEP\n//   Board ${P.dir} -> A4988 DIR\n//   A4988 EN    -> GND (tied LOW so the driver stays enabled -- leaving EN\n//                  unconnected leaves the driver DISABLED in this simulator,\n//                  same lesson as a real A4988 with a floating EN pin)\n//   12V PSU     -> A4988 VMOT/GND (motor power, kept separate from board power)\n//   A4988 1A/1B/2A/2B -> Stepper motor 1A/1B/2A/2B (its two coils)\n//\n// MS1/MS2/MS3 are left unconnected, so the driver runs in full-step mode\n// (1.8 degrees/step -> 200 steps per full revolution).\n\nconst int stepPin = ${stepNum};\nconst int dirPin = ${dirNum};\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(stepPin, OUTPUT);\n  pinMode(dirPin, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(dirPin, HIGH); // clockwise\n  Serial.println("Rotating 90 deg clockwise (50 steps)...");\n  for (int i = 0; i < 50; i++) {\n    digitalWrite(stepPin, HIGH);\n    delay(5);\n    digitalWrite(stepPin, LOW);\n    delay(5);\n  }\n  delay(600);\n\n  digitalWrite(dirPin, LOW); // counter-clockwise\n  Serial.println("Rotating 90 deg counter-clockwise (50 steps)...");\n  for (int i = 0; i < 50; i++) {\n    digitalWrite(stepPin, HIGH);\n    delay(5);\n    digitalWrite(stepPin, LOW);\n    delay(5);\n  }\n  delay(600);\n}`
       : `// A4988 드라이버로 바이폴라 스텝모터를 돌리는 예제: STEP 핀에 펄스가 한 번(상승 엣지,\n// LOW->HIGH) 들어올 때마다 한 스텝씩 움직이고, DIR 핀으로 회전 방향을 정합니다. 이\n// 시뮬레이터도 실제 A4988처럼 STEP의 상승 엣지 1번을 스텝 1번으로 셉니다.\n//\n// 시뮬레이터 배선(이 예제를 누르면 자동으로 배치·배선됩니다):\n//   보드 ${P.vcc}    -> A4988 VDD  (로직 전원)\n//   보드 GND   -> A4988 GND\n//   보드 ${P.step}  -> A4988 STEP\n//   보드 ${P.dir} -> A4988 DIR\n//   A4988 EN    -> GND (LOW로 묶어 드라이버를 계속 활성 상태로 유지 -- EN을 연결하지\n//                  않으면 이 시뮬레이터에서는 드라이버가 비활성 상태가 됩니다. 실제\n//                  A4988도 EN이 플로팅이면 동작이 불안정해지는 것과 같은 교훈입니다)\n//   12V 전원    -> A4988 VMOT/GND (모터 전원 — 보드 전원과 분리)\n//   A4988 1A/1B/2A/2B -> 스텝모터 1A/1B/2A/2B (두 코일)\n//\n// MS1/MS2/MS3은 일부러 연결하지 않아 풀스텝 모드로 동작합니다\n// (한 스텝 = 1.8도, 한 바퀴 = 200스텝).\n\nconst int stepPin = ${stepNum};\nconst int dirPin = ${dirNum};\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(stepPin, OUTPUT);\n  pinMode(dirPin, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(dirPin, HIGH); // 시계방향\n  Serial.println("시계방향으로 90도(50스텝) 회전...");\n  for (int i = 0; i < 50; i++) {\n    digitalWrite(stepPin, HIGH);\n    delay(5);\n    digitalWrite(stepPin, LOW);\n    delay(5);\n  }\n  delay(600);\n\n  digitalWrite(dirPin, LOW); // 반시계방향\n  Serial.println("반시계방향으로 90도(50스텝) 회전...");\n  for (int i = 0; i < 50; i++) {\n    digitalWrite(stepPin, HIGH);\n    delay(5);\n    digitalWrite(stepPin, LOW);\n    delay(5);\n  }\n  delay(600);\n}`;
+  } else if (type === 'dcmotor'){
+    const P = PERIPH_PINS[board] || PERIPH_PINS.r4;
+    const in1Num = P.in1.replace(/^(D|GPIO)/, '');
+    const enaNum = P.ena.replace(/^(D|GPIO)/, '');
+    editor.value = currentLang === 'en'
+      ? `// Control a DC motor through an L298N driver: IN1 sets the rotation direction and\n// ENA (PWM) sets the speed. This simulator reads ENA's PWM duty (0~255 -> 0~100%)\n// as speed and IN1's HIGH/LOW as direction, exactly like the real L298N.\n//\n// Wiring in the simulator (already placed and wired for you by this example):\n//   Board ${P.in1}  -> L298N IN1  (direction)\n//   Board ${P.ena}  -> L298N ENA  (speed, PWM)\n//   12V PSU   -> L298N motor power (VCC/GND, kept separate from board power)\n//   L298N GND -> Board GND (common ground, required for the logic signals)\n//   L298N OUT1/OUT2 -> DC motor terminals (no polarity)\n\nconst int in1Pin = ${in1Num};\nconst int enaPin = ${enaNum};\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(in1Pin, OUTPUT);\n}\n\nvoid loop() {\n  Serial.println("Forward, ramping up...");\n  digitalWrite(in1Pin, HIGH);\n  for (int pwm = 0; pwm <= 255; pwm += 5) {\n    analogWrite(enaPin, pwm);\n    delay(40);\n  }\n  delay(500);\n\n  Serial.println("Switching to reverse, ramping up...");\n  digitalWrite(in1Pin, LOW);\n  for (int pwm = 0; pwm <= 255; pwm += 5) {\n    analogWrite(enaPin, pwm);\n    delay(40);\n  }\n  delay(500);\n\n  analogWrite(enaPin, 0); // stop\n  delay(500);\n}`
+      : `// L298N 드라이버로 DC 모터를 제어하는 예제: IN1으로 회전 방향을, ENA(PWM)로 속도를\n// 정합니다. 이 시뮬레이터는 실제 L298N처럼 ENA의 PWM 듀티(0~255 -> 0~100%)를 속도로,\n// IN1의 HIGH/LOW를 방향으로 읽습니다.\n//\n// 시뮬레이터 배선(이 예제를 누르면 자동으로 배치·배선됩니다):\n//   보드 ${P.in1}  -> L298N IN1  (방향)\n//   보드 ${P.ena}  -> L298N ENA  (속도, PWM)\n//   12V 전원  -> L298N 모터 전원(VCC/GND) — 보드 전원과 분리\n//   L298N GND -> 보드 GND (로직 신호가 정상 인식되려면 반드시 필요한 공통 접지)\n//   L298N OUT1/OUT2 -> DC 모터 단자(극성 무관)\n\nconst int in1Pin = ${in1Num};\nconst int enaPin = ${enaNum};\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(in1Pin, OUTPUT);\n}\n\nvoid loop() {\n  Serial.println("정방향, 서서히 가속...");\n  digitalWrite(in1Pin, HIGH);\n  for (int pwm = 0; pwm <= 255; pwm += 5) {\n    analogWrite(enaPin, pwm);\n    delay(40);\n  }\n  delay(500);\n\n  Serial.println("역방향으로 전환, 서서히 가속...");\n  digitalWrite(in1Pin, LOW);\n  for (int pwm = 0; pwm <= 255; pwm += 5) {\n    analogWrite(enaPin, pwm);\n    delay(40);\n  }\n  delay(500);\n\n  analogWrite(enaPin, 0); // 정지\n  delay(500);\n}`;
+  } else if (type === 'servo'){
+    const P = PERIPH_PINS[board] || PERIPH_PINS.r4;
+    const sigNum = P.servoSig.replace(/^(D|GPIO)/, '');
+    editor.value = currentLang === 'en'
+      ? `// Servo motor angle control. This simulator doesn't implement the Servo.h library --\n// instead it reads the SIG pin's PWM duty from analogWrite(pin, 0~255) and maps it\n// directly to an angle of 0~180 degrees (0 -> 0 deg, 255 -> 180 deg).\n\nconst int servoPin = ${sigNum};\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  for (int angle = 0; angle <= 180; angle += 10) {\n    int pwm = map(angle, 0, 180, 0, 255);\n    analogWrite(servoPin, pwm);\n    Serial.print("Angle: "); Serial.println(angle);\n    delay(150);\n  }\n  delay(400);\n  for (int angle = 180; angle >= 0; angle -= 10) {\n    int pwm = map(angle, 0, 180, 0, 255);\n    analogWrite(servoPin, pwm);\n    Serial.print("Angle: "); Serial.println(angle);\n    delay(150);\n  }\n  delay(400);\n}`
+      : `// 서보모터 각도 제어 예제. 이 시뮬레이터는 Servo.h 라이브러리 대신, SIG 핀에\n// analogWrite(핀, 0~255)로 준 PWM 듀티를 그대로 0~180도로 환산해서 보여줍니다\n// (0 -> 0도, 255 -> 180도).\n\nconst int servoPin = ${sigNum};\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  for (int angle = 0; angle <= 180; angle += 10) {\n    int pwm = map(angle, 0, 180, 0, 255);\n    analogWrite(servoPin, pwm);\n    Serial.print("각도: "); Serial.println(angle);\n    delay(150);\n  }\n  delay(400);\n  for (int angle = 180; angle >= 0; angle -= 10) {\n    int pwm = map(angle, 0, 180, 0, 255);\n    analogWrite(servoPin, pwm);\n    Serial.print("각도: "); Serial.println(angle);\n    delay(150);\n  }\n  delay(400);\n}`;
+  } else if (type === 'encoder'){
+    const P = PERIPH_PINS[board] || PERIPH_PINS.r4;
+    const in1Num = P.in1.replace(/^(D|GPIO)/, '');
+    const enaNum = P.ena.replace(/^(D|GPIO)/, '');
+    const encaNum = P.encA.replace(/^(D|GPIO)/, '');
+    editor.value = currentLang === 'en'
+      ? `// Drives a DC motor via L298N while counting rising edges on the encoder's A-phase\n// pulse (ENCA) to measure rotation speed in Hz (pulses per second), read back once\n// per second.\n\nconst int in1Pin = ${in1Num};\nconst int enaPin = ${enaNum};\nconst int encaPin = ${encaNum};\n\nunsigned long pulseCount = 0;\nint lastEnca = LOW;\nunsigned long lastMeasureMs = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(in1Pin, OUTPUT);\n  pinMode(encaPin, INPUT);\n  digitalWrite(in1Pin, HIGH);\n  analogWrite(enaPin, 180); // start at about 70% speed\n}\n\nvoid loop() {\n  int enca = digitalRead(encaPin);\n  if (enca == HIGH && lastEnca == LOW) pulseCount++;\n  lastEnca = enca;\n\n  if (millis() - lastMeasureMs >= 1000) {\n    Serial.print("Encoder speed: ");\n    Serial.print(pulseCount);\n    Serial.println(" Hz");\n    pulseCount = 0;\n    lastMeasureMs = millis();\n  }\n}`
+      : `// L298N으로 DC 모터를 구동하면서, 엔코더 A상 펄스(ENCA)의 상승 엣지 개수를 세어\n// 1초마다 회전 속도(Hz = 초당 펄스 수)를 계산하는 예제.\n\nconst int in1Pin = ${in1Num};\nconst int enaPin = ${enaNum};\nconst int encaPin = ${encaNum};\n\nunsigned long pulseCount = 0;\nint lastEnca = LOW;\nunsigned long lastMeasureMs = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(in1Pin, OUTPUT);\n  pinMode(encaPin, INPUT);\n  digitalWrite(in1Pin, HIGH);\n  analogWrite(enaPin, 180); // 약 70% 속도로 회전 시작\n}\n\nvoid loop() {\n  int enca = digitalRead(encaPin);\n  if (enca == HIGH && lastEnca == LOW) pulseCount++;\n  lastEnca = enca;\n\n  if (millis() - lastMeasureMs >= 1000) {\n    Serial.print("엔코더 속도: ");\n    Serial.print(pulseCount);\n    Serial.println(" Hz");\n    pulseCount = 0;\n    lastMeasureMs = millis();\n  }\n}`;
+  } else if (type === 'acmotor'){
+    const P = PERIPH_PINS[board] || PERIPH_PINS.r4;
+    const relayNum = P.relayIn.replace(/^(D|GPIO)/, '');
+    editor.value = currentLang === 'en'
+      ? `// Drive a 5V relay to switch a real AC 220V motor on and off. Same wiring principle\n// as the "220V load via relay" example, but the load here is a spinning AC motor\n// instead of a plain resistor.\n\nconst int relayPin = ${relayNum};\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(relayPin, OUTPUT);\n  digitalWrite(relayPin, LOW);\n}\n\nvoid loop() {\n  Serial.println("Motor ON");\n  digitalWrite(relayPin, HIGH);\n  delay(3000);\n\n  Serial.println("Motor OFF");\n  digitalWrite(relayPin, LOW);\n  delay(3000);\n}`
+      : `// 5V 릴레이로 실제 AC 220V 모터를 껐다 켰다 하는 예제. '릴레이로 220V 부하 스위칭'\n// 예제와 배선 원리는 같지만, 부하가 저항이 아니라 실제로 회전하는 AC 모터입니다.\n\nconst int relayPin = ${relayNum};\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(relayPin, OUTPUT);\n  digitalWrite(relayPin, LOW);\n}\n\nvoid loop() {\n  Serial.println("모터 ON");\n  digitalWrite(relayPin, HIGH);\n  delay(3000);\n\n  Serial.println("모터 OFF");\n  digitalWrite(relayPin, LOW);\n  delay(3000);\n}`;
   } else if (type === 'wifi_ap_msg'){
     editor.value = currentLang === 'en'
       ? `// Receives the signal(SIG, D2) sent by the Wireless AP component. While the AP is\n// powered on, its SIG pin toggles HIGH/LOW roughly every 0.4s -- this simulator does\n// not implement a real Wi-Fi (802.11) protocol stack, so "the AP sends, R4 receives"\n// is simplified down to a single digital pulse.\n\nconst int apSigPin = 2;\nconst int ledPin = 13;\nint lastState = LOW;\nint msgCount = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(apSigPin, INPUT);\n  pinMode(ledPin, OUTPUT);\n  Serial.println("R4: waiting for Wireless AP signal...");\n}\n\nvoid loop() {\n  int state = digitalRead(apSigPin);\n  if (state == HIGH && lastState == LOW) {\n    msgCount++;\n    digitalWrite(ledPin, !digitalRead(ledPin)); // flip the LED on every message (visual indicator)\n    Serial.print("[WiFi AP message received] #");\n    Serial.println(msgCount);\n  }\n  lastState = state;\n  delay(50);\n}`
@@ -8629,7 +8805,7 @@ function loadExampleCode(board, type){
 
 /* ============ BOM (Bill of Materials) list ============ */
 function BOM_LABELS_FN(){ return {
-  led: 'LED', pot: tr('bom.pot'), btn: tr('bom.btn'), scope: tr('bom.scope'),
+  led: 'LED', pot: tr('bom.pot'), btn: tr('bom.btn'), toggleswitch: tr('bom.toggleswitch'), scope: tr('bom.scope'),
   rgbled: tr('bom.rgbled'), psu: tr('comp.psu.title'), breadboard: tr('bom.breadboard'),
   btmodule: tr('bom.btmodule'), wifiap: tr('bom.wifiap'), dac: tr('comp.dac.title').replace(/<br>.*/,'').trim(),
   ultrasonic: tr('bom.ultrasonic'), gyro: tr('bom.gyro'), accel: tr('bom.accel'), servo: tr('comp.servo.label'), rs485servo: tr('comp.rs485servo.label'), canmodule: tr('comp.canmodule.title'), canfdmodule: tr('comp.canfdmodule.title'), dcmotor: tr('comp.dcmotor.label'),
@@ -9349,6 +9525,138 @@ function wireStepperExample(board, key){
   taggedWire(key, document.querySelector(`#${driver} [data-pin$="_2B"]`), document.querySelector(`#${motor} [data-pin$="_2B"]`));
   document.getElementById(`${psu}_switch`).click();
 }
+
+// R3/R4 예제: DC모터 + L298N 드라이버 — IN1(방향)·ENA(PWM 속도)를 보드 디지털 핀으로 직접
+// 제어합니다. runPeripheralExample()의 5번 항목(모터+드라이버)과 같은 배선이지만, 이 예제는
+// 그것만 단독으로 떼어내 방향 전환·가속을 눈으로 보여주는 코드와 함께 제공합니다.
+function wireDcMotorExample(board, key){
+  if (!boardInstances[board]) spawnBoard(board);
+  const boardEl = document.getElementById(boardDomId[board]);
+  if (!boardEl) return;
+  const pos = elCanvasPos(boardEl);
+  const P = PERIPH_PINS[board];
+  const COL1 = pos.x + 640, COL2 = pos.x + 800, COL3 = pos.x + 960;
+  let gi = 0;
+  const nextGnd = () => boardEl.querySelector(`[data-pin="${P.gnds[gi++ % P.gnds.length]}"]`);
+  const in1Pin = boardEl.querySelector(`[data-pin="${P.in1}"]`);
+  const enaPin = boardEl.querySelector(`[data-pin="${P.ena}"]`);
+
+  const motor = placeExp('dcmotor', key, COL1, pos.y + 20);
+  const driver = placeExp('motordriver', key, COL2, pos.y + 20);
+  const psu = placeExp('psu', key, COL3, pos.y + 20);
+  document.querySelector(`#${psu} .psu-dc-volt`).value = '12';
+
+  taggedWire(key, document.querySelector(`#${psu} [data-pin$="_V"]`), document.querySelector(`#${driver} [data-pin$="_V"]`));
+  taggedWire(key, document.querySelector(`#${psu} [data-pin$="_G"]`), document.querySelector(`#${driver} [data-pin$="_G"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_G"]`), nextGnd()); // 공통 접지
+  taggedWire(key, in1Pin, document.querySelector(`#${driver} [data-pin$="_IN1"]`));
+  taggedWire(key, enaPin, document.querySelector(`#${driver} [data-pin$="_ENA"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_OUT1"]`), document.querySelector(`#${motor} [data-pin$="_TA"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_OUT2"]`), document.querySelector(`#${motor} [data-pin$="_TB"]`));
+  document.getElementById(`${psu}_switch`).click();
+}
+
+// R3/R4 예제: 서보모터 — 이 시뮬레이터는 Servo 라이브러리 대신, SIG 핀의 PWM 듀티(analogWrite
+// 0~255)를 그대로 0~180도로 환산해서 보여줍니다(7761번째 줄의 서보 각도 갱신 로직 참고).
+function wireServoExample(board, key){
+  if (!boardInstances[board]) spawnBoard(board);
+  const boardEl = document.getElementById(boardDomId[board]);
+  if (!boardEl) return;
+  const pos = elCanvasPos(boardEl);
+  const P = PERIPH_PINS[board];
+  const COL1 = pos.x + 640;
+  let gi = 0;
+  const nextGnd = () => boardEl.querySelector(`[data-pin="${P.gnds[gi++ % P.gnds.length]}"]`);
+  const vccPin = boardEl.querySelector(`[data-pin="${P.vcc}"]`);
+  const sigPin = boardEl.querySelector(`[data-pin="${P.servoSig}"]`);
+
+  const servo = placeExp('servo', key, COL1, pos.y + 20);
+  taggedWire(key, vccPin, document.querySelector(`#${servo} [data-pin$="_V"]`));
+  taggedWire(key, document.querySelector(`#${servo} [data-pin$="_G"]`), nextGnd());
+  taggedWire(key, sigPin, document.querySelector(`#${servo} [data-pin$="_SIG"]`));
+}
+
+// R3/R4 예제: DC모터 + 엔코더 — L298N으로 구동하면서, 엔코더 A상 펄스(ENCA)를 보드 디지털
+// 입력 핀으로 되읽어 회전 속도(Hz)를 피드백으로 확인합니다.
+function wireEncoderExample(board, key){
+  if (!boardInstances[board]) spawnBoard(board);
+  const boardEl = document.getElementById(boardDomId[board]);
+  if (!boardEl) return;
+  const pos = elCanvasPos(boardEl);
+  const P = PERIPH_PINS[board];
+  const COL1 = pos.x + 640, COL2 = pos.x + 800, COL3 = pos.x + 960;
+  let gi = 0;
+  const nextGnd = () => boardEl.querySelector(`[data-pin="${P.gnds[gi++ % P.gnds.length]}"]`);
+  const in1Pin = boardEl.querySelector(`[data-pin="${P.in1}"]`);
+  const enaPin = boardEl.querySelector(`[data-pin="${P.ena}"]`);
+  const encAPin = boardEl.querySelector(`[data-pin="${P.encA}"]`);
+
+  const motor = placeExp('dcmotor-enc', key, COL1, pos.y + 20);
+  const driver = placeExp('motordriver', key, COL2, pos.y + 20);
+  const psu = placeExp('psu', key, COL3, pos.y + 20);
+  document.querySelector(`#${psu} .psu-dc-volt`).value = '12';
+
+  taggedWire(key, document.querySelector(`#${psu} [data-pin$="_V"]`), document.querySelector(`#${driver} [data-pin$="_V"]`));
+  taggedWire(key, document.querySelector(`#${psu} [data-pin$="_G"]`), document.querySelector(`#${driver} [data-pin$="_G"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_G"]`), nextGnd()); // 공통 접지
+  taggedWire(key, in1Pin, document.querySelector(`#${driver} [data-pin$="_IN1"]`));
+  taggedWire(key, enaPin, document.querySelector(`#${driver} [data-pin$="_ENA"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_OUT1"]`), document.querySelector(`#${motor} [data-pin$="_TA"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_OUT2"]`), document.querySelector(`#${motor} [data-pin$="_TB"]`));
+  taggedWire(key, encAPin, document.querySelector(`#${motor} [data-pin$="_ENCA"]`));
+  taggedWire(key, document.querySelector(`#${motor} [data-pin$="_ENCG"]`), nextGnd());
+  document.getElementById(`${psu}_switch`).click();
+}
+
+// R3/R4 예제: AC 모터 — 5V 릴레이로 AC 220V 모터를 ON/OFF. 기존 'relay' 예제(부하=저항)와
+// 배선 원리는 같지만, 부하가 실제로 회전하는 AC 모터라는 점이 다릅니다.
+function wireAcMotorExample(board, key){
+  if (!boardInstances[board]) spawnBoard(board);
+  const boardEl = document.getElementById(boardDomId[board]);
+  if (!boardEl) return;
+  const pos = elCanvasPos(boardEl);
+  const P = PERIPH_PINS[board];
+  const COL1 = pos.x + 640, COL2 = pos.x + 800, COL3 = pos.x + 960;
+  let gi = 0;
+  const nextGnd = () => boardEl.querySelector(`[data-pin="${P.gnds[gi++ % P.gnds.length]}"]`);
+  const vccPin = boardEl.querySelector(`[data-pin="${P.vcc}"]`);
+  const relayInPin = boardEl.querySelector(`[data-pin="${P.relayIn}"]`);
+
+  const relay = placeExp('relay', key, COL1, pos.y + 20);
+  const motor = placeExp('acmotor', key, COL2, pos.y + 20);
+  const psu = placeExp('psu', key, COL3, pos.y + 20);
+  document.querySelector(`#${psu} .psu-mode`).value = 'ac1';
+  psuModeChanged(psu);
+
+  taggedWire(key, vccPin, document.querySelector(`#${relay} [data-pin$="_VCC"]`));
+  taggedWire(key, document.querySelector(`#${relay} [data-pin$="_GND"]`), nextGnd());
+  taggedWire(key, relayInPin, document.querySelector(`#${relay} [data-pin$="_IN"]`));
+  const psuL = document.querySelector(`#${psu} [data-pin$="_L"]`);
+  const psuN = document.querySelector(`#${psu} [data-pin$="_N"]`);
+  taggedWire(key, psuL, document.querySelector(`#${relay} [data-pin$="_COM"]`));
+  taggedWire(key, document.querySelector(`#${relay} [data-pin$="_NO"]`), document.querySelector(`#${motor} [data-pin$="_L"]`));
+  taggedWire(key, document.querySelector(`#${motor} [data-pin$="_N"]`), psuN);
+  document.getElementById(`${psu}_switch`).click();
+}
+
+// R3/R4 예제: RS-485 버스 서보모터 — 통신 실험 갤러리의 runRs485ServoSingleExample()과
+// 같은 배선(데이터 핀 1개 + VCC/GND)을 이 예제 전용으로 재사용합니다.
+function wireRs485MotorExample(board, key){
+  if (!boardInstances[board]) spawnBoard(board);
+  const boardEl = document.getElementById(boardDomId[board]);
+  if (!boardEl) return;
+  const pos = elCanvasPos(boardEl);
+  const s1 = placeExp('rs485servo', key, pos.x + 640, pos.y + 20);
+  const pins = RS485_SINGLE_PINS[board] || RS485_SINGLE_PINS.r4;
+  const sig = boardEl.querySelector(`[data-pin="${pins.sig}"]`);
+  const v = boardEl.querySelector(`[data-pin="${pins.v}"]`);
+  const g = boardEl.querySelector(`[data-pin="${pins.g}"]`);
+  if (sig && v && g){
+    taggedWire(key, v, document.querySelector(`#${s1} [data-pin$="_V1"]`));
+    taggedWire(key, g, document.querySelector(`#${s1} [data-pin$="_G1"]`));
+    taggedWire(key, sig, document.querySelector(`#${s1} [data-pin$="_D1"]`));
+  }
+}
 function runCodeExample(board, key){
   // 기본 내장 보드(r4/r3)의 예제를 고르면 "예제만 새로" 보이도록 캔버스를 완전히 비우고
   // 시작합니다. 사용자가 직접 여러 대 추가해 둔 보드(r4_2, r3_2, ...)는 예제 갤러리의 대상이
@@ -9363,6 +9671,16 @@ function runCodeExample(board, key){
     wirePortControlLeds(board, key, ['D2','D3','D4','D5','D6','D7']);
   } else if (key === 'stepper'){
     wireStepperExample(board, key);
+  } else if (key === 'dcmotor'){
+    wireDcMotorExample(board, key);
+  } else if (key === 'servo'){
+    wireServoExample(board, key);
+  } else if (key === 'encoder'){
+    wireEncoderExample(board, key);
+  } else if (key === 'acmotor'){
+    wireAcMotorExample(board, key);
+  } else if (key === 'rs485_servo_single'){
+    wireRs485MotorExample(board, key);
   }
   loadExampleCode(board, key);
   openBoardPopup(board);
@@ -9877,11 +10195,11 @@ function runRs485ServoChainExample(){
 // 보드별 핀 배치가 서로 달라서(R3/R4는 D번호, ESP32는 GPIO번호 + GND/VCC 핀이 하나뿐) 보드
 // 종류에 따라 쓸 핀 이름을 따로 정리해 둡니다.
 const PERIPH_PINS = {
-  r3:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12' },
-  r4:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12' },
-  esp32b: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15' },
-  esp32d: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15' },
-  esp32t: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15' },
+  r3:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12', servoSig: 'D9', encA: 'D3', relayIn: 'D7' },
+  r4:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12', servoSig: 'D9', encA: 'D3', relayIn: 'D7' },
+  esp32b: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15', servoSig: 'GPIO22', encA: 'GPIO21', relayIn: 'GPIO16' },
+  esp32d: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15', servoSig: 'GPIO22', encA: 'GPIO21', relayIn: 'GPIO16' },
+  esp32t: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15', servoSig: 'GPIO22', encA: 'GPIO21', relayIn: 'GPIO16' },
 };
 // "주변장치 종합" 예제 카드 — 센서(LDR)·버튼(풀업 1개 + 풀다운 1개)·LED·모터+드라이버(전원은
 // 보드와 분리된 별도 PSU)를 한 보드에 모두 배치하고 배선한 뒤, 그것들을 모두 다루는 예제
