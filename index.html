@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.98a</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.99a</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -240,6 +240,7 @@
   .ep-card .ep-text{flex:1; min-width:0;}
   .ep-card .ep-title{font-size:.76rem; color:var(--text); font-weight:600; margin-bottom:3px;}
   .ep-card .ep-desc{font-size:.66rem; color:var(--text-faint); line-height:1.4;}
+  .ep-section-label{font-size:.64rem; color:var(--text-faint); font-family:'IBM Plex Mono',monospace; letter-spacing:.5px; padding-top:8px; margin-top:2px; border-top:1px solid var(--border);}
 
   /* Legend — 캔버스 좌하단에 항상 떠 있는 HUD라, 스크롤로 그 아래에 보드가 오면 클릭/드래그를
      가로채던 문제가 있었습니다. 컨테이너 자체는 pointer-events:none으로 클릭을 통과시키고,
@@ -916,6 +917,16 @@
     background:linear-gradient(160deg, rgba(255,255,255,.05), transparent 40%), linear-gradient(135deg, #0f9297, #053e42);
     height:236px;
   }
+  /* Mega 2560 — R3와 같은 teal 계열(실제 하드웨어 색)이지만, 54개의 디지털 핀 + 16개의 아날로그
+     핀을 한 줄씩 더 넉넉히 펼쳐 담기 위해 훨씬 넓습니다. */
+  .board.board-mega{
+    width:1300px; height:260px;
+    background:linear-gradient(160deg, rgba(255,255,255,.05), transparent 40%), linear-gradient(135deg, #0f9297, #053e42);
+  }
+  /* D14~D53(40개)을 담는 두 번째 디지털 헤더 줄 — D0~D13(.header-row.top) 위쪽에 한 단 더 얹습니다. */
+  .header-row.top2{position:absolute; display:flex; top:-70px; left:34px; right:34px; justify-content:space-between; z-index:4;}
+  .header-row.top2 .pin-name{top:19px; left:50%; transform:translateX(-50%);}
+  .cap-digital2{position:absolute; font-family:'IBM Plex Mono',monospace; font-size:.52rem; color:#6fd1d5; letter-spacing:1px; text-transform:uppercase; top:-101px; left:34px;}
   /* ESP32 계열 보드(esp32b/esp32d/esp32t) — 검정 톤 PCB에 실버 실크스크린 */
   .board.board-esp32{
     background:linear-gradient(160deg, rgba(255,255,255,.04), transparent 40%), linear-gradient(135deg, #22262c, #0a0c0e);
@@ -997,6 +1008,7 @@
   .example-buttons{display:flex; flex-wrap:wrap; gap:8px; margin:10px 14px 0; flex:0 0 auto;}
   .example-buttons .btn{font-size:.72rem; padding:6px 12px;}
   .example-section-label{flex-basis:100%; font-size:.62rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; letter-spacing:.5px; margin:4px 0 -2px;}
+  .example-gallery-hint{font-size:.68rem; color:var(--text-faint); display:flex; align-items:center;}
 
   .compile-progress{height:3px; width:100%; background:transparent;}
   .compile-progress.active{background:linear-gradient(90deg, #12a4ab 0%, #3fd0d6 50%, #12a4ab 100%); background-size:200% 100%; animation:moveProgress 1s linear infinite;}
@@ -1009,7 +1021,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.98a</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.99a</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1035,6 +1047,8 @@
       <div class="ds-menu" id="dsMenu" hidden>
         <a href="https://docs.arduino.cc/resources/datasheets/A000066-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r3board">R3 보드 (Arduino UNO R3) 데이터시트</a>
         <a href="https://docs.arduino.cc/resources/datasheets/ATmega328P-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r3">R3 CPU (ATmega328P) 데이터시트</a>
+        <a href="https://docs.arduino.cc/resources/datasheets/A000067-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.megaboard">Mega 보드 (Arduino Mega 2560) 데이터시트</a>
+        <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega640-1280-1281-2560-2561-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.mega">Mega CPU (ATmega2560) 데이터시트</a>
         <a href="https://docs.arduino.cc/resources/datasheets/ABX00080-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r4board">R4 보드 (Arduino UNO R4 Minima) 데이터시트</a>
         <a href="https://docs.arduino.cc/resources/datasheets/ra4m1-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r4">R4 CPU (RA4M1) 데이터시트</a>
         <a href="https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.esp32chip">ESP32 (칩) 데이터시트</a>
@@ -1055,7 +1069,7 @@
     <div class="palette-items">
       <div class="palette-group" data-group="boards">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.boards">보드</span><span class="pg-count">5</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.boards">보드</span><span class="pg-count">6</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnBoard('r4')">
@@ -1065,6 +1079,10 @@
           <div class="palette-item" onclick="spawnBoard('r3')">
             <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#12a2a8,#054145);"></div></div>
             <span data-i18n="palette.addr3">Uno R3 보드 추가</span>
+          </div>
+          <div class="palette-item" onclick="spawnBoard('mega')">
+            <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#12a2a8,#054145);"></div></div>
+            <span data-i18n="palette.addmega">Mega 2560 보드 추가</span>
           </div>
           <div class="palette-item" onclick="spawnBoard('esp32b')">
             <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#3a3f46,#0a0c0e);border:1px solid #555;"></div></div>
@@ -1405,6 +1423,7 @@
       <button class="ep-tab active" data-tab="exp" onclick="switchGalleryTab('exp')" data-i18n="gallery.tabExp">⚡ 전기 실험</button>
       <button class="ep-tab" data-tab="r4" onclick="switchGalleryTab('r4')" data-i18n="gallery.tabR4">🅡4 R4 코딩</button>
       <button class="ep-tab" data-tab="r3" onclick="switchGalleryTab('r3')" data-i18n="gallery.tabR3">🅡3 R3 코딩</button>
+      <button class="ep-tab" data-tab="mega" onclick="switchGalleryTab('mega')" data-i18n="gallery.tabMega">🅼 Mega 코딩</button>
       <button class="ep-tab" data-tab="esp32b" onclick="switchGalleryTab('esp32b')" data-i18n="gallery.tabEsp32b">📶 ESP32 DevKit</button>
       <button class="ep-tab" data-tab="esp32d" onclick="switchGalleryTab('esp32d')" data-i18n="gallery.tabEsp32d">🖥 ESP32 디스플레이</button>
       <button class="ep-tab" data-tab="esp32t" onclick="switchGalleryTab('esp32t')" data-i18n="gallery.tabEsp32t">👆 ESP32 터치</button>
@@ -1439,17 +1458,7 @@
     <div class="popup-body">
       <div class="example-buttons">
         <button class="btn primary" id="btnCompileR4" onclick="executeCompilerPipeline('r4')" data-i18n="popup.compile">▶ 컴파일 &amp; 빌드 업로드</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','counter')" data-i18n="popup.exCounterD13">카운터 &amp; D13 점멸</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','analog')" data-i18n="popup.exAnalog">A0 가변저항 &amp; D9 PWM</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','port_wide')" data-i18n="popup.exPortWideR4">R_PORT1 레지스터로 D2~D7 묶음 제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
-        <div class="example-section-label" data-i18n="popup.motorSectionTitle">— 모터 예제 —</div>
-        <button class="btn ghost" onclick="runCodeExample('r4','dcmotor')" data-i18n="popup.exDcMotor">DC모터: L298N 드라이버로 방향·속도 제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','servo')" data-i18n="popup.exServo">서보모터: 각도 제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','encoder')" data-i18n="popup.exEncoder">DC모터+엔코더: 회전 속도(Hz) 피드백</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','stepper')" data-i18n="popup.exStepper">A4988로 스텝모터 각도 제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','acmotor')" data-i18n="popup.exAcMotor">AC모터: 릴레이로 ON/OFF</button>
-        <button class="btn ghost" onclick="runCodeExample('r4','rs485_servo_single')" data-i18n="popup.exRs485Motor">RS-485 버스 서보모터</button>
+        <span class="example-gallery-hint" data-i18n="popup.galleryHint">예제는 오른쪽 🗂 예제 갤러리에서 골라주세요</span>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR4">1</div>
@@ -1509,18 +1518,7 @@ void loop() {
     <div class="popup-body">
       <div class="example-buttons">
         <button class="btn primary" id="btnCompileR3" onclick="executeCompilerPipeline('r3')" data-i18n="popup.compile">▶ 컴파일 &amp; 빌드 업로드</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','counter')" data-i18n="popup.exCounter">카운터 예제</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','register')" data-i18n="popup.exRegister">DDR/PORT 레지스터 직접제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','api_vs_register')" data-i18n="popup.exApiVsReg">13번(API) vs 12번(레지스터)</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','port_full')" data-i18n="popup.exPortFullR3">PORTD 전체 8핀 일괄 제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
-        <div class="example-section-label" data-i18n="popup.motorSectionTitle">— 모터 예제 —</div>
-        <button class="btn ghost" onclick="runCodeExample('r3','dcmotor')" data-i18n="popup.exDcMotor">DC모터: L298N 드라이버로 방향·속도 제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','servo')" data-i18n="popup.exServo">서보모터: 각도 제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','encoder')" data-i18n="popup.exEncoder">DC모터+엔코더: 회전 속도(Hz) 피드백</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','stepper')" data-i18n="popup.exStepper">A4988로 스텝모터 각도 제어</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','acmotor')" data-i18n="popup.exAcMotor">AC모터: 릴레이로 ON/OFF</button>
-        <button class="btn ghost" onclick="runCodeExample('r3','rs485_servo_single')" data-i18n="popup.exRs485Motor">RS-485 버스 서보모터</button>
+        <span class="example-gallery-hint" data-i18n="popup.galleryHint">예제는 오른쪽 🗂 예제 갤러리에서 골라주세요</span>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR3">1</div>
@@ -1597,11 +1595,13 @@ const STRINGS = {
   "bom.wireCount": { ko: "연결된 전선", en: "Wires connected" },
   "board.r4": { ko: "Arduino Uno R4 WiFi", en: "Arduino Uno R4 WiFi" },
   "board.r3": { ko: "Arduino Uno R3", en: "Arduino Uno R3" },
+  "board.mega": { ko: "Arduino Mega 2560", en: "Arduino Mega 2560" },
+  "board.megaCapExt": { ko: "DIGITAL 14-53 (PWM ~44,45,46)", en: "DIGITAL 14-53 (PWM ~44,45,46)" },
   "board.esp32b": { ko: "ESP32 개발보드 (DevKit)", en: "ESP32 DevKit Board" },
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.98a", en: "K's Simulator Ver0.98a" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.99a", en: "K's Simulator Ver0.99a" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -1841,6 +1841,7 @@ const STRINGS = {
   "gallery.codeExampleDesc": { ko: "클릭하면 해당 보드에 예제 코드를 불러오고 에디터를 엽니다.", en: "Click to load this example into that board's editor and open it." },
   "gallery.tabExp": { ko: "⚡ 전기 실험", en: "⚡ Electrical Experiments" },
   "gallery.tabR3": { ko: "🅡3 R3 코딩", en: "🅡3 R3 Coding" },
+  "gallery.tabMega": { ko: "🅼 Mega 코딩", en: "🅼 Mega Coding" },
   "gallery.tabR4": { ko: "🅡4 R4 코딩", en: "🅡4 R4 Coding" },
   "gallery.tabEsp32b": { ko: "📶 ESP32 DevKit", en: "📶 ESP32 DevKit" },
   "gallery.tabEsp32d": { ko: "🖥 ESP32 디스플레이", en: "🖥 ESP32 Display" },
@@ -1877,6 +1878,8 @@ const STRINGS = {
   "toolbar.datasheet": { ko: "📄 보드 및 CPU 데이터시트", en: "📄 Board & CPU Datasheet" },
   "datasheet.r3board": { ko: "R3 보드 (Arduino UNO R3) 데이터시트", en: "R3 Board (Arduino UNO R3) Datasheet" },
   "datasheet.r3": { ko: "R3 CPU (ATmega328P) 데이터시트", en: "R3 CPU (ATmega328P) Datasheet" },
+  "datasheet.megaboard": { ko: "Mega 보드 (Arduino Mega 2560) 데이터시트", en: "Mega Board (Arduino Mega 2560) Datasheet" },
+  "datasheet.mega": { ko: "Mega CPU (ATmega2560) 데이터시트", en: "Mega CPU (ATmega2560) Datasheet" },
   "datasheet.r4board": { ko: "R4 보드 (Arduino UNO R4 Minima) 데이터시트", en: "R4 Board (Arduino UNO R4 Minima) Datasheet" },
   "datasheet.r4": { ko: "R4 CPU (RA4M1) 데이터시트", en: "R4 CPU (RA4M1) Datasheet" },
   "datasheet.esp32chip": { ko: "ESP32 (칩) 데이터시트", en: "ESP32 (Chip) Datasheet" },
@@ -1919,6 +1922,7 @@ const STRINGS = {
   "motor.reverse": { ko: "역방향", en: "Reverse" },
   "motor.stopped": { ko: "정지", en: "Stopped" },
   "palette.addr3": { ko: "Uno R3 보드 추가", en: "Add Uno R3 board" },
+  "palette.addmega": { ko: "Mega 2560 보드 추가", en: "Add Mega 2560 board" },
   "palette.addr4": { ko: "Uno R4 WiFi 보드 추가", en: "Add Uno R4 WiFi board" },
   "palette.addesp32b": { ko: "ESP32 DevKit 보드 추가", en: "Add ESP32 DevKit board" },
   "palette.addesp32d": { ko: "ESP32 보드 추가<br>(컬러 디스플레이 내장)", en: "Add ESP32 board<br>(built-in color display)" },
@@ -1987,6 +1991,9 @@ const STRINGS = {
   "popup.exAnalog": { ko: "A0 가변저항 &amp; D9 PWM", en: "A0 Potentiometer &amp; D9 PWM" },
   "popup.exApiVsReg": { ko: "13번(API) vs 12번(레지스터)", en: "Pin 13 (API) vs Pin 12 (Register)" },
   "popup.exPortFullR3": { ko: "PORTD 전체 8핀 일괄 제어", en: "Full 8-Pin PORTD Control" },
+  "popup.exRegisterMega": { ko: "DDR/PORT 레지스터 직접제어(D13=PB7)", en: "Direct DDR/PORT Register Control (D13=PB7)" },
+  "popup.exApiVsRegMega": { ko: "13번(API) vs 12번(레지스터)", en: "Pin 13 (API) vs Pin 12 (Register)" },
+  "popup.exPortAMega": { ko: "PORTA 전체 8핀 일괄 제어(D22~D29)", en: "Full 8-Pin PORTA Control (D22~D29)" },
   "popup.exPortWideR4": { ko: "R_PORT1 레지스터로 D2~D7 묶음 제어", en: "R_PORT1 Register Bundle Control (D2~D7)" },
   "popup.exCounter": { ko: "카운터 예제", en: "Counter Example" },
   "popup.exCounterD13": { ko: "카운터 &amp; D13 점멸", en: "Counter &amp; D13 Blink" },
@@ -2010,6 +2017,7 @@ const STRINGS = {
   "popup.exRelay": { ko: "5V 릴레이로 220V 부하 스위칭", en: "Switch a 220V Load with a 5V Relay" },
   "popup.exStepper": { ko: "A4988로 스텝모터 각도 제어", en: "Control a Stepper Motor with A4988" },
   "popup.motorSectionTitle": { ko: "— 모터 예제 —", en: "— Motor Examples —" },
+  "popup.galleryHint": { ko: "예제는 오른쪽 🗂 예제 갤러리에서 골라주세요", en: "Pick an example from the 🗂 Example Gallery on the right" },
   "popup.exDcMotor": { ko: "DC모터: L298N 드라이버로 방향·속도 제어", en: "DC Motor: Direction & Speed via L298N Driver" },
   "popup.exServo": { ko: "서보모터: 각도 제어", en: "Servo Motor: Angle Control" },
   "popup.exEncoder": { ko: "DC모터+엔코더: 회전 속도(Hz) 피드백", en: "DC Motor+Encoder: Rotation Speed Feedback (Hz)" },
@@ -2051,7 +2059,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.98a", en: "K's Arduino Simulator Ver0.98a" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.99a", en: "K's Arduino Simulator Ver0.99a" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -2191,6 +2199,35 @@ const PIN_KIND = {};
 [...DIGITAL_PINS, ...POWER_PINS, ...ANALOG_PINS].forEach(p => {
   PIN_KIND[p.id] = POWER_KIND_PINS.has(p.id) ? 'power' : GND_KIND_PINS.has(p.id) ? 'gnd' : 'signal';
 });
+
+// ============ Arduino Mega 2560 전용 핀 배열 ============
+// 전원 핀(IOREF/3V3/5V/GND/GND/VIN)은 R3/R4와 완전히 동일해 POWER_PINS를 그대로 재사용합니다.
+// 디지털 0~13번은 이름은 같지만 PWM 가능 핀 목록이 Uno와 달라(2,7,8,12,13도 PWM 가능 —
+// 공식 스펙: "Pins 2-13 and 44-46 provide 8-bit PWM capability") 라벨(~ 표시)만 새로 정의합니다.
+const MEGA_DIGITAL_PINS_LOW = [
+  {id:'AREF', label:'AREF'}, {id:'GND_D', label:'GND'},
+  {id:'D13', label:'~13'}, {id:'D12', label:'~12'},
+  {id:'D11', label:'~11'}, {id:'D10', label:'~10'},
+  {id:'D9', label:'~9'}, {id:'D8', label:'~8'},
+  {id:'D7', label:'~7'}, {id:'D6', label:'~6'},
+  {id:'D5', label:'~5'}, {id:'D4', label:'4'},
+  {id:'D3', label:'~3'}, {id:'D2', label:'~2'},
+  {id:'D1', label:'TX0'}, {id:'D0', label:'RX0'}
+];
+// D14~D53(40개, 위쪽 두 번째 헤더 줄). PWM은 44,45,46만 추가로 있습니다.
+const MEGA_PWM_HIGH = new Set([44, 45, 46]);
+const MEGA_DIGITAL_PINS_EXT = [];
+for (let i = 14; i <= 53; i++){
+  MEGA_DIGITAL_PINS_EXT.push({ id: 'D' + i, label: (MEGA_PWM_HIGH.has(i) ? '~' : '') + i });
+}
+// A0~A15(16개, 10비트 ADC). A0~A5는 ANALOG_PINS와 이름이 같아 이미 PIN_KIND에 등록돼 있습니다.
+const MEGA_ANALOG_PINS = [];
+for (let i = 0; i <= 15; i++){
+  MEGA_ANALOG_PINS.push({ id: 'A' + i, label: 'A' + i });
+}
+[...MEGA_DIGITAL_PINS_EXT, ...MEGA_ANALOG_PINS].forEach(p => {
+  if (!(p.id in PIN_KIND)) PIN_KIND[p.id] = 'signal';
+});
 // 전원 레일 핀(IOREF/3V3/5V/VIN)이 실제로 몇 볼트인지: R3/R4는 5V 로직 보드라 3V3 핀만
 // 3.3V이고 나머지는 5V, VIN은 배터리/어댑터 입력이라 보통 5V보다 높습니다(9V 흔함). ESP32는
 // 3.3V 로직 보드라 IOREF 개념이 없는 대신 3V3가 논리 기준 전압이고, 보드에 적힌 VIN(라벨
@@ -2231,7 +2268,7 @@ const ESP32_ADC_PINS = [
   PIN_KIND[p.id] = POWER_KIND_PINS.has(p.id) ? 'power' : GND_KIND_PINS.has(p.id) ? 'gnd' : 'signal';
 });
 // 보드 타입별 "온보드 LED"가 실제로 물려있는 핀 — runTick에서 그 핀 상태를 읽어 보드 위 LED를 켭니다.
-const BOARD_ONBOARD_LED_PIN = { r4: 'D13', r3: 'D13', esp32b: 'GPIO2', esp32d: 'GPIO2', esp32t: 'GPIO2' };
+const BOARD_ONBOARD_LED_PIN = { r4: 'D13', r3: 'D13', mega: 'D13', esp32b: 'GPIO2', esp32d: 'GPIO2', esp32t: 'GPIO2' };
 
 // AVR 8비트 레지스터(DDRx/PORTx) <-> 아두이노 핀 번호 매핑. R3(ATmega328P)의 실제 배선과 동일.
 const AVR_PORT_PIN_MAP = {
@@ -2239,6 +2276,33 @@ const AVR_PORT_PIN_MAP = {
   D: {0:'D0', 1:'D1', 2:'D2', 3:'D3', 4:'D4', 5:'D5', 6:'D6', 7:'D7'},
   C: {0:'A0', 1:'A1', 2:'A2', 3:'A3', 4:'A4', 5:'A5'},
 };
+// Mega 2560(ATmega2560)의 실제 디지털 핀 <-> AVR 포트/비트 매핑(공식 Arduino 스펙 + 2개의
+// 독립적인 핀아웃 레퍼런스를 상호 대조해 확인). Uno와 달리 D0~D13조차 PORTB/D 한두 개에
+// 몰려 있지 않고 포트 A/B/C/D/E/G/H/J/L에 흩어져 있습니다. PORTA(D22~D29)만 유일하게
+// Uno의 PORTD=D0~D7 트릭과 똑같이 "오름차순으로 가지런히" 배치돼 있어, 이 시뮬레이터의
+// 대표 예제(mega_porta)로 씁니다.
+const MEGA_PORT_PIN_MAP = {
+  A: {0:'D22', 1:'D23', 2:'D24', 3:'D25', 4:'D26', 5:'D27', 6:'D28', 7:'D29'},
+  B: {0:'D53', 1:'D52', 2:'D51', 3:'D50', 4:'D10', 5:'D11', 6:'D12', 7:'D13'},
+  C: {0:'D37', 1:'D36', 2:'D35', 3:'D34', 4:'D33', 5:'D32', 6:'D31', 7:'D30'},
+  D: {0:'D21', 1:'D20', 2:'D19', 3:'D18', 7:'D38'},
+  E: {0:'D0', 1:'D1', 3:'D5', 4:'D2', 5:'D3'},
+  G: {0:'D41', 1:'D40', 2:'D39', 5:'D4'},
+  H: {0:'D17', 1:'D16', 3:'D6', 4:'D7', 5:'D8', 6:'D9'},
+  J: {0:'D15', 1:'D14'},
+  L: {0:'D49', 1:'D48', 2:'D47', 3:'D46', 4:'D45', 5:'D44', 6:'D43', 7:'D42'},
+};
+// AVR_PORT_PIN_MAP/MEGA_PORT_PIN_MAP(포트->비트->핀 이름)을 역으로 뒤집어, "핀 이름 -> [포트글자,
+// 비트]"로 조회할 수 있게 합니다. API 호출(pinMode/digitalWrite)이 대응하는 레지스터 비트도
+// 함께 갱신할 때 씁니다(보드별로 매핑이 다르므로 board를 받아 알맞은 맵을 고릅니다).
+function pinToAvrBitMap(board){
+  const portMap = board.startsWith('mega') ? MEGA_PORT_PIN_MAP : AVR_PORT_PIN_MAP;
+  const out = {};
+  Object.entries(portMap).forEach(([letter, map]) => {
+    Object.entries(map).forEach(([bit, pinName]) => { out[pinName] = [letter, Number(bit)]; });
+  });
+  return out;
+}
 
 // R4(RA4M1) 포트 레지스터(R_PORTn->PODR/PDR/POSR/PORR/PIDR) <-> 아두이노 핀 번호 매핑.
 // R3(AVR)와 달리 R4는 D0~D13이 한 포트에 예쁘게 몰려 있지 않고 Port 0/1/3/4에 흩어져 있습니다
@@ -2313,7 +2377,9 @@ function transpileCppToJs(cppCode) {
   js = js.replace(/\bPreferences\s+(\w+)\s*;/g, 'let $1 = new Preferences();');
   js = js.replace(/\bArduinoLEDMatrix\s+(\w+)\s*(?:\(\s*\))?\s*;/g, 'let $1 = new ArduinoLEDMatrix();');
 
-  ['B', 'C', 'D'].forEach(letter => {
+  // A/E/G/H/J/L은 Mega(ATmega2560)가 추가로 쓰는 포트입니다 — R3/R4 코드에는 등장하지 않으므로
+  // 이 치환을 늘려도 기존 보드에는 아무 영향이 없습니다.
+  ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'J', 'L'].forEach(letter => {
     js = js.replace(new RegExp(`\\bDDR${letter}\\b`, 'g'), `__regs.DDR${letter}`);
     js = js.replace(new RegExp(`\\bPORT${letter}\\b`, 'g'), `__regs.PORT${letter}`);
     js = js.replace(new RegExp(`\\bPIN${letter}\\b`, 'g'), `__regs.PIN${letter}`);
@@ -2405,11 +2471,17 @@ function pushEdge(board, pinName, v){
 }
 
 function makeRegs(board){
-  const raw = { DDRB:0, DDRC:0, DDRD:0, PORTB:0, PORTC:0, PORTD:0, PINB:0, PINC:0, PIND:0 };
+  // Mega는 실제로 훨씬 많은 포트(A/B/C/D/E/G/H/J/L)를 쓰고, 그 매핑이 Uno/R3와 전혀 다르므로
+  // (예: Mega의 D13은 PB7, Uno는 PB5) 보드가 Mega 계열일 때만 별도의 포트 목록/맵을 씁니다.
+  const isMega = board.startsWith('mega');
+  const portLetters = isMega ? ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'J', 'L'] : ['B', 'C', 'D'];
+  const portMap = isMega ? MEGA_PORT_PIN_MAP : AVR_PORT_PIN_MAP;
+  const raw = {};
+  portLetters.forEach(letter => { raw['DDR' + letter] = 0; raw['PORT' + letter] = 0; raw['PIN' + letter] = 0; });
   const nsPerCycle = () => 1e9 / mcuVM[board].clockHz;
   const bump = (cost) => { mcuVM[board].regCycles += cost; mcuVM[board].cycleOffsetNs += cost * nsPerCycle(); };
   const regs = {};
-  ['B', 'C', 'D'].forEach(letter => {
+  portLetters.forEach(letter => {
     Object.defineProperty(regs, 'DDR' + letter, {
       get: () => { bump(REG_ACCESS_CYCLES); return raw['DDR' + letter]; },
       set: (v) => { bump(REG_ACCESS_CYCLES); raw['DDR' + letter] = v; }
@@ -2423,10 +2495,10 @@ function makeRegs(board){
       set: (v) => {
         bump(REG_ACCESS_CYCLES);
         raw['PORT' + letter] = v;
-        const map = AVR_PORT_PIN_MAP[letter];
+        const map = portMap[letter];
         Object.entries(map).forEach(([bit, pinName]) => {
           const newV = (v >> bit) & 1;
-          // 이 D0~D13 이름의 레지스터 직접제어 경로는 R3(진짜 AVR)와 R4(같은 핀 이름 규약을 쓰는
+          // 이 D0~D13 이름의 레지스터 직접제어 경로는 R3/Mega(진짜 AVR)와 R4(같은 핀 이름 규약을 쓰는
           // 5V 로직 보드)에만 걸리고 ESP32는 GPIOxx 이름을 쓰므로 이 맵에 안 걸립니다 — 그래서
           // volts를 5V로 고정해도 항상 맞습니다.
           mcuVM[board].pinState[pinName] = { type: 'digital', v: newV, volts: newV ? 5 : 0 };
@@ -2514,7 +2586,8 @@ function executeCompilerPipeline(board) {
 
   logSerial(`\n================ [ GCC Compiler Toolchain: ${board.toUpperCase()} ] ================`, board);
   const isEsp32Board = board.startsWith('esp32');
-  const mcuTarget = board.startsWith('r3') ? 'atmega328p' : isEsp32Board ? 'esp32' : 'renesas_ra4m1';
+  const isMegaBoard = board.startsWith('mega');
+  const mcuTarget = board.startsWith('r3') ? 'atmega328p' : isMegaBoard ? 'atmega2560' : isEsp32Board ? 'esp32' : 'renesas_ra4m1';
   const ccBin = isEsp32Board ? 'xtensa-esp32-elf-g++' : 'avr-g++';
   const ldBin = isEsp32Board ? 'xtensa-esp32-elf-gcc' : 'avr-gcc';
   const objcopyBin = isEsp32Board ? 'xtensa-esp32-elf-objcopy' : 'avr-objcopy';
@@ -2612,11 +2685,13 @@ function executeCompilerPipeline(board) {
   setTimeout(() => {
     logSerial(`[3/3] Generating ${isEsp32Board ? 'Binary' : 'Hex Binary'}: ${objcopyBin} ${isEsp32Board ? '-O binary firmware.elf firmware.bin' : '-O ihex -R .eeprom firmware.elf firmware.hex'}`, board);
 
-    const flashBase = board.startsWith('r3') ? 1420 : isEsp32Board ? 18000 : 3840;
+    const flashBase = board.startsWith('r3') ? 1420 : isMegaBoard ? 3600 : isEsp32Board ? 18000 : 3840;
     const flashSize = flashBase + rawCode.length * 4;
-    const maxFlash = board.startsWith('r3') ? 32256 : isEsp32Board ? 1310720 : 262144;
+    // Mega 2560: 256KB 플래시(부트로더 약 8KB 제외 후 실사용 가능한 값 기준), 8KB(=8192) SRAM,
+    // 4KB EEPROM(이 표시에는 EEPROM을 별도로 안 보여주지만 makeMcuState 등에는 영향 없음).
+    const maxFlash = board.startsWith('r3') ? 32256 : isMegaBoard ? 253952 : isEsp32Board ? 1310720 : 262144;
     const ramSize = 180 + Math.floor(rawCode.length * 0.3) + (isEsp32Board ? 16000 : 0);
-    const maxRam = board.startsWith('r3') ? 2048 : isEsp32Board ? 327680 : 32768;
+    const maxRam = board.startsWith('r3') ? 2048 : isMegaBoard ? 8192 : isEsp32Board ? 327680 : 32768;
 
     logSerial(`\nProgram storage: ${flashSize} bytes (${((flashSize/maxFlash)*100).toFixed(1)}%) of maximum ${maxFlash} bytes.`, board);
     logSerial(`Dynamic memory:  ${ramSize} bytes (${((ramSize/maxRam)*100).toFixed(1)}%) of maximum ${maxRam} bytes.`, board);
@@ -2707,10 +2782,18 @@ function deployToMCU(board, rawCode) {
         }
       };
       const HIGH = 1, LOW = 0, OUTPUT = 1, INPUT = 0, INPUT_PULLUP = 2;
-      // AVR 레지스터 비트 상수 (PBn/PCn/PDn) — DDRx/PORTx 직접 제어 코드에서 사용됩니다.
+      // AVR 레지스터 비트 상수(PAn/PBn/PCn/PDn/PEn/PGn/PHn/PJn/PLn) — DDRx/PORTx 직접 제어
+      // 코드에서 사용됩니다. R3/R4는 PB/PC/PD만 실제로 쓰지만, Mega는 그 외 포트도 쓰므로
+      // 나머지 문자도 미리 전부 선언해 둡니다(안 쓰는 보드에서는 그냥 안 쓰이는 상수일 뿐입니다).
+      const PA0=0,PA1=1,PA2=2,PA3=3,PA4=4,PA5=5,PA6=6,PA7=7;
       const PB0=0,PB1=1,PB2=2,PB3=3,PB4=4,PB5=5,PB6=6,PB7=7;
-      const PC0=0,PC1=1,PC2=2,PC3=3,PC4=4,PC5=5;
+      const PC0=0,PC1=1,PC2=2,PC3=3,PC4=4,PC5=5,PC6=6,PC7=7;
       const PD0=0,PD1=1,PD2=2,PD3=3,PD4=4,PD5=5,PD6=6,PD7=7;
+      const PE0=0,PE1=1,PE2=2,PE3=3,PE4=4,PE5=5,PE6=6,PE7=7;
+      const PG0=0,PG1=1,PG2=2,PG3=3,PG4=4,PG5=5,PG6=6,PG7=7;
+      const PH0=0,PH1=1,PH2=2,PH3=3,PH4=4,PH5=5,PH6=6,PH7=7;
+      const PJ0=0,PJ1=1,PJ2=2,PJ3=3,PJ4=4,PJ5=5,PJ6=6,PJ7=7;
+      const PL0=0,PL1=1,PL2=2,PL3=3,PL4=4,PL5=5,PL6=6,PL7=7;
       // API 호출(pinMode/digitalWrite/analogWrite/digitalRead/analogRead)은 실제 AVR에서도
       // 핀 번호->포트/비트마스크 조회, 인터럽트 disable/enable, read-modify-write를 거치는
       // 만큼 매번 ${API_CALL_CYCLES}사이클의 비용이 드는 것으로 계산합니다. (아래 makeRegs의
@@ -2722,11 +2805,7 @@ function deployToMCU(board, rawCode) {
       // 갱신합니다. 이렇게 하지 않으면 13번(API)과 12번(레지스터)처럼 같은 포트(PORTB)의 다른
       // 비트를 API/레지스터 두 방식으로 섞어 쓸 때, 레지스터 접근이 레지스터의 나머지 비트를
       // (API가 갱신한 적 없는) 옛 값으로 되돌려버려 API 쪽 핀 상태가 사라지는 문제가 생깁니다.
-      const PIN_TO_AVR_BIT = {
-        D8:['B',0], D9:['B',1], D10:['B',2], D11:['B',3], D12:['B',4], D13:['B',5],
-        D0:['D',0], D1:['D',1], D2:['D',2], D3:['D',3], D4:['D',4], D5:['D',5], D6:['D',6], D7:['D',7],
-        A0:['C',0], A1:['C',1], A2:['C',2], A3:['C',3], A4:['C',4], A5:['C',5],
-      };
+      const PIN_TO_AVR_BIT = ${JSON.stringify(pinToAvrBitMap(board))};
       // API 호출 1회 = ${API_CALL_CYCLES}사이클 비용을 누적 카운터(apiCycles, readout용)와
       // cycleOffsetNs(이번 loop() 안에서의 가상 실행 시간, 오실로스코프 정밀 모드용)에 모두 반영합니다.
       function __bumpApi() {
@@ -8324,6 +8403,27 @@ function buildR3BoardHTML(key){
     <div class="header-caption cap-analog">ANALOG IN (ADC)</div>`;
 }
 
+// Arduino Mega 2560의 보드 그림. R3와 똑같이 커스텀 SVG 없이 CSS만으로 만들지만, 디지털 핀이
+// 54개(0~13 + 14~53 두 줄)이고 아날로그 입력이 16개(A0~A15)라 헤더 줄이 하나 더 있습니다.
+function buildMegaBoardHTML(key){
+  const suffix = key.includes('_') ? ' #' + key.split('_')[1] : '';
+  return `
+    <div class="silk silk-word" style="top:44px;left:26px;">ARDUINO</div>
+    <div class="silk silk-title" style="top:58px;left:26px;">MEGA 2560 R3${suffix}</div>
+    <div class="silk silk-sub" style="top:90px; left:26px;">ATmega2560 · 8-bit AVR @ 16MHz</div>
+    <div class="onboard-led" id="l13Led_${key}" style="top:44px; left:220px;"></div>
+    <div class="reset-btn" onclick="resetBoard('${key}')" data-i18n-title="board.resetTitle" title="리셋"><div class="cap"></div></div>
+    <div class="reset-caption" data-i18n="board.resetCaption">RESET</div>
+    <div class="header-row top2" id="rowDigitalExt_${key}"></div>
+    <div class="header-row top" id="rowDigital_${key}"></div>
+    <div class="header-row power" id="rowPower_${key}"></div>
+    <div class="header-row analog" id="rowAnalog_${key}"></div>
+    <div class="header-caption cap-digital2" data-i18n="board.megaCapExt">DIGITAL 14-53 (PWM ~44,45,46)</div>
+    ${pinMapCaptionHTML()}
+    <div class="header-caption cap-power">POWER</div>
+    <div class="header-caption cap-analog">ANALOG IN (ADC) A0-A15</div>`;
+}
+
 // ESP32 계열 3종의 보드 그림을 만듭니다.
 //  - esp32b: 디스플레이 없는 기본 개발보드(DevKit)
 //  - esp32d: 컬러 TFT 디스플레이가 보드에 내장(240x135, ST7789 계열과 비슷한 소형 화면)
@@ -8391,13 +8491,21 @@ function buildBoardPopupHTML(key, type){
   const label = boardTypeLabel(type);
   const suffix = key.includes('_') ? ' #' + key.split('_')[1] : '';
   const targetLine = type === 'r3' ? 'Target: ATmega328P (8-bit AVR @ 16MHz)'
+    : type === 'mega' ? 'Target: ATmega2560 (8-bit AVR @ 16MHz)'
     : isEsp32 ? 'Target: ESP32-WROOM-32 (Xtensa LX6 dual-core @ 240MHz)'
     : 'Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)';
-  const toolchain = type === 'r3' ? 'AVR-GCC' : isEsp32 ? 'Xtensa-GCC' : 'C/C++ GCC';
-  // DDRx/PORTx/PINx 레지스터 이름은 AVR(ATmega328P, R3)만의 것이라 R4/ESP32는 같은 이름의
-  // 예제를 쓰지 않지만, R4는 R_PORTn->PDR/PODR/POSR/PORR로 그 자리를 대신하는 예제를 따로 둡니다.
+  const toolchain = (type === 'r3' || type === 'mega') ? 'AVR-GCC' : isEsp32 ? 'Xtensa-GCC' : 'C/C++ GCC';
+  // DDRx/PORTx/PINx 레지스터 이름은 AVR(ATmega328P R3, ATmega2560 Mega)만의 것이라 R4/ESP32는
+  // 같은 이름의 예제를 쓰지 않지만, R4는 R_PORTn->PDR/PODR/POSR/PORR로 그 자리를 대신하는
+  // 예제를 따로 둡니다.
   let counterButton, extraButtons;
-  if (type === 'r3'){
+  if (type === 'mega'){
+    const buttons = MEGA_EXAMPLE_DEFS.map(d => d.sectionLabel
+      ? `<div class="example-section-label">${tr(d.sectionLabel)}</div>`
+      : `<button class="btn ghost" onclick="runCodeExample('${key}','${d.key}')">${tr(d.titleKey)}</button>`);
+    counterButton = buttons[0];
+    extraButtons = buttons.slice(1).join('\n        ');
+  } else if (type === 'r3'){
     counterButton = `<button class="btn ghost" onclick="runCodeExample('${key}','counter')">${tr('popup.exCounterD13')}</button>`;
     extraButtons = `<button class="btn ghost" onclick="runCodeExample('${key}','register')">${tr('popup.exRegister')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','api_vs_register')">${tr('popup.exApiVsReg')}</button>
@@ -8501,6 +8609,7 @@ function spawnBoard(type, dropX, dropY){
 
   const el = document.createElement('div');
   el.className = type === 'r3' ? 'placed-component board board-r3'
+    : type === 'mega' ? 'placed-component board board-mega'
     : isEsp32 ? `placed-component board board-esp32 board-${type}`
     : 'placed-component board';
   el.id = `arduinoBoard_${key}`;
@@ -8514,15 +8623,18 @@ function spawnBoard(type, dropX, dropY){
     el.style.left = '480px';
     el.style.top = (360 + row * 460) + 'px';
   }
-  el.innerHTML = type === 'r3' ? buildR3BoardHTML(key) : isEsp32 ? buildESP32BoardHTML(key, type) : buildR4BoardHTML(key);
+  el.innerHTML = type === 'r3' ? buildR3BoardHTML(key)
+    : type === 'mega' ? buildMegaBoardHTML(key)
+    : isEsp32 ? buildESP32BoardHTML(key, type) : buildR4BoardHTML(key);
   document.getElementById('canvasInner').appendChild(el);
 
-  const topPins = isEsp32 ? ESP32_GPIO_PINS : DIGITAL_PINS;
+  const topPins = type === 'mega' ? MEGA_DIGITAL_PINS_LOW : isEsp32 ? ESP32_GPIO_PINS : DIGITAL_PINS;
   const powerPins = isEsp32 ? ESP32_POWER_PINS : POWER_PINS;
-  const analogPins = isEsp32 ? ESP32_ADC_PINS : ANALOG_PINS;
+  const analogPins = type === 'mega' ? MEGA_ANALOG_PINS : isEsp32 ? ESP32_ADC_PINS : ANALOG_PINS;
   buildHeader(`rowDigital_${key}`, topPins, 'digital');
   buildHeader(`rowPower_${key}`, powerPins, 'power');
   buildHeader(`rowAnalog_${key}`, analogPins, 'analog');
+  if (type === 'mega') buildHeader(`rowDigitalExt_${key}`, MEGA_DIGITAL_PINS_EXT, 'digital');
   if (type === 'r4') rebuildMatrixGrid(`matrixGrid_${key}`);
 
   // 깨끗한 기본 키('r4' 또는 'r3')로 만들어질 때만 이미 HTML에 있는 정적 팝업(popupR4/popupR3)을
@@ -8531,7 +8643,7 @@ function spawnBoard(type, dropX, dropY){
   // (r3_2, ...)와 ESP32 계열은 항상 새 팝업을 만듭니다.
   const reusesStaticPopup = key === type && (type === 'r4' || type === 'r3');
   if (!reusesStaticPopup) buildBoardPopupHTML(key, type);
-  if (!mcuVM[key]) mcuVM[key] = createMcuState(type === 'r3' ? 16e6 : isEsp32 ? 240e6 : 48e6);
+  if (!mcuVM[key]) mcuVM[key] = createMcuState((type === 'r3' || type === 'mega') ? 16e6 : isEsp32 ? 240e6 : 48e6);
   boardDomId[key] = el.id;
   boardInstances[key] = { key, type, domId: el.id };
   // mcuVM[key]가 만들어진 다음에 터치 이벤트를 연결해야 합니다 — bindTouchScreenEvents가
@@ -8636,6 +8748,18 @@ function loadExampleCode(board, type){
     editor.value = currentLang === 'en'
       ? `// R4 port-bundle control example -- D2~D7 all happen to sit on Port 1, so they can be\n// moved together with R_PORT1->PODR/POSR/PORR in just 1~2 clock cycles.\n// (D0,D1,D8,D9,D13 belong to other ports -- Uno R4 pins are scattered across several\n// internal ports to keep the same header layout as R3, so R3's "PORTD = one byte for\n// all of D0~D7" trick doesn't carry over directly. Instead, whichever pins DO share a\n// port -- here, D2~D7 on Port 1 -- can still be bundled for a big speed win over calling\n// digitalWrite() six separate times.)\n//\n// Real bit positions (from the official Arduino Uno R4 variant.cpp):\n//   D2=P1.04  D3=P1.05  D4=P1.06  D5=P1.07  D6=P1.11  D7=P1.12\n\nconst uint32_t D2_BIT = (1 << 4);\nconst uint32_t D3_BIT = (1 << 5);\nconst uint32_t D4_BIT = (1 << 6);\nconst uint32_t D5_BIT = (1 << 7);\nconst uint32_t D6_BIT = (1 << 11);\nconst uint32_t D7_BIT = (1 << 12);\nconst uint32_t ALL_BITS = D2_BIT | D3_BIT | D4_BIT | D5_BIT | D6_BIT | D7_BIT;\n\nvoid setup() {\n  Serial.begin(9600);\n  R_PORT1->PDR |= ALL_BITS; // Set D2~D7 to OUTPUT together\n  Serial.println("R4: Port 1 bundle ready (D2~D7)");\n}\n\nvoid loop() {\n  // 1) POSR: turn all 6 pins ON at once (1 cycle, doesn't touch any other pin)\n  Serial.println("POSR -> D2~D7 all ON");\n  R_PORT1->POSR = ALL_BITS;\n  delay(500);\n\n  // 2) PORR: turn all 6 pins OFF at once (1 cycle)\n  Serial.println("PORR -> D2~D7 all OFF");\n  R_PORT1->PORR = ALL_BITS;\n  delay(500);\n\n  // 3) PODR: checkerboard pattern (alternate the even/odd-indexed pins)\n  Serial.println("PODR -> checkerboard pattern");\n  R_PORT1->PODR = D2_BIT | D4_BIT | D6_BIT;\n  delay(400);\n  R_PORT1->PODR = D3_BIT | D5_BIT | D7_BIT;\n  delay(400);\n  R_PORT1->PODR = 0;\n  delay(400);\n}`
       : `// R4 포트 묶음 제어 예제 — D2~D7 여섯 핀이 마침 전부 Port 1에 몰려 있어서,\n// R_PORT1->PODR/POSR/PORR 레지스터 하나로 1~2클록 만에 한꺼번에 움직일 수 있습니다.\n// (D0,D1,D8,D9,D13은 다른 포트에 속해 있습니다 — Uno R4는 R3와 같은 헤더 배치를\n// 맞추다 보니 핀들이 내부 여러 포트에 흩어져 있어, R3처럼 "PORTD 한 바이트로\n// D0~D7 전부"라는 트릭이 그대로 통하지 않습니다. 대신 같은 포트에 모여 있는 핀들\n// — 여기서는 Port 1의 D2~D7 — 끼리는 digitalWrite() 6번 대신 레지스터 한 번으로\n// 묶어서 큰 속도 이득을 볼 수 있습니다.)\n//\n// 실제 비트 위치(공식 Arduino Uno R4 variant.cpp 기준):\n//   D2=P1.04  D3=P1.05  D4=P1.06  D5=P1.07  D6=P1.11  D7=P1.12\n\nconst uint32_t D2_BIT = (1 << 4);\nconst uint32_t D3_BIT = (1 << 5);\nconst uint32_t D4_BIT = (1 << 6);\nconst uint32_t D5_BIT = (1 << 7);\nconst uint32_t D6_BIT = (1 << 11);\nconst uint32_t D7_BIT = (1 << 12);\nconst uint32_t ALL_BITS = D2_BIT | D3_BIT | D4_BIT | D5_BIT | D6_BIT | D7_BIT;\n\nvoid setup() {\n  Serial.begin(9600);\n  R_PORT1->PDR |= ALL_BITS; // D2~D7을 한 번에 출력으로 설정\n  Serial.println("R4: Port 1 묶음 준비 완료 (D2~D7)");\n}\n\nvoid loop() {\n  // 1) POSR로 6개 핀 동시 HIGH (단 1클록, 다른 핀에는 영향 없음)\n  Serial.println("POSR -> D2~D7 전부 ON");\n  R_PORT1->POSR = ALL_BITS;\n  delay(500);\n\n  // 2) PORR로 6개 핀 동시 LOW (단 1클록)\n  Serial.println("PORR -> D2~D7 전부 OFF");\n  R_PORT1->PORR = ALL_BITS;\n  delay(500);\n\n  // 3) PODR로 체크무늬 패턴 (짝수/홀수 번째 핀을 번갈아 켜기)\n  Serial.println("PODR -> 체크무늬 패턴");\n  R_PORT1->PODR = D2_BIT | D4_BIT | D6_BIT;\n  delay(400);\n  R_PORT1->PODR = D3_BIT | D5_BIT | D7_BIT;\n  delay(400);\n  R_PORT1->PODR = 0;\n  delay(400);\n}`;
+  } else if (type === 'mega_register'){
+    editor.value = currentLang === 'en'
+      ? `// Example: control D13 directly via the DDRB/PORTB registers.\n// NOTE: on the Mega 2560, D13 is PB7 (NOT PB5 like on the Uno/R3) -- the Mega's D0~D13\n// pins are scattered across several ports (see the 'mega_porta' example for the one\n// port that DOES line up neatly with consecutive pin numbers).\nvoid setup() {\n  Serial.begin(9600);\n  DDRB |= (1 << PB7);   // Set D13 (PB7 on Mega) as an output\n}\n\nvoid loop() {\n  PORTB ^= (1 << PB7);  // Toggle the port bit directly\n  delay(150);\n}`
+      : `// DDRB/PORTB 레지스터로 D13을 직접 제어하는 예제.\n// 주의: Mega 2560의 D13은 PB7입니다(Uno/R3의 PB5가 아닙니다) -- Mega의 D0~D13은 여러\n// 포트에 흩어져 있습니다('mega_porta' 예제가 딱 하나, 핀 번호와 포트 비트가 가지런히\n// 일치하는 포트입니다).\nvoid setup() {\n  Serial.begin(9600);\n  DDRB |= (1 << PB7);   // D13(Mega에서는 PB7)을 출력으로 설정\n}\n\nvoid loop() {\n  PORTB ^= (1 << PB7);  // 포트 비트를 직접 토글\n  delay(150);\n}`;
+  } else if (type === 'mega_api_vs_register'){
+    editor.value = currentLang === 'en'
+      ? `// Compares the same action implemented two ways: pin 12 via the DDR/PORT registers,\n// pin 13 via the standard API. On the Mega 2560, D12=PB6 and D13=PB7 -- adjacent bits\n// on the SAME port (PORTB), just like D12/D13 on the Uno/R3 (also PORTB there, but\n// different bit numbers: PB4/PB5).\n\nconst int ledApiPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  DDRB |= (1 << PB6);   // same effect as pinMode(12, OUTPUT) on the Mega\n  pinMode(ledApiPin, OUTPUT);\n  Serial.println("Pin12=register(first), Pin13=API(second), blinking together.");\n}\n\nvoid loop() {\n  PORTB |= (1 << PB6);\n  digitalWrite(ledApiPin, HIGH);\n  Serial.println("12(REG)=HIGH, 13(API)=HIGH");\n  delay(500);\n\n  PORTB &= ~(1 << PB6);\n  digitalWrite(ledApiPin, LOW);\n  Serial.println("12(REG)=LOW,  13(API)=LOW");\n  delay(500);\n}`
+      : `// 같은 동작을 12번 핀은 DDR/PORT 레지스터로, 13번 핀은 표준 API로 구현해 비교합니다.\n// Mega 2560에서는 D12=PB6, D13=PB7로, 같은 포트(PORTB)의 이웃한 비트입니다 — Uno/R3의\n// D12/D13도 마찬가지로 PORTB이지만 비트 번호가 다릅니다(PB4/PB5).\n\nconst int ledApiPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  DDRB |= (1 << PB6);   // Mega에서 pinMode(12, OUTPUT)과 동일한 효과\n  pinMode(ledApiPin, OUTPUT);\n  Serial.println("12번=레지스터(먼저), 13번=API(나중)로 동시에 점멸합니다.");\n}\n\nvoid loop() {\n  PORTB |= (1 << PB6);\n  digitalWrite(ledApiPin, HIGH);\n  Serial.println("12(REG)=HIGH, 13(API)=HIGH");\n  delay(500);\n\n  PORTB &= ~(1 << PB6);\n  digitalWrite(ledApiPin, LOW);\n  Serial.println("12(REG)=LOW,  13(API)=LOW");\n  delay(500);\n}`;
+  } else if (type === 'mega_porta'){
+    editor.value = currentLang === 'en'
+      ? `// Mega full-port control example -- PORTA is the ONE port on the Mega 2560 whose 8\n// bits line up with 8 consecutive Arduino pin numbers (D22~D29), exactly like PORTD\n// lines up with D0~D7 on the Uno/R3. A single PORTA write moves all 8 pins (D22~D29)\n// at once in ONE clock cycle, instead of 8 separate ~56-cycle digitalWrite() calls.\n// (Every other Mega port is scattered across non-consecutive pin numbers -- see the\n// 'mega_register' example's note.)\n//\n// Wiring: an LED+resistor on every pin D22~D29, so the raw 8-bit value is directly\n// visible as a binary counter (D29 = MSB, D22 = LSB).\n\nvoid setup() {\n  DDRA = 0xFF; // Set D22~D29 all to OUTPUT at once\n}\n\nvoid loop() {\n  for (int i = 0; i <= 255; i++) {\n    PORTA = i; // Write all 8 pins in a single instruction\n    delay(120);\n  }\n}`
+      : `// Mega 포트 전체 제어 예제 — PORTA는 Mega 2560에서 유일하게 8개 비트가 연속된 아두이노\n// 핀 번호(D22~D29) 8개와 가지런히 일치하는 포트입니다. Uno/R3의 PORTD가 D0~D7과 맞아\n// 떨어지는 것과 정확히 같은 구조입니다. PORTA 레지스터 한 번 쓰기로 D22~D29 8개 핀이\n// 단 1클록에 동시에 바뀝니다 — digitalWrite()를 8번 따로 부르는 것과 대조적입니다.\n// (Mega의 나머지 포트는 모두 핀 번호가 연속되지 않게 흩어져 있습니다 —\n// 'mega_register' 예제의 설명 참고.)\n//\n// 배선: D22~D29 각 핀에 저항+LED를 하나씩 달아, 8비트 값이 그대로 "2진수 카운터"로\n// 보이게 했습니다(D29가 최상위 비트, D22가 최하위 비트).\n\nvoid setup() {\n  DDRA = 0xFF; // D22~D29를 한 번에 전부 출력으로 설정\n}\n\nvoid loop() {\n  for (int i = 0; i <= 255; i++) {\n    PORTA = i; // 명령어 하나로 8개 핀 전부에 값을 출력\n    delay(120);\n  }\n}`;
   } else if (type === 'relay'){
     editor.value = currentLang === 'en'
       ? `// Drive a 5V relay module from an Arduino digital pin to switch a HIGH-VOLTAGE\n// load (up to 48V DC / 220V AC) that never touches the Arduino itself.\n//\n// Wiring in the simulator:\n//   Board 5V  -> Relay VCC\n//   Board GND -> Relay GND\n//   Board D7  -> Relay IN\n//   Relay COM/NO (or COM/NC) -> the high-voltage load's switching path\n//     (e.g. AC PSU (ac1) L -> Relay COM, Relay NO -> motor3ph/lamp load -> PSU N)\n//\n// IN = HIGH energizes the coil -> COM connects to NO (normally-open closes).\n// IN = LOW  de-energizes it    -> COM connects to NC (normally-closed).\n// This mirrors a real opto-isolated relay module: the coil side (5V logic)\n// and the contact side (up to 48V DC / 220V AC) are electrically separate --\n// the Arduino only ever switches the small 5V coil current, never the load.\n\nconst int relayPin = 7;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(relayPin, OUTPUT);\n  digitalWrite(relayPin, LOW); // start de-energized (load on NC, if wired there)\n}\n\nvoid loop() {\n  Serial.println("Relay ON  (energized -> COM-NO closed)");\n  digitalWrite(relayPin, HIGH);\n  delay(2000);\n\n  Serial.println("Relay OFF (de-energized -> COM-NC closed)");\n  digitalWrite(relayPin, LOW);\n  delay(2000);\n}`
@@ -8826,7 +8950,7 @@ function BOM_LABELS_FN(){ return {
 }; }
 function boardTypeLabel(type){
   return {
-    r4: tr('board.r4'), r3: tr('board.r3'),
+    r4: tr('board.r4'), r3: tr('board.r3'), mega: tr('board.mega'),
     esp32b: tr('board.esp32b'), esp32d: tr('board.esp32d'), esp32t: tr('board.esp32t'),
   }[type] || type;
 }
@@ -8836,7 +8960,7 @@ function openBomList(){
     let key, label;
     if (el.classList.contains('board')){
       const inst = boardInstances[el.dataset.board];
-      const type = inst ? inst.type : (el.dataset.board.startsWith('r3') ? 'r3' : 'r4');
+      const type = inst ? inst.type : (el.dataset.board.startsWith('r3') ? 'r3' : el.dataset.board.startsWith('mega') ? 'mega' : 'r4');
       key = 'board-' + type;
       label = boardTypeLabel(type);
     } else {
@@ -8916,6 +9040,18 @@ function schematicPinName(pinEl, ownerEl){
 function svgEsc(s){
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+// 회로도 캔버스 크기를 정할 때 라벨/값 문자열이 실제로 얼마나 넓게 그려질지 미리 어림잡습니다.
+// (팝업 창을 열기 전, DOM에 아직 붙지 않은 텍스트라 getComputedTextLength()로 실측할 수 없어서
+// 문자 종류별 평균 폭으로 추정합니다.) 한글/전각 문자는 모노스페이스 폰트에서도 거의 정사각형
+// (1em 안팎)으로 그려지고, 그 외 라틴 문자·숫자·기호는 그보다 좁게 그려지는 경향을 반영했습니다.
+function schematicTextWidth(text, fontSize){
+  if (!text) return 0;
+  let w = 0;
+  for (const ch of String(text)){
+    w += /[ᄀ-ᇿㄱ-ㆎꥠ-꥿가-힣＀-￯]/.test(ch) ? fontSize * 1.05 : fontSize * 0.62;
+  }
+  return w;
+}
 // 보드를 먼저, 나머지 부품은 캔버스에 놓인 순서 그대로 좌→우로 한 줄씩 채워나가는 격자
 // 배치를 씁니다(한 줄에 다 안 들어가면 다음 줄로 줄바꿈). 실제 캔버스 배치를 그대로 옮기면
 // 보드처럼 큰 요소와 작은 부품이 한 스케일로 눌려서 서로 겹치기 쉬우므로, 대신 각 기호가
@@ -8963,15 +9099,25 @@ function buildSchematicModel(){
     } else {
       w = 110; h = 50;
     }
+    // 라벨/값 문자열이 기호 폭(w)보다 넓을 때(한글 라벨은 특히 길어지기 쉽습니다 — 예:
+    // "스텝모터 드라이버 (A4988)") 그 글자가 옆 부품이나 캔버스 바깥으로 잘려 나가지 않도록,
+    // 이 노드가 실제로 차지할 "칸" 너비(effW)를 라벨/값 폭까지 감싸도록 넉넉하게 잡습니다.
+    // 전선/핀은 원래 기호 폭(w) 기준 그대로 두고, 기호 자체는 이 칸 안에서 가운데로 배치합니다.
+    const label = schematicLabelOf(it.el);
+    const value = schematicValueOf(it.el);
+    const labelW = schematicTextWidth(label, 12);
+    const valueW = value ? schematicTextWidth(value, 10) : 0;
+    const effW = Math.max(w, labelW, valueW) + 16;
     const extraBelow = (it.kind === 'box' ? PIN_STUB + 18 : 20);
     const cellH = h + extraBelow;
-    if (curX > MARGIN && curX + w > MARGIN + MAX_ROW_W){
+    if (curX > MARGIN && curX + effW > MARGIN + MAX_ROW_W){
       curX = MARGIN;
       curY += rowH + GAP_Y;
       rowH = 0;
     }
-    const x = curX, y = curY;
-    curX += w + GAP_X;
+    const cellX = curX, y = curY;
+    const x = cellX + (effW - w) / 2; // 기호를 칸 정중앙에 배치(핀 위치는 w 기준 그대로 유지)
+    curX += effW + GAP_X;
     rowH = Math.max(rowH, cellH);
 
     const pins = [];
@@ -8989,8 +9135,8 @@ function buildSchematicModel(){
     }
     pins.forEach((p, pIdx) => pinIndexOf.set(p.pinEl, { n: nodeIdx, p: pIdx }));
     nodes.push({
-      kind: it.kind, label: schematicLabelOf(it.el), value: schematicValueOf(it.el),
-      x, y, w, h, rot: 0,
+      kind: it.kind, label, value,
+      x, y, w, h, cellX, cellRight: cellX + effW, rot: 0,
       pins: pins.map(p => ({ name: p.name, lx: p.lx, ly: p.ly })),
     });
   });
@@ -9002,7 +9148,7 @@ function buildSchematicModel(){
     wireList.push({ a, b, color: wo.color || WIRE_DEFAULT_COLOR, bends: [] });
   });
 
-  const maxRight = Math.max(...nodes.map(n => n.x + n.w));
+  const maxRight = Math.max(...nodes.map(n => n.cellRight));
   const maxBottom = Math.max(...nodes.map(n => n.y + n.h + (n.kind === 'box' ? PIN_STUB + 16 : 20)));
   return { nodes, wires: wireList, width: Math.ceil(Math.max(600, maxRight + MARGIN)), height: Math.ceil(Math.max(400, maxBottom + MARGIN)) };
 }
@@ -9375,6 +9521,13 @@ const R4_EXAMPLE_DEFS = [
   { key: 'port_wide', titleKey: 'popup.exPortWideR4' },
   { key: 'relay', titleKey: 'popup.exRelay' },
   { key: 'fireworks', titleKey: 'popup.exFireworksR4' },
+  { sectionLabel: 'popup.motorSectionTitle' },
+  { key: 'dcmotor', titleKey: 'popup.exDcMotor' },
+  { key: 'servo', titleKey: 'popup.exServo' },
+  { key: 'encoder', titleKey: 'popup.exEncoder' },
+  { key: 'stepper', titleKey: 'popup.exStepper' },
+  { key: 'acmotor', titleKey: 'popup.exAcMotor' },
+  { key: 'rs485_servo_single', titleKey: 'popup.exRs485Motor' },
 ];
 const R3_EXAMPLE_DEFS = [
   { key: 'counter', titleKey: 'popup.exCounter' },
@@ -9382,6 +9535,31 @@ const R3_EXAMPLE_DEFS = [
   { key: 'api_vs_register', titleKey: 'popup.exApiVsReg' },
   { key: 'port_full', titleKey: 'popup.exPortFullR3' },
   { key: 'relay', titleKey: 'popup.exRelay' },
+  { sectionLabel: 'popup.motorSectionTitle' },
+  { key: 'dcmotor', titleKey: 'popup.exDcMotor' },
+  { key: 'servo', titleKey: 'popup.exServo' },
+  { key: 'encoder', titleKey: 'popup.exEncoder' },
+  { key: 'stepper', titleKey: 'popup.exStepper' },
+  { key: 'acmotor', titleKey: 'popup.exAcMotor' },
+  { key: 'rs485_servo_single', titleKey: 'popup.exRs485Motor' },
+];
+// Mega 2560 코딩 예제 — R3와 같은 깊이(레지스터 직접제어 예제 포함)로 구성했습니다.
+// mega_register/mega_api_vs_register/mega_porta는 R3의 register/api_vs_register/port_full을
+// Mega의 실제 포트 매핑(D13=PB7, D12=PB6, D22~D29=PORTA)에 맞춰 새로 쓴 것입니다.
+const MEGA_EXAMPLE_DEFS = [
+  { key: 'counter', titleKey: 'popup.exCounterD13' },
+  { key: 'analog', titleKey: 'popup.exAnalog' },
+  { key: 'mega_register', titleKey: 'popup.exRegisterMega' },
+  { key: 'mega_api_vs_register', titleKey: 'popup.exApiVsRegMega' },
+  { key: 'mega_porta', titleKey: 'popup.exPortAMega' },
+  { key: 'relay', titleKey: 'popup.exRelay' },
+  { sectionLabel: 'popup.motorSectionTitle' },
+  { key: 'dcmotor', titleKey: 'popup.exDcMotor' },
+  { key: 'servo', titleKey: 'popup.exServo' },
+  { key: 'encoder', titleKey: 'popup.exEncoder' },
+  { key: 'stepper', titleKey: 'popup.exStepper' },
+  { key: 'acmotor', titleKey: 'popup.exAcMotor' },
+  { key: 'rs485_servo_single', titleKey: 'popup.exRs485Motor' },
 ];
 // ESP32 코딩 예제 — 보드 종류별로 갤러리 탭을 따로 두어(DevKit/디스플레이/터치) 각 보드가
 // 실제로 할 수 있는 예제만 모아 보여줍니다.
@@ -9442,6 +9620,8 @@ function renderGalleryBody(){
     defs = R4_EXAMPLE_DEFS; icon = ICO_CHIP_R4; onClick = (d) => `runCodeExample('r4','${d.key}')`;
   } else if (galleryTab === 'r3'){
     defs = R3_EXAMPLE_DEFS; icon = ICO_CHIP_R3; onClick = (d) => `runCodeExample('r3','${d.key}')`;
+  } else if (galleryTab === 'mega'){
+    defs = MEGA_EXAMPLE_DEFS; icon = ICO_CHIP_R3; onClick = (d) => `runCodeExample('mega','${d.key}')`;
   } else if (galleryTab === 'esp32b'){
     defs = ESP32B_EXAMPLE_DEFS; icon = ICO_CHIP_ESP32; onClick = (d) => `runCodeExample('${d.board}','${d.key}')`;
   } else if (galleryTab === 'esp32d'){
@@ -9453,14 +9633,17 @@ function renderGalleryBody(){
   } else {
     defs = COMM_EXAMPLE_DEFS; icon = ICO_COMM; onClick = (d) => `runCommExample('${d.key}')`;
   }
-  body.innerHTML = defs.map(d => `
+  body.innerHTML = defs.map(d => {
+    if (d.sectionLabel) return `<div class="ep-section-label">${tr(d.sectionLabel)}</div>`;
+    return `
     <div class="ep-card" onclick="${onClick(d)}">
       <div class="ep-icon">${d.icon || icon}</div>
       <div class="ep-text">
         <div class="ep-title">${tr(d.titleKey)}</div>
         <div class="ep-desc">${tr(d.descKey || 'gallery.codeExampleDesc')}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // 코딩 예제 카드: 해당 보드가 캔버스에 아직 없으면(R3는 기본 미배치) 하나 만들고, 예제 코드를
@@ -9662,13 +9845,15 @@ function runCodeExample(board, key){
   // 시작합니다. 사용자가 직접 여러 대 추가해 둔 보드(r4_2, r3_2, ...)는 예제 갤러리의 대상이
   // 아니라 사용자가 직접 구성한 회로이므로, 그 보드의 팝업 버튼을 눌렀을 때는 캔버스를
   // 비우지 않고 그 보드의 코드만 바꿔 올립니다.
-  const isDefaultBoard = board === 'r4' || board === 'r3' || ESP32_BOARD_TYPES.has(board);
+  const isDefaultBoard = board === 'r4' || board === 'r3' || board === 'mega' || ESP32_BOARD_TYPES.has(board);
   if (isDefaultBoard) clearCanvasAll();
   if (isDefaultBoard && !boardInstances[board]) spawnBoard(board);
   if (key === 'port_full'){
     wirePortControlLeds(board, key, ['D0','D1','D2','D3','D4','D5','D6','D7']);
   } else if (key === 'port_wide'){
     wirePortControlLeds(board, key, ['D2','D3','D4','D5','D6','D7']);
+  } else if (key === 'mega_porta'){
+    wirePortControlLeds(board, key, ['D22','D23','D24','D25','D26','D27','D28','D29']);
   } else if (key === 'stepper'){
     wireStepperExample(board, key);
   } else if (key === 'dcmotor'){
@@ -10197,6 +10382,7 @@ function runRs485ServoChainExample(){
 const PERIPH_PINS = {
   r3:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12', servoSig: 'D9', encA: 'D3', relayIn: 'D7' },
   r4:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12', servoSig: 'D9', encA: 'D3', relayIn: 'D7' },
+  mega:   { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12', servoSig: 'D9', encA: 'D3', relayIn: 'D7' },
   esp32b: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15', servoSig: 'GPIO22', encA: 'GPIO21', relayIn: 'GPIO16' },
   esp32d: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15', servoSig: 'GPIO22', encA: 'GPIO21', relayIn: 'GPIO16' },
   esp32t: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15', servoSig: 'GPIO22', encA: 'GPIO21', relayIn: 'GPIO16' },
