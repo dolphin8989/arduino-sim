@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.96b</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.97c</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -90,6 +90,10 @@
     border:1px solid var(--border-strong); border-radius:8px; padding:6px; z-index:500;
     box-shadow:0 10px 24px rgba(0,0,0,.45); display:flex; flex-direction:column; gap:2px;
   }
+  /* .ds-menu의 display:flex가 [hidden] 속성의 기본 display:none보다 우선 적용되어(둘 다 저작자
+     스타일 없이는 동일 우선순위지만, .ds-menu는 저작자 스타일이라 브라우저 기본 [hidden] 규칙을
+     이겨버림) 버튼을 다시 눌러도 메뉴가 계속 화면에 남아있던 버그를 고칩니다. */
+  .ds-menu[hidden]{ display:none; }
   .ds-menu a{display:block; padding:8px 10px; border-radius:5px; color:var(--text); text-decoration:none; font-size:.78rem;}
   .ds-menu a:hover{background:var(--bg-panel); color:var(--teal);}
   .code-export-group{display:flex; align-items:center; gap:4px;}
@@ -120,7 +124,16 @@
   .palette-group.collapsed .pg-caret{transform:rotate(-90deg);}
   .palette-group-header .pg-count{margin-left:auto; font-weight:400; font-size:.6rem; opacity:.7;}
   .palette-group-body{display:flex; flex-direction:column; gap:8px; padding-top:6px;}
-  .palette-group.collapsed .palette-group-body{display:none;}
+  /* '🔬 전기 실험실'만 예전 방식 그대로 즉시 표시/숨김(display:none)입니다(요청: "전기 실습 등은
+     따로 빼주고"). 나머지 그룹은 버튼을 누르면 아래로 스르륵 슬라이드되며 펼쳐지고 한 번 더
+     누르면 슬라이드되어 접힙니다 — JS가 max-height를 실제 콘텐츠 높이 ↔ 0으로 애니메이션하므로,
+     display:none을 걸면 트랜지션이 재생될 기회조차 없이 그냥 즉시 사라져버려 이 규칙은 반드시
+     전기실험실 쪽에만 한정해야 합니다.*/
+  .palette-group[data-group="explab"].collapsed .palette-group-body{display:none;}
+  .palette-group:not([data-group="explab"]) .palette-group-body{
+    overflow:hidden; transition:max-height .28s ease, padding-top .28s ease;
+  }
+  .palette-group:not([data-group="explab"]).collapsed .palette-group-body{padding-top:0;}
   .palette-item{
     background:var(--bg-panel-2); border:1px solid var(--border); border-radius:8px; padding:12px 10px;
     display:flex; flex-direction:column; align-items:center; gap:8px; cursor:grab; text-align:center;
@@ -399,7 +412,6 @@
   }
   .scope-hold-btn:hover, .scope-zoom-btn:hover{border-color:var(--teal);}
   .scope-hold-btn.held{background:#3a2f0d; color:#f2a53d; border-color:#f2a53d;}
-  .scope-hold-btn.armed{background:#2a2f0d; color:#d8e84a; border-color:#d8e84a; animation:scopeArmedPulse 1s ease-in-out infinite;}
   @keyframes scopeArmedPulse{0%,100%{opacity:1;} 50%{opacity:.55;}}
   .scope-zoom-btn.active{background:#0d2a3a; color:#5ad0e6; border-color:#5ad0e6;}
   .scope-screen{background:#03150c; border:2px solid #0a0c0e; border-radius:5px; padding:3px; position:relative;}
@@ -434,6 +446,18 @@
   .scope-decode-btn.active{background:#0b5d3e; color:#fff; border-color:#3ddc84;}
   .scope-decode-out{margin-top:4px; font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:#3ddc84; line-height:1.5; word-break:break-all;}
   .scope-decode-out .scope-decode-hint{color:var(--text-faint);}
+  /* 트리거 버튼: 기존 정지/재개(RUN·STOP) 버튼과는 완전히 별개의 하단 컨트롤입니다 — 켜두면
+     다음 디지털 엣지에서 자동으로 화면이 멈추고, 꺼두면(기본값) 그런 자동 정지가 전혀 일어나지
+     않습니다(수동 정지/재개만 가능). 두 버튼이 서로의 상태를 표시/침범하지 않도록 완전히
+     분리했습니다. */
+  .scope-trigger-row{display:flex; align-items:center; gap:8px; margin-top:7px; padding-top:6px; border-top:1px solid #34383f;}
+  .scope-trigger-label{font-family:'IBM Plex Mono',monospace; font-size:.58rem; color:var(--text-faint);}
+  .scope-trigger-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--text-dim); background:#1a1e24;
+    border:1px solid var(--border-strong); border-radius:4px; padding:3px 8px; cursor:pointer;
+  }
+  .scope-trigger-btn:hover{border-color:var(--teal);}
+  .scope-trigger-btn.armed{background:#2a2f0d; color:#d8e84a; border-color:#d8e84a; animation:scopeArmedPulse 1s ease-in-out infinite;}
 
   /* Breadboard */
   .comp-breadboard{
@@ -642,6 +666,133 @@
   .psu-3ph-legend span{font-family:'IBM Plex Mono',monospace; font-size:.56rem;}
   .pin-mini.psu-r{border-color:#ff5c5c;} .pin-mini.psu-s{border-color:#ffd23f;} .pin-mini.psu-t{border-color:#5aa9e6;}
 
+  /* ---------- 손잡이 발전기 (전자기유도 — 크랭크를 돌려 전기를 만듦, DC/AC 선택) ---------- */
+  .comp-generator{width:192px;}
+  .comp-generator select.generator-mode{
+    width:100%; margin-bottom:7px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong);
+    border-radius:4px; font-size:.66rem; padding:3px; cursor:pointer;
+  }
+  .generator-crank-wrap{display:flex; justify-content:center; margin:2px 0 8px;}
+  .generator-crank{
+    width:44px; height:44px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#454b53,#20242a 75%);
+    border:2px solid #575d66; position:relative; box-shadow:0 4px 8px rgba(0,0,0,.4);
+  }
+  .generator-crank::after{content:''; position:absolute; inset:15px; border-radius:50%; background:#2a2e33;}
+  .generator-crank-handle{
+    position:absolute; top:50%; left:50%; width:3px; height:17px; background:#e8d38a; border-radius:2px;
+    transform-origin:50% 2px; transform:translate(-1.5px,-2px) rotate(0deg);
+  }
+  .generator-btns{display:flex; gap:5px; margin-bottom:7px;}
+  .generator-btn{
+    flex:1; font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:var(--text-dim); background:#1a1e24;
+    border:1px solid var(--border-strong); border-radius:4px; padding:5px 3px; cursor:pointer; user-select:none;
+  }
+  .generator-btn:hover{border-color:var(--teal);}
+  .generator-btn.cranking{background:#264a1e; color:#8ee68a; border-color:#8ee68a;}
+  .generator-readout{
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:#5ad0e6; text-align:center; margin-bottom:7px;
+  }
+
+  /* ---------- 🔬 전기 실험실: 소금물 동전 전지 / 과일 전지 / 외르스텟 / 다이오드 / 트랜지스터 ---------- */
+  .comp-coincell{width:150px;}
+  .coincell-stack{display:flex; flex-direction:column-reverse; align-items:center; gap:2px; min-height:64px; justify-content:flex-start; margin-bottom:6px;}
+  .coincell-layer{width:52px; height:9px; border-radius:3px; background:linear-gradient(180deg,#e6c66a,#a8792a); border:1px solid #7a5a1a; box-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .coincell-layer::before{content:'';}
+  .coincell-controls{display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:6px; font-size:.66rem; color:var(--text-dim);}
+  .coincell-controls input[type="range"]{width:80px;}
+  .coincell-readout{font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:#5ad0e6; text-align:center; margin-bottom:6px;}
+
+  .comp-fruitbatt{width:158px;}
+  .fruitbatt-visual{display:flex; justify-content:center; align-items:center; gap:3px; min-height:34px; margin-bottom:6px;}
+  .fruitbatt-icon{width:26px; height:26px; border-radius:50%; box-shadow:0 2px 4px rgba(0,0,0,.35);}
+  .comp-fruitbatt select.fruitbatt-type{
+    width:100%; margin-bottom:6px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong);
+    border-radius:4px; font-size:.62rem; padding:3px; cursor:pointer;
+  }
+  .fruitbatt-controls{display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:6px; font-size:.66rem; color:var(--text-dim);}
+  .fruitbatt-controls input[type="range"]{width:70px;}
+  .fruitbatt-readout{font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:#5ad0e6; text-align:center; margin-bottom:6px;}
+
+  .comp-oersted{width:150px; padding:11px; background:linear-gradient(160deg,#2a2620,#161310); border:1px solid #4a3f2c; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .oersted-wire{width:100%; height:6px; border-radius:3px; background:repeating-linear-gradient(90deg,#c98a3a 0px,#e8b25f 3px,#c98a3a 6px); margin:8px 0;}
+  .oersted-compass{width:52px; height:52px; border-radius:50%; background:radial-gradient(circle at 40% 35%,#3a3f47,#181b1f); border:2px solid #5a6a5a; margin:6px auto; position:relative;}
+  .oersted-needle{
+    position:absolute; top:50%; left:50%; width:3px; height:38px; border-radius:2px;
+    background:linear-gradient(180deg,#e64545 0%,#e64545 48%,#e8e8e8 52%,#e8e8e8 100%);
+    transform-origin:50% 50%; transform:translate(-1.5px,-19px) rotate(0deg); transition:transform .15s ease-out;
+  }
+  .oersted-readout{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:#5ad0e6; margin-top:4px;}
+
+  .comp-diode{width:118px; padding:10px; background:linear-gradient(160deg,#2a2020,#161010); border:1px solid #4a3232; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .diode-body{display:flex; align-items:center; justify-content:center; gap:0; margin:8px 0;}
+  .diode-tri{width:0; height:0; border-top:9px solid transparent; border-bottom:9px solid transparent; border-left:16px solid #d43b3b; transition:border-left-color .15s;}
+  .diode-tri.conducting{border-left-color:#8ee68a;}
+  .diode-bar{width:3px; height:22px; background:#d0d0d0; border-radius:1px;}
+  .diode-status{font-size:.6rem; color:var(--text-dim); margin-top:2px;}
+  .diode-status.conducting{color:#8ee68a;}
+
+  .comp-transistor{width:126px; padding:10px; background:linear-gradient(160deg,#2a3648,#161c26); border:1px solid #3a4a5f; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .transistor-body{width:56px; height:56px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#454b53,#20242a 75%); border:2px solid #575d66; margin:6px auto; position:relative;}
+  .transistor-led{width:11px; height:11px; border-radius:50%; background:#3a3a3a; margin:0 auto; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); box-shadow:inset 0 0 3px rgba(0,0,0,.6);}
+  .transistor-led.on{background:#5aff5a; box-shadow:0 0 8px 3px rgba(90,255,90,.6);}
+  .transistor-status{font-size:.62rem; color:var(--text-dim); margin-top:6px;}
+  .transistor-status.on{color:#8ee68a;}
+  .comp-transistor .comp-pin-row{flex-wrap:wrap; gap:5px 7px; justify-content:center;}
+
+  /* ---------- 🔬 전기 실험실 2차: 변압기 / 평행 도선의 힘 / 전자석 / 퓨즈 ---------- */
+  .comp-transformer{width:168px;}
+  .transformer-core{
+    width:100%; height:44px; margin:8px 0; border-radius:4px;
+    background:repeating-linear-gradient(90deg,#c98a3a 0px,#e8b25f 3px,#c98a3a 6px);
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .transformer-core::before, .transformer-core::after{
+    content:''; position:absolute; top:4px; bottom:4px; width:8px; background:#2c3138; border-radius:2px;
+  }
+  .transformer-core::before{left:38%;} .transformer-core::after{left:58%;}
+  .transformer-ratio{display:flex; align-items:center; justify-content:center; gap:5px; margin-bottom:6px; font-size:.66rem; color:var(--text-dim);}
+  .transformer-ratio input{width:38px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; padding:2px 4px; text-align:center;}
+  .transformer-readout{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:#5ad0e6; text-align:center; margin-bottom:6px;}
+  .transformer-warn{font-size:.58rem; color:#ffb347; text-align:center; margin-bottom:4px;}
+
+  .comp-parallelwires{width:150px; padding:11px; background:linear-gradient(160deg,#2a2620,#161310); border:1px solid #4a3f2c; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .pwires-visual{display:flex; flex-direction:column; align-items:center; gap:10px; margin:10px 0; transition:gap .3s ease;}
+  .pwires-wire{width:100px; height:6px; border-radius:3px; background:#c98a3a; position:relative; display:flex; align-items:center; justify-content:center;}
+  .pwires-arrow{position:absolute; font-size:.72rem; color:#1a1e24; transition:transform .3s ease;}
+  .pwires-readout{font-size:.64rem; color:var(--text-dim); min-height:14px;}
+  .pwires-readout.attract{color:#8ee68a;}
+  .pwires-readout.repel{color:#ff8c6a;}
+
+  .comp-electromagnet{width:130px; padding:11px; background:linear-gradient(160deg,#2a2620,#161310); border:1px solid #4a3f2c; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .electromagnet-core-wrap{display:flex; justify-content:center; align-items:flex-end; gap:2px; min-height:70px; margin:6px 0; position:relative;}
+  .electromagnet-core{
+    width:16px; height:56px; border-radius:3px;
+    background:repeating-linear-gradient(0deg,#c98a3a 0px,#e8b25f 3px,#c98a3a 6px);
+    border:1px solid #7a5a1a;
+  }
+  .electromagnet-clip{
+    width:14px; height:5px; border:2px solid #b8bec7; border-radius:3px; background:transparent;
+    transition:transform .25s ease, opacity .25s ease; opacity:.45; transform:translateY(6px) rotate(90deg);
+  }
+  .electromagnet-clip.attached{opacity:1; transform:translateY(-30px) rotate(90deg);}
+  .electromagnet-status{font-size:.62rem; color:var(--text-dim); margin-top:4px;}
+  .electromagnet-status.on{color:#8ee68a;}
+
+  .comp-fuse{width:126px; padding:11px; background:linear-gradient(160deg,#2a2620,#161310); border:1px solid #4a3f2c; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .fuse-body{width:70px; height:20px; margin:8px auto; border-radius:9px; background:#e8dcc0; border:2px solid #a89060; position:relative; overflow:hidden;}
+  .fuse-body::after{content:''; position:absolute; left:8px; right:8px; top:50%; height:2px; background:#5a4a2a; transform:translateY(-1px);}
+  .fuse-body.blown{background:#2a2020; border-color:#5a3a3a;}
+  .fuse-body.blown::after{background:#000; box-shadow:0 0 4px 2px rgba(255,80,0,.5);}
+  .fuse-controls{display:flex; align-items:center; justify-content:center; gap:5px; margin-bottom:6px; font-size:.6rem; color:var(--text-dim);}
+  .comp-fuse select.fuse-rated{background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.62rem; padding:2px; cursor:pointer;}
+  .fuse-status{font-size:.62rem; color:#8ee68a; margin-bottom:6px;}
+  .fuse-status.blown{color:#ff5c5c;}
+  .fuse-replace-btn{
+    width:100%; font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:var(--text-dim); background:#1a1e24;
+    border:1px solid var(--border-strong); border-radius:4px; padding:4px 3px; cursor:pointer; margin-bottom:6px;
+  }
+  .fuse-replace-btn:hover{border-color:var(--teal);}
+
   /* ---------- 2채널 가변 전원 공급기 (0~48V, 전압/전류 표시) ---------- */
   .comp-benchpsu{
     width:172px; padding:11px; background:linear-gradient(160deg,#232a22,#12160f); border:1px solid #3f4a3a;
@@ -698,6 +849,23 @@
   .comp-dcmotor-enc .motor-fan{position:absolute; inset:6px; border-radius:50%; background:conic-gradient(#8b93a1 0deg 90deg,#3a4048 90deg 180deg,#8b93a1 180deg 270deg,#3a4048 270deg 360deg);}
   .enc-disk{position:absolute; inset:16px; border-radius:50%; background:repeating-conic-gradient(#e8d38a 0deg 15deg, #2a2a2a 15deg 30deg); border:1px solid #000; opacity:.9;}
   .enc-badge{font-family:'IBM Plex Mono',monospace; font-size:.54rem; color:#3ddc84;}
+
+  /* ---------- 스텝모터 (바이폴라 4선, NEMA-17류) ---------- */
+  /* 연속 회전이 아니라 STEP 펄스 하나마다 정해진 각도씩 "딸깍" 끊어져 도는 모습을 강조하기
+     위해, DC 모터의 매끈한 회전 애니메이션 대신 rotor에 transition만 짧게 걸어 스텝마다
+     제자리에서 툭 튀는 느낌을 줍니다(모터 바디에는 실제 스텝모터처럼 톱니 자극을 그렸습니다). */
+  .comp-stepper{width:80px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .stepper-body{width:52px; height:52px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#6a6660,#2a2823 75%); border:3px solid #1a1815; position:relative; box-shadow:0 6px 14px rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center;}
+  .stepper-rotor{position:absolute; inset:6px; border-radius:50%; background:repeating-conic-gradient(#e8b23f 0deg 22.5deg, #3a2f18 22.5deg 45deg); border:1px solid #000; transition:transform .06s ease-out;}
+  .stepper-rotor::after{content:''; position:absolute; top:2px; left:50%; width:4px; height:38%; background:#ffffff; border-radius:2px; transform:translateX(-50%); box-shadow:0 0 3px rgba(255,255,255,.8);}
+  .stepper-hub{position:absolute; width:14px; height:14px; border-radius:50%; background:#1a1815; border:1px solid #000; z-index:1;}
+  .stepper-badge{font-family:'IBM Plex Mono',monospace; font-size:.54rem; color:#e8b23f;}
+
+  /* ---------- A4988 스텝모터 드라이버 모듈 ---------- */
+  .comp-a4988{width:168px; padding:10px; background:linear-gradient(160deg,#2a1e33,#160f1c); border:1px solid #4a3560; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .a4988-title{font-size:.62rem; color:#c99cff; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; line-height:1.35;}
+  .comp-a4988 .md-out-row{margin-top:10px; padding-top:8px; border-top:1px dashed #4a3560;}
+  .comp-a4988 .ms-row{margin-top:8px; padding-top:8px; border-top:1px dashed #4a3560; opacity:.85;}
 
   /* ---------- 디지털 멀티미터 ---------- */
   .comp-multimeter{width:132px; padding:12px 10px; background:linear-gradient(160deg,#3a3f37,#23261f); border:1px solid #4a4f3f; border-radius:12px; text-align:center; box-shadow:0 8px 18px rgba(0,0,0,.4);}
@@ -824,7 +992,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.96b</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.97c</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -846,10 +1014,15 @@
     <button class="btn ghost" onclick="openSchematicView()" data-i18n="toolbar.schematic">📐 회로도 그리기</button>
     <button class="btn ghost" id="btnGallery" onclick="toggleExampleGallery()" data-i18n="toolbar.gallery">🗂 예제 갤러리</button>
     <div class="ds-menu-wrap" id="dsMenuWrap">
-      <button class="btn ghost" onclick="toggleDatasheetMenu(event)" data-i18n="toolbar.datasheet">📄 CPU 데이터시트</button>
+      <button class="btn ghost" onclick="toggleDatasheetMenu(event)" data-i18n="toolbar.datasheet">📄 보드 및 CPU 데이터시트</button>
       <div class="ds-menu" id="dsMenu" hidden>
-        <a href="https://docs.arduino.cc/resources/datasheets/ATmega328P-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r3">R3 (ATmega328P) 데이터시트</a>
-        <a href="https://docs.arduino.cc/resources/datasheets/ra4m1-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r4">R4 (RA4M1) 데이터시트</a>
+        <a href="https://docs.arduino.cc/resources/datasheets/A000066-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r3board">R3 보드 (Arduino UNO R3) 데이터시트</a>
+        <a href="https://docs.arduino.cc/resources/datasheets/ATmega328P-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r3">R3 CPU (ATmega328P) 데이터시트</a>
+        <a href="https://docs.arduino.cc/resources/datasheets/ABX00080-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r4board">R4 보드 (Arduino UNO R4 Minima) 데이터시트</a>
+        <a href="https://docs.arduino.cc/resources/datasheets/ra4m1-datasheet.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.r4">R4 CPU (RA4M1) 데이터시트</a>
+        <a href="https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.esp32chip">ESP32 (칩) 데이터시트</a>
+        <a href="https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32e_esp32-wroom-32ue_datasheet_en.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.esp32wroom">ESP32-WROOM-32E/32UE (모듈) 데이터시트</a>
+        <a href="https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf" target="_blank" rel="noopener noreferrer" data-i18n="datasheet.esp32trm">ESP32 기술 레퍼런스 매뉴얼</a>
       </div>
     </div>
     <button class="btn ghost" onclick="saveProjectToFile()" data-i18n="toolbar.save">💾 저장</button>
@@ -946,7 +1119,7 @@
       </div>
       <div class="palette-group" data-group="power">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.power">전원 장치</span><span class="pg-count">4</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.power">전원 장치</span><span class="pg-count">5</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('psu')">
@@ -965,11 +1138,58 @@
             <div class="swatch"><div style="width:22px;height:16px;border-radius:2px;background:#3a3f47;border:1px solid #5aa9e6;"></div></div>
             <span data-i18n="palette.ac3phase">3상 전원<br>(380V/220V)</span>
           </div>
+          <div class="palette-item" onclick="spawnComponent('generator')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:#2c3138;border:2px solid #e8d38a;"></div></div>
+            <span data-i18n="palette.generator">손잡이 발전기<br>(전자기유도, DC/AC 선택)</span>
+          </div>
+        </div>
+      </div>
+      <div class="palette-group" data-group="explab">
+        <div class="palette-group-header" onclick="togglePaletteGroup(this)">
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.explab">🔬 전기 실험실</span><span class="pg-count">9</span>
+        </div>
+        <div class="palette-group-body">
+          <div class="palette-item" onclick="spawnComponent('coincell')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(180deg,#d9b45a,#8a6a2a);border:1px solid #b8860b;"></div></div>
+            <span data-i18n="palette.coincell">소금물 동전 전지<br>(층층이 쌓기)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('fruitbatt')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f2c14e,#c96a1f);"></div></div>
+            <span data-i18n="palette.fruitbatt">과일 전지<br>(감자·레몬·오렌지)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('oersted')">
+            <div class="swatch"><div style="width:26px;height:8px;border-radius:4px;background:#8a6a2a;"></div></div>
+            <span data-i18n="palette.oersted">외르스텟 실험<br>(전류의 자기장, 나침반)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('diode')">
+            <div class="swatch"><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:14px solid #d43b3b;"></div></div>
+            <span data-i18n="palette.diode">다이오드<br>(한쪽 방향으로만 전류)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('transistor')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:#2c3138;border:1px solid #5a6a5a;"></div></div>
+            <span data-i18n="palette.transistor">트랜지스터<br>(베이스 전류로 스위칭)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('transformer')">
+            <div class="swatch"><div style="width:24px;height:18px;border-radius:2px;background:#3a3f47;border:1px solid #c98a3a;"></div></div>
+            <span data-i18n="palette.transformer">변압기<br>(1차:2차 권수비)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('parallelwires')">
+            <div class="swatch"><div style="width:26px;height:14px;display:flex;flex-direction:column;gap:3px;"><div style="height:4px;background:#c98a3a;border-radius:2px;"></div><div style="height:4px;background:#c98a3a;border-radius:2px;"></div></div></div>
+            <span data-i18n="palette.parallelwires">평행 도선의 힘<br>(전류 방향에 따라 밀당)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('electromagnet')">
+            <div class="swatch"><div style="width:16px;height:24px;border-radius:3px;background:repeating-linear-gradient(0deg,#c98a3a 0px,#e8b25f 3px,#c98a3a 6px);"></div></div>
+            <span data-i18n="palette.electromagnet">전자석<br>(전류 → 자기장 → 클립 부착)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('fuse')">
+            <div class="swatch"><div style="width:26px;height:11px;border-radius:5px;background:#e8dcc0;border:1px solid #a89060;"></div></div>
+            <span data-i18n="palette.fuse">퓨즈<br>(정격 초과시 끊어짐)</span>
+          </div>
         </div>
       </div>
       <div class="palette-group" data-group="motor">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.motor">모터 &amp; 드라이버</span><span class="pg-count">10</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.motor">모터 &amp; 드라이버</span><span class="pg-count">12</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('servo')">
@@ -1011,6 +1231,14 @@
           <div class="palette-item" onclick="spawnComponent('bldcdriver')">
             <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#1e2436,#12141f);border:1px solid #364a6a;"></div></div>
             <span data-i18n="palette.bldcdriver">BLDC 드라이버</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('stepper')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:repeating-conic-gradient(#e8b23f 0deg 22.5deg,#3a2f18 22.5deg 45deg);"></div></div>
+            <span data-i18n="palette.stepper">스텝모터<br>(바이폴라 4선)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('a4988')">
+            <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#2a1e33,#160f1c);border:1px solid #4a3560;"></div></div>
+            <span data-i18n="palette.a4988">스텝모터 드라이버<br>(A4988)</span>
           </div>
         </div>
       </div>
@@ -1193,6 +1421,7 @@
         <button class="btn ghost" onclick="runCodeExample('r4','analog')" data-i18n="popup.exAnalog">A0 가변저항 &amp; D9 PWM</button>
         <button class="btn ghost" onclick="runCodeExample('r4','port_wide')" data-i18n="popup.exPortWideR4">R_PORT1 레지스터로 D2~D7 묶음 제어</button>
         <button class="btn ghost" onclick="runCodeExample('r4','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
+        <button class="btn ghost" onclick="runCodeExample('r4','stepper')" data-i18n="popup.exStepper">A4988로 스텝모터 각도 제어</button>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR4">1</div>
@@ -1256,6 +1485,7 @@ void loop() {
         <button class="btn ghost" onclick="runCodeExample('r3','api_vs_register')" data-i18n="popup.exApiVsReg">13번(API) vs 12번(레지스터)</button>
         <button class="btn ghost" onclick="runCodeExample('r3','port_full')" data-i18n="popup.exPortFullR3">PORTD 전체 8핀 일괄 제어</button>
         <button class="btn ghost" onclick="runCodeExample('r3','relay')" data-i18n="popup.exRelay">5V 릴레이로 220V 부하 스위칭</button>
+        <button class="btn ghost" onclick="runCodeExample('r3','stepper')" data-i18n="popup.exStepper">A4988로 스텝모터 각도 제어</button>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR3">1</div>
@@ -1304,6 +1534,8 @@ const STRINGS = {
   "esp32.displayCaption": { ko: "코드가 tft.* 함수를 호출하면 여기 그려집니다", en: "Drawn here when your code calls tft.* functions" },
   "esp32.touchCaption": { ko: "화면을 클릭/드래그하면 터치로 인식됩니다 (Touch.pressed/x/y)", en: "Click/drag the screen to simulate a touch (Touch.pressed/x/y)" },
   "bom.bldcdriver": { ko: "BLDC 드라이버 (ESC)", en: "BLDC Driver (ESC)" },
+  "bom.stepper": { ko: "스텝모터 (바이폴라 4선)", en: "Stepper Motor (bipolar 4-wire)" },
+  "bom.a4988": { ko: "스텝모터 드라이버 (A4988)", en: "Stepper Driver (A4988)" },
   "bom.breadboard": { ko: "브레드보드", en: "Breadboard" },
   "bom.btmodule": { ko: "블루투스 모듈", en: "Bluetooth Module" },
   "bom.btn": { ko: "푸시 버튼", en: "Push Button" },
@@ -1333,7 +1565,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.96b", en: "K's Simulator Ver0.96b" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.97c", en: "K's Simulator Ver0.97c" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -1350,6 +1582,21 @@ const STRINGS = {
   "comp.lsCh2LvTitle": { ko: "채널2 (3.3V측 신호)", en: "Channel 2 (3.3V-side signal)" },
   "comp.battVcc": { ko: "배터리/전원 VCC", en: "Battery/power VCC" },
   "comp.bldcdriver.title": { ko: "BLDC 전자변속기<br>(ESC / 드라이버)", en: "BLDC Electronic Speed Controller<br>(ESC / Driver)" },
+  "comp.a4988.title": { ko: "스텝모터 드라이버", en: "Stepper Driver" },
+  "comp.a4988.vddTitle": { ko: "로직 전원 VDD (3~5.5V, 보드 5V/3V3)", en: "Logic power VDD (3–5.5V, board 5V/3V3)" },
+  "comp.a4988.vmotTitle": { ko: "모터 전원 VMOT (8~35V, 보드와 분리된 전원)", en: "Motor power VMOT (8–35V, separate from board power)" },
+  "comp.a4988.gndTitle": { ko: "GND (로직·모터 공통 접지)", en: "GND (shared logic/motor ground)" },
+  "comp.a4988.stepTitle": { ko: "STEP → 상승 엣지 1번마다 1스텝 회전", en: "STEP → one rising edge = one step" },
+  "comp.a4988.dirTitle": { ko: "DIR → 회전 방향 (HIGH/LOW)", en: "DIR → rotation direction (HIGH/LOW)" },
+  "comp.a4988.enTitle": { ko: "EN (Enable) → LOW일 때만 출력 활성 (GND에 연결 필요)", en: "EN (Enable) → active only when LOW (must wire to GND)" },
+  "comp.a4988.msTitle": { ko: "마이크로스텝 선택 (MS1/MS2/MS3, 비연결=LOW=풀스텝)", en: "Microstep select (MS1/MS2/MS3, unconnected = LOW = full step)" },
+  "comp.a4988.coilATitle": { ko: "코일 A 출력 → 스텝모터 1A/1B", en: "Coil A output → stepper 1A/1B" },
+  "comp.a4988.coilBTitle": { ko: "코일 B 출력 → 스텝모터 2A/2B", en: "Coil B output → stepper 2A/2B" },
+  "comp.stepper.label": { ko: "스텝모터", en: "Stepper Motor" },
+  "comp.stepper.coilATitle": { ko: "코일 A → A4988 1A/1B", en: "Coil A → A4988 1A/1B" },
+  "comp.stepper.coilBTitle": { ko: "코일 B → A4988 2A/2B", en: "Coil B → A4988 2A/2B" },
+  "stepper.disabled": { ko: "비활성 (EN=HIGH)", en: "Disabled (EN=HIGH)" },
+  "stepper.idle": { ko: "정지", en: "Idle" },
   "comp.bldcmotor.label": { ko: "BLDC 모터", en: "BLDC Motor" },
   "comp.bt.remoteSend": { ko: "원격 명령 전송", en: "Send remote command" },
   "comp.bt.txdTitle": { ko: "TXD → 보드 RX (보드가 받는 데이터)", en: "TXD → board RX (data the board receives)" },
@@ -1410,6 +1657,84 @@ const STRINGS = {
   "comp.ac3phase.title": { ko: "3상 전원 (380V/220V)", en: "3-Phase Source (380V/220V)" },
   "bom.ac3phase": { ko: "3상 전원", en: "3-Phase Source" },
   "palette.ac3phase": { ko: "3상 전원<br>(380V/220V)", en: "3-Phase Source<br>(380V/220V)" },
+  "comp.generator.title": { ko: "손잡이 발전기", en: "Hand-Crank Generator" },
+  "comp.generator.dc": { ko: "DC 발전", en: "DC" },
+  "comp.generator.ac": { ko: "AC 발전", en: "AC" },
+  "comp.generator.revBtn": { ko: "◀◀ 역방향", en: "◀◀ Reverse" },
+  "comp.generator.fwdBtn": { ko: "정방향 ▶▶", en: "Forward ▶▶" },
+  "comp.generator.revTitle": { ko: "반시계 방향으로 크랭크를 돌립니다 (누르고 있는 동안 점점 빨라지고, 손을 떼면 서서히 멈춥니다)", en: "Turns the crank counter-clockwise (speeds up while held, coasts to a stop when released)" },
+  "comp.generator.fwdTitle": { ko: "시계 방향으로 크랭크를 돌립니다 (누르고 있는 동안 점점 빨라지고, 손을 떼면 서서히 멈춥니다)", en: "Turns the crank clockwise (speeds up while held, coasts to a stop when released)" },
+  "comp.generator.vTitle": { ko: "발전 출력 (+)", en: "Generated output (+)" },
+  "comp.generator.gTitle": { ko: "발전 출력 기준(공통)", en: "Generated output reference (common)" },
+  "bom.generator": { ko: "손잡이 발전기", en: "Hand-Crank Generator" },
+  "palette.generator": { ko: "손잡이 발전기<br>(전자기유도, DC/AC 선택)", en: "Hand-Crank Generator<br>(electromagnetic induction, DC/AC)" },
+  "comp.coincell.title": { ko: "소금물 동전 전지", en: "Salt-Water Coin Battery" },
+  "comp.coincell.layersLabel": { ko: "층 수", en: "Layers" },
+  "comp.coincell.vTitle": { ko: "전지 출력 (+)", en: "Battery output (+)" },
+  "comp.coincell.gTitle": { ko: "전지 출력 기준(공통)", en: "Battery output reference (common)" },
+  "bom.coincell": { ko: "소금물 동전 전지", en: "Salt-Water Coin Battery" },
+  "comp.fruitbatt.title": { ko: "과일 전지", en: "Fruit Battery" },
+  "comp.fruitbatt.potato": { ko: "감자 (약 0.5V)", en: "Potato (~0.5V)" },
+  "comp.fruitbatt.lemon": { ko: "레몬 (약 0.9V)", en: "Lemon (~0.9V)" },
+  "comp.fruitbatt.orange": { ko: "오렌지 (약 0.7V)", en: "Orange (~0.7V)" },
+  "comp.fruitbatt.countLabel": { ko: "직렬 개수", en: "In series" },
+  "comp.fruitbatt.vTitle": { ko: "전지 출력 (+)", en: "Battery output (+)" },
+  "comp.fruitbatt.gTitle": { ko: "전지 출력 기준(공통)", en: "Battery output reference (common)" },
+  "bom.fruitbatt": { ko: "과일 전지", en: "Fruit Battery" },
+  "comp.oersted.title": { ko: "외르스텟 실험", en: "Oersted's Experiment" },
+  "comp.oersted.desc": { ko: "전선에 전류가 흐르면 그 주위에 자기장이 생겨 나침반 바늘이 움직입니다 — 전류의 방향에 따라 좌우로, 세기에 따라 더 크게 돌아갑니다.", en: "Current through the wire creates a magnetic field around it, deflecting the compass needle — direction flips left/right with current direction, and magnitude grows with current strength." },
+  "comp.oersted.aTitle": { ko: "전류 입력 A", en: "Current in A" },
+  "comp.oersted.bTitle": { ko: "전류 출력 B", en: "Current out B" },
+  "bom.oersted": { ko: "외르스텟 실험", en: "Oersted's Experiment" },
+  "comp.diode.title": { ko: "다이오드", en: "Diode" },
+  "comp.diode.on": { ko: "▶ 통전 (순방향)", en: "▶ Conducting (forward)" },
+  "comp.diode.off": { ko: "✕ 차단 (역방향)", en: "✕ Blocked (reverse)" },
+  "comp.diode.aTitle": { ko: "애노드 (+, Anode)", en: "Anode (+)" },
+  "comp.diode.kTitle": { ko: "캐소드 (−, Cathode)", en: "Cathode (−)" },
+  "bom.diode": { ko: "다이오드", en: "Diode" },
+  "comp.transistor.title": { ko: "트랜지스터 (NPN)", en: "Transistor (NPN)" },
+  "comp.transistor.on": { ko: "● ON (C-E 통전)", en: "● ON (C-E conducting)" },
+  "comp.transistor.off": { ko: "○ OFF (C-E 차단)", en: "○ OFF (C-E blocked)" },
+  "comp.transistor.bTitle": { ko: "베이스 (B) ← 제어 신호", en: "Base (B) ← control signal" },
+  "comp.transistor.cTitle": { ko: "컬렉터 (C)", en: "Collector (C)" },
+  "comp.transistor.eTitle": { ko: "이미터 (E)", en: "Emitter (E)" },
+  "bom.transistor": { ko: "트랜지스터", en: "Transistor" },
+  "comp.transformer.title": { ko: "변압기", en: "Transformer" },
+  "comp.transformer.n1Label": { ko: "1차 권수(N1)", en: "Primary turns (N1)" },
+  "comp.transformer.n2Label": { ko: "2차 권수(N2)", en: "Secondary turns (N2)" },
+  "comp.transformer.p1Title": { ko: "1차 입력 P1", en: "Primary input P1" },
+  "comp.transformer.p2Title": { ko: "1차 입력 P2", en: "Primary input P2" },
+  "comp.transformer.vTitle": { ko: "2차 출력 (+)", en: "Secondary output (+)" },
+  "comp.transformer.gTitle": { ko: "2차 출력 기준(공통)", en: "Secondary output reference (common)" },
+  "comp.transformer.dcWarn": { ko: "⚠ DC 입력 — 변압기는 교류에서만 동작합니다", en: "⚠ DC input — transformers only work with AC" },
+  "bom.transformer": { ko: "변압기", en: "Transformer" },
+  "palette.transformer": { ko: "변압기<br>(1차:2차 권수비)", en: "Transformer<br>(primary:secondary turns ratio)" },
+  "comp.parallelwires.title": { ko: "평행 도선의 힘", en: "Force Between Parallel Wires" },
+  "comp.parallelwires.attract": { ko: "↔ 같은 방향 → 서로 당김", en: "↔ Same direction → attract" },
+  "comp.parallelwires.repel": { ko: "↮ 반대 방향 → 서로 밀어냄", en: "↮ Opposite direction → repel" },
+  "comp.parallelwires.none": { ko: "전류 없음", en: "No current" },
+  "comp.parallelwires.w1aTitle": { ko: "도선1 입력", en: "Wire 1 in" },
+  "comp.parallelwires.w1bTitle": { ko: "도선1 출력", en: "Wire 1 out" },
+  "comp.parallelwires.w2aTitle": { ko: "도선2 입력", en: "Wire 2 in" },
+  "comp.parallelwires.w2bTitle": { ko: "도선2 출력", en: "Wire 2 out" },
+  "bom.parallelwires": { ko: "평행 도선의 힘", en: "Force Between Parallel Wires" },
+  "palette.parallelwires": { ko: "평행 도선의 힘<br>(전류 방향에 따라 밀당)", en: "Parallel Wires<br>(attract/repel by current direction)" },
+  "comp.electromagnet.title": { ko: "전자석", en: "Electromagnet" },
+  "comp.electromagnet.vccTitle": { ko: "코일 전원 (+)", en: "Coil power (+)" },
+  "comp.electromagnet.gndTitle": { ko: "코일 전원 기준(GND)", en: "Coil power reference (GND)" },
+  "comp.electromagnet.off": { ko: "○ 자성 없음", en: "○ Not magnetized" },
+  "comp.electromagnet.on": { ko: "● 전자석 작동 중", en: "● Magnetized" },
+  "bom.electromagnet": { ko: "전자석", en: "Electromagnet" },
+  "palette.electromagnet": { ko: "전자석<br>(전류 → 자기장 → 클립 부착)", en: "Electromagnet<br>(current → magnetism → paperclips)" },
+  "comp.fuse.title": { ko: "퓨즈", en: "Fuse" },
+  "comp.fuse.ratedLabel": { ko: "정격 전류", en: "Rated current" },
+  "comp.fuse.ok": { ko: "● 정상", en: "● OK" },
+  "comp.fuse.blown": { ko: "✕ 끊어짐! (과전류)", en: "✕ Blown! (overcurrent)" },
+  "comp.fuse.replaceBtn": { ko: "🔧 교체", en: "🔧 Replace" },
+  "comp.fuse.aTitle": { ko: "입력 A", en: "In A" },
+  "comp.fuse.bTitle": { ko: "출력 B", en: "Out B" },
+  "bom.fuse": { ko: "퓨즈", en: "Fuse" },
+  "palette.fuse": { ko: "퓨즈<br>(정격 초과시 끊어짐)", en: "Fuse<br>(blows over rated current)" },
   "exp.rlc3Phase.title": { ko: "3상 RLC 부하 실습", en: "3-Phase RLC Load" },
   "exp.rlc3Phase.desc": { ko: "3상 전원의 R·S·T 각 상에 R-L-C 부하를 걸고, 스코프로 한 상의 전류·전압 위상차를 확인합니다.", en: "R-L-C load on each phase (R/S/T) of a 3-phase source — check the current/voltage phase shift of one phase on the scope." },
   "comp.relay.ratedTitle": { ko: "코일 정격 전압 (VCC 핀에 이 전압이 공급되어야 실제로 여자(동작)합니다)", en: "Coil rated voltage (VCC must supply this voltage for the coil to actually energize)" },
@@ -1423,7 +1748,10 @@ const STRINGS = {
   "relay.deenergized": { ko: "대기 (NC)", en: "Idle (NC)" },
   "comp.sPhase": { ko: "S상 (L2)", en: "Phase S (L2)" },
   "comp.scope.holdBtn": { ko: "⏸ 정지", en: "⏸ Hold" },
-  "comp.scope.holdTitle": { ko: "화면을 정지/재개합니다 (실제 스코프의 RUN/STOP)", en: "Freeze/resume the display (like a real scope RUN/STOP)" },
+  "comp.scope.holdTitle": { ko: "화면을 정지/재개합니다 (실제 스코프의 RUN/STOP, 아래쪽 트리거 버튼과는 별개로 동작합니다)", en: "Freeze/resume the display (like a real scope RUN/STOP — works independently of the Trigger button below)" },
+  "comp.scope.triggerBtn": { ko: "🔺 트리거 OFF", en: "🔺 Trigger OFF" },
+  "comp.scope.triggerTitle": { ko: "켜면 다음 디지털 신호 변화(엣지)가 감지되는 순간 자동으로 화면이 정지합니다. 정지/재개 버튼과는 별개의 독립된 기능입니다.", en: "When ON, the display automatically freezes the instant the next digital signal change (edge) is detected. Independent of the Hold/Resume button." },
+  "scope.triggerLabel": { ko: "트리거", en: "Trigger" },
   "comp.scope.zoomBtn": { ko: "🔍 확대", en: "🔍 Zoom" },
   "comp.scope.zoomBtnOff": { ko: "🔍 확대 해제", en: "🔍 Unzoom" },
   "comp.scope.zoomTitle": { ko: "화면 안의 두 라인을 드래그해 그 구간만 확대해서 봅니다. 확대 중에는 빈 화면을 드래그해 상하좌우로 이동할 수 있습니다.", en: "Drag the two lines to zoom into that time range. While zoomed, drag empty screen area to pan." },
@@ -1495,9 +1823,14 @@ const STRINGS = {
   "comm.canHighSpeed.desc": { ko: "R3·R4에 각각 CAN 통신 모듈을 달고 CANH-CANH·CANL-CANL로 버스를 이어, beginPacket/write/endPacket으로 보내고 parsePacket/packetId/read로 받습니다(500kbps 고정).", en: "R3 and R4 each get a CAN module, wired CANH-CANH/CANL-CANL; send with beginPacket/write/endPacket, receive with parsePacket/packetId/read (fixed at 500kbps)." },
   "comm.canFd.title": { ko: "CAN FD 통신 모듈 2개로 보드 간 통신 (최대 64바이트)", en: "Board-to-Board CAN FD (2 modules, up to 64 bytes)" },
   "comm.canFd.desc": { ko: "일반 CAN 모듈과 배선·API는 같지만 한 패킷에 최대 64바이트까지 실을 수 있는 CAN FD 모듈 2개로 R3·R4를 연결합니다.", en: "Same wiring and API as the plain CAN module, but connects R3 and R4 via 2 CAN FD modules that carry up to 64 bytes per packet." },
-  "toolbar.datasheet": { ko: "📄 CPU 데이터시트", en: "📄 CPU Datasheet" },
-  "datasheet.r3": { ko: "R3 (ATmega328P) 데이터시트", en: "R3 (ATmega328P) Datasheet" },
-  "datasheet.r4": { ko: "R4 (RA4M1) 데이터시트", en: "R4 (RA4M1) Datasheet" },
+  "toolbar.datasheet": { ko: "📄 보드 및 CPU 데이터시트", en: "📄 Board & CPU Datasheet" },
+  "datasheet.r3board": { ko: "R3 보드 (Arduino UNO R3) 데이터시트", en: "R3 Board (Arduino UNO R3) Datasheet" },
+  "datasheet.r3": { ko: "R3 CPU (ATmega328P) 데이터시트", en: "R3 CPU (ATmega328P) Datasheet" },
+  "datasheet.r4board": { ko: "R4 보드 (Arduino UNO R4 Minima) 데이터시트", en: "R4 Board (Arduino UNO R4 Minima) Datasheet" },
+  "datasheet.r4": { ko: "R4 CPU (RA4M1) 데이터시트", en: "R4 CPU (RA4M1) Datasheet" },
+  "datasheet.esp32chip": { ko: "ESP32 (칩) 데이터시트", en: "ESP32 (Chip) Datasheet" },
+  "datasheet.esp32wroom": { ko: "ESP32-WROOM-32E/32UE (모듈) 데이터시트", en: "ESP32-WROOM-32E/32UE (Module) Datasheet" },
+  "datasheet.esp32trm": { ko: "ESP32 기술 레퍼런스 매뉴얼", en: "ESP32 Technical Reference Manual" },
   "exp.divider.desc": { ko: "1kΩ 두 개로 5V를 나눠 중간 지점이 2.5V가 되는지 멀티미터(DCV)로 확인합니다.", en: "Two 1kΩ resistors divide 5V — check with the multimeter (DCV) that the midpoint reads 2.5V." },
   "exp.divider.title": { ko: "전압 분배 회로", en: "Voltage Divider" },
   "exp.relaySwitch.desc": { ko: "보드 D7 핀으로 5V 릴레이를 구동해 AC 220V 부하를 스위칭합니다. 예제 코드도 함께 불러옵니다.", en: "Drive a 5V relay from board pin D7 to switch an AC 220V load. Also loads the matching example sketch." },
@@ -1552,10 +1885,18 @@ const STRINGS = {
   "palette.group.comm": { ko: "통신 모듈", en: "Communication Modules" },
   "palette.group.display": { ko: "디스플레이", en: "Displays" },
   "palette.group.measure": { ko: "계측 & 신호/스위칭", en: "Measurement & Signal/Switching" },
+  "palette.group.explab": { ko: "🔬 전기 실험실", en: "🔬 Electricity Lab" },
+  "palette.coincell": { ko: "소금물 동전 전지<br>(층층이 쌓기)", en: "Salt-Water Coin Battery<br>(stackable layers)" },
+  "palette.fruitbatt": { ko: "과일 전지<br>(감자·레몬·오렌지)", en: "Fruit Battery<br>(potato/lemon/orange)" },
+  "palette.oersted": { ko: "외르스텟 실험<br>(전류의 자기장, 나침반)", en: "Oersted's Experiment<br>(current's magnetic field, compass)" },
+  "palette.diode": { ko: "다이오드<br>(한쪽 방향으로만 전류)", en: "Diode<br>(current flows one way only)" },
+  "palette.transistor": { ko: "트랜지스터<br>(베이스 전류로 스위칭)", en: "Transistor<br>(switched by base current)" },
   "palette.acmotor": { ko: "단상 AC 모터<br>(220V)", en: "Single-Phase AC Motor<br>(220V)" },
   "palette.acmotorctrl": { ko: "AC 모터 컨트롤러<br>(속도 조절기)", en: "AC Motor Controller<br>(speed regulator)" },
   "palette.levelshifter": { ko: "레벨 시프터<br>(5V ↔ 3.3V)", en: "Logic Level Shifter<br>(5V ↔ 3.3V)" },
   "palette.bldcdriver": { ko: "BLDC 드라이버", en: "BLDC Driver" },
+  "palette.stepper": { ko: "스텝모터<br>(바이폴라 4선)", en: "Stepper Motor<br>(bipolar 4-wire)" },
+  "palette.a4988": { ko: "스텝모터 드라이버<br>(A4988)", en: "Stepper Driver<br>(A4988)" },
   "palette.bldcmotor": { ko: "BLDC 모터", en: "BLDC Motor" },
   "palette.breadboard": { ko: "브레드보드", en: "Breadboard" },
   "palette.bt": { ko: "블루투스 모듈", en: "Bluetooth Module" },
@@ -1613,6 +1954,7 @@ const STRINGS = {
   "popup.exClock": { ko: "현재 시간 시계", en: "Current-Time Clock" },
   "popup.exRegister": { ko: "DDR/PORT 레지스터 직접제어", en: "Direct DDR/PORT Register Control" },
   "popup.exRelay": { ko: "5V 릴레이로 220V 부하 스위칭", en: "Switch a 220V Load with a 5V Relay" },
+  "popup.exStepper": { ko: "A4988로 스텝모터 각도 제어", en: "Control a Stepper Motor with A4988" },
   "popup.regCycles0": { ko: "레지스터 직접제어(DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)", en: "Direct register control (DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)" },
   "popup.serialHead": { ko: "빌드 콘솔 / 시리얼 모니터", en: "Build Console / Serial Monitor" },
   "psu.dcPlusTitle": { ko: "DC + (선택한 전압)", en: "DC + (selected voltage)" },
@@ -1649,7 +1991,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.96b", en: "K's Arduino Simulator Ver0.96b" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.97c", en: "K's Arduino Simulator Ver0.97c" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -1723,6 +2065,13 @@ function refreshDynamicI18nText(){
       label.textContent = tr('motor.stopped');
     }
   });
+  document.querySelectorAll('.comp-stepper').forEach(el => {
+    const label = el.querySelector('[id$="_angle"]');
+    if (!label) return;
+    const enabled = el.dataset.enabled === '1';
+    const angle = parseFloat(el.dataset.angle || '0');
+    label.textContent = enabled ? `${(Math.round(angle * 10) / 10)}°` : tr('stepper.idle');
+  });
   document.querySelectorAll('.comp-wifiap [id$="_status"]').forEach(el => {
     const sw = el.closest('.comp-wifiap')?.querySelector('.ap-switch');
     const powered = !!(sw && sw.classList.contains('on'));
@@ -1731,9 +2080,10 @@ function refreshDynamicI18nText(){
   const simBtn = document.getElementById('btnSim');
   if (simBtn) simBtn.textContent = isSimulating ? tr('sim.stopBtn') : tr('toolbar.simStart');
   document.querySelectorAll('.scope-hold-btn').forEach(btn => {
-    btn.textContent = btn.classList.contains('held') ? tr('scope.resumeBtn')
-      : btn.classList.contains('armed') ? tr('scope.armedBtn')
-      : tr('comp.scope.holdBtn');
+    btn.textContent = btn.classList.contains('held') ? tr('scope.resumeBtn') : tr('comp.scope.holdBtn');
+  });
+  document.querySelectorAll('.scope-trigger-btn').forEach(btn => {
+    btn.textContent = btn.classList.contains('armed') ? tr('scope.armedBtn') : tr('comp.scope.triggerBtn');
   });
   if (typeof renderGalleryBody === 'function' && document.getElementById('galleryBody')) renderGalleryBody();
 }
@@ -3025,7 +3375,7 @@ function makeDraggable(el){
     // 있는 조작 요소는, 그냥 누르기만 하면(움직임 없이 떼면) 원래대로 클릭/포커스/값 변경이
     // 되어야 하지만, 누른 채로 조금이라도 끌면 그 순간부터 부품 자체를 드래그하는 것으로
     // 전환합니다 — 부품 중앙만 눌러도 이동시킬 수 있어야 한다는 요청에 따른 처리입니다.
-    const interactiveTarget = e.target.closest('input, select, .btn-cap, .reset-btn');
+    const interactiveTarget = e.target.closest('input, select, .btn-cap, .reset-btn, .generator-btn, .fuse-replace-btn');
     if (interactiveTarget){
       const startX = e.clientX, startY = e.clientY;
       const rect0 = el.getBoundingClientRect();
@@ -3105,13 +3455,41 @@ document.addEventListener('mouseup', () => {
   const justDraggedEl = activeDrag;
   activeDrag = null; draggingWirePoint = null;
   if (justDraggedEl && !justDraggedEl.classList.contains('board')) syncBreadboardPlugs(justDraggedEl);
+  // 발전기 크랭크 버튼 위에서 손을 뗐어야 할 mouseup이 (부품을 끄는 도중 마우스가 버튼을 벗어나
+  // 있어서) 그 버튼 자신의 onmouseup을 못 받는 경우를 대비한 안전장치 — 어디서 손을 떼든 크랭크가
+  // "누른 채로 멈춰버리는" 일이 없게 여기서도 한 번 더 정리합니다.
+  document.querySelectorAll('.comp-generator').forEach(gen => {
+    if (gen.dataset.cranking) gen.dataset.cranking = '';
+    gen.querySelectorAll('.generator-btn').forEach(b => b.classList.remove('cranking'));
+  });
 });
 
 // 부품 상자(팔레트)의 카테고리 그룹을 접었다 펼칩니다 — 그룹 헤더(이름표)를 클릭할 때마다
 // 토글되며, 상태는 그 그룹 div의 클래스(collapsed)에만 저장됩니다(별도 상태 변수 불필요).
+// '🔬 전기 실험실'만 예외로 슬라이드 애니메이션 없이 즉시 표시/숨김(기존 방식 그대로)입니다.
 function togglePaletteGroup(headerEl){
   const group = headerEl.closest('.palette-group');
-  if (group) group.classList.toggle('collapsed');
+  if (!group) return;
+  if (group.dataset.group === 'explab'){
+    group.classList.toggle('collapsed');
+    return;
+  }
+  const body = group.querySelector('.palette-group-body');
+  const collapsing = !group.classList.contains('collapsed'); // 지금 열려있다 → 이번 클릭으로 접힘
+  if (collapsing){
+    body.style.maxHeight = body.scrollHeight + 'px'; // 지금 실제 높이로 고정한 뒤
+    requestAnimationFrame(() => {
+      group.classList.add('collapsed'); // padding-top:0도 이 클래스로 걸리므로, height와 같은 프레임에 같이 시작
+      body.style.maxHeight = '0px'; // 다음 프레임에 0으로 → 슬라이드 접힘
+    });
+  } else {
+    group.classList.remove('collapsed');
+    body.style.maxHeight = body.scrollHeight + 'px'; // 콘텐츠 높이까지 슬라이드 펼침
+    body.addEventListener('transitionend', function onEnd(){
+      body.style.maxHeight = 'none'; // 펼친 뒤엔 고정 높이를 풀어 두어야, 창 크기 변경 등에도 안 잘림
+      body.removeEventListener('transitionend', onEnd);
+    });
+  }
 }
 
 // ---- 부품 상자(팔레트)에서 마우스로 부품을 끌어다 캔버스의 원하는 위치에 놓기 ----
@@ -3450,7 +3828,7 @@ function spawnComponent(type, dropX, dropY){
     div.innerHTML = `
       <div class="scope-head"><span>4CH OSCILLOSCOPE</span><div class="scope-head-btns">
         <button class="scope-zoom-btn" id="${id}_zoombtn" onclick="toggleScopeZoom('${id}')" data-i18n-title="comp.scope.zoomTitle" title="화면 안의 두 라인을 드래그해 그 구간만 확대해서 봅니다. 확대 중에는 빈 화면을 드래그해 상하좌우로 이동할 수 있습니다." data-i18n="comp.scope.zoomBtn">🔍 확대</button>
-        <button class="scope-hold-btn" id="${id}_holdbtn" onclick="toggleScopeHold('${id}')" data-i18n-title="comp.scope.holdTitle" title="화면을 정지/재개합니다 (실제 스코프의 RUN/STOP)" data-i18n="comp.scope.holdBtn">⏸ 정지</button>
+        <button class="scope-hold-btn" id="${id}_holdbtn" onclick="toggleScopeHold('${id}')" data-i18n-title="comp.scope.holdTitle" title="화면을 정지/재개합니다 (실제 스코프의 RUN/STOP, 아래쪽 트리거 버튼과는 별개로 동작합니다)" data-i18n="comp.scope.holdBtn">⏸ 정지</button>
       </div></div>
       <div class="scope-screen" id="${id}_screen"><canvas id="${id}_canvas" width="700" height="150"></canvas></div>
       <div class="scope-controls">
@@ -3510,7 +3888,11 @@ function spawnComponent(type, dropX, dropY){
         <button class="scope-decode-btn" data-proto="i2c" onclick="toggleScopeDecode('${id}','i2c')">I2C</button>
         <button class="scope-decode-btn" data-proto="485" onclick="toggleScopeDecode('${id}','485')">485</button>
       </div>
-      <div class="scope-decode-out" id="${id}_decodeout"></div>`;
+      <div class="scope-decode-out" id="${id}_decodeout"></div>
+      <div class="scope-trigger-row">
+        <span class="scope-trigger-label" data-i18n="scope.triggerLabel">트리거</span>
+        <button class="scope-trigger-btn" id="${id}_triggerbtn" onclick="toggleScopeTrigger('${id}')" data-i18n-title="comp.scope.triggerTitle" title="켜면 다음 디지털 신호 변화(엣지)가 감지되는 순간 자동으로 화면이 정지합니다. 정지/재개 버튼과는 별개의 독립된 기능입니다." data-i18n="comp.scope.triggerBtn">🔺 트리거 OFF</button>
+      </div>`;
   } else if (type === 'breadboard'){
     div.classList.add('comp-breadboard');
     div.innerHTML = `
@@ -3720,6 +4102,240 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G1" title="CH1 GND"></div><span class="pin-cap cap-gnd">G1</span></div>
         <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V2" data-i18n-title="comp.benchpsu.v2Title" title="CH2 V+ (0~48V, CH2 스위치로 켬/끔, CH1과 완전히 분리된 별도 출력)"></div><span class="pin-cap cap-vcc">V2+</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G2" title="CH2 GND"></div><span class="pin-cap cap-gnd">G2</span></div>
+      </div>`;
+  } else if (type === 'generator'){
+    // 손잡이 발전기(수동 발전기) — 전자기유도로 "회전시켜서 전기를 만드는" 원리(발전기·파라데이
+    // 법칙)를 실습하기 위한 부품입니다. 지금까지의 모터들(DC/AC/BLDC/서보)은 전기를 넣으면
+    // 회전하는 방향만 있었는데, 이 부품은 그 반대 방향(운동 → 전기)을 다룹니다. 정방향/역방향
+    // 버튼을 누르고 있는 동안 크랭크가 점점 빨리 돌고(dataset.speed, -100~100), 손을 떼면
+    // 마찰로 서서히 멈춥니다 — runTick()의 맨 앞부분에서 매 틱(25ms) 갱신합니다.
+    // comp-psu 클래스를 같이 붙여 기존 PSU 인프라(psuSourceParams·acReachablePsu·
+    // externalSourceOnNet의 _V/_G 처리)를 그대로 재사용하고, dataset.mode만 'gendc'/'genac'라는
+    // 새 값으로 구분합니다(기존 dc/ac1/ac3 문자열과 겹치지 않으므로 PSU 쪽 기존 로직에는 전혀
+    // 영향이 없습니다).
+    div.classList.add('comp-psu', 'comp-generator');
+    div.dataset.mode = 'gendc';
+    div.dataset.speed = '0';
+    div.dataset.cranking = '';
+    div.dataset.angle = '0';
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.generator.title">손잡이 발전기</div>
+      <select class="generator-mode" onchange="generatorModeChanged('${id}')">
+        <option value="gendc" selected data-i18n="comp.generator.dc">DC 발전</option>
+        <option value="genac" data-i18n="comp.generator.ac">AC 발전</option>
+      </select>
+      <div class="generator-crank-wrap">
+        <div class="generator-crank"><div class="generator-crank-handle" id="${id}_handle"></div></div>
+      </div>
+      <div class="generator-btns">
+        <button type="button" class="generator-btn generator-btn-rev" data-i18n-title="comp.generator.revTitle" title="반시계 방향으로 크랭크를 돌립니다 (누르고 있는 동안 점점 빨라지고, 손을 떼면 서서히 멈춥니다)"
+          onmousedown="event.stopPropagation(); generatorCrankStart('${id}','rev')" onmouseup="generatorCrankStop('${id}')" onmouseleave="generatorCrankStop('${id}')"
+          ontouchstart="event.stopPropagation(); generatorCrankStart('${id}','rev')" ontouchend="generatorCrankStop('${id}')" data-i18n="comp.generator.revBtn">◀◀ 역방향</button>
+        <button type="button" class="generator-btn generator-btn-fwd" data-i18n-title="comp.generator.fwdTitle" title="시계 방향으로 크랭크를 돌립니다 (누르고 있는 동안 점점 빨라지고, 손을 떼면 서서히 멈춥니다)"
+          onmousedown="event.stopPropagation(); generatorCrankStart('${id}','fwd')" onmouseup="generatorCrankStop('${id}')" onmouseleave="generatorCrankStop('${id}')"
+          ontouchstart="event.stopPropagation(); generatorCrankStart('${id}','fwd')" ontouchend="generatorCrankStop('${id}')" data-i18n="comp.generator.fwdBtn">정방향 ▶▶</button>
+      </div>
+      <div class="generator-readout" id="${id}_readout">0.0 V</div>
+      <div class="psu-switch" id="${id}_switch"><div class="knob"></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.generator.vTitle" title="발전 출력 (+)"></div><span class="pin-cap cap-vcc">V+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.generator.gTitle" title="발전 출력 기준(공통)"></div><span class="pin-cap cap-gnd">G</span></div>
+      </div>`;
+  } else if (type === 'coincell'){
+    // 소금물 동전 전지 — 동전(구리/아연 등) 사이에 소금물을 적신 천/종이를 끼워 층층이 쌓으면
+    // (볼타 전지와 같은 원리) 층 수만큼 전압이 직렬로 더해집니다. comp-psu + dataset.mode='coincell'로
+    // 기존 PSU 인프라(psuSourceParams/acReachablePsu/externalSourceOnNet)를 재사용합니다.
+    div.classList.add('comp-psu', 'comp-coincell');
+    div.dataset.mode = 'coincell';
+    div.dataset.layers = '3';
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.coincell.title">소금물 동전 전지</div>
+      <div class="coincell-stack" id="${id}_stack"></div>
+      <div class="coincell-controls">
+        <span data-i18n="comp.coincell.layersLabel">층 수</span>
+        <input type="range" min="1" max="10" value="3" id="${id}_layers" oninput="coincellLayersChanged('${id}')">
+        <span id="${id}_layersval">3</span>
+      </div>
+      <div class="coincell-readout" id="${id}_readout">2.1 V</div>
+      <div class="psu-switch on" id="${id}_switch"><div class="knob"></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.coincell.vTitle" title="전지 출력 (+)"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.coincell.gTitle" title="전지 출력 기준(공통)"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>`;
+  } else if (type === 'fruitbatt'){
+    // 과일 전지 — 감자/레몬/오렌지에 서로 다른 금속(구리·아연) 전극을 꽂으면 과일의 산성 전해액이
+    // 갈바니 전지를 이룹니다. 과일마다 대략적인 실측 전압이 다르고(감자 약 0.5V, 레몬 약 0.9V,
+    // 오렌지 약 0.7V), 여러 개를 직렬로 연결하면(직렬 개수) 전압이 그만큼 더해집니다.
+    div.classList.add('comp-psu', 'comp-fruitbatt');
+    div.dataset.mode = 'fruitbatt';
+    div.dataset.fruit = 'potato';
+    div.dataset.count = '1';
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.fruitbatt.title">과일 전지</div>
+      <div class="fruitbatt-visual" id="${id}_visual"></div>
+      <select class="fruitbatt-type" onchange="fruitbattChanged('${id}')">
+        <option value="potato" selected data-i18n="comp.fruitbatt.potato">감자 (약 0.5V)</option>
+        <option value="lemon" data-i18n="comp.fruitbatt.lemon">레몬 (약 0.9V)</option>
+        <option value="orange" data-i18n="comp.fruitbatt.orange">오렌지 (약 0.7V)</option>
+      </select>
+      <div class="fruitbatt-controls">
+        <span data-i18n="comp.fruitbatt.countLabel">직렬 개수</span>
+        <input type="range" min="1" max="4" value="1" id="${id}_count" oninput="fruitbattChanged('${id}')">
+        <span id="${id}_countval">1</span>
+      </div>
+      <div class="fruitbatt-readout" id="${id}_readout">0.5 V</div>
+      <div class="psu-switch on" id="${id}_switch"><div class="knob"></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.fruitbatt.vTitle" title="전지 출력 (+)"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.fruitbatt.gTitle" title="전지 출력 기준(공통)"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>`;
+  } else if (type === 'oersted'){
+    // 외르스텟 실험 — 전선(도선) 자체를 회로에 직렬로 끼워 넣으면, 그 전선에 흐르는 실제 전류를
+    // (오실로스코프의 "전류(I)" 채널과 똑같은 방식으로) 구해 나침반 바늘을 그 방향·세기에 맞춰
+    // 돌립니다. resistive-2pin(아주 작은 저항, 이상적 도선)이라 회로에는 영향을 주지 않습니다.
+    div.classList.add('comp-oersted', 'resistive-2pin');
+    div.dataset.ohms = String(1e-6);
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.oersted.title">외르스텟 실험</div>
+      <div class="oersted-wire"></div>
+      <div class="oersted-compass"><div class="oersted-needle" id="${id}_needle"></div></div>
+      <div class="oersted-readout" id="${id}_readout">0.0 mA</div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_A" data-i18n-title="comp.oersted.aTitle" title="전류 입력 A"></div>
+        <div class="pin-mini" data-pin="${id}_B" data-i18n-title="comp.oersted.bTitle" title="전류 출력 B"></div>
+      </div>`;
+  } else if (type === 'diode'){
+    // 다이오드 — 애노드(A)가 캐소드(K)보다 순방향 전압(약 0.6V) 이상 높을 때만 통전(순방향 바이어스),
+    // 그 반대(역방향)면 거의 무한대 저항으로 차단합니다. resistive-2pin이라 실제로 통전 중일 때는
+    // 뒤쪽에 물린 LED 등에도 전류가 그대로 전달됩니다(runTick의 사전 단계에서 매 틱 갱신).
+    div.classList.add('comp-diode', 'resistive-2pin');
+    div.dataset.ohms = String(DIODE_REVERSE_OHMS);
+    div.dataset.conducting = '0';
+    div.innerHTML = `
+      <div class="comp-label" data-i18n="comp.diode.title">다이오드</div>
+      <div class="diode-body"><div class="diode-tri" id="${id}_tri"></div><div class="diode-bar"></div></div>
+      <div class="diode-status" id="${id}_status" data-i18n="comp.diode.off">✕ 차단 (역방향)</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" data-i18n-title="comp.diode.aTitle" title="애노드 (+, Anode)"></div><span class="pin-cap cap-vcc">A</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_B" data-i18n-title="comp.diode.kTitle" title="캐소드 (−, Cathode)"></div><span class="pin-cap cap-gnd">K</span></div>
+      </div>`;
+  } else if (type === 'transistor'){
+    // 트랜지스터(NPN 단순화 모델) — 베이스(B)에 문턱 전압(약 0.6V, 실제 Vbe) 이상이 걸리면 그
+    // 순간부터 컬렉터-이미터(C-E) 사이가 0Ω 스위치처럼 닫힙니다(relayContactEdges와 완전히 같은
+    // 방식으로 transistorContactEdges가 resistiveEdges/buildAcNetworkGraph에 가상 엣지를 추가).
+    div.classList.add('comp-transistor');
+    div.dataset.on = '0';
+    div.innerHTML = `
+      <div class="comp-label" data-i18n="comp.transistor.title">트랜지스터 (NPN)</div>
+      <div class="transistor-body" id="${id}_body"><div class="transistor-led" id="${id}_led"></div></div>
+      <div class="transistor-status" id="${id}_status" data-i18n="comp.transistor.off">○ OFF (C-E 차단)</div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_B" data-i18n-title="comp.transistor.bTitle" title="베이스 (B) ← 제어 신호"></div>
+        <div class="pin-mini" data-pin="${id}_C" data-i18n-title="comp.transistor.cTitle" title="컬렉터 (C)"></div>
+        <div class="pin-mini" data-pin="${id}_E" data-i18n-title="comp.transistor.eTitle" title="이미터 (E)"></div>
+      </div>`;
+  } else if (type === 'transformer'){
+    // 변압기 — 1차(P1/P2)는 실제 배선에 영향을 주지 않는 "측정 전용" 핀입니다(전압계처럼 회로에
+    // 부담을 주지 않기 위해 resistive-2pin으로 만들지 않음). acReachablePsu/psuSourceParams/
+    // acDcMultiSourceSolve로 1차에 걸린 실제 교류 전압을 구한 뒤, 권수비(N2/N1)를 곱해 2차
+    // (comp-psu, mode='transformer', 기존 _V/_G 관례 재사용)의 출력 전압으로 그대로 내놓습니다.
+    // DC(주파수 0)를 넣으면 실제 변압기처럼 2차에 아무 것도 나오지 않습니다.
+    div.classList.add('comp-psu', 'comp-transformer');
+    div.dataset.mode = 'transformer';
+    div.dataset.n1 = '100';
+    div.dataset.n2 = '50';
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.transformer.title">변압기</div>
+      <div class="transformer-core"></div>
+      <div class="transformer-ratio">
+        <input type="number" min="1" step="1" value="100" id="${id}_n1" data-i18n-title="comp.transformer.n1Label" title="1차 권수(N1)" oninput="transformerRatioChanged('${id}')">
+        <span>:</span>
+        <input type="number" min="1" step="1" value="50" id="${id}_n2" data-i18n-title="comp.transformer.n2Label" title="2차 권수(N2)" oninput="transformerRatioChanged('${id}')">
+      </div>
+      <div class="transformer-readout" id="${id}_readout">0.0 V</div>
+      <div class="transformer-warn" id="${id}_warn" data-i18n="comp.transformer.dcWarn" hidden>⚠ DC 입력 — 변압기는 교류에서만 동작합니다</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_P1" data-i18n-title="comp.transformer.p1Title" title="1차 입력 P1"></div><span class="pin-cap">P1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_P2" data-i18n-title="comp.transformer.p2Title" title="1차 입력 P2"></div><span class="pin-cap">P2</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.transformer.vTitle" title="2차 출력 (+)"></div><span class="pin-cap cap-vcc">S1</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.transformer.gTitle" title="2차 출력 기준(공통)"></div><span class="pin-cap cap-gnd">S2</span></div>
+      </div>`;
+  } else if (type === 'parallelwires'){
+    // 평행 도선의 힘 — 도선 두 개를 각각 독립된 resistive-2pin(1µΩ, 이상적 도선)으로 만들어(하나의
+    // 부품 안에 서로 다른 엣지 2개를 넣기 위해 안쪽에 별도 div로 감쌈), 오실로스코프의 전류(I)
+    // 채널과 같은 방법으로 각 도선의 실제 전류를 구합니다. 두 전류의 방향이 같으면 서로 당기고
+    // (그림에서 간격이 좁아짐), 반대면 서로 밀어냅니다(간격이 넓어짐) — 실제 앙페르 힘의 방향과 같습니다.
+    div.classList.add('comp-parallelwires');
+    div.innerHTML = `
+      <div class="comp-label" data-i18n="comp.parallelwires.title">평행 도선의 힘</div>
+      <div class="pwires-visual" id="${id}_visual">
+        <div class="pwires-wire"><span class="pwires-arrow" id="${id}_arrow1">▶</span></div>
+        <div class="pwires-wire"><span class="pwires-arrow" id="${id}_arrow2">▶</span></div>
+      </div>
+      <div class="pwires-readout" id="${id}_readout" data-i18n="comp.parallelwires.none">전류 없음</div>
+      <div class="comp-pin-row">
+        <div class="resistive-2pin" id="${id}_w1" style="display:contents;">
+          <div class="pin-col"><div class="pin-mini" data-pin="${id}_w1_A" data-i18n-title="comp.parallelwires.w1aTitle" title="도선1 입력"></div><span class="pin-cap">1A</span></div>
+          <div class="pin-col"><div class="pin-mini" data-pin="${id}_w1_B" data-i18n-title="comp.parallelwires.w1bTitle" title="도선1 출력"></div><span class="pin-cap">1B</span></div>
+        </div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="resistive-2pin" id="${id}_w2" style="display:contents;">
+          <div class="pin-col"><div class="pin-mini" data-pin="${id}_w2_A" data-i18n-title="comp.parallelwires.w2aTitle" title="도선2 입력"></div><span class="pin-cap">2A</span></div>
+          <div class="pin-col"><div class="pin-mini" data-pin="${id}_w2_B" data-i18n-title="comp.parallelwires.w2bTitle" title="도선2 출력"></div><span class="pin-cap">2B</span></div>
+        </div>
+      </div>`;
+    // 오실로스코프의 전류(I) 채널과 같은 트릭: 사실상 0Ω(이상적 도선)이지만, acDcMultiSourceSolve가
+    // value<=0인 엣지는 union으로 묻어버려 edgeCurrentByRef로 전류를 절대 못 구하므로 아주 작은
+    // 양수(1µΩ)를 대신 넣어둡니다.
+    div.querySelector(`#${id}_w1`).dataset.ohms = String(1e-6);
+    div.querySelector(`#${id}_w2`).dataset.ohms = String(1e-6);
+  } else if (type === 'electromagnet'){
+    // 전자석 — 릴레이의 코일(VCC/GND, 문턱전압으로 여자 여부 판정)과 완전히 같은 방식입니다.
+    // 실제 회로 그래프에는 끼지 않는 "코일 부하"이고, 전압이 높을수록 더 많은 클립이 달라붙는
+    // 모습으로(전류가 셀수록 자기장이 강해진다는 것을) 표현합니다.
+    div.classList.add('comp-electromagnet');
+    div.dataset.energized = '0';
+    div.innerHTML = `
+      <div class="comp-label" data-i18n="comp.electromagnet.title">전자석</div>
+      <div class="electromagnet-core-wrap" id="${id}_wrap">
+        <div class="electromagnet-core"></div>
+        <div class="electromagnet-clip" id="${id}_clip1"></div>
+        <div class="electromagnet-clip" id="${id}_clip2"></div>
+        <div class="electromagnet-clip" id="${id}_clip3"></div>
+      </div>
+      <div class="electromagnet-status" id="${id}_status" data-i18n="comp.electromagnet.off">○ 자성 없음</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_VCC" data-i18n-title="comp.electromagnet.vccTitle" title="코일 전원 (+)"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_GND" data-i18n-title="comp.electromagnet.gndTitle" title="코일 전원 기준(GND)"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>`;
+  } else if (type === 'fuse'){
+    // 퓨즈 — resistive-2pin(정상시 저저항)이라 실제 회로 저항으로 반영됩니다. 오실로스코프의
+    // 전류(I) 채널과 같은 방법으로 실제 전류를 구해 정격을 넘으면 "끊어짐"(1억Ω, 영구 개방)으로
+    // 전환하고, 그 뒤로는 "교체" 버튼을 눌러야만 정상 상태로 되돌아갑니다(실제 퓨즈가 한 번
+    // 끊어지면 갈아 끼워야 하는 것과 같습니다).
+    div.classList.add('comp-fuse', 'resistive-2pin');
+    div.dataset.ohms = String(FUSE_OK_OHMS);
+    div.dataset.rated = '1';
+    div.dataset.blown = '0';
+    div.innerHTML = `
+      <div class="comp-label" data-i18n="comp.fuse.title">퓨즈</div>
+      <div class="fuse-body" id="${id}_body"></div>
+      <div class="fuse-controls">
+        <span data-i18n="comp.fuse.ratedLabel">정격 전류</span>
+        <select class="fuse-rated" id="${id}_rated" onchange="fuseRatedChanged('${id}')">
+          <option value="0.5">0.5A</option>
+          <option value="1" selected>1A</option>
+          <option value="2">2A</option>
+        </select>
+      </div>
+      <div class="fuse-status" id="${id}_status" data-i18n="comp.fuse.ok">● 정상</div>
+      <button type="button" class="fuse-replace-btn" onclick="fuseReplace('${id}')" data-i18n="comp.fuse.replaceBtn">🔧 교체</button>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_A" data-i18n-title="comp.fuse.aTitle" title="입력 A"></div>
+        <div class="pin-mini" data-pin="${id}_B" data-i18n-title="comp.fuse.bTitle" title="출력 B"></div>
       </div>`;
   } else if (type === 'btmodule'){
     div.classList.add('comp-btmodule');
@@ -4088,6 +4704,43 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-mini" data-pin="${id}_ENCA" data-i18n-title="comp.encaTitle" title="엔코더 A상 펄스 출력 → 보드 디지털 핀"></div>
         <div class="pin-mini" data-pin="${id}_ENCG" data-i18n-title="comp.encgTitle" title="엔코더 GND"></div>
       </div>`;
+  } else if (type === 'stepper'){
+    div.classList.add('comp-stepper');
+    div.innerHTML = `
+      <div class="stepper-body"><div class="stepper-rotor" id="${id}_rotor"></div><div class="stepper-hub"></div></div>
+      <div class="comp-label"><span data-i18n="comp.stepper.label">스텝모터</span><span id="${id}_angle" data-i18n="stepper.idle">정지</span></div>
+      <div class="stepper-badge" id="${id}_stepcount">0 step</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_1A" data-i18n-title="comp.stepper.coilATitle" title="코일 A → A4988 1A/1B"></div><span class="pin-cap" style="color:var(--text-faint)">1A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_1B" data-i18n-title="comp.stepper.coilATitle" title="코일 A → A4988 1A/1B"></div><span class="pin-cap" style="color:var(--text-faint)">1B</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_2A" data-i18n-title="comp.stepper.coilBTitle" title="코일 B → A4988 2A/2B"></div><span class="pin-cap" style="color:var(--text-faint)">2A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_2B" data-i18n-title="comp.stepper.coilBTitle" title="코일 B → A4988 2A/2B"></div><span class="pin-cap" style="color:var(--text-faint)">2B</span></div>
+      </div>`;
+  } else if (type === 'a4988'){
+    div.classList.add('comp-a4988');
+    div.innerHTML = `
+      <div class="a4988-title">A4988<br><span data-i18n="comp.a4988.title">스텝모터 드라이버</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.a4988.vddTitle" title="로직 전원 VDD (3~5.5V, 보드 5V/3V3)"></div><span class="pin-cap cap-vcc">VDD</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.a4988.gndTitle" title="GND (로직·모터 공통 접지)"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_VM" data-i18n-title="comp.a4988.vmotTitle" title="모터 전원 VMOT (8~35V, 보드와 분리된 전원)"></div><span class="pin-cap cap-vcc">VMOT</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_STEP" data-i18n-title="comp.a4988.stepTitle" title="STEP → 상승 엣지 1번마다 1스텝 회전"></div><span class="pin-cap cap-sig">STEP</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_DIR" data-i18n-title="comp.a4988.dirTitle" title="DIR → 회전 방향 (HIGH/LOW)"></div><span class="pin-cap cap-sig">DIR</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_EN" data-i18n-title="comp.a4988.enTitle" title="EN (Enable) → LOW일 때만 출력 활성 (GND에 연결 필요)"></div><span class="pin-cap cap-sig">EN</span></div>
+      </div>
+      <div class="comp-pin-row ms-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_MS1" data-i18n-title="comp.a4988.msTitle" title="마이크로스텝 선택 (MS1/MS2/MS3, 비연결=LOW=풀스텝)"></div><span class="pin-cap" style="color:var(--text-faint)">MS1</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_MS2" data-i18n-title="comp.a4988.msTitle" title="마이크로스텝 선택 (MS1/MS2/MS3, 비연결=LOW=풀스텝)"></div><span class="pin-cap" style="color:var(--text-faint)">MS2</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_MS3" data-i18n-title="comp.a4988.msTitle" title="마이크로스텝 선택 (MS1/MS2/MS3, 비연결=LOW=풀스텝)"></div><span class="pin-cap" style="color:var(--text-faint)">MS3</span></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_1A" data-i18n-title="comp.a4988.coilATitle" title="코일 A 출력 → 스텝모터 1A/1B"></div><span class="pin-cap" style="color:var(--text-faint)">1A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_1B" data-i18n-title="comp.a4988.coilATitle" title="코일 A 출력 → 스텝모터 1A/1B"></div><span class="pin-cap" style="color:var(--text-faint)">1B</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_2A" data-i18n-title="comp.a4988.coilBTitle" title="코일 B 출력 → 스텝모터 2A/2B"></div><span class="pin-cap" style="color:var(--text-faint)">2A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_2B" data-i18n-title="comp.a4988.coilBTitle" title="코일 B 출력 → 스텝모터 2A/2B"></div><span class="pin-cap" style="color:var(--text-faint)">2B</span></div>
+      </div>`;
   } else if (type === 'multimeter'){
     div.classList.add('comp-multimeter');
     div.innerHTML = `
@@ -4152,6 +4805,10 @@ function spawnComponent(type, dropX, dropY){
     updateInductor(id);
   } else if (type === 'relay'){
     updateRelayVisual(id, false);
+  } else if (type === 'coincell'){
+    renderCoincellStack(div); updateCoincellReadout(div);
+  } else if (type === 'fruitbatt'){
+    renderFruitbattVisual(div); updateFruitbattReadout(div);
   }
   return id;
 }
@@ -4260,6 +4917,31 @@ function driveMotor(motorId, speed, dir){
     if (fan) fan.style.animation = 'none';
     if (label) label.textContent = tr('motor.stopped');
   }
+}
+
+// A4988의 MS1/MS2/MS3 세 핀 상태(각 0/1)로 실제 데이터시트의 마이크로스텝 분주비를 찾습니다.
+// 정의되지 않은 조합(예: 011)은 풀스텝으로 취급합니다.
+function a4988MicrostepDivisor(ms1, ms2, ms3){
+  if (ms1 && ms2 && ms3) return 16;   // 1/16
+  if (ms1 && ms2 && !ms3) return 8;   // 1/8
+  if (!ms1 && ms2 && !ms3) return 4;  // 1/4
+  if (ms1 && !ms2 && !ms3) return 2;  // 1/2
+  return 1;                            // 풀스텝 (000, 그 외 미정의 조합)
+}
+
+// 스텝모터 하나의 회전자(rotor) 각도를 화면에 반영합니다. angleDeg는 A4988이 매 틱 누적해 온
+// 절대 각도(도)이고, enabled=false면 "정지/비활성" 표시만 하고 각도는 마지막 값을 그대로
+// 유지합니다(전원이 나가도 스텝모터는 실제로도 멈춘 자리에 그대로 있습니다 — 홀딩 토크가
+// 없어지는 것과 헷갈리기 쉬운 부분이라 각도 표시는 남겨 둡니다).
+function driveStepper(stepperId, angleDeg, enabled, stepCount){
+  const el = document.getElementById(stepperId);
+  const rotor = document.getElementById(`${stepperId}_rotor`);
+  const label = document.getElementById(`${stepperId}_angle`);
+  const badge = document.getElementById(`${stepperId}_stepcount`);
+  if (el){ el.dataset.angle = String(angleDeg); el.dataset.enabled = enabled ? '1' : '0'; el.dataset.stepCount = String(stepCount); }
+  if (rotor) rotor.style.transform = `rotate(${angleDeg}deg)`;
+  if (label) label.textContent = enabled ? `${(Math.round(angleDeg * 10) / 10)}°` : tr('stepper.idle');
+  if (badge) badge.textContent = `${Math.round(stepCount)} step`;
 }
 
 // RS-485 버스 서보(.comp-rs485servo) 하나의 각도를 실제로 화면에 반영합니다. 일반 DC 서보처럼
@@ -4576,6 +5258,390 @@ function psuAcReading(psuEl, suffix){
   const t = Date.now();
   const instant = vPeak * Math.sin((t / 1000) * 2 * Math.PI * 60 + phaseDeg * Math.PI / 180);
   return { type: 'ac', v: instant, rms, phaseDeg, wave: 'ac' };
+}
+
+/* ---------- 손잡이 발전기 (전자기유도 — DC/AC 선택) ---------- */
+// 최댓값들은 임의로 정한 "교육용 데모" 값입니다(실제 소형 손잡이 발전기의 출력과 대략 비슷한
+// 범위). AC 쪽 주파수를 일부러 낮게(최대 5Hz) 잡아서, 오실로스코프의 기본 타임/DIV 설정에서도
+// 사인파 몇 주기가 눈으로 따라갈 수 있을 만큼 느리게 보이도록 했습니다 — 실제 발전기 주파수와는
+// 무관하며, 순전히 "느리게 돌리면 파형도 느려진다"를 직접 보여주기 위한 선택입니다.
+const GENERATOR_MAX_DC_V = 6;
+const GENERATOR_MAX_AC_RMS_V = 6;
+const GENERATOR_MAX_AC_HZ = 5;
+function generatorModeChanged(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.dataset.mode = el.querySelector('.generator-mode').value;
+  updateGeneratorReadout(el);
+}
+// 크랭크 버튼을 누르고 있는 동안 이 부품의 dataset.cranking을 'fwd'/'rev'로 표시해 두면,
+// runTick()이 매 물리 틱(25ms)마다 그걸 보고 속도를 가속/감속시킵니다 — 실제 속도 변화는
+// 여기서 하지 않고 시뮬레이션 루프 쪽에서 일괄 처리합니다(정지 중엔 크랭크를 눌러도 아무
+// 일도 일어나지 않는 것이 맞습니다 — 다른 부품들도 전부 "시뮬레이션 시작" 중에만 동작합니다).
+function generatorCrankStart(id, dir){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.dataset.cranking = dir;
+  el.querySelectorAll('.generator-btn').forEach(b => b.classList.remove('cranking'));
+  el.querySelector(dir === 'fwd' ? '.generator-btn-fwd' : '.generator-btn-rev')?.classList.add('cranking');
+}
+function generatorCrankStop(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.dataset.cranking = '';
+  el.querySelectorAll('.generator-btn').forEach(b => b.classList.remove('cranking'));
+}
+// DC 모드: 속도(-100~100)에 정비례한 전압, 방향(부호)이 그대로 극성이 됩니다 — 실제 정류자형
+// DC 발전기도 회전 방향을 반대로 돌리면 출력 극성이 반대로 뒤집힙니다(모터의 "전압을 반대로
+// 걸면 반대로 돈다"와 완전히 대응되는, 가역적인 원리라는 걸 보여줍니다).
+function generatorDcVoltage(genEl){
+  const speed = parseFloat(genEl.dataset.speed || '0');
+  return (speed / 100) * GENERATOR_MAX_DC_V;
+}
+// AC 모드: |속도|에 비례해 진폭과 주파수가 함께 커집니다(실제로도 더 빨리 돌릴수록 기전력의
+// 크기와 주기 둘 다 커집니다 — 유도기전력 e = -N·dΦ/dt 이므로). 방향(부호)은 파형 전체를
+// 그대로 뒤집는 것과 같아서(amp의 부호로 표현), 역방향으로 돌리면 오실로스코프에서 파형이
+// 위아래로 뒤집혀 보입니다.
+function generatorAcParams(genEl){
+  const speed = parseFloat(genEl.dataset.speed || '0');
+  const frac = Math.abs(speed) / 100;
+  const sign = speed < 0 ? -1 : 1;
+  return { amp: sign * frac * GENERATOR_MAX_AC_RMS_V * Math.SQRT2, omega: frac * GENERATOR_MAX_AC_HZ * 2 * Math.PI };
+}
+// 이 발전기의 출력 핀(_V)에 멀티미터 등을 "직접" 물렸을 때 읽히는 값 — externalSourceOnNet에서
+// 호출됩니다(저항 등을 거쳐 부하가 걸린 경우는 psuSourceParams를 통한 전체 회로망 해석으로
+// 따로 계산되고, 이 함수는 그 전체 해석에 넣을 전압을 구할 때도 함께 재사용됩니다).
+function generatorReading(genEl){
+  if (genEl.dataset.mode === 'genac'){
+    const { amp, omega } = generatorAcParams(genEl);
+    if (omega <= 0) return null;
+    const t = Date.now() / 1000;
+    return { type: 'ac', v: amp * Math.sin(omega * t), rms: Math.abs(amp) / Math.SQRT2, phaseDeg: amp < 0 ? 180 : 0, wave: 'ac' };
+  }
+  return { type: 'volt', v: generatorDcVoltage(genEl) };
+}
+function updateGeneratorReadout(genEl){
+  const readout = genEl.querySelector('.generator-readout');
+  if (!readout) return;
+  if (genEl.dataset.mode === 'genac'){
+    const frac = Math.abs(parseFloat(genEl.dataset.speed || '0')) / 100;
+    readout.textContent = `${(frac * GENERATOR_MAX_AC_RMS_V).toFixed(1)} Vrms · ${(frac * GENERATOR_MAX_AC_HZ).toFixed(1)} Hz`;
+  } else {
+    readout.textContent = `${generatorDcVoltage(genEl).toFixed(1)} V`;
+  }
+}
+
+/* ---------- 🔬 전기 실험실: 소금물 동전 전지 ---------- */
+// 층 하나(동전+소금물 적신 종이)당 기전력은 실제 아연-구리 조합의 실측값(약 0.7~1.1V, 전해액이
+// 묽은 산이 아니라 소금물이라 이론값 0.76V보다 조금 낮은 쪽으로 잡음)을 참고한 교육용 근사값입니다.
+const COINCELL_V_PER_LAYER = 0.7;
+function coincellLayersChanged(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const slider = el.querySelector(`#${id}_layers`);
+  const layers = parseInt(slider.value, 10);
+  el.dataset.layers = String(layers);
+  el.querySelector(`#${id}_layersval`).textContent = String(layers);
+  renderCoincellStack(el);
+  updateCoincellReadout(el);
+}
+function renderCoincellStack(el){
+  const stack = el.querySelector('.coincell-stack');
+  if (!stack) return;
+  const layers = parseInt(el.dataset.layers || '1', 10);
+  stack.innerHTML = Array.from({ length: layers }, () => `<div class="coincell-layer"></div>`).join('');
+}
+function coincellVoltage(el){
+  return parseInt(el.dataset.layers || '1', 10) * COINCELL_V_PER_LAYER;
+}
+function updateCoincellReadout(el){
+  const readout = el.querySelector('.coincell-readout');
+  if (readout) readout.textContent = `${coincellVoltage(el).toFixed(1)} V`;
+}
+
+/* ---------- 🔬 전기 실험실: 과일 전지 ---------- */
+// 과일마다 산도·전해질 특성이 달라 기전력이 조금씩 다릅니다(위키백과 등에서 흔히 인용되는 레몬
+// 약 0.9V를 기준으로, 감자는 그보다 낮은 약 0.5V, 오렌지는 그 중간인 약 0.7V로 근사).
+const FRUITBATT_V = { potato: 0.5, lemon: 0.9, orange: 0.7 };
+const FRUITBATT_COLOR = {
+  potato: 'radial-gradient(circle at 35% 30%,#c9a25a,#8a6a3a)',
+  lemon: 'radial-gradient(circle at 35% 30%,#f5e96a,#c9b32a)',
+  orange: 'radial-gradient(circle at 35% 30%,#f2a14e,#c9631f)',
+};
+function fruitbattChanged(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.dataset.fruit = el.querySelector('.fruitbatt-type').value;
+  el.dataset.count = el.querySelector(`#${id}_count`).value;
+  el.querySelector(`#${id}_countval`).textContent = el.dataset.count;
+  renderFruitbattVisual(el);
+  updateFruitbattReadout(el);
+}
+function renderFruitbattVisual(el){
+  const visual = el.querySelector('.fruitbatt-visual');
+  if (!visual) return;
+  const count = parseInt(el.dataset.count || '1', 10);
+  const bg = FRUITBATT_COLOR[el.dataset.fruit || 'potato'];
+  visual.innerHTML = Array.from({ length: count }, () => `<div class="fruitbatt-icon" style="background:${bg};"></div>`).join('');
+}
+function fruitbattVoltage(el){
+  const v = FRUITBATT_V[el.dataset.fruit || 'potato'] || 0.5;
+  return v * parseInt(el.dataset.count || '1', 10);
+}
+function updateFruitbattReadout(el){
+  const readout = el.querySelector('.fruitbatt-readout');
+  if (readout) readout.textContent = `${fruitbattVoltage(el).toFixed(1)} V`;
+}
+
+/* ---------- 🔬 전기 실험실: 다이오드 ---------- */
+// 순방향(A가 K보다 문턱전압 이상 높음)일 때는 거의 단락(1Ω), 역방향/미달일 때는 거의 개방(1억Ω)으로
+// 취급합니다 — resistive-2pin이라 이 값이 곧 resistiveEdges()/buildAcNetworkGraph() 양쪽 모두의
+// 실제 회로 저항으로 반영됩니다. A/K 중 어느 쪽도 전원에 "직결"되어 있지 않은 배선(예: 단순
+// 직렬 루프에서 다이오드를 거꾸로 끼운 경우)에서는 A 한쪽만 읽으면 "자기 자신의 지금 상태"를
+// 통해서만 전원에 도달하게 되어, 매 틱 그 상태를 그대로 재확인해버리는 래치(고정)에 빠집니다.
+// 이를 피하려고 A/K 두 핀 모두 "다이오드 자신의 엣지를 뺀 나머지 회로만"의 관점에서 독립적으로
+// 전압을 구해 비교합니다 — 실제로 다이오드를 잠깐 떼어냈을 때 양끝에 걸리는 전압을 재는 것과 같습니다.
+const DIODE_VF = 0.6; // 실제 실리콘 다이오드 순방향 전압(Vf)과 비슷한 교육용 문턱값
+const DIODE_FORWARD_OHMS = 1;
+const DIODE_REVERSE_OHMS = 1e8;
+function diodeUpdate(el){
+  if (!isSimulating){ el.dataset.ohms = String(DIODE_REVERSE_OHMS); el.dataset.conducting = '0'; updateDiodeVisual(el); return; }
+  const aPin = el.querySelector('[data-pin$="_A"]');
+  const bPin = el.querySelector('[data-pin$="_B"]');
+  const edgesExcl = resistiveEdges().filter(e => !(e.legA && e.legA.closest('.comp-diode') === el));
+  const va = aPin ? readingToVolts(resistiveReading(aPin, edgesExcl)) : 0;
+  const vb = bPin ? readingToVolts(resistiveReading(bPin, edgesExcl)) : 0;
+  const forward = (va - vb) > DIODE_VF;
+  el.dataset.ohms = String(forward ? DIODE_FORWARD_OHMS : DIODE_REVERSE_OHMS);
+  el.dataset.conducting = forward ? '1' : '0';
+  updateDiodeVisual(el);
+}
+function updateDiodeVisual(el){
+  const tri = el.querySelector('.diode-tri'), status = el.querySelector('.diode-status');
+  const on = el.dataset.conducting === '1';
+  if (tri) tri.classList.toggle('conducting', on);
+  if (status){
+    status.classList.toggle('conducting', on);
+    status.dataset.i18n = on ? 'comp.diode.on' : 'comp.diode.off';
+    status.textContent = tr(status.dataset.i18n);
+  }
+}
+
+/* ---------- 🔬 전기 실험실: 트랜지스터 (NPN 단순화 스위치 모델) ---------- */
+// 실제 트랜지스터의 Vbe(약 0.6V)를 문턱값으로 삼아, 베이스에 그 이상의 전압이 걸리면 그 순간부터
+// 컬렉터-이미터 사이가 닫힌 스위치(0Ω)가 됩니다 — 릴레이의 코일-접점 관계와 완전히 동일한 방식.
+const TRANSISTOR_VBE = 0.6;
+function transistorIsOn(tEl){
+  if (!isSimulating) return false;
+  const bPin = tEl.querySelector('[data-pin$="_B"]');
+  if (!bPin) return false;
+  const r = resistiveReading(bPin);
+  if (!r) return false;
+  return readingToVolts(r) >= TRANSISTOR_VBE;
+}
+function updateTransistorVisual(id, on){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const led = document.getElementById(`${id}_led`);
+  if (led) led.classList.toggle('on', on);
+  const status = document.getElementById(`${id}_status`);
+  if (status){
+    status.classList.toggle('on', on);
+    status.dataset.i18n = on ? 'comp.transistor.on' : 'comp.transistor.off';
+    status.textContent = tr(status.dataset.i18n);
+  }
+  el.dataset.on = on ? '1' : '0';
+}
+// 릴레이의 relayContactEdges()와 완전히 같은 패턴 — dataset.on이 '1'인 트랜지스터만 C-E를
+// 0Ω 가상 엣지로 resistiveEdges()/buildAcNetworkGraph() 양쪽에 추가합니다.
+function transistorContactEdges(){
+  const out = [];
+  document.querySelectorAll('.comp-transistor').forEach(t => {
+    if (t.dataset.on !== '1') return;
+    const c = t.querySelector('[data-pin$="_C"]'), e = t.querySelector('[data-pin$="_E"]');
+    if (c && e) out.push({ legA: c, legB: e, ohms: 0 });
+  });
+  return out;
+}
+
+/* ---------- 🔬 전기 실험실: 외르스텟 실험 (전류 → 자기장 → 나침반 편향) ---------- */
+// 오실로스코프의 "전류(I)" 채널과 완전히 같은 방법으로(acReachablePsu→psuSourceParams→
+// acDcMultiSourceSolve→edgeCurrentByRef) 이 도선에 실제로 흐르는 전류(phasor)를 구해, 그
+// 크기·방향에 맞춰 나침반 바늘을 돌립니다. 도선 자체는 resistive-2pin(1µΩ, 이상적 도선)이라
+// 회로 동작에는 영향을 주지 않습니다.
+const OERSTED_DEG_PER_MA = 3; // 20mA 정도면 눈에 잘 보이게 60˚ 근처로 꺾이도록 잡은 교육용 스케일
+function updateOerstedNeedle(el){
+  const needle = el.querySelector('.oersted-needle');
+  const readout = el.querySelector('.oersted-readout');
+  let mA = 0;
+  if (isSimulating){
+    const aPin = el.querySelector('[data-pin$="_A"]');
+    const psu = aPin ? acReachablePsu(aPin) : null;
+    const params = psu ? psuSourceParams(psu) : null;
+    if (params && params.knownPairs && params.knownPairs.length){
+      const solved = acDcMultiSourceSolve(params.knownPairs, params.omega);
+      const I = solved ? solved.edgeCurrentByRef(el) : null;
+      if (I) mA = I.re * 1000; // 부호가 곧 전류 방향 → 나침반이 좌/우 어느 쪽으로 꺾일지를 그대로 결정
+    }
+  }
+  const angle = Math.max(-80, Math.min(80, mA * OERSTED_DEG_PER_MA));
+  if (needle) needle.style.transform = `translate(-1.5px,-19px) rotate(${angle}deg)`;
+  if (readout) readout.textContent = `${mA.toFixed(1)} mA`;
+}
+
+// 오실로스코프의 "전류(I)" 채널·외르스텟 실험과 완전히 같은 방법으로, refEl로 등록된
+// resistive-2pin 엣지에 흐르는 실제 전류를 mA로 구합니다(평행 도선/퓨즈가 함께 재사용).
+function measuredCurrentMA(anyPinOnEdge, refEl){
+  if (!isSimulating || !anyPinOnEdge) return 0;
+  const psu = acReachablePsu(anyPinOnEdge);
+  const params = psu ? psuSourceParams(psu) : null;
+  if (!params || !params.knownPairs || !params.knownPairs.length) return 0;
+  const solved = acDcMultiSourceSolve(params.knownPairs, params.omega);
+  const I = solved ? solved.edgeCurrentByRef(refEl) : null;
+  return I ? I.re * 1000 : 0;
+}
+
+/* ---------- 🔬 전기 실험실: 변압기 ---------- */
+function transformerRatioChanged(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.dataset.n1 = el.querySelector(`#${id}_n1`).value;
+  el.dataset.n2 = el.querySelector(`#${id}_n2`).value;
+}
+// 1차(P1/P2)는 전압계 프로브처럼 회로에 부담을 주지 않는 "측정 전용" 핀입니다(resistive-2pin이
+// 아님) — 1차를 구동하는 실제 전원의 acDcMultiSourceSolve 해석 결과에서 두 핀의 노드 전압만
+// 읽어옵니다. 1차가 아무 것에도 물려있지 않거나 DC(ω=0)면 null을 돌려줍니다(실제 변압기도
+// DC에서는 유도기전력이 생기지 않아 2차에 아무 것도 안 나옵니다).
+function transformerPrimaryPhasor(el){
+  const p1 = el.querySelector('[data-pin$="_P1"]'), p2 = el.querySelector('[data-pin$="_P2"]');
+  if (!p1 || !p2 || !isSimulating) return null;
+  const psu = acReachablePsu(p1);
+  const params = psu ? psuSourceParams(psu) : null;
+  if (!params || !params.knownPairs || !params.knownPairs.length) return null;
+  const solved = acDcMultiSourceSolve(params.knownPairs, params.omega);
+  if (!solved) return null;
+  const v1 = solved.nodeVoltage(p1), v2 = solved.nodeVoltage(p2);
+  if (!v1 || !v2) return null;
+  return { V: cSub(v1, v2), omega: params.omega };
+}
+function transformerRatio(el){
+  const n1 = parseFloat(el.dataset.n1 || '100') || 1;
+  const n2 = parseFloat(el.dataset.n2 || '50') || 0;
+  return n2 / n1;
+}
+// 이 변압기의 2차 출력 핀(_V)에 멀티미터 등을 "직접" 물렸을 때 읽히는 값 — externalSourceOnNet과
+// psuSourceParams(부하가 걸린 전체 회로망 해석) 양쪽에서 함께 재사용합니다.
+function transformerReading(el){
+  const primary = transformerPrimaryPhasor(el);
+  if (!primary || primary.omega <= 0) return null;
+  const amp = cAbs(primary.V) * transformerRatio(el);
+  const t = Date.now() / 1000;
+  return { type: 'ac', v: amp * Math.sin(primary.omega * t), rms: amp / Math.SQRT2, phaseDeg: 0, wave: 'ac' };
+}
+function updateTransformerReadout(el){
+  const readout = el.querySelector('.transformer-readout');
+  const warn = el.querySelector('.transformer-warn');
+  const primary = transformerPrimaryPhasor(el);
+  if (warn) warn.hidden = !isSimulating || !primary || primary.omega > 0;
+  if (!readout) return;
+  if (!primary || primary.omega <= 0){ readout.textContent = '0.0 V'; return; }
+  const vsAmp = cAbs(primary.V) * transformerRatio(el);
+  readout.textContent = `${(vsAmp / Math.SQRT2).toFixed(1)} Vrms`;
+}
+
+/* ---------- 🔬 전기 실험실: 평행 도선의 힘 ---------- */
+function updateParallelWiresVisual(el){
+  const w1 = document.getElementById(`${el.id}_w1`), w2 = document.getElementById(`${el.id}_w2`);
+  const p1 = w1 ? w1.querySelector('[data-pin$="_A"]') : null;
+  const p2 = w2 ? w2.querySelector('[data-pin$="_A"]') : null;
+  const i1 = measuredCurrentMA(p1, w1), i2 = measuredCurrentMA(p2, w2);
+  const arrow1 = document.getElementById(`${el.id}_arrow1`), arrow2 = document.getElementById(`${el.id}_arrow2`);
+  if (arrow1) arrow1.style.transform = i1 < 0 ? 'scaleX(-1)' : 'scaleX(1)';
+  if (arrow2) arrow2.style.transform = i2 < 0 ? 'scaleX(-1)' : 'scaleX(1)';
+  const visual = el.querySelector('.pwires-visual');
+  const readout = el.querySelector('.pwires-readout');
+  const bothFlowing = Math.abs(i1) > 0.05 && Math.abs(i2) > 0.05;
+  let gap = 10, cls = null, textKey = 'comp.parallelwires.none';
+  if (bothFlowing){
+    const sameDir = (i1 > 0) === (i2 > 0);
+    const strength = Math.min(1, Math.abs(i1 * i2) / 400); // 시각적 간격 변화용 임의 정규화(교육용)
+    gap = sameDir ? Math.max(2, 10 - strength * 8) : Math.min(22, 10 + strength * 12);
+    cls = sameDir ? 'attract' : 'repel';
+    textKey = sameDir ? 'comp.parallelwires.attract' : 'comp.parallelwires.repel';
+  }
+  if (visual) visual.style.gap = `${gap}px`;
+  if (readout){
+    readout.classList.remove('attract', 'repel');
+    if (cls) readout.classList.add(cls);
+    readout.dataset.i18n = textKey;
+    readout.textContent = tr(textKey);
+  }
+}
+
+/* ---------- 🔬 전기 실험실: 전자석 ---------- */
+// 릴레이의 코일(VCC/GND, 문턱전압으로 여자 여부 판정)과 완전히 같은 패턴입니다 — 실제 회로
+// 그래프에는 끼지 않는 "코일 부하"입니다.
+const ELECTROMAGNET_THRESHOLD_V = 2;
+function electromagnetState(el){
+  if (!isSimulating) return { on: false, voltage: 0 };
+  const vPin = el.querySelector('[data-pin$="_VCC"]');
+  const r = vPin ? resistiveReading(vPin) : null;
+  const voltage = r ? readingToVolts(r) : 0;
+  return { on: voltage >= ELECTROMAGNET_THRESHOLD_V, voltage };
+}
+function updateElectromagnetVisual(id, state){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.dataset.energized = state.on ? '1' : '0';
+  const clips = el.querySelectorAll('.electromagnet-clip');
+  const attachCount = state.on ? Math.min(clips.length, 1 + Math.floor(state.voltage / 3)) : 0;
+  clips.forEach((c, i) => c.classList.toggle('attached', i < attachCount));
+  const status = el.querySelector('.electromagnet-status');
+  if (status){
+    status.classList.toggle('on', state.on);
+    status.dataset.i18n = state.on ? 'comp.electromagnet.on' : 'comp.electromagnet.off';
+    status.textContent = tr(status.dataset.i18n);
+  }
+}
+
+/* ---------- 🔬 전기 실험실: 퓨즈 ---------- */
+const FUSE_OK_OHMS = 0.1;
+const FUSE_BLOWN_OHMS = 1e8;
+function fuseRatedChanged(id){
+  const el = document.getElementById(id);
+  if (el) el.dataset.rated = el.querySelector(`#${id}_rated`).value;
+}
+function fuseReplace(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.dataset.blown = '0';
+  el.dataset.ohms = String(FUSE_OK_OHMS);
+  updateFuseVisual(el);
+}
+function updateFuseVisual(el){
+  const blown = el.dataset.blown === '1';
+  const body = el.querySelector('.fuse-body'), status = el.querySelector('.fuse-status');
+  if (body) body.classList.toggle('blown', blown);
+  if (status){
+    status.classList.toggle('blown', blown);
+    status.dataset.i18n = blown ? 'comp.fuse.blown' : 'comp.fuse.ok';
+    status.textContent = tr(status.dataset.i18n);
+  }
+}
+// 매 틱 실제 전류(mA)를 구해 정격(A)을 초과하면 영구적으로 "끊어짐" 상태로 전환합니다 — 실제
+// 퓨즈처럼 전류가 다시 정상으로 돌아와도 저절로 복구되지 않고, "교체" 버튼을 눌러야만 정상으로
+// 돌아옵니다.
+function fuseCheck(el){
+  if (el.dataset.blown === '1'){ el.dataset.ohms = String(FUSE_BLOWN_OHMS); updateFuseVisual(el); return; }
+  if (!isSimulating) return;
+  const aPin = el.querySelector('[data-pin$="_A"]');
+  const mA = aPin ? measuredCurrentMA(aPin, el) : 0;
+  const ratedA = parseFloat(el.dataset.rated || '1');
+  if (Math.abs(mA) > ratedA * 1000){
+    el.dataset.blown = '1';
+    el.dataset.ohms = String(FUSE_BLOWN_OHMS);
+  }
+  updateFuseVisual(el);
 }
 
 /* ============ Wires Engine & Electrical Net ============ */
@@ -5127,6 +6193,15 @@ function externalSourceOnNet(pinEl){
       const psu = el.closest('.comp-psu');
       if (psu){
         if (psu.dataset.mode === 'dc' && pid.endsWith('_V')) return psuDcReading(psu);
+        if ((psu.dataset.mode === 'gendc' || psu.dataset.mode === 'genac') && pid.endsWith('_V')){
+          // 손잡이 발전기: 실제로 크랭크가 돌고 있을 때(psu-switch가 on)만 값을 내놓습니다 —
+          // 멈춰 있으면(0V) 회로에 아무 신호원도 없는 것과 같으므로 null을 반환합니다.
+          const on = psu.querySelector('.psu-switch')?.classList.contains('on');
+          return on ? generatorReading(psu) : null;
+        }
+        if (psu.dataset.mode === 'coincell' && pid.endsWith('_V')) return { type: 'volt', v: coincellVoltage(psu) };
+        if (psu.dataset.mode === 'fruitbatt' && pid.endsWith('_V')) return { type: 'volt', v: fruitbattVoltage(psu) };
+        if (psu.dataset.mode === 'transformer' && pid.endsWith('_V')) return transformerReading(psu);
         const m = pid.match(/(_L1|_L2|_L3|_L)$/);
         if (m && psu.dataset.mode !== 'dc') return psuAcReading(psu, m[1]);
       }
@@ -5268,13 +6343,16 @@ function resistiveEdges(){
     const legB = el.querySelector('[data-pin$="_B"]');
     return { legA, legB, ohms: 0 };
   }).filter(e => e.legA && e.legB);
-  return base.concat(relayContactEdges(), motorCtrlContactEdges(), inductorEdges);
+  return base.concat(relayContactEdges(), motorCtrlContactEdges(), transistorContactEdges(), inductorEdges);
 }
 // startPinEl의 net(대표 원소로 관리)에서 출발해 저항 엣지를 하나씩 건너며 도달 가능한 모든
 // net과 "그 net까지의 최소 누적 저항"을 구합니다. 회로 규모가 매우 작으므로(교육용 시뮬레이터)
 // 정교한 우선순위 큐 없이 라운드 릴렉스만으로 충분합니다.
-function resistiveBFS(startPinEl){
-  const edges = resistiveEdges();
+// edgesOverride를 넘기면(예: 다이오드가 자기 자신의 엣지를 뺀 "나머지 회로만"의 관점에서 A/K 각
+// 핀의 전압을 독립적으로 구하고 싶을 때) resistiveEdges() 대신 그 목록을 씁니다 — 자기 자신의
+// 현재 상태를 자기 자신을 판단하는 데 쓰는 순환 참조(및 그로 인한 래치/진동)를 피하기 위함입니다.
+function resistiveBFS(startPinEl, edgesOverride){
+  const edges = edgesOverride || resistiveEdges();
   const visited = [{ rep: startPinEl, net: netOf(startPinEl), distR: 0 }];
   if (!edges.length) return visited;
   const findIdx = (el) => visited.findIndex(v => v.net.has(el));
@@ -5306,10 +6384,10 @@ function readingToVolts(reading){
 // netReading()을 확장: 직결(0Ω) net에 신호원이 없을 때만 저항/파워케이블을 건너 뛰어 가장 가까운
 // (또는 두 개의) 신호원을 찾고, 저항값에 따라 감쇠된 값을 돌려줍니다. 저항이 전혀 없는 회로는
 // 위 direct 체크에서 그대로 return되므로 기존 동작과 100% 동일합니다(회귀 없음).
-function resistiveReading(pinEl){
+function resistiveReading(pinEl, edgesOverride){
   const direct = netReading(pinEl);
   if (direct) return direct;
-  const visited = resistiveBFS(pinEl);
+  const visited = resistiveBFS(pinEl, edgesOverride);
   if (visited.length <= 1) return null;
   const sources = [];
   for (const v of visited){
@@ -5489,7 +6567,7 @@ function buildAcNetworkGraph(){
     const farads = Math.max(0, parseFloat(el.dataset.farads || '0')) || 0;
     edges.push({ i: nodeIdFor(a), j: nodeIdFor(b), type: 'C', value: farads, ref: el });
   });
-  relayContactEdges().concat(motorCtrlContactEdges()).forEach(e => {
+  relayContactEdges().concat(motorCtrlContactEdges(), transistorContactEdges()).forEach(e => {
     if (!e.legA || !e.legB) return;
     edges.push({ i: nodeIdFor(e.legA), j: nodeIdFor(e.legB), type: 'R', value: 0, ref: null });
   });
@@ -5660,6 +6738,43 @@ function psuSourceParams(psuEl){
     knownPairs.push({ el: neutralEl, V: cx(0, 0) });
     return { knownPairs, omega: OMEGA60 };
   }
+  // 손잡이 발전기 — 핀 이름은 DC 모드('_V'/'_G')와 완전히 똑같이 재사용하지만(그래서 위 'dc'
+  // 분기와 pin 접미사가 같아도 서로 안 겹칩니다 — mode 문자열 자체가 다르므로), 고정된 전압
+  // 대신 지금 크랭크 속도에서 계산한 값을 매번 새로 구합니다.
+  if (mode === 'gendc'){
+    const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
+    if (!hotEl || !gndEl) return null;
+    return { knownPairs: [{ el: hotEl, V: cx(generatorDcVoltage(psuEl), 0) }, { el: gndEl, V: cx(0, 0) }], omega: 0 };
+  }
+  if (mode === 'genac'){
+    const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
+    if (!hotEl || !gndEl) return null;
+    const { amp, omega } = generatorAcParams(psuEl);
+    if (omega <= 0) return null; // 안 돌리고 있으면(속도 0) 전원으로 취급하지 않습니다 — 실제로도 안 돌리면 전기가 안 나옵니다
+    return { knownPairs: [{ el: hotEl, V: cx(amp, 0) }, { el: gndEl, V: cx(0, 0) }], omega };
+  }
+  // 소금물 동전 전지 / 과일 전지 — 화학 전지는 늘 "켜져" 있으므로(크랭크처럼 사용자가 계속
+  // 조작해야 하는 게 아니라 스위치가 항상 on) 층 수/직렬 개수로 정해진 전압을 그대로 DC로 냅니다.
+  if (mode === 'coincell'){
+    const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
+    if (!hotEl || !gndEl) return null;
+    return { knownPairs: [{ el: hotEl, V: cx(coincellVoltage(psuEl), 0) }, { el: gndEl, V: cx(0, 0) }], omega: 0 };
+  }
+  if (mode === 'fruitbatt'){
+    const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
+    if (!hotEl || !gndEl) return null;
+    return { knownPairs: [{ el: hotEl, V: cx(fruitbattVoltage(psuEl), 0) }, { el: gndEl, V: cx(0, 0) }], omega: 0 };
+  }
+  // 변압기 — 1차에 걸린 실제 교류 전압(측정 전용 P1/P2)에 권수비(N2/N1)를 곱해 2차 출력으로
+  // 그대로 냅니다. 1차가 비어있거나 DC(ω=0)면 2차는 전원으로 취급되지 않습니다(null).
+  if (mode === 'transformer'){
+    const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
+    if (!hotEl || !gndEl) return null;
+    const primary = transformerPrimaryPhasor(psuEl);
+    if (!primary || primary.omega <= 0) return null;
+    const Vs = cMul(primary.V, cx(transformerRatio(psuEl), 0));
+    return { knownPairs: [{ el: hotEl, V: Vs }, { el: gndEl, V: cx(0, 0) }], omega: primary.omega };
+  }
   return null;
 }
 // startEl에서 저항/인덕터/커패시터/릴레이 접점(값과 무관하게 "선로로 이어지는가"만)을 모두 건너
@@ -5674,7 +6789,7 @@ function acReachablePsu(startEl){
     const a = el.querySelector('[data-pin$="_A"]'), b = el.querySelector('[data-pin$="_B"]');
     if (a && b) allEdgePins.push([a, b]);
   });
-  relayContactEdges().concat(motorCtrlContactEdges()).forEach(e => { if (e.legA && e.legB) allEdgePins.push([e.legA, e.legB]); });
+  relayContactEdges().concat(motorCtrlContactEdges(), transistorContactEdges()).forEach(e => { if (e.legA && e.legB) allEdgePins.push([e.legA, e.legB]); });
 
   const seenNets = [netOf(startEl)];
   let idx = 0;
@@ -6036,29 +7151,51 @@ const heldScopes = new Map(); // id -> { perfNow, dateNow }
 // digitalWrite 등으로 인한 값 변화)가 감지되는 즉시 자동으로 그 순간 정지합니다. 사람이 버튼을
 // 누르는 반응 속도로는 도저히 따라잡을 수 없는, 레지스터 제어처럼 아주 빠르게 스쳐 지나가는
 // 파형도 놓치지 않고 캡처하기 위한 기능입니다.
+// ※ 예전에는 이 트리거 무장 기능이 정지/재개(HOLD) 버튼 하나에 같이 얹혀 있었는데(버튼을
+// 누르는 순서에 따라 무장→정지→재개로 순환), 두 기능이 뒤섞여 헷갈린다는 의견에 따라 완전히
+// 분리했습니다. 이제 정지/재개(scope-hold-btn, 상단)와 트리거 ON/OFF(scope-trigger-btn, 하단)는
+// 서로 독립된 두 개의 버튼이고, heldScopes/armedScopes도 서로의 상태를 건드리지 않습니다 —
+// 다만 "정지"는 즉시 그 순간을 얼려버리는 동작이라 대기 중이던 트리거 무장은 의미가 없어져
+// 함께 취소하고, 반대로 트리거를 새로 무장할 때는 정지된 화면으로는 새 엣지를 감지할 수 없으니
+// 자동으로 재개시킵니다(이 두 지점 외에는 서로에게 전혀 영향을 주지 않습니다).
 const armedScopes = new Set(); // id 집합
 const scopeLastDigital = {}; // `${scopeId}_${ch}` -> 직전 틱의 디지털 값(0/1), 엣지 감지용
 function setScopeHoldUI(id, state){
   const btn = document.getElementById(`${id}_holdbtn`);
   if (!btn) return;
-  btn.classList.remove('held', 'armed');
-  if (state === 'held'){ btn.classList.add('held'); btn.textContent = tr('scope.resumeBtn'); }
-  else if (state === 'armed'){ btn.classList.add('armed'); btn.textContent = tr('scope.armedBtn'); }
-  else { btn.textContent = tr('comp.scope.holdBtn'); }
+  btn.classList.toggle('held', state === 'held');
+  btn.textContent = state === 'held' ? tr('scope.resumeBtn') : tr('comp.scope.holdBtn');
+}
+function setScopeTriggerUI(id, state){
+  const btn = document.getElementById(`${id}_triggerbtn`);
+  if (!btn) return;
+  btn.classList.toggle('armed', state === 'armed');
+  btn.textContent = state === 'armed' ? tr('scope.armedBtn') : tr('comp.scope.triggerBtn');
 }
 function toggleScopeHold(id){
   if (heldScopes.has(id)){
     // 정지 해제 → 실시간으로 복귀
     heldScopes.delete(id);
     setScopeHoldUI(id, 'live');
-  } else if (armedScopes.has(id)){
-    // 트리거 대기 취소 → 실시간으로 복귀
-    armedScopes.delete(id);
-    setScopeHoldUI(id, 'live');
   } else {
-    // 트리거 무장: 다음 디지털 엣지에서 자동 정지
+    // 지금 이 순간 바로 정지 — 트리거 대기 중이었다면 더 기다릴 이유가 없으므로 함께 취소합니다.
+    heldScopes.set(id, { perfNow: performance.now(), dateNow: Date.now() });
+    setScopeHoldUI(id, 'held');
+    if (armedScopes.has(id)){ armedScopes.delete(id); setScopeTriggerUI(id, 'idle'); }
+  }
+  drawScope(id);
+}
+function toggleScopeTrigger(id){
+  if (armedScopes.has(id)){
+    // 트리거 무장 취소 — 화면은 계속 흐르던 대로 유지됩니다(정지/재개 상태는 건드리지 않음).
+    armedScopes.delete(id);
+    setScopeTriggerUI(id, 'idle');
+  } else {
+    // 트리거 무장: 다음 디지털 엣지에서 자동 정지. 이미 정지되어 있으면 새 엣지를 감지할 수
+    // 없으므로(정지 중엔 샘플 갱신이 멈춥니다) 먼저 재개시킵니다.
     armedScopes.add(id);
-    setScopeHoldUI(id, 'armed');
+    setScopeTriggerUI(id, 'armed');
+    if (heldScopes.has(id)){ heldScopes.delete(id); setScopeHoldUI(id, 'live'); }
   }
   drawScope(id);
 }
@@ -6312,6 +7449,7 @@ function toggleSimulation(){
       if (label) label.textContent = '90°';
     });
     document.querySelectorAll('.comp-dcmotor, .comp-dcmotor-enc, .comp-bldcmotor, .comp-motor3ph, .comp-acmotor').forEach(m => driveMotor(m.id, 0, 1));
+    document.querySelectorAll('.comp-stepper').forEach(st => driveStepper(st.id, parseFloat(st.dataset.angle || '0'), false, parseFloat(st.dataset.stepCount || '0')));
     document.querySelectorAll('.comp-relay').forEach(relay => updateRelayVisual(relay.id, false));
     document.querySelectorAll('.comp-multimeter').forEach(mm => updateMultimeter(mm.id));
     logSerial('--- ' + tr('sim.stoppedTag') + ' ---');
@@ -6426,6 +7564,45 @@ function runTick(){
     const level = enR ? Math.max(0, Math.min(1, enR.v)) : 0;
     ctrl.dataset.speedLevel = String(level);
   });
+
+  // 0-3. 손잡이 발전기의 크랭크 속도를 매 물리 틱마다 갱신합니다 — 버튼을 누르고 있는 동안
+  // (dataset.cranking이 'fwd'/'rev') 그 방향으로 점점 가속되고, 손을 떼면 서서히 0으로
+  // 감쇠합니다(관성이 있는 실제 손잡이 발전기처럼). |속도|가 어느 정도 이상이면 psu-switch에
+  // 'on'을 붙여 psuSourceParams/acReachablePsu/externalSourceOnNet이 모두 "지금 발전 중"으로
+  // 인식하게 하고, 크랭크 손잡이 그림도 실제 회전 각도만큼 돌려 줍니다.
+  document.querySelectorAll('.comp-generator').forEach(gen => {
+    let speed = parseFloat(gen.dataset.speed || '0');
+    const dir = gen.dataset.cranking;
+    if (dir === 'fwd') speed = Math.min(100, speed + 6);
+    else if (dir === 'rev') speed = Math.max(-100, speed - 6);
+    else speed = speed > 0 ? Math.max(0, speed - 4) : (speed < 0 ? Math.min(0, speed + 4) : 0);
+    gen.dataset.speed = String(speed);
+    const spinning = Math.abs(speed) > 0.5;
+    gen.querySelector('.psu-switch')?.classList.toggle('on', spinning);
+    let angle = parseFloat(gen.dataset.angle || '0');
+    angle = (angle + speed * 3.6) % 360;
+    gen.dataset.angle = String(angle);
+    const handle = gen.querySelector('.generator-crank-handle');
+    if (handle) handle.style.transform = `rotate(${angle}deg)`;
+    updateGeneratorReadout(gen);
+  });
+
+  // 0-4. 다이오드의 순방향/역방향 상태(=지금 틱의 dataset.ohms)를 먼저 정해 둡니다 — 이 값이
+  // 곧 resistiveEdges()/buildAcNetworkGraph() 양쪽의 실제 회로 저항이 되므로, 뒤쪽 단계(LED 등)가
+  // 이 다이오드를 거쳐 신호를 읽기 전에 최신이어야 합니다.
+  document.querySelectorAll('.comp-diode').forEach(diodeUpdate);
+
+  // 0-5. 트랜지스터의 베이스 전압으로 on/off(=C-E 스위치 개폐)를 먼저 정해 둡니다 — 릴레이와
+  // 완전히 같은 이유로, transistorContactEdges()가 참조하는 dataset.on이 저항망 계산 전에
+  // 최신이어야 합니다.
+  document.querySelectorAll('.comp-transistor').forEach(t => {
+    updateTransistorVisual(t.id, transistorIsOn(t));
+  });
+
+  // 0-6. 퓨즈의 실제 전류를 먼저 확인해 정격을 넘으면 끊어짐(dataset.ohms를 영구히 1억Ω으로)
+  // 처리합니다 — 이 값이 곧 resistiveEdges()/buildAcNetworkGraph()의 실제 회로 저항이 되므로,
+  // 뒤쪽 단계가 이 퓨즈를 거쳐 신호를 읽기 전에 최신이어야 합니다.
+  document.querySelectorAll('.comp-fuse').forEach(fuseCheck);
 
   // 1. 보드 온보드 LED 제어 (배선이 없으면 그 보드 자신의 실행 결과를 그대로 사용) — 보드 전부.
   // 온보드 LED가 물린 핀은 보드 종류마다 다릅니다(Uno 계열은 D13, ESP32 계열은 GPIO2).
@@ -6593,6 +7770,55 @@ function runTick(){
     driveMotor(am.id, speed, 1);
   });
 
+  // 5-4. 스텝모터 + A4988 드라이버: STEP 핀의 "상승 엣지"가 들어올 때마다 DIR 방향으로
+  // 한 스텝(MS1/MS2/MS3에 따른 마이크로스텝 분주 적용)씩 회전자를 돌립니다. EN이 명시적으로
+  // GND(LOW)에 연결되어 있어야 활성화됩니다 — 실제 A4988도 EN을 안 잡아주면(플로팅) 동작이
+  // 불안정해서, 이 시뮬레이터에서는 "EN을 GND에 꽂아야 돈다"를 아예 규칙으로 못박아 배선
+  // 실수를 그대로 겪어보게 했습니다. 매 틱 STEP 이전 값(dataset.prevStep)과 비교해 엣지를
+  // 검출하므로, 아두이노 코드의 digitalWrite(step,HIGH)→delay→LOW 패턴이 그대로 스텝 수로
+  // 반영됩니다(단, 이 틱 주기보다 훨씨 빠른 STEP 펄스는 놓칠 수 있습니다 — 다른 디지털 신호와
+  // 동일한 시뮬레이터 시간 해상도의 한계입니다).
+  document.querySelectorAll('.comp-stepper').forEach(st => {
+    driveStepper(st.id, parseFloat(st.dataset.angle || '0'), false, parseFloat(st.dataset.stepCount || '0'));
+  });
+  document.querySelectorAll('.comp-a4988').forEach(a4 => {
+    const legReading = (suffix) => {
+      const legEl = a4.querySelector(`[data-pin$="_${suffix}"]`);
+      return legEl ? resistiveReading(legEl) : null;
+    };
+    const stepR = legReading('STEP');
+    const dirR = legReading('DIR');
+    const enR = legReading('EN');
+    const ms1R = legReading('MS1'), ms2R = legReading('MS2'), ms3R = legReading('MS3');
+    // EN은 명시적으로 LOW로 배선되어 있을 때만 활성(실제 칩의 active-low 동작 + "안 꽂으면 안
+    // 돈다"는 배선 교훈을 함께 반영). STEP/DIR도 실제로 배선되어 있어야(=null이 아니어야) 합니다.
+    const enabled = !!enR && enR.v <= 0.5 && !!stepR && !!dirR;
+    const stepVal = stepR && stepR.v > 0.5 ? 1 : 0;
+    const prevStep = parseFloat(a4.dataset.prevStep || '0');
+    const dirVal = (dirR && dirR.v > 0.5) ? 1 : -1;
+    let angle = parseFloat(a4.dataset.angle || '0');
+    let stepCount = parseFloat(a4.dataset.stepCount || '0');
+    if (isSimulating && enabled && stepVal === 1 && prevStep === 0){
+      const ms1 = !!ms1R && ms1R.v > 0.5, ms2 = !!ms2R && ms2R.v > 0.5, ms3 = !!ms3R && ms3R.v > 0.5;
+      const div = a4988MicrostepDivisor(ms1, ms2, ms3);
+      const stepDeg = 1.8 / div; // 200 step/rev(1.8°/step) 바이폴라 스텝모터 기준
+      angle = (angle + dirVal * stepDeg + 360000) % 360;
+      stepCount += 1;
+    }
+    a4.dataset.prevStep = String(stepVal);
+    a4.dataset.angle = String(angle);
+    a4.dataset.stepCount = String(stepCount);
+    const coilAPin = a4.querySelector('[data-pin$="_1A"]');
+    if (coilAPin){
+      netOf(coilAPin).forEach(el => {
+        const stepperEl = el.closest && el.closest('.comp-stepper');
+        if (stepperEl && el.dataset.pin && el.dataset.pin.endsWith('_1A')){
+          driveStepper(stepperEl.id, angle, isSimulating && enabled, stepCount);
+        }
+      });
+    }
+  });
+
   // 6. 블루투스 모듈 상태 LED (시뮬레이션 중 페어링된 것처럼 점멸) / 무선 AP 링 애니메이션
   document.querySelectorAll('.comp-btmodule').forEach(bt => {
     const led = document.getElementById(`${bt.id}_led`);
@@ -6661,10 +7887,13 @@ function runTick(){
     if (!held) drawScope(sc.id);
     if (!held) updateScopeDecodeOutput(sc.id);
     if (armed && triggered){
-      // 트리거 발생 — 방금 캡처한 샘플까지 포함해 그 순간 그대로 정지합니다.
+      // 트리거 발생 — 방금 캡처한 샘플까지 포함해 그 순간 그대로 정지합니다. 트리거는 다시
+      // 무장하기 전까지는 껐다(idle) 표시하고, 정지/재개 버튼은 "정지" 상태로 바뀝니다 —
+      // 두 버튼이 서로 다른 것을 나타내는 독립된 상태이므로 둘 다 갱신해야 합니다.
       armedScopes.delete(sc.id);
       heldScopes.set(sc.id, { perfNow: performance.now(), dateNow: Date.now() });
       setScopeHoldUI(sc.id, 'held');
+      setScopeTriggerUI(sc.id, 'idle');
       drawScope(sc.id);
     }
   });
@@ -6706,6 +7935,25 @@ function runTick(){
   // 11. 엔코더 DC 모터 펄스 배지(Hz) — 아직 아무 데도 연결되지 않았어도 회전 중이면 표시되어야 하므로
   //     배선 여부와 무관하게 매 틱 갱신합니다.
   document.querySelectorAll('.comp-dcmotor-enc').forEach(m => encoderPulseReading(m));
+
+  // 12. 외르스텟 실험(전류→자기장→나침반) — 오실로스코프의 전류(I) 채널과 같은 방법으로 이
+  //     도선에 흐르는 실제 전류를 구해 나침반 바늘을 돌립니다.
+  document.querySelectorAll('.comp-oersted').forEach(updateOerstedNeedle);
+
+  // 13. 변압기 — 1차 측 전압(AC)에 권수비를 곱해 2차 측 전압을 계산합니다. 순수 표시용이라 다른
+  //     부품이 이 값을 회로적으로 참조하지 않으므로(외부에서 읽을 때는 externalSourceOnNet이
+  //     그때그때 다시 계산) 틱 중 어디에 있어도 안전합니다.
+  document.querySelectorAll('.comp-transformer').forEach(updateTransformerReadout);
+
+  // 14. 평행 도선의 힘 — 두 도선의 실제 전류를 구해 방향이 같으면 당기고 다르면 밀어내는 모습을
+  //     그립니다(순수 표시용).
+  document.querySelectorAll('.comp-parallelwires').forEach(updateParallelWiresVisual);
+
+  // 15. 전자석 — 코일 전압이 문턱을 넘으면 자성이 생겨 클립이 달라붙습니다(릴레이 코일과 같은
+  //     방식의 순수 표시용 부하).
+  document.querySelectorAll('.comp-electromagnet').forEach(el => {
+    updateElectromagnetVisual(el.id, electromagnetState(el));
+  });
 }
 
 const SCOPE_HDIV = 10; // 화면 가로 칸 수 (실제 오실로스코프처럼 TIME/DIV x 10칸 = 전체 화면 시간)
@@ -7018,7 +8266,8 @@ function buildBoardPopupHTML(key, type){
     extraButtons = `<button class="btn ghost" onclick="runCodeExample('${key}','register')">${tr('popup.exRegister')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','api_vs_register')">${tr('popup.exApiVsReg')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','port_full')">${tr('popup.exPortFullR3')}</button>
-        <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`;
+        <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','stepper')">${tr('popup.exStepper')}</button>`;
   } else if (isEsp32){
     // 보드 종류(DevKit/디스플레이/터치)에 맞는 예제 목록 배열을 그대로 재사용해, 갤러리 탭과
     // 팝업의 빠른 실행 버튼이 항상 같은 예제 세트를 보여주게 합니다.
@@ -7030,7 +8279,8 @@ function buildBoardPopupHTML(key, type){
     counterButton = `<button class="btn ghost" onclick="runCodeExample('${key}','counter')">${tr('popup.exCounterD13')}</button>`;
     extraButtons = `<button class="btn ghost" onclick="runCodeExample('${key}','analog')">${tr('popup.exAnalog')}</button>
         <button class="btn ghost" onclick="runCodeExample('${key}','port_wide')">${tr('popup.exPortWideR4')}</button>
-        <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>`;
+        <button class="btn ghost" onclick="runCodeExample('${key}','relay')">${tr('popup.exRelay')}</button>
+        <button class="btn ghost" onclick="runCodeExample('${key}','stepper')">${tr('popup.exStepper')}</button>`;
   }
   const ledPinValue = isEsp32 ? 'const int ledPin = 2;' : 'const int ledPin = 13;';
   const defaultCode = `// ${label}${suffix} sketch\nint count = 0;\n${ledPinValue}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Board ${key} Tick: ");\n  Serial.println(count);\n  delay(200);\n}`;
@@ -7241,6 +8491,13 @@ function loadExampleCode(board, type){
     editor.value = currentLang === 'en'
       ? `// Drive a 5V relay module from an Arduino digital pin to switch a HIGH-VOLTAGE\n// load (up to 48V DC / 220V AC) that never touches the Arduino itself.\n//\n// Wiring in the simulator:\n//   Board 5V  -> Relay VCC\n//   Board GND -> Relay GND\n//   Board D7  -> Relay IN\n//   Relay COM/NO (or COM/NC) -> the high-voltage load's switching path\n//     (e.g. AC PSU (ac1) L -> Relay COM, Relay NO -> motor3ph/lamp load -> PSU N)\n//\n// IN = HIGH energizes the coil -> COM connects to NO (normally-open closes).\n// IN = LOW  de-energizes it    -> COM connects to NC (normally-closed).\n// This mirrors a real opto-isolated relay module: the coil side (5V logic)\n// and the contact side (up to 48V DC / 220V AC) are electrically separate --\n// the Arduino only ever switches the small 5V coil current, never the load.\n\nconst int relayPin = 7;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(relayPin, OUTPUT);\n  digitalWrite(relayPin, LOW); // start de-energized (load on NC, if wired there)\n}\n\nvoid loop() {\n  Serial.println("Relay ON  (energized -> COM-NO closed)");\n  digitalWrite(relayPin, HIGH);\n  delay(2000);\n\n  Serial.println("Relay OFF (de-energized -> COM-NC closed)");\n  digitalWrite(relayPin, LOW);\n  delay(2000);\n}`
       : `// 아두이노 디지털 핀으로 5V 릴레이 모듈의 코일을 구동해, 아두이노와 전기적으로 완전히\n// 분리된 고전압 부하(최대 DC 48V / AC 220V)를 스위칭하는 예제입니다.\n//\n// 시뮬레이터 배선:\n//   보드 5V  -> 릴레이 VCC\n//   보드 GND -> 릴레이 GND\n//   보드 D7  -> 릴레이 IN\n//   릴레이 COM/NO(또는 COM/NC) -> 스위칭하려는 고전압 부하 경로\n//     (예: AC 전원(ac1) L -> 릴레이 COM, 릴레이 NO -> 3상모터/램프 부하 -> 전원 N)\n//\n// IN = HIGH → 코일이 여자(勵磁)되어 COM이 NO(평소 열림)에 연결됩니다.\n// IN = LOW  → 코일이 소자(消磁)되어 COM이 NC(평소 닫힘)에 연결됩니다.\n// 실제 포토커플러 절연 릴레이 모듈처럼, 코일 쪽(5V 로직)과 접점 쪽(최대 DC 48V/AC 220V)이\n// 전기적으로 완전히 분리되어 있습니다 — 아두이노는 작은 5V 코일 전류만 스위칭할 뿐,\n// 고전압 부하 전류는 전혀 흐르지 않습니다.\n\nconst int relayPin = 7;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(relayPin, OUTPUT);\n  digitalWrite(relayPin, LOW); // 처음엔 소자 상태(NC 쪽에 부하를 달았다면 그쪽이 켜짐)\n}\n\nvoid loop() {\n  Serial.println("릴레이 ON  (여자 -> COM-NO 닫힘)");\n  digitalWrite(relayPin, HIGH);\n  delay(2000);\n\n  Serial.println("릴레이 OFF (소자 -> COM-NC 닫힘)");\n  digitalWrite(relayPin, LOW);\n  delay(2000);\n}`;
+  } else if (type === 'stepper'){
+    const P = PERIPH_PINS[board] || PERIPH_PINS.r4;
+    const stepNum = P.step.replace(/^(D|GPIO)/, '');
+    const dirNum = P.dir.replace(/^(D|GPIO)/, '');
+    editor.value = currentLang === 'en'
+      ? `// Turn a bipolar stepper motor through an A4988 driver: every STEP pulse moves it\n// one step, and DIR sets the rotation direction. This simulator counts one step per\n// rising edge (LOW->HIGH) on STEP, just like a real A4988.\n//\n// Wiring in the simulator (already placed and wired for you by this example):\n//   Board ${P.vcc}    -> A4988 VDD  (logic power)\n//   Board GND   -> A4988 GND\n//   Board ${P.step}  -> A4988 STEP\n//   Board ${P.dir} -> A4988 DIR\n//   A4988 EN    -> GND (tied LOW so the driver stays enabled -- leaving EN\n//                  unconnected leaves the driver DISABLED in this simulator,\n//                  same lesson as a real A4988 with a floating EN pin)\n//   12V PSU     -> A4988 VMOT/GND (motor power, kept separate from board power)\n//   A4988 1A/1B/2A/2B -> Stepper motor 1A/1B/2A/2B (its two coils)\n//\n// MS1/MS2/MS3 are left unconnected, so the driver runs in full-step mode\n// (1.8 degrees/step -> 200 steps per full revolution).\n\nconst int stepPin = ${stepNum};\nconst int dirPin = ${dirNum};\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(stepPin, OUTPUT);\n  pinMode(dirPin, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(dirPin, HIGH); // clockwise\n  Serial.println("Rotating 90 deg clockwise (50 steps)...");\n  for (int i = 0; i < 50; i++) {\n    digitalWrite(stepPin, HIGH);\n    delay(5);\n    digitalWrite(stepPin, LOW);\n    delay(5);\n  }\n  delay(600);\n\n  digitalWrite(dirPin, LOW); // counter-clockwise\n  Serial.println("Rotating 90 deg counter-clockwise (50 steps)...");\n  for (int i = 0; i < 50; i++) {\n    digitalWrite(stepPin, HIGH);\n    delay(5);\n    digitalWrite(stepPin, LOW);\n    delay(5);\n  }\n  delay(600);\n}`
+      : `// A4988 드라이버로 바이폴라 스텝모터를 돌리는 예제: STEP 핀에 펄스가 한 번(상승 엣지,\n// LOW->HIGH) 들어올 때마다 한 스텝씩 움직이고, DIR 핀으로 회전 방향을 정합니다. 이\n// 시뮬레이터도 실제 A4988처럼 STEP의 상승 엣지 1번을 스텝 1번으로 셉니다.\n//\n// 시뮬레이터 배선(이 예제를 누르면 자동으로 배치·배선됩니다):\n//   보드 ${P.vcc}    -> A4988 VDD  (로직 전원)\n//   보드 GND   -> A4988 GND\n//   보드 ${P.step}  -> A4988 STEP\n//   보드 ${P.dir} -> A4988 DIR\n//   A4988 EN    -> GND (LOW로 묶어 드라이버를 계속 활성 상태로 유지 -- EN을 연결하지\n//                  않으면 이 시뮬레이터에서는 드라이버가 비활성 상태가 됩니다. 실제\n//                  A4988도 EN이 플로팅이면 동작이 불안정해지는 것과 같은 교훈입니다)\n//   12V 전원    -> A4988 VMOT/GND (모터 전원 — 보드 전원과 분리)\n//   A4988 1A/1B/2A/2B -> 스텝모터 1A/1B/2A/2B (두 코일)\n//\n// MS1/MS2/MS3은 일부러 연결하지 않아 풀스텝 모드로 동작합니다\n// (한 스텝 = 1.8도, 한 바퀴 = 200스텝).\n\nconst int stepPin = ${stepNum};\nconst int dirPin = ${dirNum};\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(stepPin, OUTPUT);\n  pinMode(dirPin, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(dirPin, HIGH); // 시계방향\n  Serial.println("시계방향으로 90도(50스텝) 회전...");\n  for (int i = 0; i < 50; i++) {\n    digitalWrite(stepPin, HIGH);\n    delay(5);\n    digitalWrite(stepPin, LOW);\n    delay(5);\n  }\n  delay(600);\n\n  digitalWrite(dirPin, LOW); // 반시계방향\n  Serial.println("반시계방향으로 90도(50스텝) 회전...");\n  for (int i = 0; i < 50; i++) {\n    digitalWrite(stepPin, HIGH);\n    delay(5);\n    digitalWrite(stepPin, LOW);\n    delay(5);\n  }\n  delay(600);\n}`;
   } else if (type === 'wifi_ap_msg'){
     editor.value = currentLang === 'en'
       ? `// Receives the signal(SIG, D2) sent by the Wireless AP component. While the AP is\n// powered on, its SIG pin toggles HIGH/LOW roughly every 0.4s -- this simulator does\n// not implement a real Wi-Fi (802.11) protocol stack, so "the AP sends, R4 receives"\n// is simplified down to a single digital pulse.\n\nconst int apSigPin = 2;\nconst int ledPin = 13;\nint lastState = LOW;\nint msgCount = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(apSigPin, INPUT);\n  pinMode(ledPin, OUTPUT);\n  Serial.println("R4: waiting for Wireless AP signal...");\n}\n\nvoid loop() {\n  int state = digitalRead(apSigPin);\n  if (state == HIGH && lastState == LOW) {\n    msgCount++;\n    digitalWrite(ledPin, !digitalRead(ledPin)); // flip the LED on every message (visual indicator)\n    Serial.print("[WiFi AP message received] #");\n    Serial.println(msgCount);\n  }\n  lastState = state;\n  delay(50);\n}`
@@ -7381,10 +8638,15 @@ function BOM_LABELS_FN(){ return {
   resistor: tr('bom.resistor'), powercable: tr('bom.powercable'), motor3ph: tr('comp.motor3ph.label'),
   acmotor: tr('bom.acmotor'), acmotorctrl: tr('bom.acmotorctrl'), levelshifter: tr('bom.levelshifter'),
   bldcmotor: tr('comp.bldcmotor.label'), bldcdriver: tr('bom.bldcdriver'), 'dcmotor-enc': tr('bom.dcmotorenc'),
+  stepper: tr('bom.stepper'), a4988: tr('bom.a4988'),
   multimeter: tr('comp.mm.title'),
   capacitor: tr('comp.capacitor.label'), 'capacitor-e': tr('comp.capacitorE.label'), inductor: tr('comp.inductor.label'),
   relay: tr('comp.relay.title'), benchpsu: tr('bom.benchpsu'),
-  ac220: tr('bom.ac220'), ac3phase: tr('bom.ac3phase'),
+  ac220: tr('bom.ac220'), ac3phase: tr('bom.ac3phase'), generator: tr('bom.generator'),
+  coincell: tr('bom.coincell'), fruitbatt: tr('bom.fruitbatt'), oersted: tr('bom.oersted'),
+  diode: tr('bom.diode'), transistor: tr('bom.transistor'),
+  transformer: tr('bom.transformer'), parallelwires: tr('bom.parallelwires'),
+  electromagnet: tr('bom.electromagnet'), fuse: tr('bom.fuse'),
 }; }
 function boardTypeLabel(type){
   return {
@@ -7444,6 +8706,7 @@ function schematicKindOf(ownerEl){
   if (ownerEl.classList.contains('comp-capacitor-e')) return 'capacitorE';
   if (ownerEl.classList.contains('capacitive-2pin')) return 'capacitor';
   if (ownerEl.classList.contains('inductive-2pin')) return 'inductor';
+  if (ownerEl.classList.contains('comp-diode')) return 'diode';
   if (ownerEl.classList.contains('resistive-2pin')) return 'resistor';
   if (ownerEl.classList.contains('comp-led')) return 'led';
   return 'box';
@@ -7467,7 +8730,12 @@ function schematicPinName(pinEl, ownerEl){
   const raw = pinEl.dataset.pin || '';
   if (ownerEl.classList.contains('board')) return raw;
   const prefix = ownerEl.id + '_';
-  return raw.startsWith(prefix) ? raw.slice(prefix.length) : raw;
+  const suffix = raw.startsWith(prefix) ? raw.slice(prefix.length) : raw;
+  // 다이오드는 resistiveEdges()와의 호환을 위해 캐소드 핀의 실제 data-pin 접미사가 "_B"이지만
+  // (저항/커패시터 등 다른 모든 resistive-2pin 부품과 같은 A/B 규약을 따르기 위함), 회로도에는
+  // 사용자가 보는 그대로 "K"(캐소드)로 표시합니다.
+  if (ownerEl.classList.contains('comp-diode') && suffix === 'B') return 'K';
+  return suffix;
 }
 function svgEsc(s){
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -7604,16 +8872,18 @@ function schematicPopupScriptSource(){
     "    } else {",
     "      body += '<line x1=\"'+p2+'\" y1=\"'+(cy-14)+'\" x2=\"'+p2+'\" y2=\"'+(cy+14)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>';",
     "    }",
-    "  } else if (node.kind === 'led'){",
+    "  } else if (node.kind === 'led' || node.kind === 'diode'){",
     "    var tri = (cx-8)+','+(cy-10)+' '+(cx-8)+','+(cy+10)+' '+(cx+8)+','+cy;",
     "    body = '<line x1=\"0\" y1=\"'+cy+'\" x2=\"'+(cx-8)+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
     "      + '<polygon points=\"'+tri+'\" fill=\"none\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
     "      + '<line x1=\"'+(cx+8)+'\" y1=\"'+(cy-10)+'\" x2=\"'+(cx+8)+'\" y2=\"'+(cy+10)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>'",
-    "      + '<line x1=\"'+(cx+8)+'\" y1=\"'+cy+'\" x2=\"'+w+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
-    "      + '<line x1=\"'+(cx-3)+'\" y1=\"'+(cy-16)+'\" x2=\"'+(cx+5)+'\" y2=\"'+(cy-25)+'\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
-    "      + '<path d=\"M '+(cx+1)+','+(cy-25)+' L '+(cx+5)+','+(cy-25)+' L '+(cx+5)+','+(cy-21)+'\" fill=\"none\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
-    "      + '<line x1=\"'+(cx+5)+'\" y1=\"'+(cy-9)+'\" x2=\"'+(cx+13)+'\" y2=\"'+(cy-18)+'\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
-    "      + '<path d=\"M '+(cx+9)+','+(cy-18)+' L '+(cx+13)+','+(cy-18)+' L '+(cx+13)+','+(cy-14)+'\" fill=\"none\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>';",
+    "      + '<line x1=\"'+(cx+8)+'\" y1=\"'+cy+'\" x2=\"'+w+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>';",
+    "    if (node.kind === 'led'){",
+    "      body += '<line x1=\"'+(cx-3)+'\" y1=\"'+(cy-16)+'\" x2=\"'+(cx+5)+'\" y2=\"'+(cy-25)+'\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
+    "        + '<path d=\"M '+(cx+1)+','+(cy-25)+' L '+(cx+5)+','+(cy-25)+' L '+(cx+5)+','+(cy-21)+'\" fill=\"none\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
+    "        + '<line x1=\"'+(cx+5)+'\" y1=\"'+(cy-9)+'\" x2=\"'+(cx+13)+'\" y2=\"'+(cy-18)+'\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
+    "        + '<path d=\"M '+(cx+9)+','+(cy-18)+' L '+(cx+13)+','+(cy-18)+' L '+(cx+13)+','+(cy-14)+'\" fill=\"none\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>';",
+    "    }",
     "  } else {",
     "    body = '<rect x=\"0\" y=\"0\" width=\"'+w+'\" height=\"'+h+'\" rx=\"6\" fill=\"#1b2129\" stroke=\"#4a5a6a\" stroke-width=\"1.6\"/>';",
     "    node.pins.forEach(function(p){",
@@ -7944,6 +9214,7 @@ const ESP32B_EXAMPLE_DEFS = [
   { key: 'wifi', board: 'esp32b', titleKey: 'popup.exWifi' },
   { key: 'pwm32', board: 'esp32b', titleKey: 'popup.exPwm32' },
   { key: 'prefs32', board: 'esp32b', titleKey: 'popup.exPrefs32' },
+  { key: 'stepper', board: 'esp32b', titleKey: 'popup.exStepper' },
 ];
 const ESP32D_EXAMPLE_DEFS = [
   { key: 'display', board: 'esp32d', titleKey: 'popup.exDisplay' },
@@ -8042,6 +9313,42 @@ function wirePortControlLeds(board, key, pinNames){
     taggedWire(key, document.querySelector(`#${led} [data-pin$="_K"]`), nextGnd());
   });
 }
+// 스텝모터 + A4988 드라이버 예제 배선 — 모터→드라이버→전원 순서(신호가 흐르는 순서와 같은
+// 좌→우 배치)로 놓아 배선이 지그재그로 겹치지 않게 합니다. 모터 쪽 전원(VMOT)은 보드가 아닌
+// 별도 12V DC 전원에서 받고, 로직(VDD)은 보드 전원 레일에서 받습니다 — 실제 A4988 모듈도
+// 이렇게 로직/모터 전원을 분리해서 쓰는 것이 표준입니다. EN은 일부러 GND에 직접 연결해
+// 두었습니다(연결하지 않으면 활성화되지 않는다는 것을 이 시뮬레이터의 규칙으로 삼았습니다).
+function wireStepperExample(board, key){
+  if (!boardInstances[board]) spawnBoard(board);
+  const boardEl = document.getElementById(boardDomId[board]);
+  if (!boardEl) return;
+  const pos = elCanvasPos(boardEl);
+  const P = PERIPH_PINS[board];
+  const COL1 = pos.x + 640, COL2 = pos.x + 830, COL3 = pos.x + 1010;
+  let gi = 0;
+  const nextGnd = () => boardEl.querySelector(`[data-pin="${P.gnds[gi++ % P.gnds.length]}"]`);
+  const vccPin = boardEl.querySelector(`[data-pin="${P.vcc}"]`);
+  const stepPin = boardEl.querySelector(`[data-pin="${P.step}"]`);
+  const dirPin = boardEl.querySelector(`[data-pin="${P.dir}"]`);
+
+  const motor = placeExp('stepper', key, COL1, pos.y + 20);
+  const driver = placeExp('a4988', key, COL2, pos.y + 20);
+  const psu = placeExp('psu', key, COL3, pos.y + 20);
+  document.querySelector(`#${psu} .psu-dc-volt`).value = '12';
+
+  taggedWire(key, vccPin, document.querySelector(`#${driver} [data-pin$="_V"]`));
+  taggedWire(key, document.querySelector(`#${psu} [data-pin$="_V"]`), document.querySelector(`#${driver} [data-pin$="_VM"]`));
+  taggedWire(key, document.querySelector(`#${psu} [data-pin$="_G"]`), document.querySelector(`#${driver} [data-pin$="_G"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_G"]`), nextGnd()); // 공통 접지
+  taggedWire(key, stepPin, document.querySelector(`#${driver} [data-pin$="_STEP"]`));
+  taggedWire(key, dirPin, document.querySelector(`#${driver} [data-pin$="_DIR"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_EN"]`), nextGnd()); // EN=LOW로 활성화
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_1A"]`), document.querySelector(`#${motor} [data-pin$="_1A"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_1B"]`), document.querySelector(`#${motor} [data-pin$="_1B"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_2A"]`), document.querySelector(`#${motor} [data-pin$="_2A"]`));
+  taggedWire(key, document.querySelector(`#${driver} [data-pin$="_2B"]`), document.querySelector(`#${motor} [data-pin$="_2B"]`));
+  document.getElementById(`${psu}_switch`).click();
+}
 function runCodeExample(board, key){
   // 기본 내장 보드(r4/r3)의 예제를 고르면 "예제만 새로" 보이도록 캔버스를 완전히 비우고
   // 시작합니다. 사용자가 직접 여러 대 추가해 둔 보드(r4_2, r3_2, ...)는 예제 갤러리의 대상이
@@ -8054,6 +9361,8 @@ function runCodeExample(board, key){
     wirePortControlLeds(board, key, ['D0','D1','D2','D3','D4','D5','D6','D7']);
   } else if (key === 'port_wide'){
     wirePortControlLeds(board, key, ['D2','D3','D4','D5','D6','D7']);
+  } else if (key === 'stepper'){
+    wireStepperExample(board, key);
   }
   loadExampleCode(board, key);
   openBoardPopup(board);
@@ -8568,11 +9877,11 @@ function runRs485ServoChainExample(){
 // 보드별 핀 배치가 서로 달라서(R3/R4는 D번호, ESP32는 GPIO번호 + GND/VCC 핀이 하나뿐) 보드
 // 종류에 따라 쓸 핀 이름을 따로 정리해 둡니다.
 const PERIPH_PINS = {
-  r3:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'] },
-  r4:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'] },
-  esp32b: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'] },
-  esp32d: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'] },
-  esp32t: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'] },
+  r3:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12' },
+  r4:     { btnUp: 'D2', btnDown: 'D4', led: 'D9', in1: 'D7', ena: 'D6', analog: 'A0', vcc: '5V', gnds: ['GND_D', 'GND_P1', 'GND_P2'], step: 'D8', dir: 'D12' },
+  esp32b: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15' },
+  esp32d: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15' },
+  esp32t: { btnUp: 'GPIO4', btnDown: 'GPIO5', led: 'GPIO18', in1: 'GPIO19', ena: 'GPIO23', analog: 'GPIO34', vcc: '3V3', gnds: ['GND_E1'], step: 'GPIO2', dir: 'GPIO15' },
 };
 // "주변장치 종합" 예제 카드 — 센서(LDR)·버튼(풀업 1개 + 풀다운 1개)·LED·모터+드라이버(전원은
 // 보드와 분리된 별도 PSU)를 한 보드에 모두 배치하고 배선한 뒤, 그것들을 모두 다루는 예제
