@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.993b</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.993e</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1102,7 +1102,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.993b</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.993e</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1728,7 +1728,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.993b", en: "K's Simulator Ver0.993b" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.993e", en: "K's Simulator Ver0.993e" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -2205,7 +2205,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.993b", en: "K's Arduino Simulator Ver0.993b" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.993e", en: "K's Arduino Simulator Ver0.993e" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -5675,6 +5675,18 @@ function ledContactEdges(){
 // 자리에서 회로 전체가 끊어져 버려(전류계 자신은 물론 그 뒤에 달린 LED/전압계까지 전부) 아무
 // 값도 나오지 않았습니다. DC A 모드일 때만 이 두 프로브 사이를 거의 0Ω인 가상 도선으로 이어
 // 실제 전류계처럼 "직렬로 끼워도 회로가 그대로 이어지는" 동작을 하게 합니다.
+//
+// [Ver 0.993c에서 시도했다가 0.993e에서 되돌림] 한때는 모드와 무관하게(DC V/AC V/Ω 모드에서도)
+// 이 가상 도선을 이어서, 같은 자리에 꽂아두고 모드만 바꿔가며 여러 값을 보고 싶다는 요청에
+// 맞추려 했습니다. 하지만 이건 사실 실제 계측기 동작과 맞지 않습니다 — 실제 전압계는 입력
+// 임피던스가 매우 높아(사실상 개방) 회로에 "직렬로" 끼우면 실제로도 회로가 끊깁니다(전압계는
+// 원래 병렬로 탭을 내어 재는 계기입니다). "모드 무관 항상 도통"으로 만들었더니, 프로브 하나가
+// 아직 미연결(플로팅)인 상태에서도 반대쪽과 가상으로 이어져 버려 실제로는 끊겨 있어야 할
+// 구간(및 그 너머의 "하단 회로")이 마치 살아있는 것처럼 보이는 새로운 버그가 생겼고, 이건
+// "직렬로 잘못 끼운 전압계는 회로를 끊는다"는 실제 전기 원리를 가르치는 데도 오히려 방해가
+// 됩니다. 그래서 이 가상 도선은 다시 DC A(전류) 모드일 때만 만들도록 되돌렸습니다 — 같은
+// 지점의 전압을 보고 싶다면(직렬로 끼운 전류계와 별개로) 그 지점에서 병렬로 한 가닥 더 따서
+// 전압계를 탭 내는 것이 실제 회로에서도, 이 시뮬레이터에서도 올바른 방법입니다.
 const AMMETER_SERIES_OHMS = 0.01;
 function ammeterContactEdges(){
   const out = [];
@@ -7022,7 +7034,10 @@ function netReading(pinEl){
 /* ============ 저항 회로망 (Resistor/PowerCable) 전압 계산 ============ */
 // 저항/파워케이블은 두 다리가 직접 union(0Ω)되지 않고, "그 부품 하나만큼의 저항"으로 이어진
 // 별도의 net으로 남습니다. 이 그래프를 다익스트라 방식으로 훑어 저항 경로를 계산합니다.
-function resistiveEdges(){
+// 멀티미터(ammeterContactEdges)를 뺀 "나머지 회로"만의 저항 엣지 — ammeterContactEdges() 자신이
+// "이 멀티미터가 아니면 두 프로브가 아예 이어져 있지 않은가?"를 판단할 때 자기 자신을 포함한
+// 전체 그래프를 쓰면 순환 참조가 생기므로, 그 판단 기준으로 쓸 "멀티미터 없는" 버전을 따로 둡니다.
+function resistiveEdgesWithoutMeters(){
   const base = Array.from(document.querySelectorAll('.resistive-2pin')).map(el => {
     const legA = el.querySelector('[data-pin$="_A"]');
     const legB = el.querySelector('[data-pin$="_B"]');
@@ -7038,7 +7053,10 @@ function resistiveEdges(){
     const legB = el.querySelector('[data-pin$="_B"]');
     return { legA, legB, ohms: 0 };
   }).filter(e => e.legA && e.legB);
-  return base.concat(relayContactEdges(), motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges(), inductorEdges, ledContactEdges(), ammeterContactEdges(), bulb220ContactEdges(), ledtube220ContactEdges());
+  return base.concat(relayContactEdges(), motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges(), inductorEdges, ledContactEdges(), bulb220ContactEdges(), ledtube220ContactEdges());
+}
+function resistiveEdges(){
+  return resistiveEdgesWithoutMeters().concat(ammeterContactEdges());
 }
 // startPinEl의 net(대표 원소로 관리)에서 출발해 저항 엣지를 하나씩 건너며 도달 가능한 모든
 // net과 "그 net까지의 최소 누적 저항"을 구합니다. 회로 규모가 매우 작으므로(교육용 시뮬레이터)
@@ -7584,10 +7602,16 @@ function updateMultimeter(id){
 
   const netRed = netOf(pRed), netBlk = netOf(pBlk);
   const sameNet = netRed.has(pBlk);
+  // [Ver 0.993c] 이 멀티미터 자신이 ammeterContactEdges()로 끼워 넣은 가상 도선(P-N 직결, 모드와
+  // 무관하게 항상 존재)은 모든 모드의 계산에서 반드시 빼고 "나머지 회로"만의 관점에서 봐야
+  // 합니다 — 안 빼면 자기 자신의 거의 0Ω짜리 도선이 가장 짧은 경로가 되어 버려 두 프로브가
+  // 서로 단락된 것처럼 보이고(자기 참조), 전압차·저항이 둘 다 0에 가깝게만 나옵니다
+  // (diodeUpdate/ledUpdate와 같은 이유의 자기 참조 제외).
+  const edgesExcl = resistiveEdges().filter(e => !(e.legA === pRed && e.legB === pBlk) && !(e.legA === pBlk && e.legB === pRed));
 
   if (mode === 'ohm'){
     if (sameNet){ valEl.textContent = '0.00'; unitEl.textContent = `Ω (${tr('mm.continuity')})`; return; }
-    const r = resistancePathBetween(pRed, pBlk);
+    const r = resistancePathBetween(pRed, pBlk, edgesExcl);
     if (r == null){ valEl.textContent = 'OL'; unitEl.textContent = ''; return; }
     valEl.textContent = (Math.round(r * 100) / 100).toString();
     unitEl.textContent = 'Ω';
@@ -7602,7 +7626,7 @@ function updateMultimeter(id){
   }
 
   if (mode === 'dcv' || mode === 'acv'){
-    const rRed = resistiveReading(pRed), rBlk = resistiveReading(pBlk);
+    const rRed = resistiveReading(pRed, edgesExcl), rBlk = resistiveReading(pBlk, edgesExcl);
     const vRed = readingToDisplayVolts(rRed, mode), vBlk = readingToDisplayVolts(rBlk, mode);
     const diff = vRed - vBlk;
     valEl.textContent = diff.toFixed(2);
@@ -7611,11 +7635,6 @@ function updateMultimeter(id){
   }
 
   if (mode === 'dca'){
-    // 이 전류계 자신이 ammeterContactEdges()로 끼워 넣은 가상 도선(P-N 직결)은 반드시 빼고
-    // "나머지 회로"만의 관점에서 봐야 합니다 — 안 빼면 자기 자신의 거의 0Ω짜리 도선이 가장
-    // 짧은 경로가 되어 버려 전압차·저항이 둘 다 0에 가까워지고(자기 참조), 결과가 항상 0.00으로
-    // 나옵니다(diodeUpdate/ledUpdate와 같은 이유의 자기 참조 제외).
-    const edgesExcl = resistiveEdges().filter(e => !(e.legA === pRed && e.legB === pBlk) && !(e.legA === pBlk && e.legB === pRed));
     // resistancePathBetween()은 두 점 사이의 순수 저항 경로만 찾는데, PSU 같은 전원은 V/GND
     // 두 핀이 저항 엣지로 직접 이어져 있지 않아(둘 다 "신호원"일 뿐, 서로를 잇는 엣지가 없음)
     // 이 방법으론 루프를 찾을 수 없습니다. 대신 양쪽 프로브가 "각자" 가장 가까운 신호원까지
@@ -11655,6 +11674,20 @@ function handleProjectFileSelected(inputEl){
   reader.readAsText(file);
 }
 
+// [Ver 0.993d] 왼쪽 부품 팔레트를 처음 열었을 때 "보드"만 펼쳐 있고 나머지 그룹은 전부
+// 접혀 있게 합니다(요청: "부품 고르는 부분에서 보드만 열고 나머지는 닫으면 좋겠다") — 그룹이
+// 워낙 많아서(기본 입출력·수동소자·전원 장치·모터 등) 처음 켰을 때 스크롤이 길어지는 걸
+// 줄이고, 지금 수업에 필요한 보드부터 바로 보이게 합니다. togglePaletteGroup()이 여닫을 때
+// 쓰는 것과 같은 방식(collapsed 클래스 + 슬라이드용 max-height)으로 "이미 접힌" 상태를 만들어
+// 두는 것뿐이라, 사용자가 다시 클릭하면 평소처럼 정상적으로 펼쳐집니다.
+function collapseNonBoardPaletteGroupsByDefault(){
+  document.querySelectorAll('.palette-group').forEach(group => {
+    if (group.dataset.group === 'boards') return; // 보드류는 시작부터 열려 있어야 함
+    group.classList.add('collapsed');
+    const body = group.querySelector('.palette-group-body');
+    if (body && group.dataset.group !== 'explab') body.style.maxHeight = '0px';
+  });
+}
 window.addEventListener('DOMContentLoaded', () => {
   applyI18n();
   const nameInput = document.getElementById('projectNameInput');
@@ -11663,6 +11696,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initCodeEditor(document.getElementById('codeEditorR3'), document.getElementById('lineNumR3'), 'r3');
   executeCompilerPipeline('r4');
   updateUndoRedoButtons();
+  collapseNonBoardPaletteGroupsByDefault();
 });
 </script>
 </body>
