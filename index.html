@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.99c</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.991a</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1075,7 +1075,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.99c</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.991a</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1690,7 +1690,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.99c", en: "K's Simulator Ver0.99c" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.991a", en: "K's Simulator Ver0.991a" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -2160,7 +2160,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.99c", en: "K's Arduino Simulator Ver0.99c" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.991a", en: "K's Arduino Simulator Ver0.991a" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -9519,9 +9519,31 @@ function schematicPopupScriptSource(){
     "  return Math.hypot(p.x-projX, p.y-projY);",
     "}",
     "function clearSvg(){ while (svgRoot.firstChild) svgRoot.removeChild(svgRoot.firstChild); }",
+    "// 부품을 드래그하거나(R키로) 회전시켜 처음 계산해 둔 MODEL.width/height 범위 밖으로",
+    "// 옮기면, 그 부분이 SVG의 viewBox 경계에 잘려 안 보이게 되는 문제가 있었습니다",
+    "// (SVG는 기본적으로 자기 viewBox 바깥을 그리지 않습니다). 그래서 매번 다시 그릴 때마다",
+    "// getBBox()로 지금 실제로 그려진 내용(배선·부품·라벨 전부)의 진짜 범위를 재보고,",
+    "// 그 범위를 넉넉히 담도록 viewBox/width/height와 배경 사각형을 함께 늘려 잡습니다",
+    "// (원래 크기보다 작아지지는 않도록 배경 사각형을 항상 MODEL 기본 크기로도 그려 둡니다).",
+    "function fitCanvasToContent(bgRect){",
+    "  var bbox;",
+    "  try { bbox = svgRoot.getBBox(); } catch (e) { return; }",
+    "  if (!bbox || !isFinite(bbox.x) || !isFinite(bbox.width)) return;",
+    "  var margin = 40;",
+    "  var minX = Math.floor(bbox.x - margin);",
+    "  var minY = Math.floor(bbox.y - margin);",
+    "  var w = Math.ceil(bbox.width + margin * 2);",
+    "  var h = Math.ceil(bbox.height + margin * 2);",
+    "  svgRoot.setAttribute('viewBox', minX + ' ' + minY + ' ' + w + ' ' + h);",
+    "  svgRoot.setAttribute('width', w);",
+    "  svgRoot.setAttribute('height', h);",
+    "  bgRect.setAttribute('x', minX); bgRect.setAttribute('y', minY);",
+    "  bgRect.setAttribute('width', w); bgRect.setAttribute('height', h);",
+    "}",
     "function renderAll(){",
     "  clearSvg();",
-    "  svgRoot.appendChild(el('rect', {x:0,y:0,width:MODEL.width,height:MODEL.height,fill:'#0b0e12'}));",
+    "  var bgRect = el('rect', {x:0,y:0,width:MODEL.width,height:MODEL.height,fill:'#0b0e12'});",
+    "  svgRoot.appendChild(bgRect);",
     "  MODEL.wires.forEach(function(w, wi){",
     "    var pts = wirePathPoints(w);",
     "    var d = pathDFromPoints(pts);",
@@ -9550,8 +9572,18 @@ function schematicPopupScriptSource(){
     "      svgRoot.appendChild(el('rect', {x:bp.x-5, y:bp.y-5, width:10, height:10, class:'sch-bend', 'data-wire-idx':wi, 'data-bend-idx':bi}));",
     "    });",
     "  });",
+    "  fitCanvasToContent(bgRect);",
     "}",
-    "function getSvgPoint(e){ var rect = svgRoot.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; }",
+    "// viewBox의 최소 x/y와 확대 배율까지 함께 반영해 화면 좌표를 SVG 사용자 좌표로 정확히",
+    "// 변환합니다 (fitCanvasToContent()가 viewBox 원점을 0,0이 아닌 값으로 옮길 수 있으므로,",
+    "// 이 보정이 없으면 캔버스가 커진 뒤 드래그 위치가 어긋납니다).",
+    "function getSvgPoint(e){",
+    "  var rect = svgRoot.getBoundingClientRect();",
+    "  var vb = svgRoot.viewBox.baseVal;",
+    "  var scaleX = rect.width ? vb.width / rect.width : 1;",
+    "  var scaleY = rect.height ? vb.height / rect.height : 1;",
+    "  return { x: vb.x + (e.clientX - rect.left) * scaleX, y: vb.y + (e.clientY - rect.top) * scaleY };",
+    "}",
     "function selectNode(idx){ if (idx === selectedNodeIdx) return; selectedNodeIdx = idx; renderAll(); }",
     "function addBendPoint(wireIdx, e){",
     "  var w = MODEL.wires[wireIdx];",
