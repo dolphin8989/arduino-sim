@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.991b</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.993b</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -358,6 +358,7 @@
   }
   .led-dome.on{box-shadow:0 0 16px 4px rgba(255,80,40,.85);}
   .led-val{font-family:'IBM Plex Mono',monospace; font-size:.56rem; color:var(--teal-strong); min-height:1em;}
+  .led-cur{font-family:'IBM Plex Mono',monospace; font-size:.54rem; min-height:1em; text-align:center; line-height:1.25;}
   .led-color-select{
     width:100%; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px;
     font-size:.58rem; padding:1px 2px; cursor:pointer; font-family:'IBM Plex Mono',monospace;
@@ -687,7 +688,7 @@
   .comp-wallswitch .ts-state{margin-bottom:6px;}
 
   /* ---------- 전원 공급 장치 (DC 다전압 / AC 단상·3상) ---------- */
-  .comp-psu select.psu-mode, .comp-psu select.psu-dc-volt{
+  .comp-psu select.psu-mode, .comp-psu select.psu-dc-volt, .comp-psu select.psu-ac-volt{
     width:100%; margin-bottom:7px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong);
     border-radius:4px; font-size:.66rem; padding:3px; cursor:pointer;
   }
@@ -1043,16 +1044,42 @@
 
   .code-editor-wrap{
     flex:1; margin:10px 14px 10px; display:flex; background:#0a0d12; border:1px solid var(--border);
-    border-radius:8px; overflow:hidden; min-height:0;
+    border-radius:8px; overflow:hidden; min-height:0; position:relative;
   }
   .code-linenumbers{
-    flex:0 0 auto; width:40px; padding:14px 6px 14px 0; text-align:right; font-family:'IBM Plex Mono',monospace;
+    flex:0 0 auto; width:48px; padding:14px 6px 14px 8px; text-align:right; font-family:'IBM Plex Mono',monospace;
     font-size:.82rem; line-height:1.55; color:#4a5568; background:#080a0e; border-right:1px solid var(--border);
-    overflow:hidden; white-space:pre; user-select:none;
+    overflow:hidden; white-space:pre; user-select:none; cursor:pointer;
   }
+  .code-linenumbers .gline{display:block; position:relative;}
+  .code-linenumbers .gline:hover{color:#8fb8e0;}
+  /* 브레이크포인트가 찍힌 줄: 줄 번호 왼쪽에 빨간 점을 붙입니다(거터를 클릭해 켜고 끕니다). */
+  .code-linenumbers .gline.has-bp::before{
+    content:''; position:absolute; left:-6px; top:50%; transform:translateY(-50%);
+    width:8px; height:8px; border-radius:50%; background:#ff5f56; box-shadow:0 0 4px #ff5f56;
+  }
+  /* 디버거가 지금 멈춰 있는 줄: 거터 배경을 강조합니다. */
+  .code-linenumbers .gline.cur-line{background:#3a2f0d; color:#f2c94c;}
   .code-editor{
     flex:1; margin:0; background:#0a0d12; color:#cde6ff; font-family:'IBM Plex Mono',monospace;
     font-size:.82rem; padding:14px; border:none; outline:none; resize:none; line-height:1.55; tab-size:2;
+  }
+  /* 디버그 바 (Ver 0.992): 브레이크포인트에 걸려 일시정지된 동안만 나타나는 계속/한 줄씩 실행
+     컨트롤입니다. */
+  .debug-bar{
+    display:none; align-items:center; gap:10px; margin:8px 14px 0; padding:7px 12px;
+    background:#3a2f0d; border:1px solid #6b5215; border-radius:8px; font-family:'IBM Plex Mono',monospace;
+    font-size:.72rem; color:#f2c94c; flex:0 0 auto;
+  }
+  .debug-bar.active{display:flex;}
+  .debug-bar .debug-status{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .debug-bar .debug-btn{font-size:.7rem; padding:5px 10px;}
+  /* 브레이크포인트에서 멈췄을 때, 에디터 안의 변수 위에 마우스를 올리면 뜨는 작은 값 창.
+     마우스가 벗어나면(mouseleave) 곧바로 사라집니다. */
+  .debug-var-tooltip{
+    position:fixed; background:#101418; border:1px solid #3a4656; border-radius:6px; padding:6px 10px;
+    font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:#cde6ff; box-shadow:0 8px 20px rgba(0,0,0,.5);
+    z-index:9999; pointer-events:none; max-width:280px; white-space:pre-wrap; display:none;
   }
   .serial-panel{height:220px; border-top:1px solid var(--border); display:flex; flex-direction:column; flex:0 0 auto;}
   .serial-head{padding:8px 14px; font-size:.68rem; font-weight:600; color:var(--text-dim); background:var(--bg-panel-2);
@@ -1075,7 +1102,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.991b</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.993b</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1460,7 +1487,8 @@
       • <span data-i18n="hint.wirePoint">전선을 더블클릭하면 그 자리에 점이 생겨 원하는 위치로 끌어서 구부릴 수 있고, 점을 다시 더블클릭하면 없앨 수 있습니다. 옆 점과 수평·수직으로 가까워지면 자동으로 딱 맞춰지고(Shift를 누르면 자유롭게), 이렇게 직각으로도 자유롭게도 배선을 정리할 수 있습니다.</span><br>
       • <span data-i18n="hint.delete">부품 선택 후 <b>Delete</b> 키를 누르면 삭제됩니다.</span><br>
       • <span data-i18n="hint.resistor">저항/파워케이블은 값을 입력하면 실제로 전압이 분배되어 LED 밝기 등에 반영됩니다.</span><br>
-      • <span data-i18n="hint.compile"><b>[▶ 컴파일 &amp; 빌드 업로드]</b> 후 시뮬레이션을 시작하세요.</span>
+      • <span data-i18n="hint.compile"><b>[▶ 컴파일 &amp; 빌드 업로드]</b> 후 시뮬레이션을 시작하세요.</span><br>
+      • <span data-i18n="debug.hint">줄 번호 왼쪽을 클릭해 브레이크포인트(●)를 켜고 끌 수 있습니다. 멈춘 줄의 변수 위에 마우스를 올리면 값을 볼 수 있습니다.</span>
     </div>
   </div>
 
@@ -1537,6 +1565,11 @@
         <button class="btn primary" id="btnCompileR4" onclick="executeCompilerPipeline('r4')" data-i18n="popup.compile">▶ 컴파일 &amp; 빌드 업로드</button>
         <span class="example-gallery-hint" data-i18n="popup.galleryHint">예제는 오른쪽 🗂 예제 갤러리에서 골라주세요</span>
       </div>
+      <div class="debug-bar" id="debugBarR4">
+        <span class="debug-status" id="debugStatusR4"></span>
+        <button class="btn ghost debug-btn" onclick="debugContinue('r4')" data-i18n="debug.continueBtn">▶ 계속</button>
+        <button class="btn ghost debug-btn" onclick="debugStepLine('r4')" data-i18n="debug.stepBtn">⤵ 한 줄씩</button>
+      </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR4">1</div>
       <textarea id="codeEditorR4" class="code-editor" spellcheck="false">// Arduino Uno R4 WiFi sketch
@@ -1596,6 +1629,11 @@ void loop() {
       <div class="example-buttons">
         <button class="btn primary" id="btnCompileR3" onclick="executeCompilerPipeline('r3')" data-i18n="popup.compile">▶ 컴파일 &amp; 빌드 업로드</button>
         <span class="example-gallery-hint" data-i18n="popup.galleryHint">예제는 오른쪽 🗂 예제 갤러리에서 골라주세요</span>
+      </div>
+      <div class="debug-bar" id="debugBarR3">
+        <span class="debug-status" id="debugStatusR3"></span>
+        <button class="btn ghost debug-btn" onclick="debugContinue('r3')" data-i18n="debug.continueBtn">▶ 계속</button>
+        <button class="btn ghost debug-btn" onclick="debugStepLine('r3')" data-i18n="debug.stepBtn">⤵ 한 줄씩</button>
       </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNumR3">1</div>
@@ -1690,7 +1728,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.991b", en: "K's Simulator Ver0.991b" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.993b", en: "K's Simulator Ver0.993b" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -1743,6 +1781,7 @@ const STRINGS = {
   "comp.encgTitle": { ko: "엔코더 GND", en: "Encoder GND" },
   "comp.lcd.title": { ko: "캐릭터 LCD 16x2 (HD44780, 4-bit)", en: "Character LCD 16x2 (HD44780, 4-bit)" },
   "comp.led.colorSelect": { ko: "LED 색상 선택", en: "LED color" },
+  "comp.led.curTitle": { ko: "정격(20mA) 대비 실제 전류 — 100% 이상(빨강)이면 과전류로 실제라면 LED가 탈 수 있는 상태, 100% 미만(파랑)이면 안전", en: "Actual current vs. rating (20mA) — 100% or more (red) is overcurrent that could burn out a real LED; under 100% (blue) is safe" },
   "comp.md.out1Title": { ko: "모터 출력 1 → DC 모터 단자 1", en: "Motor output 1 → DC motor terminal 1" },
   "comp.md.out2Title": { ko: "모터 출력 2 → DC 모터 단자 2", en: "Motor output 2 → DC motor terminal 2" },
   "comp.md.title": { ko: "모터 드라이버", en: "Motor Driver" },
@@ -1762,6 +1801,9 @@ const STRINGS = {
   "comp.powercable.label": { ko: "파워케이블", en: "Power Cable" },
   "comp.psu.ac1": { ko: "AC 단상 (220V)", en: "AC 1-Phase (220V)" },
   "comp.psu.ac1Badge": { ko: "⎓ AC 220V · 60Hz<br>(대한민국 표준 단상)", en: "⎓ AC 220V · 60Hz<br>(Korean standard 1-phase)" },
+  "comp.psu.ac1Badge100": { ko: "⎓ AC 100V · 60Hz<br>(미국식 단상)", en: "⎓ AC 100V · 60Hz<br>(US-style 1-phase)" },
+  "comp.psu.ac1Volt220": { ko: "AC 220V (한국식)", en: "AC 220V (Korean-style)" },
+  "comp.psu.ac1Volt100": { ko: "AC 100V (미국식)", en: "AC 100V (US-style)" },
   "comp.psu.dcCustom": { ko: "직접 입력…", en: "Custom…" },
   "comp.psu.dcCustomPh": { ko: "전압(V) 직접 입력", en: "Enter voltage (V)" },
   "comp.psu.ac3": { ko: "AC 3상 (380V/220V)", en: "AC 3-Phase (380V/220V)" },
@@ -2163,7 +2205,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.991b", en: "K's Arduino Simulator Ver0.991b" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.993b", en: "K's Arduino Simulator Ver0.993b" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -2553,6 +2595,138 @@ function transpileCppToJs(cppCode) {
   return js;
 }
 
+/* ============ Ver 0.992: 코드 에디터 디버거 — 브레이크포인트 체크포인트 삽입 ============
+   setup()/loop() 안, 중첩 블록(if/for/while/switch 등) 밖의 "최상위" 문장 줄 앞에만
+   await __dbgCheckpoint(...) 호출을 끼워 넣습니다. 중첩 블록 안의 줄까지 다 지원하려면
+   그 줄까지 도달했을 때 실제로 어떤 지역 변수가 스코프에 있는지를 훨씬 정교하게 추적해야
+   하는데, 잘못 판단하면 삽입한 코드 자체가 ReferenceError를 던져 "브레이크포인트를 쓰지
+   않는 스케치까지" 깨뜨릴 위험이 있습니다. 그래서 v1은 안전하게 최상위 줄만 지원합니다
+   (거터에는 어느 줄이든 점을 찍을 수 있지만, 중첩 블록 안의 점은 실제로 멈추지 않습니다).
+
+   transpileCppToJs()를 부르기 "전에" 원본 rawCode 문자열에 직접 끼워 넣는 이유:
+     1) 주석 제거 때문에 줄 번호가 밀리는 transpile 이후 텍스트가 아니라, 사용자가 에디터에서
+        실제로 보는 원본 줄 번호를 체크포인트 인자로 그대로 쓸 수 있고,
+     2) 끼워 넣는 "await __dbgCheckpoint(...)" 줄은 그 자체로 이미 유효한 JS라서(타입 키워드로
+        시작하지 않으므로) transpileCppToJs()의 정규식들을 그대로 통과해도 변형되지 않습니다. */
+function maskCodeForDepth(text){
+  // 문자열/문자 리터럴과 주석의 "내용"만 공백으로 지우고 줄바꿈·길이는 그대로 유지합니다
+  // (중괄호 깊이를 셀 때 문자열/주석 속 { } 에 속지 않기 위함 — 분석 전용, 출력에는 안 씀).
+  let out = '';
+  let i = 0;
+  const n = text.length;
+  while (i < n){
+    const c = text[i], c2 = text[i + 1];
+    if (c === '/' && c2 === '/'){
+      let j = i;
+      while (j < n && text[j] !== '\n') j++;
+      out += ' '.repeat(j - i);
+      i = j;
+    } else if (c === '/' && c2 === '*'){
+      let j = i + 2;
+      while (j < n - 1 && !(text[j] === '*' && text[j + 1] === '/')) j++;
+      j = Math.min(j + 2, n);
+      for (let k = i; k < j; k++) out += text[k] === '\n' ? '\n' : ' ';
+      i = j;
+    } else if (c === '"' || c === "'"){
+      const quote = c;
+      let j = i + 1;
+      while (j < n && text[j] !== quote){ if (text[j] === '\\') j++; j++; }
+      j = Math.min(j + 1, n);
+      for (let k = i; k < j; k++) out += text[k] === '\n' ? '\n' : ' ';
+      i = j;
+    } else { out += c; i++; }
+  }
+  return out;
+}
+function computeLineDepthInfo(masked){
+  // masked의 각 줄에 대해 { 시작 오프셋(rawCode 기준, masked와 길이가 동일하므로 그대로 씀),
+  // 줄이 "시작할 때"의 중괄호 깊이, "끝날 때"의 깊이를 계산합니다.
+  const lines = masked.split('\n');
+  const info = [];
+  let depth = 0, offset = 0;
+  for (let li = 0; li < lines.length; li++){
+    const line = lines[li];
+    const depthBefore = depth;
+    for (let ci = 0; ci < line.length; ci++){
+      if (line[ci] === '{') depth++;
+      else if (line[ci] === '}') depth = Math.max(0, depth - 1);
+    }
+    info.push({ lineNo: li + 1, startOffset: offset, depthBefore, depthAfter: depth });
+    offset += line.length + 1;
+  }
+  return info;
+}
+const DBG_DECL_RE = /^(?:static\s+)?(?:const\s+)?(?:unsigned\s+)?(?:int|long|short|char|float|double|uint8_t|uint16_t|uint32_t|bool|byte|String)\s+(\w+)\s*(?:\[[^\]]*\])?\s*(?:=[\s\S]*)?;\s*$/;
+function declaredNameOnLine(rawLine){
+  const m = rawLine.trim().match(DBG_DECL_RE);
+  return m ? m[1] : null;
+}
+function findFunctionBodyRange(masked, fnName){
+  const headerRe = new RegExp('\\bvoid\\s+' + fnName + '\\s*\\([^)]*\\)\\s*\\{');
+  const m = headerRe.exec(masked);
+  if (!m) return null;
+  const openOffset = m.index + m[0].length - 1; // '{'의 위치
+  let depth = 0;
+  for (let i = openOffset; i < masked.length; i++){
+    if (masked[i] === '{') depth++;
+    else if (masked[i] === '}'){
+      depth--;
+      if (depth === 0) return { start: openOffset + 1, end: i };
+    }
+  }
+  return null;
+}
+// rawCode(원본 스케치)에 브레이크포인트 체크포인트를 끼워 넣은 새 코드를 돌려줍니다.
+// 실패하면(예상 못한 코드 구조 등) 절대 예외를 던지지 않고 원본을 그대로 돌려줘, 디버거
+// 삽입이 실패해도 스케치 실행 자체는 항상 정상 동작하게 합니다(호출부에서도 이중으로 감쌉니다).
+function injectDebugCheckpoints(rawCode, board){
+  const masked = maskCodeForDepth(rawCode);
+  const depthInfo = computeLineDepthInfo(masked);
+  const rawLines = rawCode.split('\n');
+
+  // 1) 전역(파일 최상위, 깊이 0) 변수 이름 수집 — setup()/loop() 등 어떤 함수 본문에도 속하지
+  //    않는, 깊이가 줄 시작·끝 모두 0인 줄에서만 찾습니다(자연히 함수 본문 내부는 제외됨).
+  const globalNames = [];
+  depthInfo.forEach(info => {
+    if (info.depthBefore === 0 && info.depthAfter === 0){
+      const name = declaredNameOnLine(rawLines[info.lineNo - 1]);
+      if (name) globalNames.push(name);
+    }
+  });
+
+  const insertions = []; // { offset, text }
+  ['setup', 'loop'].forEach(fnName => {
+    const range = findFunctionBodyRange(masked, fnName);
+    if (!range) return;
+    const localNames = [];
+    depthInfo.forEach(info => {
+      const rawLine = rawLines[info.lineNo - 1];
+      const lineStart = info.startOffset;
+      const lineEnd = lineStart + rawLine.length;
+      if (lineEnd <= range.start || lineStart >= range.end) return; // 이 함수 본문 밖
+      // 함수 본문 기준 상대 깊이 1(=바로 안, 중첩 블록에 들어가지 않은) 줄만 취급합니다.
+      if (info.depthBefore !== 1 || info.depthAfter !== 1) return;
+      const trimmed = rawLine.trim();
+      if (!trimmed) return;
+      const varsSnapshot = globalNames.concat(localNames);
+      const indent = (rawLine.match(/^\s*/) || [''])[0];
+      const varsObj = varsSnapshot.length ? `{${varsSnapshot.join(',')}}` : '{}';
+      insertions.push({
+        offset: info.startOffset,
+        text: `${indent}await __dbgCheckpoint(${JSON.stringify(board)}, ${info.lineNo}, ${varsObj});\n`,
+      });
+      const declName = declaredNameOnLine(rawLine);
+      if (declName) localNames.push(declName);
+    });
+  });
+
+  if (!insertions.length) return rawCode;
+  insertions.sort((a, b) => b.offset - a.offset); // 뒤에서부터 끼워 넣어야 앞쪽 오프셋이 안 밀림
+  let out = rawCode;
+  insertions.forEach(ins => { out = out.slice(0, ins.offset) + ins.text + out.slice(ins.offset); });
+  return out;
+}
+
 // 보드별 AVR 레지스터 상태 + PORTx 쓰기를 실제 아두이노 핀 상태로 반영하는 프록시 객체.
 // (DDRx/PINx는 값만 보존하고, 방향/토글 효과는 이 단순 모델에서는 시각적으로 재현하지 않습니다.)
 //
@@ -2847,7 +3021,13 @@ function deployToMCU(board, rawCode) {
   updateCycleStats(board);
 
   try {
-    const transpiled = transpileCppToJs(rawCode);
+    // 디버거 체크포인트 삽입은 실패해도(예상 못한 코드 구조 등) 절대 실행 자체를 막으면 안
+    // 되므로, 실패 시 원본 rawCode로 조용히 되돌아갑니다(= 지금까지와 100% 동일한 동작).
+    let codeForTranspile = rawCode;
+    try { codeForTranspile = injectDebugCheckpoints(rawCode, board); }
+    catch (e) { codeForTranspile = rawCode; }
+    dbgStateFor(board).execGen = myGen;
+    const transpiled = transpileCppToJs(codeForTranspile);
 
     const setupMatch = transpiled.match(/void\s+setup\s*\(\s*\)\s*\{([\s\S]*?)\}\s*(?=void|$)/);
     const loopMatch = transpiled.match(/void\s+loop\s*\(\s*\)\s*\{([\s\S]*?)\}\s*$/);
@@ -3440,10 +3620,10 @@ function deployToMCU(board, rawCode) {
       return { setup: __user_setup, loop: __user_loop };
     `;
 
-    const runner = new AsyncFunction('mcuVM', 'logSerial', 'boardPinReading', '__regs', 'boardDomId', 'serialRxBuffer', '__serialTransmit', 'i2cRxBuffer', '__i2cTransfer', '__i2cRequestFrom', 'canRxQueue', '__canTransmit', 'canfdRxQueue', '__canfdTransmit', fullExecution);
+    const runner = new AsyncFunction('mcuVM', 'logSerial', 'boardPinReading', '__regs', 'boardDomId', 'serialRxBuffer', '__serialTransmit', 'i2cRxBuffer', '__i2cTransfer', '__i2cRequestFrom', 'canRxQueue', '__canTransmit', 'canfdRxQueue', '__canfdTransmit', '__dbgCheckpoint', fullExecution);
     mcu.bootTimeMs = performance.now();
 
-    runner(mcuVM, logSerial, boardPinReading, makeRegs(board), boardDomId, serialRxBuffer, __serialTransmit, i2cRxBuffer, __i2cTransfer, __i2cRequestFrom, canRxQueue, __canTransmit, canfdRxQueue, __canfdTransmit).then(instance => {
+    runner(mcuVM, logSerial, boardPinReading, makeRegs(board), boardDomId, serialRxBuffer, __serialTransmit, i2cRxBuffer, __i2cTransfer, __i2cRequestFrom, canRxQueue, __canTransmit, canfdRxQueue, __canfdTransmit, __dbgCheckpoint).then(instance => {
       if (mcu.gen !== myGen) return; // 그 사이 재컴파일/재배포되었으면 이 결과는 버립니다.
       mcu.loopFn = instance.loop;
       mcu.isCompiled = true;
@@ -4044,6 +4224,7 @@ function spawnComponent(type, dropX, dropY){
     div.innerHTML = `
       <div class="led-dome" id="${id}_bulb"></div>
       <div class="led-val" id="${id}_val">0%</div>
+      <div class="led-cur" id="${id}_cur" data-i18n-title="comp.led.curTitle" title="정격(20mA) 대비 실제 전류 — 100% 이상(빨강)이면 과전류로 실제라면 LED가 탈 수 있는 상태, 100% 미만(파랑)이면 안전"></div>
       <select class="led-color-select" id="${id}_color" data-i18n-title="comp.led.colorSelect" title="LED 색상 선택">
         <option value="red" selected>Red</option>
         <option value="green">Green</option>
@@ -4141,6 +4322,10 @@ function spawnComponent(type, dropX, dropY){
             <option value="1" selected>1</option>
             <option value="2">2</option>
             <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
           </select><span id="${id}_chunit${n}">V/DIV</span>
         </label>`).join('')}
       </div>
@@ -4319,6 +4504,10 @@ function spawnComponent(type, dropX, dropY){
         <input type="number" class="psu-dc-custom" min="0" max="400" step="0.1" value="5" hidden data-i18n-ph="comp.psu.dcCustomPh" placeholder="전압(V) 직접 입력">
       </div>
       <div class="psu-ac-panel" hidden>
+        <select class="psu-ac-volt" onchange="psuAcVoltChanged('${id}')">
+          <option value="220" selected data-i18n="comp.psu.ac1Volt220">AC 220V (한국식)</option>
+          <option value="100" data-i18n="comp.psu.ac1Volt100">AC 100V (미국식)</option>
+        </select>
         <div class="psu-ac-badge" data-i18n="comp.psu.ac1Badge">⎓ AC 220V · 60Hz<br>(대한민국 표준 단상)</div>
       </div>
       <div class="psu-ac3-panel" hidden>
@@ -5140,6 +5329,8 @@ function spawnComponent(type, dropX, dropY){
     updateInductor(id);
   } else if (type === 'relay'){
     updateRelayVisual(id, false);
+  } else if (type === 'led'){
+    applyLedOffAppearance(div); // 스폰 직후에도 선택된(기본) 색이 바로 보이도록
   } else if (type === 'coincell'){
     renderCoincellStack(div); updateCoincellReadout(div);
   } else if (type === 'fruitbatt'){
@@ -5458,6 +5649,72 @@ function updateRelayVisual(id, energized){
   el.dataset.energized = energized ? '1' : '0';
 }
 // 릴레이 접점(COM/NO/NC)을 resistiveEdges()가 인식하는 가상 0Ω/개방 엣지 목록으로 변환합니다.
+// [긴급 버그 수정] LED(comp-led)는 지금까지 저항망(resistiveEdges)에 전혀 포함되지 않아서,
+// 저항→LED→저항→LED 처럼 LED를 "거쳐서" 뒤로 이어지는 직렬 회로에서는 전류계/전압계가 LED
+// 건너편까지 경로를 찾지 못해 항상 0으로 나오고(전류계를 병렬로 걸쳐 재는 이 시뮬레이터의
+// "추정" 방식이 LED 뒤쪽 구간에서는 아예 작동하지 않았습니다), hasGroundReturnPath()도 LED를
+// 건너뛸 방법이 없어 두 번째 이후의 LED를 전부 "닫힌 회로 아님"으로 오판했습니다. 다이오드와
+// 똑같은 방식(_A/_K 핀을 순방향일 땐 저저항, 역방향일 땐 거의 개방인 가상 저항 엣지로 취급)으로
+// LED를 저항망에 포함시켜 이 문제를 해결합니다. LED의 두 번째 핀 이름이 "_B"가 아니라 "_K"라서
+// resistiveEdges()의 일반 매핑(.resistive-2pin, _A/_B 규약)에는 맞지 않으므로, 릴레이 접점 등과
+// 같은 방식의 전용 엣지 생성 함수로 둡니다.
+function ledContactEdges(){
+  const out = [];
+  document.querySelectorAll('.comp-led').forEach(el => {
+    const a = el.querySelector('[data-pin$="_A"]');
+    const k = el.querySelector('[data-pin$="_K"]');
+    if (!a || !k) return;
+    const ohms = parseFloat(el.dataset.ohms || String(LED_REVERSE_OHMS));
+    out.push({ legA: a, legB: k, ohms: isFinite(ohms) ? Math.max(0, ohms) : LED_REVERSE_OHMS });
+  });
+  return out;
+}
+// [긴급 버그 수정] 전류계(디지털 멀티미터의 DC A 모드)는 실제 전류계처럼 회로를 끊고 그 자리에
+// "직렬로" 끼워 넣는 것이 자연스러운 사용법인데, 지금까지 멀티미터의 두 프로브는 순전히 측정
+// 전용 핀이라 서로 이어주는 효과가 전혀 없었습니다 — 그래서 전류계를 직렬로 끼우면 오히려 그
+// 자리에서 회로 전체가 끊어져 버려(전류계 자신은 물론 그 뒤에 달린 LED/전압계까지 전부) 아무
+// 값도 나오지 않았습니다. DC A 모드일 때만 이 두 프로브 사이를 거의 0Ω인 가상 도선으로 이어
+// 실제 전류계처럼 "직렬로 끼워도 회로가 그대로 이어지는" 동작을 하게 합니다.
+const AMMETER_SERIES_OHMS = 0.01;
+function ammeterContactEdges(){
+  const out = [];
+  document.querySelectorAll('.comp-multimeter').forEach(mm => {
+    if ((mm.querySelector('.mm-mode')?.value) !== 'dca') return;
+    const p = mm.querySelector('[data-pin$="_PROBE_P"]');
+    const n = mm.querySelector('[data-pin$="_PROBE_N"]');
+    if (p && n) out.push({ legA: p, legB: n, ohms: AMMETER_SERIES_OHMS });
+  });
+  return out;
+}
+// [Ver 0.993a] 220V 백열전구 / LED 형광등 바도 실제 전구처럼 "전류를 소모"해야, 직렬로 끼운
+// 전류계(dca 모드)가 0이 아닌 값을 읽고, R·L·C 등 다른 부품과 함께 전압강하도 자연스럽게
+// 나눠집니다. 정격 전압(220V) 기준 소비전력(W)으로부터 고정 저항값을 역산해(R=V²/P) L-N
+// 사이의 저항 엣지로 취급합니다 — 실제 백열전구는 온도에 따라 저항이 변하지만, 교육용
+// 단순화를 위해 고정 저항으로 둡니다(PSU를 100V로 바꿔 꽂으면, 이 고정 저항 그대로 V²/R만큼
+// 전력이 줄어들어 "정격보다 낮은 전압에서 더 어둡게 켜지는" 실제 전구와 같은 결과가 됩니다).
+const BULB220_RATED_V = 220;
+const BULB220_WATTS = 60;      // 표준 60W 백열전구
+const BULB220_OHMS = (BULB220_RATED_V * BULB220_RATED_V) / BULB220_WATTS; // ≈807Ω
+const LEDTUBE220_WATTS = 20;   // LED 형광등 바(컨버터 내장, 상대적으로 저전력)
+const LEDTUBE220_OHMS = (BULB220_RATED_V * BULB220_RATED_V) / LEDTUBE220_WATTS; // ≈2420Ω
+function bulb220ContactEdges(){
+  const out = [];
+  document.querySelectorAll('.comp-bulb220').forEach(el => {
+    const l = el.querySelector('[data-pin$="_L"]');
+    const n = el.querySelector('[data-pin$="_N"]');
+    if (l && n) out.push({ legA: l, legB: n, ohms: BULB220_OHMS });
+  });
+  return out;
+}
+function ledtube220ContactEdges(){
+  const out = [];
+  document.querySelectorAll('.comp-ledtube220').forEach(el => {
+    const l = el.querySelector('[data-pin$="_L"]');
+    const n = el.querySelector('[data-pin$="_N"]');
+    if (l && n) out.push({ legA: l, legB: n, ohms: LEDTUBE220_OHMS });
+  });
+  return out;
+}
 function relayContactEdges(){
   const out = [];
   // 5V 릴레이 모듈과 AC 220V 코일 릴레이는 코일 여자 판정 방식만 다를 뿐(runTick의 0-1/0-1b),
@@ -5601,6 +5858,24 @@ function psuDcVoltChanged(id){
   const custom = el.querySelector('.psu-dc-custom');
   if (custom) custom.hidden = !sel || sel.value !== 'custom';
 }
+// [Ver 0.993a] AC 단상(ac1) 콘센트 전압 — 대한민국 표준 220V뿐 아니라 미국식 100V(가정용
+// 110~120V 계열을 단순화한 값)도 고를 수 있게 합니다. AC 3상(ac3)은 기존처럼 상전압
+// 220V/선간 380V 고정이라 이 select와 무관합니다.
+function psuAcVoltage(psuEl){
+  const sel = psuEl.querySelector('.psu-ac-volt');
+  if (!sel) return 220;
+  const v = parseFloat(sel.value);
+  return isFinite(v) ? v : 220;
+}
+function psuAcVoltChanged(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const sel = el.querySelector('.psu-ac-volt');
+  const badge = el.querySelector('.psu-ac-panel .psu-ac-badge');
+  if (!sel || !badge) return;
+  badge.dataset.i18n = sel.value === '100' ? 'comp.psu.ac1Badge100' : 'comp.psu.ac1Badge';
+  badge.innerHTML = tr(badge.dataset.i18n);
+}
 function psuDcReading(psuEl){
   const on = psuEl.querySelector('.psu-switch')?.classList.contains('on');
   if (!on) return null;
@@ -5620,7 +5895,9 @@ function psuAcReading(psuEl, suffix){
   const mode = psuEl.dataset.mode;
   const phaseMap = { _L: 0, _L1: 0, _L2: -120, _L3: -240 };
   const phaseDeg = phaseMap[suffix] != null ? phaseMap[suffix] : 0;
-  const rms = 220; // 상전압 220V (3상은 선간 380V — 멀티미터에서 별도 계산)
+  // AC 3상은 기존처럼 상전압 220V 고정(선간 380V는 멀티미터에서 별도 계산), AC 단상(ac1)은
+  // 사용자가 220V(한국식)/100V(미국식) 중 고른 값을 그대로 씁니다.
+  const rms = mode === 'ac1' ? psuAcVoltage(psuEl) : 220;
   const vPeak = rms * Math.SQRT2;
   const t = Date.now();
   const instant = vPeak * Math.sin((t / 1000) * 2 * Math.PI * 60 + phaseDeg * Math.PI / 180);
@@ -5792,6 +6069,30 @@ function updateDiodeVisual(el){
     status.dataset.i18n = on ? 'comp.diode.on' : 'comp.diode.off';
     status.textContent = tr(status.dataset.i18n);
   }
+}
+
+/* ---------- LED를 저항망의 순방향 다이오드처럼 취급 ---------- */
+// 다이오드(diodeUpdate)와 완전히 같은 이유로, A/K 두 핀 모두 "이 LED 자신의 엣지를 뺀 나머지
+// 회로만"의 관점에서 독립적으로 전압을 구해 비교합니다(자기 자신을 참조하는 래치 방지).
+// 순방향 문턱은 기존 발광 판정(r.v > 0.05)과 같은 기준(raw v값)을 그대로 씁니다 — 보드 디지털
+// 핀(HIGH=1)이나 PSU 직결처럼 기존에 이미 잘 동작하던 단일 LED 회로의 동작을 바꾸지 않기
+// 위함입니다.
+const LED_FORWARD_OHMS = 100;
+const LED_REVERSE_OHMS = 1e8;
+// [Ver 0.993b] 정격 전류 표시용 — 일반적인 5mm LED의 정격 순방향 전류(교육용으로 색상 구분
+// 없이 하나의 값으로 통일). 실제 회로에서 전류제한 저항 없이/너무 작은 저항으로 LED를 직결하면
+// 이 값을 훌쩍 넘겨 실제라면 LED가 타 버리는 상황을, 정격 대비 퍼센트와 색(빨강=초과/파랑=안전)
+// 으로 한눈에 보여줍니다.
+const LED_RATED_MA = 20;
+function ledUpdate(el){
+  if (!isSimulating){ el.dataset.ohms = String(LED_REVERSE_OHMS); return; }
+  const aPin = el.querySelector('[data-pin$="_A"]');
+  const kPin = el.querySelector('[data-pin$="_K"]');
+  if (!aPin || !kPin){ el.dataset.ohms = String(LED_REVERSE_OHMS); return; }
+  const edgesExcl = resistiveEdges().filter(e => !(e.legA === aPin && e.legB === kPin));
+  const ra = resistiveReading(aPin, edgesExcl);
+  const forward = !!ra && ra.v > 0.05;
+  el.dataset.ohms = String(forward ? LED_FORWARD_OHMS : LED_REVERSE_OHMS);
 }
 
 /* ---------- 🔬 전기 실험실: 트랜지스터 (NPN 단순화 스위치 모델) ---------- */
@@ -6130,6 +6431,26 @@ function createWire(pinA, pinB){
     x: p1_0.x + (p2_0.x - p1_0.x) * (i / 3),
     y: p1_0.y + (p2_0.y - p1_0.y) * (i / 3),
   }));
+  // 자동 생성된 두 꺾임점이 하필 다른 부품 몸체 위에 떨어지면(예: 두 핀 사이에 다른 부품이
+  // 끼어 있는 경우), 그 점을 드래그로 잡는 핸들이 부품과 겹쳐 보여 혼란스럽습니다. 실제
+  // 배선 경로는 routeWireAroundComponents()가 매 프레임 알아서 우회해 "그려" 주지만, 그건
+  // 그리기 전용이고 핸들 자체는 항상 w.points의 실제 좌표에 그려지므로, 만들어지는 시점에
+  // 미리 겹치는 부품 바깥(가장 가까운 변 + 여백)으로 밀어내 둡니다(아래 routeWireAroundComponents
+  // 1단계와 동일한 방식). 두 핀이 속한 부품 자신은 당연히 검사 대상에서 제외합니다.
+  const ownerA = pinA.closest('.placed-component'), ownerB = pinB.closest('.placed-component');
+  const initObstacles = wireObstacleBoxes([ownerA, ownerB].filter(Boolean));
+  initialPoints.forEach(p => {
+    const b = initObstacles.find(bx => wirePointInBox(p, bx));
+    if (!b) return;
+    const margin = WIRE_AVOID_MARGIN;
+    const dl = p.x - (b.x1 - margin), dr = (b.x2 + margin) - p.x;
+    const dt = p.y - (b.y1 - margin), db = (b.y2 + margin) - p.y;
+    const minD = Math.min(dl, dr, dt, db);
+    if (minD === dl) p.x = b.x1 - margin;
+    else if (minD === dr) p.x = b.x2 + margin;
+    else if (minD === dt) p.y = b.y1 - margin;
+    else p.y = b.y2 + margin;
+  });
   wireNetIdSeq = (wireNetIdSeq || 0) + 1;
   const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR, points: initialPoints, pointEls: [], netId: wireNetIdSeq, labelEls: [] };
   wires.push(wireObj);
@@ -6717,7 +7038,7 @@ function resistiveEdges(){
     const legB = el.querySelector('[data-pin$="_B"]');
     return { legA, legB, ohms: 0 };
   }).filter(e => e.legA && e.legB);
-  return base.concat(relayContactEdges(), motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges(), inductorEdges);
+  return base.concat(relayContactEdges(), motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges(), inductorEdges, ledContactEdges(), ammeterContactEdges(), bulb220ContactEdges(), ledtube220ContactEdges());
 }
 // startPinEl의 net(대표 원소로 관리)에서 출발해 저항 엣지를 하나씩 건너며 도달 가능한 모든
 // net과 "그 net까지의 최소 누적 저항"을 구합니다. 회로 규모가 매우 작으므로(교육용 시뮬레이터)
@@ -6753,7 +7074,7 @@ function resistiveBFS(startPinEl, edgesOverride){
 // 뜬 상태이므로 전류가 흐를 수 없어 켜지면 안 됩니다). 이 함수는 pinEl(캐소드)의 net에 GND가
 // 직접 있는지, 없으면 저항/파워케이블을 거쳐서라도 GND에 닿는지까지 확인해 "닫힌 회로"인
 // 경우에만 true를 돌려줍니다.
-function hasGroundReturnPath(pinEl){
+function hasGroundReturnPath(pinEl, edgesOverride){
   if (!pinEl) return false;
   // 보드 GND(GND_D 등, PIN_KIND==='gnd')뿐 아니라 PSU/전지/발전기/다이오드 캐소드 등 부품마다의
   // "기준(−)" 다리도 전부 role-gnd 클래스가 붙어 있으므로(핀맵 범례와 동일한 규약), 이 둘을
@@ -6763,7 +7084,12 @@ function hasGroundReturnPath(pinEl){
   // GND 역할이다"는 당연한 사실이고, 우리가 확인하려는 건 "그 캐소드가 실제로 다른 진짜
   // GND(보드 GND, PSU GND 등)까지 이어져 있는가"이기 때문입니다.
   for (const el of netOf(pinEl)) { if (el !== pinEl && isGndPin(el)) return true; }
-  const visited = resistiveBFS(pinEl);
+  // 호출자가 자기 자신의(예: 이 LED 자신의 A-K) 엣지를 뺀 목록을 넘겨주지 않았다면, 여기서
+  // 기본으로 계산합니다 — 안 빼면 이 핀이 자기 부품의 순방향 엣지를 거슬러 반대쪽 다리(예:
+  // 애노드)로 나갔다가, 그 애노드가 "다른" 경로로(예: 다른 LED의 애노드에 물려서) 실제 GND에
+  // 닿아 있을 때, 그 경로를 "내 캐소드 자신의 리턴 경로"로 잘못 인정하게 됩니다(자기 참조).
+  const edges = edgesOverride || resistiveEdges().filter(e => !(e.legA === pinEl || e.legB === pinEl));
+  const visited = resistiveBFS(pinEl, edges);
   for (const v of visited){
     if (v.rep === pinEl) continue;
     for (const el of v.net) { if (isGndPin(el)) return true; }
@@ -6783,6 +7109,24 @@ function readingToVolts(reading){
 // netReading()을 확장: 직결(0Ω) net에 신호원이 없을 때만 저항/파워케이블을 건너 뛰어 가장 가까운
 // (또는 두 개의) 신호원을 찾고, 저항값에 따라 감쇠된 값을 돌려줍니다. 저항이 전혀 없는 회로는
 // 위 direct 체크에서 그대로 return되므로 기존 동작과 100% 동일합니다(회귀 없음).
+// dca(전류) 모드 전용 보조 함수: pinEl에서 저항망을 따라 도달 가능한 "가장 가까운 신호원"과
+// 그 저항 거리를 함께 돌려줍니다(resistiveReading이 값만 돌려주는 것과 달리, 거리 자체가
+// 필요할 때 씁니다 — 전류계가 자기 자신을 뺀 나머지 회로의 "루프 전체 저항"을 구하려면,
+// PSU 같은 전원은 자기 V/GND 두 핀 사이가 저항 엣지로 직접 이어져 있지 않아
+// resistancePathBetween()만으로는 경로를 찾을 수 없기 때문에, 양쪽 프로브에서 각자 가장
+// 가까운 신호원까지의 거리를 구해 더하는 방식을 씁니다).
+function nearestSourceInfo(pinEl, edgesOverride){
+  const direct = netReading(pinEl);
+  if (direct) return { reading: direct, distR: 0 };
+  const visited = resistiveBFS(pinEl, edgesOverride);
+  let best = null;
+  for (const v of visited){
+    if (v.rep === pinEl) continue;
+    const r = netReading(v.rep);
+    if (r && (!best || v.distR < best.distR)) best = { reading: r, distR: v.distR };
+  }
+  return best;
+}
 function resistiveReading(pinEl, edgesOverride){
   const direct = netReading(pinEl);
   if (direct) return direct;
@@ -6797,15 +7141,19 @@ function resistiveReading(pinEl, edgesOverride){
   if (!sources.length) return null;
   sources.sort((a, b) => a.distR - b.distR);
   const ASSUMED_LOAD_OHMS = 150; // LED 등 "부하"의 대략적인 저항 근사값(체감용, 실측 아님)
-  if (sources.length === 1 || sources[0].distR < sources[1].distR){
+  if (sources.length === 1){
     const s = sources[0];
     const ratio = ASSUMED_LOAD_OHMS / (ASSUMED_LOAD_OHMS + s.distR);
     const out = { ...s.reading, v: s.reading.v * ratio };
     if (out.rms != null) out.rms = out.rms * ratio;
     return out;
   }
-  // 저항 경로가 같은 거리에서 서로 다른(전형적으로 VCC/GND) 두 신호원을 만난 경우 —
-  // 실제 전압분배 회로처럼 두 경로 저항의 비로 보간합니다.
+  // [긴급 버그 수정] 서로 다른 두 신호원이 발견되면(전형적으로 VCC/GND), 실제 전압분배 회로처럼
+  // 두 경로 저항의 비로 보간합니다 — 예전에는 "더 가까운 쪽 하나만" 골라 그 값에 막연한
+  // 부하 저항 비율만 곱했기 때문에(같은 거리일 때만 보간), LED가 저항망에 포함되면서(위 LED
+  // 관련 수정) 한쪽(GND)이 다른 쪽(VCC)보다 조금이라도 더 가까운 흔한 경우에 무조건 GND(0V)
+  // 쪽 값만 나와버리는 문제가 있었습니다. 두 거리가 정확히 같을 때만 특별취급하던 조건을
+  // 없애 어떤 비율에서든(예전처럼 같은 거리일 때도 동일한 결과) 항상 제대로 보간합니다.
   const [a, b] = sources;
   const totalR = a.distR + b.distR;
   const va = readingToVolts(a.reading), vb = readingToVolts(b.reading);
@@ -6819,11 +7167,14 @@ function resistiveReading(pinEl, edgesOverride){
 // analysis)으로 전체 저항 네트워크를 정확히 풀어, 직렬/병렬/브리지 등 어떤 연결 형태든 물리적으로
 // 올바른 등가 저항을 계산합니다: pinA에 1A를 주입하고 pinB를 0V로 접지했을 때 pinA에 나타나는
 // 전압이 곧 등가 저항(V = I·R, I=1)입니다.
-function resistancePathBetween(pinA, pinB){
+// edgesOverride를 넘기면(예: 전류계가 "자기 자신이 직렬로 끼워 넣은 가상 도선"을 뺀 나머지
+// 회로만의 관점에서 자기 자신에게 걸리는 전류를 구하고 싶을 때) resistiveEdges() 대신 그
+// 목록을 씁니다 — diodeUpdate/ledUpdate의 자기 참조 제외와 같은 이유입니다.
+function resistancePathBetween(pinA, pinB, edgesOverride){
   if (!pinA || !pinB) return null;
   if (netOf(pinA).has(pinB)) return 0;
 
-  const edges = resistiveEdges();
+  const edges = edgesOverride || resistiveEdges();
   if (!edges.length) return null;
 
   // 0Ω 부품(예: 저항값 0으로 설정한 파워케이블)은 완전한 도체이므로 union-find로 두 노드를
@@ -7260,11 +7611,22 @@ function updateMultimeter(id){
   }
 
   if (mode === 'dca'){
-    const r = resistancePathBetween(pRed, pBlk);
-    const rRed = resistiveReading(pRed), rBlk = resistiveReading(pBlk);
-    const vRed = readingToDisplayVolts(rRed, 'dcv'), vBlk = readingToDisplayVolts(rBlk, 'dcv');
-    if (r == null || r <= 0){ valEl.textContent = '0.00'; unitEl.textContent = 'mA'; return; }
-    const mA = Math.abs(vRed - vBlk) / r * 1000;
+    // 이 전류계 자신이 ammeterContactEdges()로 끼워 넣은 가상 도선(P-N 직결)은 반드시 빼고
+    // "나머지 회로"만의 관점에서 봐야 합니다 — 안 빼면 자기 자신의 거의 0Ω짜리 도선이 가장
+    // 짧은 경로가 되어 버려 전압차·저항이 둘 다 0에 가까워지고(자기 참조), 결과가 항상 0.00으로
+    // 나옵니다(diodeUpdate/ledUpdate와 같은 이유의 자기 참조 제외).
+    const edgesExcl = resistiveEdges().filter(e => !(e.legA === pRed && e.legB === pBlk) && !(e.legA === pBlk && e.legB === pRed));
+    // resistancePathBetween()은 두 점 사이의 순수 저항 경로만 찾는데, PSU 같은 전원은 V/GND
+    // 두 핀이 저항 엣지로 직접 이어져 있지 않아(둘 다 "신호원"일 뿐, 서로를 잇는 엣지가 없음)
+    // 이 방법으론 루프를 찾을 수 없습니다. 대신 양쪽 프로브가 "각자" 가장 가까운 신호원까지
+    // 도달하는 저항을 구해 더한 값을 전체 루프 저항으로 씁니다 — 직렬 회로에서 전류계
+    // 양쪽의 전원까지 가는 두 구간 저항의 합이 곧 전체 루프 저항이기 때문입니다.
+    const nearRed = nearestSourceInfo(pRed, edgesExcl);
+    const nearBlk = nearestSourceInfo(pBlk, edgesExcl);
+    if (!nearRed || !nearBlk){ valEl.textContent = '0.00'; unitEl.textContent = 'mA'; return; }
+    const totalR = nearRed.distR + nearBlk.distR;
+    if (totalR <= 0){ valEl.textContent = '0.00'; unitEl.textContent = 'mA'; return; }
+    const mA = Math.abs(readingToVolts(nearRed.reading) - readingToVolts(nearBlk.reading)) / totalR * 1000;
     valEl.textContent = mA.toFixed(1);
     unitEl.textContent = `mA (${tr('mm.estimated')})`;
   }
@@ -7832,6 +8194,10 @@ function toggleSimulation(){
       animationFrameId = null;
     }
 
+    // 디버거(Ver 0.992): 시뮬레이션을 멈추면, 그 순간 브레이크포인트에 걸려 일시정지 중이던
+    // 보드가 있어도 무한 대기 상태로 남지 않도록 전부 재개시키고 디버그 바도 함께 숨깁니다.
+    new Set(['r4', 'r3', ...Object.keys(boardInstances)]).forEach(k => debugStopAll(k));
+
     // 시뮬레이션을 멈추면 "전원이 실제로 끊긴 것"과 같은 상태로 되돌리기 위해, 사용자가 켜둔
     // 전원류 스위치/토글(PSU, 220V 콘센트, 벤치 전원, 무선 AP, 블루투스, 토글 스위치 등 —
     // id가 "_switch"/"_toggle"로 끝나는 모든 요소, restoreComponentSwitches()가 저장/복원할 때
@@ -7840,8 +8206,12 @@ function toggleSimulation(){
     // 일어나지 않으므로 그대로 켜진 채 남습니다(실제 건전지와 같은 동작).
     document.querySelectorAll('[id$="_switch"].on, [id$="_toggle"].on').forEach(el => el.click());
 
-    document.querySelectorAll('.led-dome, .onboard-led').forEach(el => { el.classList.remove('on'); el.style.boxShadow=''; el.style.background=''; el.style.transform=''; });
+    document.querySelectorAll('.onboard-led').forEach(el => { el.classList.remove('on'); el.style.boxShadow=''; el.style.background=''; el.style.transform=''; });
+    // led-dome은 무작정 인라인 스타일을 비우면(CSS 기본값이 빨강 계열이라) 사용자가 골라둔
+    // 색상을 잃어버리므로, 선택된 색의 "꺼짐" 색으로 다시 칠합니다.
+    document.querySelectorAll('.comp-led').forEach(applyLedOffAppearance);
     document.querySelectorAll('.led-val').forEach(el => { el.textContent = '0%'; });
+    document.querySelectorAll('.led-cur').forEach(el => { el.textContent = ''; el.style.color = ''; });
     document.querySelectorAll('.rgb-dome').forEach(el => { el.style.background=''; el.style.boxShadow=''; });
     document.querySelectorAll('.bt-led').forEach(el => el.classList.remove('on'));
     document.querySelectorAll('.comp-wifiap').forEach(ap => {
@@ -7902,6 +8272,32 @@ const LED_COLORS = {
   yellow: { on:['#fffbe0', '#ffd23f', '#b8930f'], off:['#e8d998', '#a8901f', '#4a3d0a'], glow:'255,210,63' },
   white:  { on:['#ffffff', '#f5f5f5', '#c9c9c9'], off:['#e8e8e8', '#b8b8b8', '#7a7a7a'], glow:'255,255,255' },
 };
+
+// 시뮬레이션을 시작하기 전(또는 정지한 뒤)에도, LED 색상 드롭다운에서 고른 색이 돔에 바로
+// 반영되도록 합니다. 실제 물리 틱(위 forEach)은 isSimulating일 때만 도는데, 기존에는 꺼짐 상태
+// 배경이 CSS 기본값(빨강 계열)으로 고정되어 있어 "초록을 골랐는데 시작 전엔 계속 빨갛게 보인다"
+// 는 혼란을 줬습니다. 시뮬레이션 중에는 물리 틱이 매 프레임 다시 그리므로 건드리지 않습니다.
+function applyLedOffAppearance(compEl){
+  if (!compEl || isSimulating) return;
+  const colorSel = compEl.querySelector('.led-color-select');
+  const bulb = compEl.querySelector('.led-dome');
+  if (!colorSel || !bulb) return;
+  const col = LED_COLORS[colorSel.value] || LED_COLORS.red;
+  const [c1, c2, c3] = col.off;
+  bulb.classList.remove('on');
+  bulb.style.background = `radial-gradient(circle at 35% 30%, ${c1}, ${c2} 55%, ${c3})`;
+  bulb.style.boxShadow = '0 2px 4px rgba(0,0,0,.4)';
+  bulb.style.transform = 'scale(1)';
+}
+// LED 색상 select는 부품이 새로 생성될 때도, 저장 파일을 복원할 때(restoreComponentFields가
+// 'change' 이벤트를 직접 dispatch)도 전부 이 한 군데 위임 리스너를 거치므로 별도로 리스너를
+// 붙일 필요가 없습니다.
+document.addEventListener('change', (e) => {
+  const sel = e.target;
+  if (!sel || !sel.classList || !sel.classList.contains('led-color-select')) return;
+  const compEl = sel.closest('.comp-led');
+  if (compEl) applyLedOffAppearance(compEl);
+});
 
 function SCOPE_TYPE_LABEL_FN(){ return { analog:tr('scope.type.analog'), pwm:'PWM', digital:tr('scope.type.digital'), echo:tr('scope.type.echo'), dac:'DAC', volt:tr('scope.type.volt'), ac:tr('scope.type.ac'), current:tr('scope.type.current') }; }
 let SCOPE_TYPE_LABEL = SCOPE_TYPE_LABEL_FN();
@@ -8054,6 +8450,12 @@ function runTick(){
   // 뒤쪽 단계가 이 퓨즈를 거쳐 신호를 읽기 전에 최신이어야 합니다.
   document.querySelectorAll('.comp-fuse').forEach(fuseCheck);
 
+  // 0-7. LED의 순방향/역방향 상태(=지금 틱의 dataset.ohms)도 다이오드와 같은 이유로 먼저
+  // 정해 둡니다 — 저항→LED→저항→LED처럼 LED를 거쳐 더 뒤로 이어지는 직렬 회로에서, 뒤쪽
+  // 단계(전류계/전압계, 그리고 바로 다음 단계의 다른 LED 발광 판정)가 이 LED를 거쳐 신호를
+  // 읽기 전에 최신이어야 합니다.
+  document.querySelectorAll('.comp-led').forEach(ledUpdate);
+
   // 1. 보드 온보드 LED 제어 (배선이 없으면 그 보드 자신의 실행 결과를 그대로 사용) — 보드 전부.
   // 온보드 LED가 물린 핀은 보드 종류마다 다릅니다(Uno 계열은 D13, ESP32 계열은 GPIO2).
   Object.values(boardInstances).forEach(({ key, type, domId }) => {
@@ -8071,10 +8473,15 @@ function runTick(){
     const kPin = led.querySelector('[data-pin$="_K"]');
     const bulb = led.querySelector('.led-dome');
     if (!aPin || !bulb) return;
-    const r = resistiveReading(aPin);
+    // 이 LED 자신이 ledContactEdges()로 저항망에 끼워 넣은 A-K 엣지는 반드시 빼고 읽어야
+    // 합니다 — 안 빼면 자기 캐소드 쪽(예: 바로 GND로 이어진 경우)이 "가장 가까운 신호원"으로
+    // 잡혀버려(자기 참조) 애노드 전압이 GND(0V) 쪽으로 끌려가 항상 꺼진 것처럼 보입니다
+    // (diodeUpdate/ledUpdate와 같은 이유의 자기 참조 제외).
+    const edgesExclSelf = resistiveEdges().filter(e => !(e.legA === aPin && e.legB === kPin));
+    const r = resistiveReading(aPin, edgesExclSelf);
     // 애노드에 전압이 있어도 캐소드가 실제로 GND까지 닫혀 있지 않으면(미연결, 또는 다른 LED의
     // 애노드에만 잘못 이어진 경우 등) 전류가 흐를 수 없으므로 켜지지 않습니다.
-    const lit = !!r && r.v > 0.05 && hasGroundReturnPath(kPin);
+    const lit = !!r && r.v > 0.05 && hasGroundReturnPath(kPin, edgesExclSelf);
     const level = lit ? Math.max(0.12, Math.min(1, r.v)) : 0;
     const colorSel = led.querySelector('.led-color-select');
     const col = LED_COLORS[colorSel ? colorSel.value : 'red'] || LED_COLORS.red;
@@ -8087,6 +8494,25 @@ function runTick(){
     bulb.style.transform = `scale(${lit ? (1 + level * 0.22).toFixed(2) : 1})`;
     const valEl = led.querySelector('.led-val');
     if (valEl) valEl.textContent = lit ? `${Math.round(level * 100)}% · ${readingToVolts(r).toFixed(1)}V` : '0%';
+    // [Ver 0.993b] 정격(LED_RATED_MA) 대비 실제 전류 — 전류계(dca)/전구(bulb220)와 같은 방식
+    // (양쪽 다리에서 각자 가장 가까운 신호원까지의 거리를 더해 전체 루프 저항을 구함)으로
+    // 실제 흐르는 전류(mA)를 계산해, 정격을 넘기면(전류제한 저항이 없거나 너무 작은 경우)
+    // 빨강으로, 정격 이내면 파랑으로 표시합니다.
+    const curEl = led.querySelector('.led-cur');
+    if (curEl){
+      const nearA = lit && kPin ? nearestSourceInfo(aPin, edgesExclSelf) : null;
+      const nearK = lit && kPin ? nearestSourceInfo(kPin, edgesExclSelf) : null;
+      if (nearA && nearK){
+        const loopR = nearA.distR + nearK.distR + LED_FORWARD_OHMS;
+        const mA = loopR > 0 ? Math.abs(readingToVolts(nearA.reading) - readingToVolts(nearK.reading)) / loopR * 1000 : 0;
+        const pct = (mA / LED_RATED_MA) * 100;
+        curEl.textContent = `${mA.toFixed(1)}/${LED_RATED_MA}mA (${pct.toFixed(0)}%)`;
+        curEl.style.color = pct >= 100 ? '#ff5c5c' : '#5aa9e6';
+      } else {
+        curEl.textContent = '';
+        curEl.style.color = '';
+      }
+    }
   });
 
   // 3. RGB LED: R/G/B 다리가 각각 연결된 net의 값을 섞어 색을 만듭니다.
@@ -8229,20 +8655,35 @@ function runTick(){
   document.querySelectorAll('.comp-bulb220').forEach(bulb => {
     const lPin = bulb.querySelector('[data-pin$="_L"]');
     const nPin = bulb.querySelector('[data-pin$="_N"]');
-    const lR = lPin ? resistiveReading(lPin) : null;
-    const nR = nPin ? resistiveReading(nPin) : null;
-    const lit = isSimulating && !!lR && lR.type === 'ac' && !!nR;
+    // [Ver 0.993a] 전구 자신이 bulb220ContactEdges()로 저항망에 끼워 넣은 L-N 엣지는 반드시
+    // 빼고 읽어야 합니다 — 안 빼면 N이 실제로는 중성선에 연결되어 있지 않아도, 자기 자신의
+    // 저항 엣지를 거꾸로 거슬러 L(활선)까지 도달해 "N도 신호원에 닿아 있다"고 잘못 판단합니다
+    // (LED/전류계와 같은 이유의 자기 참조 제외).
+    const edgesExclSelf = lPin && nPin ? resistiveEdges().filter(e => !(e.legA === lPin && e.legB === nPin) && !(e.legA === nPin && e.legB === lPin)) : [];
+    const nearL = lPin ? nearestSourceInfo(lPin, edgesExclSelf) : null;
+    const nearN = nPin ? nearestSourceInfo(nPin, edgesExclSelf) : null;
+    const lit = isSimulating && !!nearL && nearL.reading.type === 'ac' && !!nearN;
+    // 전구 자신의 저항(BULB220_OHMS)까지 더한 것이 전체 루프 저항입니다(전류계 dca 모드와
+    // 같은 방식 — 양쪽 다리에서 각자 가장 가까운 신호원까지의 거리를 더합니다).
+    const loopR = lit ? nearL.distR + nearN.distR + BULB220_OHMS : 0;
+    const mA = lit && loopR > 0 ? Math.abs(readingToVolts(nearL.reading) - readingToVolts(nearN.reading)) / loopR * 1000 : 0;
     const glass = document.getElementById(`${bulb.id}_glass`);
     if (glass) glass.classList.toggle('on', lit);
     const stateEl = document.getElementById(`${bulb.id}_state`);
-    if (stateEl){ stateEl.textContent = tr(lit ? 'lamp.on' : 'lamp.off'); stateEl.dataset.i18n = lit ? 'lamp.on' : 'lamp.off'; }
+    if (stateEl){
+      stateEl.textContent = lit ? `${tr('lamp.on')} · ${mA.toFixed(0)}mA` : tr('lamp.off');
+      if (lit) stateEl.removeAttribute('data-i18n'); else stateEl.dataset.i18n = 'lamp.off';
+    }
   });
   document.querySelectorAll('.comp-ledtube220').forEach(tube => {
     const lPin = tube.querySelector('[data-pin$="_L"]');
     const nPin = tube.querySelector('[data-pin$="_N"]');
-    const lR = lPin ? resistiveReading(lPin) : null;
-    const nR = nPin ? resistiveReading(nPin) : null;
-    const lit = isSimulating && !!lR && lR.type === 'ac' && !!nR;
+    const edgesExclSelfT = lPin && nPin ? resistiveEdges().filter(e => !(e.legA === lPin && e.legB === nPin) && !(e.legA === nPin && e.legB === lPin)) : [];
+    const nearLT = lPin ? nearestSourceInfo(lPin, edgesExclSelfT) : null;
+    const nearNT = nPin ? nearestSourceInfo(nPin, edgesExclSelfT) : null;
+    const lit = isSimulating && !!nearLT && nearLT.reading.type === 'ac' && !!nearNT;
+    const loopRT = lit ? nearLT.distR + nearNT.distR + LEDTUBE220_OHMS : 0;
+    const mAT = lit && loopRT > 0 ? Math.abs(readingToVolts(nearLT.reading) - readingToVolts(nearNT.reading)) / loopRT * 1000 : 0;
     const bar = document.getElementById(`${tube.id}_bar`);
     const colorSel = tube.querySelector('.led-color-select');
     const col = LED_COLORS[colorSel ? colorSel.value : 'white'] || LED_COLORS.white;
@@ -8253,7 +8694,10 @@ function runTick(){
       bar.style.boxShadow = lit ? `0 0 16px 4px rgba(${col.glow},.85)` : '';
     }
     const stateEl = document.getElementById(`${tube.id}_state`);
-    if (stateEl){ stateEl.textContent = tr(lit ? 'lamp.on' : 'lamp.off'); stateEl.dataset.i18n = lit ? 'lamp.on' : 'lamp.off'; }
+    if (stateEl){
+      stateEl.textContent = lit ? `${tr('lamp.on')} · ${mAT.toFixed(0)}mA` : tr('lamp.off');
+      if (lit) stateEl.removeAttribute('data-i18n'); else stateEl.dataset.i18n = 'lamp.off';
+    }
   });
 
   // 5-4. 스텝모터 + A4988 드라이버: STEP 핀의 "상승 엣지"가 들어올 때마다 DIR 방향으로
@@ -8882,6 +9326,11 @@ function buildBoardPopupHTML(key, type){
         ${counterButton}
         ${extraButtons}
       </div>
+      <div class="debug-bar" id="debugBar${KEY}">
+        <span class="debug-status" id="debugStatus${KEY}"></span>
+        <button class="btn ghost debug-btn" onclick="debugContinue('${key}')">${tr('debug.continueBtn')}</button>
+        <button class="btn ghost debug-btn" onclick="debugStepLine('${key}')">${tr('debug.stepBtn')}</button>
+      </div>
       <div class="code-editor-wrap">
       <div class="code-linenumbers" id="lineNum${KEY}">1</div>
       <textarea id="codeEditor${KEY}" class="code-editor" spellcheck="false">${defaultCode}</textarea>
@@ -8893,7 +9342,7 @@ function buildBoardPopupHTML(key, type){
     </div>`;
   document.body.appendChild(div);
   applyI18n(div);
-  initCodeEditor(document.getElementById(`codeEditor${KEY}`), document.getElementById(`lineNum${KEY}`));
+  initCodeEditor(document.getElementById(`codeEditor${KEY}`), document.getElementById(`lineNum${KEY}`), key);
   makePopupDraggable(div);
   return div;
 }
@@ -9015,20 +9464,164 @@ function handleEditorKeydown(e, ta){
     }
   }
 }
-function refreshLineNumbers(ta, gutter){
+/* ============ Ver 0.992: 코드 에디터 디버거 — 실행/일시정지 제어 & UI ============
+   board(예: 'r4','r3_2') -> { breakpoints:Set<줄번호>, paused, pauseResolve, currentLine,
+   currentVars(멈춘 줄에서 캡처한 변수 스냅샷), stepping(한 줄씩 실행 요청), execGen(이 배포의
+   mcu.gen — 재컴파일/정지로 무효화된 옛 실행의 체크포인트가 뒤늦게 멈추지 않도록) }. */
+const debugState = {};
+function dbgStateFor(board){
+  if (!debugState[board]) debugState[board] = {
+    breakpoints: new Set(), paused: false, pauseResolve: null,
+    currentLine: null, currentVars: null, stepping: false, execGen: 0,
+  };
+  return debugState[board];
+}
+// injectDebugCheckpoints()가 setup()/loop()의 각 최상위 줄 앞에 끼워 넣는 실제 실행 함수입니다.
+// 브레이크포인트가 없는 줄이거나 시뮬레이션이 멈춘 상태면 곧바로 돌아와(거의 공짜) 기존 실행
+// 흐름/타이밍에 실질적인 영향이 없습니다.
+async function __dbgCheckpoint(board, line, vars){
+  const st = dbgStateFor(board);
+  if (!isSimulating || st.execGen !== mcuVM[board]?.gen) return; // 옛 실행(재컴파일/정지)은 무시
+  const shouldPause = st.stepping || st.breakpoints.has(line);
+  if (!shouldPause) return;
+  st.stepping = false;
+  st.paused = true;
+  st.currentLine = line;
+  st.currentVars = vars;
+  updateDebugUI(board);
+  await new Promise(resolve => { st.pauseResolve = resolve; });
+  st.paused = false;
+  updateDebugUI(board);
+}
+function debugContinue(board){
+  const st = dbgStateFor(board);
+  if (st.pauseResolve){ const r = st.pauseResolve; st.pauseResolve = null; r(); }
+}
+function debugStepLine(board){
+  const st = dbgStateFor(board);
+  st.stepping = true;
+  debugContinue(board);
+}
+// 시뮬레이션이 멈추거나 보드가 삭제될 때 호출 — 그 순간 일시정지 중이었다면(무한 대기 상태로
+// 남지 않도록) 실행을 재개시키고, 디버그 UI도 함께 정리합니다.
+function debugStopAll(board){
+  const st = debugState[board];
+  if (!st) return;
+  st.stepping = false;
+  if (st.paused) debugContinue(board);
+  st.paused = false;
+  st.currentLine = null;
+  updateDebugUI(board);
+}
+function toggleBreakpointAt(board, lineNo){
+  const st = dbgStateFor(board);
+  if (st.breakpoints.has(lineNo)) st.breakpoints.delete(lineNo);
+  else st.breakpoints.add(lineNo);
+}
+function dbgTr(ko, en){ return (typeof currentLang !== 'undefined' && currentLang === 'en') ? en : ko; }
+function updateDebugUI(board){
+  const KEY = board.toUpperCase();
+  const st = debugState[board];
+  const gutter = document.getElementById(`lineNum${KEY}`);
+  const editor = document.getElementById(`codeEditor${KEY}`);
+  if (gutter && editor) refreshLineNumbers(editor, gutter, board);
+  const bar = document.getElementById(`debugBar${KEY}`);
+  if (!bar) return;
+  const status = document.getElementById(`debugStatus${KEY}`);
+  if (st && st.paused){
+    bar.classList.add('active');
+    if (status) status.textContent = dbgTr(`⏸ ${st.currentLine}번째 줄에서 정지`, `⏸ Paused at line ${st.currentLine}`);
+  } else {
+    bar.classList.remove('active');
+  }
+}
+// 줄 번호 거터를 클릭 가능한 <span> 한 줄씩으로 다시 그립니다 — 브레이크포인트가 찍힌 줄엔
+// 빨간 점(.has-bp), 지금 일시정지된 줄엔 강조 배경(.cur-line)을 붙입니다.
+function refreshLineNumbers(ta, gutter, board){
   if (!ta || !gutter) return;
   const lines = ta.value.split('\n').length;
-  let s = '';
-  for (let i = 1; i <= lines; i++) s += i + '\n';
-  gutter.textContent = s;
+  const st = board ? debugState[board] : null;
+  const curLine = st && st.paused ? st.currentLine : null;
+  let html = '';
+  for (let i = 1; i <= lines; i++){
+    const cls = 'gline' + (st && st.breakpoints.has(i) ? ' has-bp' : '') + (curLine === i ? ' cur-line' : '');
+    html += `<span class="${cls}" data-line="${i}">${i}</span>`;
+  }
+  gutter.innerHTML = html;
   gutter.scrollTop = ta.scrollTop;
 }
-function initCodeEditor(ta, gutter){
+// 코드 에디터는 순수 모노스페이스 폰트(IBM Plex Mono)라서 글자 폭이 항상 일정합니다 — 이 성질을
+// 이용해 마우스 좌표 -> (줄, 칸) 좌표로 정확히 역산할 수 있습니다(진짜 코드 에디터처럼 DOM 텍스트
+// 노드 hit-test를 할 필요 없이, 캔버스로 한 번 측정해 캐싱해 둔 글자 폭만으로 충분합니다).
+let __dbgCharWidthCache = null;
+function dbgCharWidth(ta){
+  if (__dbgCharWidthCache) return __dbgCharWidthCache;
+  const span = document.createElement('span');
+  const cs = getComputedStyle(ta);
+  span.style.cssText = `position:absolute; visibility:hidden; white-space:pre; font-family:${cs.fontFamily}; font-size:${cs.fontSize};`;
+  span.textContent = '0'.repeat(40);
+  document.body.appendChild(span);
+  __dbgCharWidthCache = span.getBoundingClientRect().width / 40 || 8;
+  document.body.removeChild(span);
+  return __dbgCharWidthCache;
+}
+// 멈춘 줄 위에서 변수 이름에 마우스를 올리면 그 변수의(체크포인트에서 캡처된) 값을 작은 창으로
+// 보여주고, 마우스가 벗어나면 사라집니다. — 사용자가 요청한 "브레이크포인트에 걸리면 변수 위에
+// 마우스를 올려 값을 보고, 커서가 사라지면 없어지는" 동작 그대로입니다.
+function attachDebugHover(ta, board){
+  let tooltip = null;
+  const ensureTooltip = () => {
+    if (!tooltip){ tooltip = document.createElement('div'); tooltip.className = 'debug-var-tooltip'; document.body.appendChild(tooltip); }
+    return tooltip;
+  };
+  const hide = () => { if (tooltip) tooltip.style.display = 'none'; };
+  ta.addEventListener('mousemove', (e) => {
+    const st = debugState[board];
+    if (!st || !st.paused || !st.currentVars) { hide(); return; }
+    const cs = getComputedStyle(ta);
+    const padTop = parseFloat(cs.paddingTop) || 0;
+    const padLeft = parseFloat(cs.paddingLeft) || 0;
+    const lineH = parseFloat(cs.lineHeight) || 18;
+    const rect = ta.getBoundingClientRect();
+    const y = (e.clientY - rect.top) + ta.scrollTop - padTop;
+    const x = (e.clientX - rect.left) + ta.scrollLeft - padLeft;
+    const lineIdx = Math.floor(y / lineH);
+    const lines = ta.value.split('\n');
+    if (lineIdx < 0 || lineIdx >= lines.length) { hide(); return; }
+    const lineText = lines[lineIdx];
+    const col = Math.round(x / dbgCharWidth(ta));
+    if (col < 0 || col > lineText.length) { hide(); return; }
+    let s = col, en = col;
+    while (s > 0 && /\w/.test(lineText[s - 1])) s--;
+    while (en < lineText.length && /\w/.test(lineText[en])) en++;
+    const word = lineText.slice(s, en);
+    if (!word || !Object.prototype.hasOwnProperty.call(st.currentVars, word)) { hide(); return; }
+    const tip = ensureTooltip();
+    let valStr;
+    try { const v = st.currentVars[word]; valStr = (typeof v === 'object' && v !== null) ? JSON.stringify(v) : String(v); }
+    catch (_e) { valStr = String(st.currentVars[word]); }
+    tip.textContent = `${word} = ${valStr}`;
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+    tip.style.display = 'block';
+  });
+  ta.addEventListener('mouseleave', hide);
+}
+function initCodeEditor(ta, gutter, board){
   if (!ta) return;
-  refreshLineNumbers(ta, gutter);
-  ta.addEventListener('input', () => refreshLineNumbers(ta, gutter));
+  refreshLineNumbers(ta, gutter, board);
+  ta.addEventListener('input', () => refreshLineNumbers(ta, gutter, board));
   ta.addEventListener('scroll', () => { if (gutter) gutter.scrollTop = ta.scrollTop; });
   ta.addEventListener('keydown', (e) => handleEditorKeydown(e, ta));
+  if (gutter && board){
+    gutter.addEventListener('click', (e) => {
+      const gl = e.target.closest('.gline');
+      if (!gl) return;
+      toggleBreakpointAt(board, parseInt(gl.dataset.line, 10));
+      refreshLineNumbers(ta, gutter, board);
+    });
+    attachDebugHover(ta, board);
+  }
 }
 
 function loadExampleCode(board, type){
@@ -9229,7 +9822,7 @@ function loadExampleCode(board, type){
       ? `#include <TFT_eSPI.h>\n\n// A digital clock showing the current time -- since a simulated MCU has no real-time clock\n// chip or NTP connection, this simulator simplifies it to hourNow()/minuteNow()/secondNow(),\n// which read the actual current time from the computer running the simulator.\nTFT_eSPI tft = TFT_eSPI();\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n}\n\nvoid loop() {\n  int h = hourNow();\n  int m = minuteNow();\n  int s = secondNow();\n\n  tft.fillRect(0, 0, tft.width(), tft.height(), TFT_BLACK);\n  tft.setTextColor(TFT_CYAN);\n  tft.setTextSize(8);\n  tft.setCursor(70, 110);\n  if (h < 10) tft.print("0");\n  tft.print(h);\n  tft.print(":");\n  if (m < 10) tft.print("0");\n  tft.print(m);\n  tft.print(":");\n  if (s < 10) tft.print("0");\n  tft.print(s);\n\n  Serial.print("Current time: ");\n  Serial.print(h);\n  Serial.print(":");\n  Serial.print(m);\n  Serial.print(":");\n  Serial.println(s);\n\n  delay(1000);\n}`
       : `#include <TFT_eSPI.h>\n\n// 현재 시간을 보여주는 디지털 시계 -- 시뮬레이터의 가상 MCU에는 실제 RTC 칩이나 NTP 연결이\n// 없으므로, 이 시뮬레이터에서는 hourNow()/minuteNow()/secondNow()로 단순화해서 시뮬레이터를\n// 실행 중인 컴퓨터의 실제 현재 시각을 그대로 읽어옵니다.\nTFT_eSPI tft = TFT_eSPI();\n\nvoid setup() {\n  Serial.begin(9600);\n  tft.init();\n  tft.fillScreen(TFT_BLACK);\n}\n\nvoid loop() {\n  int h = hourNow();\n  int m = minuteNow();\n  int s = secondNow();\n\n  tft.fillRect(0, 0, tft.width(), tft.height(), TFT_BLACK);\n  tft.setTextColor(TFT_CYAN);\n  tft.setTextSize(8);\n  tft.setCursor(70, 110);\n  if (h < 10) tft.print("0");\n  tft.print(h);\n  tft.print(":");\n  if (m < 10) tft.print("0");\n  tft.print(m);\n  tft.print(":");\n  if (s < 10) tft.print("0");\n  tft.print(s);\n\n  Serial.print("현재 시간: ");\n  Serial.print(h);\n  Serial.print(":");\n  Serial.print(m);\n  Serial.print(":");\n  Serial.println(s);\n\n  delay(1000);\n}`;
   }
-  refreshLineNumbers(editor, document.getElementById(`lineNum${board.toUpperCase()}`));
+  refreshLineNumbers(editor, document.getElementById(`lineNum${board.toUpperCase()}`), board);
   executeCompilerPipeline(board);
 }
 
@@ -10990,7 +11583,7 @@ function restoreProjectState(data){
     const editor = document.getElementById(`codeEditor${newKey.toUpperCase()}`);
     if (editor && b.code){
       editor.value = b.code;
-      refreshLineNumbers(editor, document.getElementById(`lineNum${newKey.toUpperCase()}`));
+      refreshLineNumbers(editor, document.getElementById(`lineNum${newKey.toUpperCase()}`), newKey);
       executeCompilerPipeline(newKey);
     }
     boardDomIdByIndex.push(inst ? inst.domId : null);
@@ -11006,7 +11599,7 @@ function restoreProjectState(data){
     const editor = document.getElementById('codeEditorR4');
     if (editor){
       editor.value = data.baseR4Code;
-      refreshLineNumbers(editor, document.getElementById('lineNumR4'));
+      refreshLineNumbers(editor, document.getElementById('lineNumR4'), 'r4');
       executeCompilerPipeline('r4');
     }
   }
@@ -11066,8 +11659,8 @@ window.addEventListener('DOMContentLoaded', () => {
   applyI18n();
   const nameInput = document.getElementById('projectNameInput');
   if (nameInput) nameInput.value = tr('toolbar.untitledProject');
-  initCodeEditor(document.getElementById('codeEditorR4'), document.getElementById('lineNumR4'));
-  initCodeEditor(document.getElementById('codeEditorR3'), document.getElementById('lineNumR3'));
+  initCodeEditor(document.getElementById('codeEditorR4'), document.getElementById('lineNumR4'), 'r4');
+  initCodeEditor(document.getElementById('codeEditorR3'), document.getElementById('lineNumR3'), 'r3');
   executeCompilerPipeline('r4');
   updateUndoRedoButtons();
 });
