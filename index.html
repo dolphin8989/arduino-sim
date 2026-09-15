@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.991a</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.991b</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1075,7 +1075,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.991a</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.991b</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1690,7 +1690,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.991a", en: "K's Simulator Ver0.991a" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.991b", en: "K's Simulator Ver0.991b" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -2119,6 +2119,9 @@ const STRINGS = {
   "popup.exStepper": { ko: "A4988로 스텝모터 각도 제어", en: "Control a Stepper Motor with A4988" },
   "popup.motorSectionTitle": { ko: "— 모터 예제 —", en: "— Motor Examples —" },
   "popup.galleryHint": { ko: "예제는 오른쪽 🗂 예제 갤러리에서 골라주세요", en: "Pick an example from the 🗂 Example Gallery on the right" },
+  "debug.continueBtn": { ko: "▶ 계속", en: "▶ Continue" },
+  "debug.stepBtn": { ko: "⤵ 한 줄씩", en: "⤵ Step" },
+  "debug.hint": { ko: "줄 번호 왼쪽을 클릭해 브레이크포인트(●)를 켜고 끌 수 있습니다. 멈춘 줄의 변수 위에 마우스를 올리면 값을 볼 수 있습니다.", en: "Click left of a line number to toggle a breakpoint (●). Hover a variable on the paused line to see its value." },
   "popup.exDcMotor": { ko: "DC모터: L298N 드라이버로 방향·속도 제어", en: "DC Motor: Direction & Speed via L298N Driver" },
   "popup.exServo": { ko: "서보모터: 각도 제어", en: "Servo Motor: Angle Control" },
   "popup.exEncoder": { ko: "DC모터+엔코더: 회전 속도(Hz) 피드백", en: "DC Motor+Encoder: Rotation Speed Feedback (Hz)" },
@@ -2160,7 +2163,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.991a", en: "K's Arduino Simulator Ver0.991a" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.991b", en: "K's Arduino Simulator Ver0.991b" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -6742,6 +6745,31 @@ function resistiveBFS(startPinEl, edgesOverride){
   }
   return visited;
 }
+// [긴급 버그 수정] LED의 캐소드(−)가 실제로 GND까지 이어지는지 확인합니다. 지금까지 LED
+// 발광 판정은 애노드(+) 쪽에 전압이 있는지만 봤을 뿐, 캐소드가 진짜로 회로를 닫고 있는지는
+// 전혀 확인하지 않았습니다 — 그래서 예를 들어 LED 두 개의 애노드끼리만 전선으로 이어(둘 다
+// 같은 전원 net을 공유하게 됨) 첫 번째 LED만 캐소드를 GND에 제대로 연결했는데도, 캐소드가
+// 아예 미연결인 두 번째 LED까지 함께 켜져 버리는 문제가 있었습니다(실제 회로라면 캐소드가
+// 뜬 상태이므로 전류가 흐를 수 없어 켜지면 안 됩니다). 이 함수는 pinEl(캐소드)의 net에 GND가
+// 직접 있는지, 없으면 저항/파워케이블을 거쳐서라도 GND에 닿는지까지 확인해 "닫힌 회로"인
+// 경우에만 true를 돌려줍니다.
+function hasGroundReturnPath(pinEl){
+  if (!pinEl) return false;
+  // 보드 GND(GND_D 등, PIN_KIND==='gnd')뿐 아니라 PSU/전지/발전기/다이오드 캐소드 등 부품마다의
+  // "기준(−)" 다리도 전부 role-gnd 클래스가 붙어 있으므로(핀맵 범례와 동일한 규약), 이 둘을
+  // 함께 확인해야 보드 GND가 아닌 부품(PSU 등)으로 돌아가는 회로도 정상적으로 인식됩니다.
+  const isGndPin = (el) => el.dataset && el.dataset.pin && (PIN_KIND[el.dataset.pin] === 'gnd' || el.classList.contains('role-gnd'));
+  // pinEl 자기 자신(예: LED의 캐소드 자신도 "역할"은 role-gnd)은 제외합니다 — "내 캐소드가
+  // GND 역할이다"는 당연한 사실이고, 우리가 확인하려는 건 "그 캐소드가 실제로 다른 진짜
+  // GND(보드 GND, PSU GND 등)까지 이어져 있는가"이기 때문입니다.
+  for (const el of netOf(pinEl)) { if (el !== pinEl && isGndPin(el)) return true; }
+  const visited = resistiveBFS(pinEl);
+  for (const v of visited){
+    if (v.rep === pinEl) continue;
+    for (const el of v.net) { if (isGndPin(el)) return true; }
+  }
+  return false;
+}
 // 어떤 reading이든 "실제 볼트"로 환산합니다. digital/analog/pwm/dac/echo는 이 시뮬레이터 전체에서
 // 0~1이 그 신호의 로직 레벨 전압(reading.logicV — R3/R4는 5V, ESP32는 3.3V, 없으면 기존처럼 5V로
 // 가정)을 나타내는 관례를 따르고, volt/ac 타입은 이미 실제 볼트입니다.
@@ -8040,10 +8068,13 @@ function runTick(){
   // 선택한 색상에 맞춰 돔 색·글로우 색이 실시간으로 바뀝니다.
   document.querySelectorAll('.comp-led').forEach(led => {
     const aPin = led.querySelector('[data-pin$="_A"]');
+    const kPin = led.querySelector('[data-pin$="_K"]');
     const bulb = led.querySelector('.led-dome');
     if (!aPin || !bulb) return;
     const r = resistiveReading(aPin);
-    const lit = !!r && r.v > 0.05;
+    // 애노드에 전압이 있어도 캐소드가 실제로 GND까지 닫혀 있지 않으면(미연결, 또는 다른 LED의
+    // 애노드에만 잘못 이어진 경우 등) 전류가 흐를 수 없으므로 켜지지 않습니다.
+    const lit = !!r && r.v > 0.05 && hasGroundReturnPath(kPin);
     const level = lit ? Math.max(0.12, Math.min(1, r.v)) : 0;
     const colorSel = led.querySelector('.led-color-select');
     const col = LED_COLORS[colorSel ? colorSel.value : 'red'] || LED_COLORS.red;
