@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.99b</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.99c</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -669,6 +669,23 @@
   .comp-relay .comp-pin-row .pin-label{display:block; font-size:.48rem; color:var(--text-faint); margin-top:1px;}
   .comp-relay select.relay-rated-v{width:100%; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; font-size:.62rem; padding:2px; cursor:pointer; margin-bottom:6px;}
 
+  /* ---------- AC 220V 코일 릴레이 (코일 자체가 220V로 직접 여자됨) ---------- */
+  /* relay-title/relay-body/relay-led/relay-armlabel 등은 위 5V 릴레이 모듈과 전역으로 공유합니다. */
+  .comp-relay220{width:126px; padding:10px; display:flex; flex-direction:column; align-items:center; gap:6px; background:linear-gradient(160deg,#2a3648,#161c26); border:1px solid #3a4a5f; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .comp-relay220 .relay-body{margin:2px auto 0;}
+  .comp-relay220 .comp-pin-row{flex-wrap:wrap; gap:5px 7px; justify-content:center;}
+
+  /* ---------- 벽면 조명 스위치 (가정용 로커/패들 스위치 모양) ---------- */
+  .comp-wallswitch{width:96px; padding:12px 10px; background:linear-gradient(160deg,#2a2f37,#1c2026); border:1px solid #454c57; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .wallswitch-title{font-size:.6rem; color:#e8c98a; font-family:'IBM Plex Mono',monospace; margin-bottom:6px; line-height:1.3;}
+  .wallswitch-track{width:40px; height:46px; margin:0 auto 8px; border-radius:5px; background:linear-gradient(160deg,#f4f1e6,#dcd7c4); border:1px solid #b8b297; position:relative; box-shadow:inset 0 0 4px rgba(0,0,0,.25), 0 3px 6px rgba(0,0,0,.3); cursor:pointer;}
+  .wallswitch-track::before, .wallswitch-track::after{content:''; position:absolute; left:50%; width:3px; height:3px; border-radius:50%; background:#8a8368; transform:translateX(-50%);}
+  .wallswitch-track::before{top:4px;} .wallswitch-track::after{bottom:4px;}
+  .wallswitch-paddle{position:absolute; left:5px; right:5px; top:5px; height:18px; border-radius:3px; background:linear-gradient(180deg,#fdfcf7,#e4e0d2); border:1px solid #b8b297; box-shadow:0 2px 3px rgba(0,0,0,.3); transition:transform .15s ease, background .15s ease, box-shadow .15s ease;}
+  .wallswitch-track.on .wallswitch-paddle{transform:translateY(19px); background:linear-gradient(180deg,#fff8e0,#ffe9a3); box-shadow:0 0 8px 2px rgba(255,210,80,.7), 0 2px 3px rgba(0,0,0,.3);}
+  .comp-wallswitch .comp-pin-row{justify-content:center; gap:18px;}
+  .comp-wallswitch .ts-state{margin-bottom:6px;}
+
   /* ---------- 전원 공급 장치 (DC 다전압 / AC 단상·3상) ---------- */
   .comp-psu select.psu-mode, .comp-psu select.psu-dc-volt{
     width:100%; margin-bottom:7px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong);
@@ -847,6 +864,33 @@
   .acmctrl-title{font-size:.62rem; color:#ffd23f; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; line-height:1.35;}
   .comp-acmotorctrl .md-out-row{margin-top:10px; padding-top:8px; border-top:1px dashed #5a4c1a;}
   .comp-acmotorctrl .acmctrl-knob{width:100%; margin-bottom:6px;}
+
+  /* ---------- 220V 부하: 백열전구 / LED 형광등 바 ---------- */
+  .comp-bulb220{width:92px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .bulb220-glass{
+    width:44px; height:50px; border-radius:50% 50% 42% 42%;
+    background:radial-gradient(circle at 35% 28%, #f2ede0, #cfc7ae 60%, #a89a72);
+    border:1px solid #8a7a52; position:relative; box-shadow:0 2px 4px rgba(0,0,0,.4);
+    transition:background .15s ease, box-shadow .15s ease;
+  }
+  .bulb220-glass::after{
+    content:''; position:absolute; left:50%; top:58%; width:2px; height:16px; background:#8a7a52; transform:translateX(-50%);
+  }
+  .bulb220-glass.on{
+    background:radial-gradient(circle at 35% 28%, #fffdf0, #ffe9a3 55%, #f2b23f);
+    box-shadow:0 0 20px 6px rgba(255,200,80,.85);
+  }
+  .bulb220-base{width:22px; height:10px; margin-top:-2px; border-radius:0 0 3px 3px; background:linear-gradient(180deg,#8b93a1,#4a4f58); border:1px solid #2a2e34;}
+  .comp-bulb220 .comp-label{margin-top:2px;}
+
+  .comp-ledtube220{width:150px; display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px; background:var(--bg-panel-2); border:1px solid var(--border-strong); border-radius:9px; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .ledtube220-bar{
+    width:118px; height:20px; border-radius:10px; background:linear-gradient(180deg,#4a4f58,#2a2e34); border:1px solid #1a1c20;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.04); transition:background .15s ease, box-shadow .15s ease;
+  }
+  .ledtube220-bar.on{background:linear-gradient(180deg,#fff,#cfe8ff); box-shadow:0 0 16px 4px rgba(200,230,255,.85);}
+  .comp-ledtube220 .led-color-select{width:118px;}
+  .comp-ledtube220 .comp-label{line-height:1.3;}
 
   /* ---------- 5V ↔ 3.3V 레벨 시프터 ---------- */
   .comp-levelshifter{width:140px; padding:10px; background:linear-gradient(160deg,#1a2e2c,#0d1816); border:1px solid #2f6a5f; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
@@ -1031,7 +1075,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.99b</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.99c</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1190,6 +1234,21 @@
           <div class="palette-item" onclick="spawnComponent('generator')">
             <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:#2c3138;border:2px solid #e8d38a;"></div></div>
             <span data-i18n="palette.generator">손잡이 발전기<br>(전자기유도, DC/AC 선택)</span>
+          </div>
+        </div>
+      </div>
+      <div class="palette-group" data-group="load220">
+        <div class="palette-group-header" onclick="togglePaletteGroup(this)">
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.load220">220V 부하 (조명)</span><span class="pg-count">2</span>
+        </div>
+        <div class="palette-group-body">
+          <div class="palette-item" onclick="spawnComponent('bulb220')">
+            <div class="swatch"><div style="width:18px;height:20px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff6d8,#ffd23f 60%,#c98a20);border:1px solid #8a6a1a;"></div></div>
+            <span data-i18n="palette.bulb220">백열전구<br>(220V AC)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('ledtube220')">
+            <div class="swatch"><div style="width:30px;height:10px;border-radius:5px;background:linear-gradient(180deg,#fff,#cfe8ff);border:1px solid #8fa8c0;box-shadow:0 0 6px 1px rgba(200,230,255,.8);"></div></div>
+            <span data-i18n="palette.ledtube220">LED 형광등 바<br>(컨버터 내장, 색상 선택)</span>
           </div>
         </div>
       </div>
@@ -1358,7 +1417,7 @@
       </div>
       <div class="palette-group" data-group="measure">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.measure">계측 &amp; 신호/스위칭</span><span class="pg-count">5</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.measure">계측 &amp; 신호/스위칭</span><span class="pg-count">7</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('scope')">
@@ -1382,6 +1441,14 @@
           <div class="palette-item" onclick="spawnComponent('relay')">
             <div class="swatch"><div style="width:22px;height:16px;border-radius:3px;background:linear-gradient(180deg,#4a5568,#232a35);border:1px solid #111;"></div></div>
             <span data-i18n="palette.relay">5V 릴레이 모듈<br>(48V DC/220V AC 스위칭)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('relay220')">
+            <div class="swatch"><div style="width:22px;height:16px;border-radius:3px;background:linear-gradient(180deg,#4a5568,#232a35);border:1px solid #111;"></div></div>
+            <span data-i18n="palette.relay220">AC 220V 코일 릴레이<br>(220V 입력으로 직접 여자)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('wallswitch')">
+            <div class="swatch"><div style="width:18px;height:22px;border-radius:3px;background:linear-gradient(160deg,#f4f1e6,#dcd7c4);border:1px solid #b8b297;"></div></div>
+            <span data-i18n="palette.wallswitch">벽면 조명 스위치<br>(가정용 스위치)</span>
           </div>
         </div>
       </div>
@@ -1595,6 +1662,10 @@ const STRINGS = {
   "bom.empty": { ko: "캔버스에 부품이 없습니다.", en: "No components on the canvas." },
   "bom.acmotor": { ko: "단상 AC 모터(220V)", en: "Single-Phase AC Motor (220V)" },
   "bom.acmotorctrl": { ko: "AC 모터 컨트롤러", en: "AC Motor Controller" },
+  "bom.bulb220": { ko: "백열전구(220V)", en: "Incandescent Bulb (220V)" },
+  "bom.ledtube220": { ko: "LED 형광등 바(220V)", en: "LED Tube Light Bar (220V)" },
+  "bom.relay220": { ko: "AC 220V 코일 릴레이", en: "AC 220V Coil Relay" },
+  "bom.wallswitch": { ko: "벽면 조명 스위치", en: "Wall Light Switch" },
   "bom.levelshifter": { ko: "레벨 시프터 (5V↔3.3V)", en: "Logic Level Shifter (5V↔3.3V)" },
   "bom.lcd": { ko: "캐릭터 LCD (16x2)", en: "Character LCD (16x2)" },
   "bom.motordriver": { ko: "모터 드라이버 (L298N)", en: "Motor Driver (L298N)" },
@@ -1619,12 +1690,15 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.99b", en: "K's Simulator Ver0.99b" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.99c", en: "K's Simulator Ver0.99c" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
   "comp.acmotor.label": { ko: "단상 AC 모터(220V)", en: "Single-Phase AC Motor (220V)" },
   "comp.acmotorctrl.title": { ko: "AC 모터 컨트롤러<br>(속도 조절기)", en: "AC Motor Controller<br>(Speed Regulator)" },
+  "comp.bulb220.label": { ko: "백열전구 (220V)", en: "Incandescent Bulb (220V)" },
+  "comp.ledtube220.label": { ko: "LED 형광등 바 (220V, 컨버터 내장)", en: "LED Tube Light Bar (220V, built-in driver)" },
+  "comp.ledtube220.colorSelect": { ko: "형광등 색상 선택", en: "Tube light color" },
   "comp.acCtrlLoutTitle": { ko: "출력 L → 모터", en: "Output L → motor" },
   "comp.acCtrlNoutTitle": { ko: "출력 N → 모터", en: "Output N → motor" },
   "comp.levelshifter.title": { ko: "레벨 시프터<br>(5V ↔ 3.3V)", en: "Logic Level Shifter<br>(5V ↔ 3.3V)" },
@@ -1699,6 +1773,8 @@ const STRINGS = {
   "comp.capacitorE.label": { ko: "전해 커패시터", en: "Electrolytic Cap." },
   "comp.inductor.label": { ko: "인덕터", en: "Inductor" },
   "comp.relay.title": { ko: "릴레이 모듈", en: "Relay Module" },
+  "comp.relay220.title": { ko: "AC 220V 코일 릴레이", en: "AC 220V Coil Relay" },
+  "comp.wallswitch.title": { ko: "벽면 조명 스위치", en: "Wall Light Switch" },
   "comp.toggleswitch.title": { ko: "토글 스위치", en: "Toggle Switch" },
   "comp.toggleswitch.termTitle": { ko: "스위치 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)", en: "Switch terminal (no polarity — pairs with the other terminal)" },
   "switch.on": { ko: "ON (닫힘)", en: "ON (closed)" },
@@ -1939,6 +2015,8 @@ const STRINGS = {
   "motor.forward": { ko: "정방향", en: "Forward" },
   "motor.reverse": { ko: "역방향", en: "Reverse" },
   "motor.stopped": { ko: "정지", en: "Stopped" },
+  "lamp.on": { ko: "켜짐", en: "On" },
+  "lamp.off": { ko: "꺼짐", en: "Off" },
   "palette.addr3": { ko: "Uno R3 보드 추가", en: "Add Uno R3 board" },
   "palette.addmega": { ko: "Mega 2560 보드 추가", en: "Add Mega 2560 board" },
   "palette.addr4": { ko: "Uno R4 WiFi 보드 추가", en: "Add Uno R4 WiFi board" },
@@ -1949,10 +2027,15 @@ const STRINGS = {
   "palette.capacitorE": { ko: "전해 커패시터<br>(극성 있음)", en: "Electrolytic Capacitor<br>(polarized)" },
   "palette.inductor": { ko: "인덕터 (코일)<br>(µH/mH/H)", en: "Inductor (Coil)<br>(µH/mH/H)" },
   "palette.relay": { ko: "5V 릴레이 모듈<br>(48V DC/220V AC 스위칭)", en: "5V Relay Module<br>(switches 48V DC/220V AC)" },
+  "palette.relay220": { ko: "AC 220V 코일 릴레이<br>(220V 입력으로 직접 여자)", en: "AC 220V Coil Relay<br>(coil energized by 220V input)" },
+  "palette.wallswitch": { ko: "벽면 조명 스위치<br>(가정용 스위치)", en: "Wall Light Switch<br>(household style)" },
   "palette.group.boards": { ko: "보드", en: "Boards" },
   "palette.group.io": { ko: "기본 입출력", en: "Basic I/O" },
   "palette.group.passive": { ko: "수동소자", en: "Passive Components" },
   "palette.group.power": { ko: "전원 장치", en: "Power Supplies" },
+  "palette.group.load220": { ko: "220V 부하 (조명)", en: "220V Loads (Lighting)" },
+  "palette.bulb220": { ko: "백열전구<br>(220V AC)", en: "Incandescent Bulb<br>(220V AC)" },
+  "palette.ledtube220": { ko: "LED 형광등 바<br>(컨버터 내장, 색상 선택)", en: "LED Tube Light Bar<br>(built-in driver, color select)" },
   "palette.group.motor": { ko: "모터 & 드라이버", en: "Motors & Drivers" },
   "palette.group.sensor": { ko: "센서", en: "Sensors" },
   "palette.group.comm": { ko: "통신 모듈", en: "Communication Modules" },
@@ -2077,7 +2160,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.99b", en: "K's Arduino Simulator Ver0.99b" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.99c", en: "K's Arduino Simulator Ver0.99c" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -2115,6 +2198,7 @@ const STRINGS = {
   "toast.loadError": { ko: "파일을 불러오지 못했습니다 (올바른 저장 파일이 맞는지 확인해 주세요).", en: "Couldn't load the file (make sure it's a valid save file)." },
   "toast.undo": { ko: "↶ 실행을 취소했습니다.", en: "↶ Undone." },
   "toast.redo": { ko: "↷ 다시 실행했습니다.", en: "↷ Redone." },
+  "toast.fuseBlown": { ko: "⚠ 퓨즈가 끊어졌습니다! 정격 전류를 초과했습니다", en: "⚠ Fuse blown! Rated current exceeded" },
   "wire.colorLabel": { ko: "전선 색상", en: "Wire color" },
   "wire.customLabel": { ko: "직접 선택", en: "Custom" },
   "wire.deleteBtn": { ko: "🗑 전선 삭제", en: "🗑 Delete wire" },
@@ -2161,8 +2245,8 @@ function refreshDynamicI18nText(){
     const angle = parseFloat(el.dataset.angle || '0');
     label.textContent = enabled ? `${(Math.round(angle * 10) / 10)}°` : tr('stepper.idle');
   });
-  document.querySelectorAll('.comp-toggleswitch').forEach(el => {
-    const sw = el.querySelector('.psu-switch');
+  document.querySelectorAll('.comp-toggleswitch, .comp-wallswitch').forEach(el => {
+    const sw = el.querySelector('.psu-switch, .wallswitch-track');
     const label = el.querySelector('[id$="_state"]');
     if (label) label.textContent = (sw && sw.classList.contains('on')) ? tr('switch.on') : tr('switch.off');
   });
@@ -3998,6 +4082,20 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini" data-pin="${id}_T1" data-i18n-title="comp.toggleswitch.termTitle" title="스위치 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)"></div><span class="pin-cap" style="color:var(--text-faint)">T1</span></div>
         <div class="pin-col"><div class="pin-mini" data-pin="${id}_T2" data-i18n-title="comp.toggleswitch.termTitle" title="스위치 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)"></div><span class="pin-cap" style="color:var(--text-faint)">T2</span></div>
       </div>`;
+  } else if (type === 'wallswitch'){
+    // 가정에서 쓰는 벽면 조명 스위치: 전기적으로는 토글 스위치(T1-T2, 극성 무관)와 완전히
+    // 같습니다 — toggleSwitchClick()으로 상태를 바꾸고 toggleSwitchContactEdges()가 T1-T2를
+    // 가상 0Ω(ON)/개방(OFF) 엣지로 변환합니다(그 함수 안에서 .comp-wallswitch도 함께 순회).
+    // 겉모습만 실제 벽스위치처럼 로커/패들 형태로 다르게 그립니다.
+    div.classList.add('comp-wallswitch');
+    div.innerHTML = `
+      <div class="wallswitch-title" data-i18n="comp.wallswitch.title">벽면 조명 스위치</div>
+      <div class="wallswitch-track" id="${id}_switch" onclick="toggleSwitchClick('${id}')"><div class="wallswitch-paddle"></div></div>
+      <div class="ts-state" id="${id}_state" data-i18n="switch.off">OFF (열림)</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_T1" data-i18n-title="comp.toggleswitch.termTitle" title="스위치 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)"></div><span class="pin-cap" style="color:var(--text-faint)">T1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_T2" data-i18n-title="comp.toggleswitch.termTitle" title="스위치 단자 (극성 무관 — 다른 쪽 단자와 짝을 이룹니다)"></div><span class="pin-cap" style="color:var(--text-faint)">T2</span></div>
+      </div>`;
   } else if (type === 'scope'){
     div.classList.add('comp-scope');
     div.innerHTML = `
@@ -4780,6 +4878,30 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-mini" data-pin="${id}_NO" data-i18n-title="relay.noTitle" title="NO (평소 열림)"></div>
         <div class="pin-mini" data-pin="${id}_NC" data-i18n-title="relay.ncTitle" title="NC (평소 닫힘)"></div>
       </div>`;
+  } else if (type === 'relay220'){
+    // AC 220V 코일 릴레이: 5V 릴레이 모듈과 달리 IN/VCC/GND 로직 핀이 아니라 코일 자체가
+    // 220V AC로 직접 여자됩니다(대형 부하용 파워 릴레이/마그네틱 컨택터를 단순화한 것). 코일
+    // 여자 판정은 acmotor/bulb220과 동일한 규약으로 runTick()에서 L/N 핀을 직접 읽어 처리하고,
+    // 접점(COM/NO/NC) 스위칭은 5V 릴레이와 완전히 동일하게 relayContactEdges()가 함께
+    // 처리합니다(그 함수 안에서 .comp-relay220도 함께 순회).
+    div.classList.add('comp-relay220');
+    div.dataset.energized = '0';
+    div.innerHTML = `
+      <div class="relay-title" data-i18n="comp.relay220.title">AC 220V 코일 릴레이</div>
+      <div class="relay-body" id="${id}_body">
+        <div class="relay-led" id="${id}_led"></div>
+        <div class="relay-armlabel" id="${id}_armlabel" data-i18n="relay.deenergized">NC</div>
+      </div>
+      <div class="acm-badge">AC 220V</div>
+      <div class="comp-pin-row">
+        <div class="pin-mini role-vcc" data-pin="${id}_L" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V, 코일 전원)"></div>
+        <div class="pin-mini role-sig" data-pin="${id}_N" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N, 코일 전원)"></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-mini" data-pin="${id}_COM" title="COM"></div>
+        <div class="pin-mini" data-pin="${id}_NO" data-i18n-title="relay.noTitle" title="NO (평소 열림)"></div>
+        <div class="pin-mini" data-pin="${id}_NC" data-i18n-title="relay.ncTitle" title="NC (평소 닫힘)"></div>
+      </div>`;
   } else if (type === 'motor3ph'){
     div.classList.add('comp-motor3ph');
     div.innerHTML = `
@@ -4820,6 +4942,41 @@ function spawnComponent(type, dropX, dropY){
       <div class="comp-pin-row md-out-row">
         <div class="pin-mini role-vcc" data-pin="${id}_LOUT" data-i18n-title="comp.acCtrlLoutTitle" title="출력 L → 모터"></div>
         <div class="pin-mini role-sig" data-pin="${id}_NOUT" data-i18n-title="comp.acCtrlNoutTitle" title="출력 N → 모터"></div>
+      </div>`;
+  } else if (type === 'bulb220'){
+    // 220V 백열전구: acmotor와 동일한 단순화 규약을 따릅니다 — L(활선) 핀이 AC 전원에 물려 있고
+    // N(중성선)이 어딘가에 배선만 되어 있으면 켜진 것으로 봅니다(왓트/저항 기반 정밀 전류 계산은
+    // 하지 않음 — acmotor·motor3ph 등 기존 220V 부하 부품들과 동일한 단순화 수준).
+    div.classList.add('comp-bulb220');
+    div.innerHTML = `
+      <div class="bulb220-glass" id="${id}_glass"></div>
+      <div class="bulb220-base"></div>
+      <div class="acm-badge">AC 220V</div>
+      <div class="comp-label"><span data-i18n="comp.bulb220.label">백열전구 (220V)</span><br><span id="${id}_state" data-i18n="lamp.off">꺼짐</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_L" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V)"></div><span class="pin-cap cap-vcc">L</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_N" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N)"></div><span class="pin-cap" style="color:var(--text-faint)">N</span></div>
+      </div>`;
+  } else if (type === 'ledtube220'){
+    // LED 형광등 바(컨버터 내장): 기존 형광등 자리를 대체하는 LED 조명 기구로, AC-DC 컨버터가
+    // 내장되어 있어 별도 드라이버 부품 없이 L/N에 220V를 바로 연결합니다. bulb220과 동일하게
+    // "L이 AC이고 N이 배선되어 있으면 켜짐"으로 단순화하고, 색상은 LED와 같은 LED_COLORS
+    // 팔레트에서 골라 막대 전체가 그 색으로 은은하게 빛나도록 표시합니다.
+    div.classList.add('comp-ledtube220');
+    div.innerHTML = `
+      <div class="ledtube220-bar" id="${id}_bar"></div>
+      <select class="led-color-select" id="${id}_color" data-i18n-title="comp.ledtube220.colorSelect" title="형광등 색상 선택">
+        <option value="white" selected>White</option>
+        <option value="yellow">Yellow</option>
+        <option value="red">Red</option>
+        <option value="green">Green</option>
+        <option value="blue">Blue</option>
+      </select>
+      <div class="acm-badge">AC 220V</div>
+      <div class="comp-label"><span data-i18n="comp.ledtube220.label">LED 형광등 바 (220V, 컨버터 내장)</span><br><span id="${id}_state" data-i18n="lamp.off">꺼짐</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_L" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V)"></div><span class="pin-cap cap-vcc">L</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_N" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N)"></div><span class="pin-cap" style="color:var(--text-faint)">N</span></div>
       </div>`;
   } else if (type === 'levelshifter'){
     // 5V ↔ 3.3V 레벨 시프터: HV/LV 기준전압 핀에 각각 5V 로직 보드(R3/R4)와 3.3V 로직 보드
@@ -5300,7 +5457,10 @@ function updateRelayVisual(id, energized){
 // 릴레이 접점(COM/NO/NC)을 resistiveEdges()가 인식하는 가상 0Ω/개방 엣지 목록으로 변환합니다.
 function relayContactEdges(){
   const out = [];
-  document.querySelectorAll('.comp-relay').forEach(el => {
+  // 5V 릴레이 모듈과 AC 220V 코일 릴레이는 코일 여자 판정 방식만 다를 뿐(runTick의 0-1/0-1b),
+  // 접점(COM/NO/NC)을 가상 0Ω/개방 엣지로 바꾸는 로직은 완전히 동일하므로 같은 함수에서 함께
+  // 처리합니다.
+  document.querySelectorAll('.comp-relay, .comp-relay220').forEach(el => {
     const energized = el.dataset.energized === '1';
     const com = el.querySelector('[data-pin$="_COM"]');
     const no = el.querySelector('[data-pin$="_NO"]');
@@ -5317,8 +5477,11 @@ function relayContactEdges(){
 // "_switch"로 끝나는 id는 자동으로 이 클래스를 저장/복원해 주므로 별도 처리가 필요 없습니다).
 function toggleSwitchContactEdges(){
   const out = [];
-  document.querySelectorAll('.comp-toggleswitch').forEach(el => {
-    const sw = el.querySelector('.psu-switch');
+  // 벽면 조명 스위치(.comp-wallswitch)는 겉모습(로커/패들)만 다를 뿐 T1-T2를 켜고 끄는 전기적
+  // 동작은 토글 스위치와 완전히 같으므로(둘 다 toggleSwitchClick()으로 켜고, 스위치 손잡이
+  // 요소의 'on' 클래스로 상태를 판정), 같은 함수에서 함께 처리합니다.
+  document.querySelectorAll('.comp-toggleswitch, .comp-wallswitch').forEach(el => {
+    const sw = el.querySelector('.psu-switch, .wallswitch-track');
     if (!sw || !sw.classList.contains('on')) return;
     const t1 = el.querySelector('[data-pin$="_T1"]');
     const t2 = el.querySelector('[data-pin$="_T2"]');
@@ -5841,6 +6004,13 @@ function fuseCheck(el){
   if (Math.abs(mA) > ratedA * 1000){
     el.dataset.blown = '1';
     el.dataset.ohms = String(FUSE_BLOWN_OHMS);
+    // 정격을 처음 초과해 끊어지는 바로 그 순간(이 if 블록은 아직 안 끊어져 있던 퓨즈에서만
+    // 도달하므로 매 틱 중복 호출되지 않음)에만, 실습 중 눈에 띄는 에러로 알려줍니다 — 토스트
+    // 팝업(화면)과 시리얼 모니터(보드가 있다면) 양쪽에 측정 전류/정격을 함께 남깁니다.
+    const measuredA = (Math.abs(mA) / 1000).toFixed(2);
+    const msg = `${tr('toast.fuseBlown')} (${measuredA}A > ${ratedA}A)`;
+    showToast(msg, true);
+    logSerial(`[${tr('comp.fuse.title')}] ${msg}`, 'both');
   }
   updateFuseVisual(el);
 }
@@ -7633,7 +7803,15 @@ function toggleSimulation(){
       cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
     }
-    
+
+    // 시뮬레이션을 멈추면 "전원이 실제로 끊긴 것"과 같은 상태로 되돌리기 위해, 사용자가 켜둔
+    // 전원류 스위치/토글(PSU, 220V 콘센트, 벤치 전원, 무선 AP, 블루투스, 토글 스위치 등 —
+    // id가 "_switch"/"_toggle"로 끝나는 모든 요소, restoreComponentSwitches()가 저장/복원할 때
+    // 쓰는 것과 같은 규약)을 전부 자기 자신의 onclick 로직을 그대로 태워서 끕니다. 코인전지·
+    // 과일전지처럼 원래 끌 수 없는(onclick이 없는) "항상 켜짐" 전원은 클릭해도 아무 일도
+    // 일어나지 않으므로 그대로 켜진 채 남습니다(실제 건전지와 같은 동작).
+    document.querySelectorAll('[id$="_switch"].on, [id$="_toggle"].on').forEach(el => el.click());
+
     document.querySelectorAll('.led-dome, .onboard-led').forEach(el => { el.classList.remove('on'); el.style.boxShadow=''; el.style.background=''; el.style.transform=''; });
     document.querySelectorAll('.led-val').forEach(el => { el.textContent = '0%'; });
     document.querySelectorAll('.rgb-dome').forEach(el => { el.style.background=''; el.style.boxShadow=''; });
@@ -7651,8 +7829,40 @@ function toggleSimulation(){
     });
     document.querySelectorAll('.comp-dcmotor, .comp-dcmotor-enc, .comp-bldcmotor, .comp-motor3ph, .comp-acmotor').forEach(m => driveMotor(m.id, 0, 1));
     document.querySelectorAll('.comp-stepper').forEach(st => driveStepper(st.id, parseFloat(st.dataset.angle || '0'), false, parseFloat(st.dataset.stepCount || '0')));
-    document.querySelectorAll('.comp-relay').forEach(relay => updateRelayVisual(relay.id, false));
+    document.querySelectorAll('.comp-relay, .comp-relay220').forEach(relay => updateRelayVisual(relay.id, false));
     document.querySelectorAll('.comp-multimeter').forEach(mm => updateMultimeter(mm.id));
+    // 220V 백열전구 / LED 형광등 바: 위 전원 자동 off로 인해 다음 틱에서 어차피 꺼지겠지만,
+    // 물리 루프 자체가 멈췄으므로 다음 틱이 오지 않습니다 — 그래서 여기서 바로 꺼진 모습으로
+    // 되돌립니다.
+    document.querySelectorAll('.comp-bulb220').forEach(bulb => {
+      const glass = document.getElementById(`${bulb.id}_glass`);
+      if (glass) glass.classList.remove('on');
+      const st = document.getElementById(`${bulb.id}_state`);
+      if (st){ st.textContent = tr('lamp.off'); st.dataset.i18n = 'lamp.off'; }
+    });
+    document.querySelectorAll('.comp-ledtube220').forEach(tube => {
+      const bar = document.getElementById(`${tube.id}_bar`);
+      if (bar){ bar.classList.remove('on'); bar.style.background = ''; bar.style.boxShadow = ''; }
+      const st = document.getElementById(`${tube.id}_state`);
+      if (st){ st.textContent = tr('lamp.off'); st.dataset.i18n = 'lamp.off'; }
+    });
+    // 손잡이 발전기: 크랭크가 관성으로 계속 도는 도중에 멈췄을 수도 있으므로 회전/전압을 0으로.
+    document.querySelectorAll('.comp-generator').forEach(gen => {
+      gen.dataset.speed = '0';
+      gen.dataset.cranking = '';
+      gen.dataset.angle = '0';
+      gen.querySelector('.psu-switch')?.classList.remove('on');
+      const handle = gen.querySelector('.generator-crank-handle');
+      if (handle) handle.style.transform = 'rotate(0deg)';
+      updateGeneratorReadout(gen);
+    });
+    // 2채널 가변 전원 공급기: 위에서 채널 스위치를 이미 껐으니 표시값도 0으로 되돌립니다.
+    document.querySelectorAll('.comp-benchpsu').forEach(bp => {
+      [1, 2].forEach(ch => {
+        const disp = document.getElementById(`${bp.id}_disp${ch}`);
+        if (disp) disp.textContent = '0.00 V · 0.00 A';
+      });
+    });
     logSerial('--- ' + tr('sim.stoppedTag') + ' ---');
   }
 }
@@ -7753,6 +7963,17 @@ function runTick(){
   // 합니다.
   document.querySelectorAll('.comp-relay').forEach(relay => {
     const energized = relayIsEnergized(relay);
+    updateRelayVisual(relay.id, energized);
+  });
+
+  // 0-1b. AC 220V 코일 릴레이: bulb220/acmotor와 같은 방식으로, 코일 L(활선) 핀이 AC 전원에
+  // 물려 있고 N(중성선)이 배선되어 있으면 여자된 것으로 봅니다.
+  document.querySelectorAll('.comp-relay220').forEach(relay => {
+    const lPin = relay.querySelector('[data-pin$="_L"]');
+    const nPin = relay.querySelector('[data-pin$="_N"]');
+    const lR = lPin ? resistiveReading(lPin) : null;
+    const nR = nPin ? resistiveReading(nPin) : null;
+    const energized = isSimulating && !!lR && lR.type === 'ac' && !!nR;
     updateRelayVisual(relay.id, energized);
   });
 
@@ -7969,6 +8190,39 @@ function runTick(){
       speed = ctrl ? Math.max(0, Math.min(1, parseFloat(ctrl.dataset.speedLevel || '0'))) : 0.85;
     }
     driveMotor(am.id, speed, 1);
+  });
+
+  // 5-3b. 220V 백열전구 / LED 형광등 바: acmotor와 같은 판정 규약(L이 AC 활선, N이 배선만
+  // 되어 있으면 켜짐)을 그대로 재사용합니다. 전구는 항상 따뜻한 백열색으로, LED 형광등 바는
+  // 선택한 색상(led-color-select, LED_COLORS 재사용)으로 빛납니다.
+  document.querySelectorAll('.comp-bulb220').forEach(bulb => {
+    const lPin = bulb.querySelector('[data-pin$="_L"]');
+    const nPin = bulb.querySelector('[data-pin$="_N"]');
+    const lR = lPin ? resistiveReading(lPin) : null;
+    const nR = nPin ? resistiveReading(nPin) : null;
+    const lit = isSimulating && !!lR && lR.type === 'ac' && !!nR;
+    const glass = document.getElementById(`${bulb.id}_glass`);
+    if (glass) glass.classList.toggle('on', lit);
+    const stateEl = document.getElementById(`${bulb.id}_state`);
+    if (stateEl){ stateEl.textContent = tr(lit ? 'lamp.on' : 'lamp.off'); stateEl.dataset.i18n = lit ? 'lamp.on' : 'lamp.off'; }
+  });
+  document.querySelectorAll('.comp-ledtube220').forEach(tube => {
+    const lPin = tube.querySelector('[data-pin$="_L"]');
+    const nPin = tube.querySelector('[data-pin$="_N"]');
+    const lR = lPin ? resistiveReading(lPin) : null;
+    const nR = nPin ? resistiveReading(nPin) : null;
+    const lit = isSimulating && !!lR && lR.type === 'ac' && !!nR;
+    const bar = document.getElementById(`${tube.id}_bar`);
+    const colorSel = tube.querySelector('.led-color-select');
+    const col = LED_COLORS[colorSel ? colorSel.value : 'white'] || LED_COLORS.white;
+    if (bar){
+      const [c1, c2, c3] = lit ? col.on : col.off;
+      bar.classList.toggle('on', lit);
+      bar.style.background = `linear-gradient(180deg, ${c1}, ${c2} 60%, ${c3})`;
+      bar.style.boxShadow = lit ? `0 0 16px 4px rgba(${col.glow},.85)` : '';
+    }
+    const stateEl = document.getElementById(`${tube.id}_state`);
+    if (stateEl){ stateEl.textContent = tr(lit ? 'lamp.on' : 'lamp.off'); stateEl.dataset.i18n = lit ? 'lamp.on' : 'lamp.off'; }
   });
 
   // 5-4. 스텝모터 + A4988 드라이버: STEP 핀의 "상승 엣지"가 들어올 때마다 DIR 방향으로
@@ -8958,11 +9212,12 @@ function BOM_LABELS_FN(){ return {
   lcd: tr('bom.lcd'), oled: tr('bom.oled'),
   resistor: tr('bom.resistor'), powercable: tr('bom.powercable'), motor3ph: tr('comp.motor3ph.label'),
   acmotor: tr('bom.acmotor'), acmotorctrl: tr('bom.acmotorctrl'), levelshifter: tr('bom.levelshifter'),
+  bulb220: tr('bom.bulb220'), ledtube220: tr('bom.ledtube220'),
   bldcmotor: tr('comp.bldcmotor.label'), bldcdriver: tr('bom.bldcdriver'), 'dcmotor-enc': tr('bom.dcmotorenc'),
   stepper: tr('bom.stepper'), a4988: tr('bom.a4988'),
   multimeter: tr('comp.mm.title'),
   capacitor: tr('comp.capacitor.label'), 'capacitor-e': tr('comp.capacitorE.label'), inductor: tr('comp.inductor.label'),
-  relay: tr('comp.relay.title'), benchpsu: tr('bom.benchpsu'),
+  relay: tr('comp.relay.title'), relay220: tr('bom.relay220'), wallswitch: tr('bom.wallswitch'), benchpsu: tr('bom.benchpsu'),
   ac220: tr('bom.ac220'), ac3phase: tr('bom.ac3phase'), generator: tr('bom.generator'),
   coincell: tr('bom.coincell'), fruitbatt: tr('bom.fruitbatt'), oersted: tr('bom.oersted'),
   diode: tr('bom.diode'), transistor: tr('bom.transistor'),
