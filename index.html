@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9915</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9919</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1300,7 +1300,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9915</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9919</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -2002,7 +2002,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9915", en: "K's Simulator Ver0.9915" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9919", en: "K's Simulator Ver0.9919" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -2592,7 +2592,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9915", en: "K's Arduino Simulator Ver0.9915" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9919", en: "K's Arduino Simulator Ver0.9919" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -2601,7 +2601,7 @@ const STRINGS = {
   "schematic.closeBtn": { ko: "닫기", en: "Close" },
   "schematic.empty": { ko: "배선된 보드나 부품이 없습니다. 먼저 회로를 구성해 주세요.", en: "No wired boards or components found. Build a circuit first." },
   "schematic.popupBlocked": { ko: "팝업이 차단되었습니다. 이 사이트의 팝업을 허용해 주세요.", en: "The popup was blocked. Please allow popups for this site." },
-  "schematic.editHint": { ko: "부품 드래그로 이동 · 클릭 후 R키로 회전 · 전선 더블클릭으로 꺾임점 추가", en: "Drag to move · click then press R to rotate · double-click a wire to add a bend point" },
+  "schematic.editHint": { ko: "부품 드래그로 이동 · 클릭 후 R키로 회전 · 전선 더블클릭으로 꺾임점 추가 · 점 더블클릭으로 삭제", en: "Drag to move · click then press R to rotate · double-click a wire to add a bend point · double-click a point to remove it" },
   "toolbar.clearConsole": { ko: "콘솔 지우기", en: "Clear Console" },
   "toolbar.editor": { ko: "코드 에디터 &amp; 컴파일러", en: "Code Editor &amp; Compiler" },
   "toolbar.gallery": { ko: "🗂 예제 갤러리", en: "🗂 Example Gallery" },
@@ -2885,7 +2885,7 @@ const boardInstances = {};
 // 없는 상태(0)로 시작합니다.
 const boardSpawnCount = { r4: 0, r3: 0 };
 
-// [버그 수정 Ver0.9915] 아두이노 String 클래스에는 자바스크립트 문자열에 없는 메서드가 몇 개
+// [버그 수정 Ver0.9917] 아두이노 String 클래스에는 자바스크립트 문자열에 없는 메서드가 몇 개
 // 있습니다(toInt/toFloat/equals/equalsIgnoreCase/c_str). indexOf/substring/trim/replace/
 // startsWith/endsWith/toUpperCase/toLowerCase/charAt/concat은 이름과 동작이 JS 문자열과
 // 그대로 같아서 문제없지만, 이 다섯 개는 JS에 아예 없어서 실제 하드웨어에서는 멀쩡한 코드가
@@ -2967,7 +2967,7 @@ function transpileCppToJs(cppCode) {
   // setFont()가 인자를 무시) 인자 자체를 통째로 비웁니다.
   js = js.replace(/\.setFont\s*\([^)]*\)/g, '.setFont()');
 
-  // [버그 수정 Ver0.9915] 아두이노 String 클래스의 length()는 "함수 호출"이지만(예:
+  // [버그 수정 Ver0.9917] 아두이노 String 클래스의 length()는 "함수 호출"이지만(예:
   // rawData.length() < 5), 자바스크립트 문자열의 length는 함수가 아니라 "속성"이라
   // 그대로 두면 실행 중에 "rawData.length is not a function"으로 멈춥니다. 인자가 없는
   // .length() 호출만 골라 .length로 바꿔 문법을 맞춥니다(다른 .length 관련 오탐 없음 —
@@ -3086,7 +3086,7 @@ function transpileCppToJs(cppCode) {
     if (str.length >= 3 && str[0] === "'" && str[str.length - 1] === "'"){
       const code = charLiteralToCode(str.slice(1, -1));
       if (code !== null){
-        // [버그 수정 Ver0.9915] 위 트레이드오프(모든 작은따옴표 char 리터럴을 무조건 아스키
+        // [버그 수정 Ver0.9917] 위 트레이드오프(모든 작은따옴표 char 리터럴을 무조건 아스키
         // 코드로 바꿈)가 .indexOf(',', fromIndex) 같은 "문자열에서 이 글자를 찾아라" 패턴에서는
         // 정반대로 깨집니다 — rawData.indexOf(44, ...)가 되어버리면 자바스크립트가 44를
         // 문자열 "44"로 취급해 찾다가 못 찾고(-1) 항상 실패합니다(실제로 학생의 CSV 파싱
@@ -4033,7 +4033,7 @@ function deployToMCU(board, rawCode) {
       // 씁니다 — 그 버퍼는 보드 팝업의 "블루투스(SerialBT) 원격 입력" 칸(sendBtRemoteInput())
       // 에서 채워집니다(실제로는 휴대폰의 블루투스 앱이 보낼 데이터를, 이 시뮬레이터에서는
       // 사람이 직접 타이핑해 대신 보내는 것으로 단순화했습니다).
-      // [버그 수정 Ver0.9915] 실제 BluetoothSerial 라이브러리에는 begin/available/read류 말고도
+      // [버그 수정 Ver0.9917] 실제 BluetoothSerial 라이브러리에는 begin/available/read류 말고도
       // setPin/connect/disconnect/hasClient/connected/isReady/end/flush/peek/write 같은 함수가
       // 더 있는데, 지금까지는 이 중 일부만 흉내 내고 있어서 학생이 실제 하드웨어에서는 멀쩡히
       // 돌아가는 코드를 그대로 넣었을 때 "SerialBT.setPin is not a function" 같은 [MCU Runtime
@@ -4779,6 +4779,9 @@ function clearCanvasAll(){
   wires.slice().forEach(w => deleteWire(w)); // 혹시 남아있는 보드-보드 직결 전선까지 마저 정리
   Object.keys(commWireTags).forEach(k => { commWireTags[k] = []; });
   closeWireEditor();
+  // 캔버스를 통째로 비우면 예전 회로도 배치 정보도 더 이상 의미가 없으므로 같이 초기화합니다.
+  // (프로젝트를 불러오는 경우에는 restoreProjectState가 바로 이어서 불러온 회로도로 덮어씁니다.)
+  savedSchematicLayout = null;
 }
 
 // 툴바의 "새 프로젝트 시작" 버튼 — 확인창을 띄운 뒤 캔버스(부품·보드·전선)를 전부 지우고,
@@ -8033,12 +8036,86 @@ function simplifyWireDetourPoints(pts){
   }
   return out;
 }
-function wirePathD(w){
+// 전선끼리 "겹치는" 부분을 계산해 뒤에 만든 전선이 먼저 있던 전선 위로 작게 반원을 그리며
+// 타넘도록 하기 위한, 순수한 선분-선분 교차점 계산입니다. 두 전선이 실제로 같은 핀에서
+// 만나는 경우(진짜 전기적 연결)는 항상 선분의 맨 끝(t=0 또는 t=1)에서 생기므로, EPS만큼
+// 안쪽만 "교차"로 인정해서 연결점이 실수로 타넘기 모양으로 그려지는 일이 없게 합니다.
+function segSegIntersectionPoint(p1, p2, p3, p4){
+  const EPS = 0.02;
+  const rX = p2.x - p1.x, rY = p2.y - p1.y;
+  const sX = p4.x - p3.x, sY = p4.y - p3.y;
+  const denom = rX * sY - rY * sX;
+  if (Math.abs(denom) < 1e-9) return null; // 평행/거의 평행한 선은 교차점이 불안정하므로 건너뜁니다.
+  const qpX = p3.x - p1.x, qpY = p3.y - p1.y;
+  const t = (qpX * sY - qpY * sX) / denom;
+  const u = (qpX * rY - qpY * rX) / denom;
+  if (t <= EPS || t >= 1 - EPS || u <= EPS || u >= 1 - EPS) return null;
+  return { t, x: p1.x + rX * t, y: p1.y + rY * t };
+}
+function routedPtsToD(pts){ return 'M ' + pts.map(p => `${p.x} ${p.y}`).join(' L '); }
+// [교차 타넘기] pts(이 전선의 꺾인 경로)를 그대로 잇되, crossingsBySeg에 적힌 지점마다 짧은
+// 반원(A 명령)을 끼워 넣어 "다른 전선을 타고 넘어가는" 모양으로 그립니다. 반원 반지름은
+// 그 지점 앞뒤로 남은 여유(다음/이전 교차점 또는 구간 끝까지의 거리)를 넘지 않도록 줄여서,
+// 교차점이 촘촘히 몰려 있어도 반원끼리 서로 겹치거나 밖으로 튀어나가지 않게 합니다.
+const WIRE_HOP_RADIUS = 6;
+function routedPtsToDWithHops(pts, crossingsBySeg){
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let si = 0; si < pts.length - 1; si++){
+    const segA = pts[si], segB = pts[si + 1];
+    const hits = (crossingsBySeg.get(si) || []).slice().sort((a, b) => a.t - b.t);
+    if (!hits.length){ d += ` L ${segB.x} ${segB.y}`; continue; }
+    const segLen = Math.hypot(segB.x - segA.x, segB.y - segA.y) || 1;
+    const ux = (segB.x - segA.x) / segLen, uy = (segB.y - segA.y) / segLen;
+    let cursorT = 0;
+    hits.forEach((hit, hi) => {
+      const nextT = hi === hits.length - 1 ? 1 : hits[hi + 1].t;
+      const availBefore = (hit.t - cursorT) * segLen;
+      const availAfter = (nextT - hit.t) * segLen;
+      const hopHalf = Math.min(WIRE_HOP_RADIUS, availBefore * 0.45, availAfter * 0.45);
+      if (hopHalf < 1.5){ cursorT = hit.t; return; } // 여유가 너무 없으면 그냥 직선으로 통과(모양이 깨지는 것보다 낫습니다)
+      const beforeT = hit.t - hopHalf / segLen, afterT = hit.t + hopHalf / segLen;
+      const bx = segA.x + ux * segLen * beforeT, by = segA.y + uy * segLen * beforeT;
+      const ax = segA.x + ux * segLen * afterT, ay = segA.y + uy * segLen * afterT;
+      d += ` L ${bx} ${by} A ${hopHalf} ${hopHalf} 0 0 1 ${ax} ${ay}`;
+      cursorT = afterT;
+    });
+    d += ` L ${segB.x} ${segB.y}`;
+  }
+  return d;
+}
+// 이 전선(routedPts)이 "나중에 만들어진" 전선이라면, 자신보다 먼저 만들어진(= wires 배열에서
+// 앞쪽에 있는) 다른 전선들과의 교차점을 찾아 그 자리마다 타넘기 모양을 넣습니다. 순서를 기준으로
+// 삼는 이유는 사용자가 "새로 만드는 전선이 앞에 있는 선을 타넘게" 해 달라고 요청했기 때문입니다
+// — 매번 다시 그릴 때 어느 쪽이 타넘을지가 바뀌면 오히려 더 헷갈리므로, 만든 순서라는 고정된
+// 기준을 씁니다. 꽂자마자 안 보이게 숨겨지는 브레드보드 plug wire는 애초에 화면에 그려지지
+// 않으므로 서로 검사에서 제외합니다.
+function computeWireRoutedPoints(w){
   const p1 = pinCenter(w.from), p2 = pinCenter(w.to);
   const rawPts = [p1, ...w.points, p2];
   const compA = w.from.closest('.placed-component'), compB = w.to.closest('.placed-component');
-  const routedPts = routeWireAroundComponents(rawPts, [compA, compB].filter(Boolean));
-  return 'M ' + routedPts.map(p => `${p.x} ${p.y}`).join(' L ');
+  return routeWireAroundComponents(rawPts, [compA, compB].filter(Boolean));
+}
+function wirePathD(w){
+  const routedPts = computeWireRoutedPoints(w);
+  if (w.isPlugWire) return routedPtsToD(routedPts); // 화면에 안 보이는 선이라 계산을 아낍니다.
+  const myIdx = wires.indexOf(w);
+  if (myIdx <= 0) return routedPtsToD(routedPts);
+  const crossingsBySeg = new Map();
+  for (let oi = 0; oi < myIdx; oi++){
+    const ow = wires[oi];
+    if (ow.isPlugWire) continue;
+    const oPts = computeWireRoutedPoints(ow);
+    for (let si = 0; si < routedPts.length - 1; si++){
+      for (let sj = 0; sj < oPts.length - 1; sj++){
+        const hit = segSegIntersectionPoint(routedPts[si], routedPts[si + 1], oPts[sj], oPts[sj + 1]);
+        if (!hit) continue;
+        if (!crossingsBySeg.has(si)) crossingsBySeg.set(si, []);
+        crossingsBySeg.get(si).push(hit);
+      }
+    }
+  }
+  if (!crossingsBySeg.size) return routedPtsToD(routedPts);
+  return routedPtsToDWithHops(routedPts, crossingsBySeg);
 }
 let wireNetIdSeq = 0;
 // 전선 한쪽 끝(circle+숫자)의 SVG 배지를 만듭니다. 같은 전선의 양 끝에 같은 번호·같은 색이
@@ -11193,7 +11270,7 @@ function buildBoardPopupHTML(key, type){
     : isEsp32 ? 'Target: ESP32-WROOM-32 (Xtensa LX6 dual-core @ 240MHz)'
     : 'Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)';
   const toolchain = (type === 'r3' || type === 'mega') ? 'AVR-GCC' : isEsp32 ? 'Xtensa-GCC' : 'C/C++ GCC';
-  // [Ver0.9915] 예전엔 여기서 보드 종류별 "빠른 실행" 예제 버튼을 10개 안팎씩 직접 만들어
+  // [Ver0.9917] 예전엔 여기서 보드 종류별 "빠른 실행" 예제 버튼을 10개 안팎씩 직접 만들어
   // 팝업 안에 늘어놓았는데, 정적 R4/R3 팝업(popupR4/popupR3)은 이미 오래전부터 그렇게 안 하고
   // 버튼 하나(컴파일)만 두고 나머지는 오른쪽 예제 갤러리로 안내하고 있었습니다 — 정작 나중에
   // 추가된 Mega/ESP32 계열은 이 정리가 안 되어 있어서 팝업이 훨씬 더 복잡해 보였습니다. 예제
@@ -11903,6 +11980,40 @@ function schematicTextWidth(text, fontSize){
 // 환경이라서, 드래그·회전 같은 편집 기능을 팝업 자체 스크립트로 완전히 새로 구현해야 하기
 // 때문입니다. 그러려면 모델이 DOM 요소 참조(pinEl) 없이 JSON으로 그대로 직렬화 가능해야
 // 하므로, 배선도 절대좌표 대신 {n: 노드 인덱스, p: 그 노드 안에서의 핀 인덱스}로 표현합니다.
+
+// [회로도 배치 저장] 회로도 팝업에서 부품을 옮기거나 회전하거나 배선에 꺾임점을 추가/삭제할
+// 때마다(schematicPopupScriptSource의 syncToOpener()), 그 팝업이 postMessage로 최신 배치를
+// 여기로 보내줍니다. 프로젝트를 저장할 때 이 값을 함께 저장해 두었다가, 나중에 이 회로도를
+// 다시 열 때 자동으로 그대로 복원합니다(정리해 둔 배치가 프로젝트 저장/불러오기 사이에
+// 사라지지 않도록). 회로 구성이 그때와 완전히 같을 때만(부품 종류/이름이 같은 자리일 때만)
+// 안전하게 덮어씌우고, 안 맞으면 그냥 기본 격자 배치로 둡니다 — applySavedSchematicLayout 참고.
+let savedSchematicLayout = null;
+window.addEventListener('message', (e) => {
+  const d = e.data;
+  if (!d || d.type !== 'k-arduino-sim-schematic-layout' || !d.model) return;
+  savedSchematicLayout = d.model;
+});
+// 방금 새로 계산한 회로도 모델(fresh layout) 위에, 저장돼 있던 배치를 "같은 자리(인덱스)에
+// 종류·이름까지 똑같은 노드/배선일 때만" 덮어씁니다 — 그 사이 회로가 바뀌어 인덱스가 어긋나면
+// 조용히 건너뛰어(에러 없이) 그 노드/배선만 기본 배치로 남습니다.
+function applySavedSchematicLayout(model){
+  const saved = savedSchematicLayout;
+  if (!saved || !model) return model;
+  (saved.nodes || []).forEach((sn, i) => {
+    const n = model.nodes[i];
+    if (!n || n.kind !== sn.kind || n.label !== sn.label) return;
+    n.x = sn.x; n.y = sn.y; n.rot = sn.rot || 0;
+  });
+  (saved.wires || []).forEach(sw => {
+    if (!sw.bends || !sw.bends.length) return;
+    const match = model.wires.find(w =>
+      (w.a.n === sw.a.n && w.a.p === sw.a.p && w.b.n === sw.b.n && w.b.p === sw.b.p) ||
+      (w.a.n === sw.b.n && w.a.p === sw.b.p && w.b.n === sw.a.n && w.b.p === sw.a.p)
+    );
+    if (match) match.bends = sw.bends.map(p => ({ x: p.x, y: p.y }));
+  });
+  return model;
+}
 function buildSchematicModel(){
   const wired = schematicWiredPinSet();
   const nodes = [];
@@ -11911,6 +12022,11 @@ function buildSchematicModel(){
 
   const rawItems = [];
   document.querySelectorAll('.placed-component').forEach(el => {
+    // [회로도 표기 규칙] 브레드보드는 실제 부품이 아니라 프로토타이핑용 판일 뿐이라, 표준
+    // 회로도에는 그리지 않습니다 — 브레드보드를 거쳐 연결된 부분은 아래에서 실제 부품 핀끼리
+    // 직접 잇는 가상의 배선으로 대체하고, 그 연결점은 (다른 모든 배선 끝과 마찬가지로) 그냥
+    // 점으로 표시되게 둡니다. 그래서 브레드보드 el 자체는 박스로 그리지 않고 건너뜁니다.
+    if (el.classList.contains('comp-breadboard')) return;
     const pins = schematicPinElsOf(el);
     const kind = schematicKindOf(el);
     let usePins;
@@ -11928,7 +12044,10 @@ function buildSchematicModel(){
   // 그대로 유지합니다(Array#sort는 안정 정렬이므로 동일 우선순위 내 순서가 보존됩니다).
   rawItems.sort((a, b) => (a.isBoard ? 0 : 1) - (b.isBoard ? 0 : 1));
 
-  const MARGIN = 70, GAP_X = 56, GAP_Y = 74, MAX_ROW_W = 1480;
+  // [간격 확대] 부품이 한 줄로 나란히 놓이면 그 사이를 잇는 배선들이 서로 바짝 붙어 거의
+  // 겹쳐 보이는 문제가 있었습니다 — 칸 사이 여백(GAP_X/GAP_Y)을 넉넉히 늘려서 전선이 지나갈
+  // 공간을 확보합니다(그래도 겹치는 자리는 위의 타넘기 렌더링이 보완해 줍니다).
+  const MARGIN = 70, GAP_X = 108, GAP_Y = 96, MAX_ROW_W = 1480;
   let curX = MARGIN, curY = MARGIN, rowH = 0;
 
   rawItems.forEach((it, nodeIdx) => {
@@ -11983,14 +12102,48 @@ function buildSchematicModel(){
 
   const wireList = [];
   wires.forEach(wo => {
+    // isPlugWire(브레드보드 구멍에 꽂혀서 자동 생성된, 화면에도 안 보이는 전선)는 위에서
+    // 브레드보드를 아예 건너뛰었으므로 그 구멍 쪽 끝이 pinIndexOf에 없어 여기서 자연히
+    // 걸러집니다 — 대신 바로 아래에서 같은 버스를 공유하는 "실제 부품 핀"끼리 직접 잇는
+    // 가상의 배선으로 대체해 넣습니다.
     const a = pinIndexOf.get(wo.from), b = pinIndexOf.get(wo.to);
     if (!a || !b) return;
     wireList.push({ a, b, color: wo.color || WIRE_DEFAULT_COLOR, bends: [] });
   });
 
+  // [회로도 표기 규칙] 브레드보드의 버스(같은 세로줄 5칸, 또는 +/− 가로 레일)를 통해서만
+  // 서로 이어져 있던 실제 부품 핀들을, 브레드보드를 대신할 직접 배선으로 이어줍니다. 버스
+  // 하나를 공유하는 핀이 3개 이상이면(예: 여러 부품이 공용 GND 레일에 물린 경우) 캔버스
+  // 배치 순서(왼쪽→오른쪽)대로 사슬처럼 잇기만 해도, 가운데 핀들은 자기 양옆 배선의 끝점
+  // 두 개가 정확히 같은 좌표에 찍혀 "점이 겹쳐" 보이므로 — 브레드보드 없이도 여러 부품이
+  // 한 버스로 묶여 있다는 사실이 자연스럽게 드러납니다.
+  // 구멍에 닿는 전선은 (1) 부품을 브레드보드에 꽂았을 때 자동 생기는 보이지 않는 plug wire와
+  // (2) 사람이 직접 보드/부품 핀에서 브레드보드 구멍까지 그은 일반 전선(예: 5V를 +레일까지
+  // 직접 연결) 두 종류가 모두 있을 수 있으므로, 종류를 가리지 않고 구멍에 닿는 모든 전선의
+  // "반대쪽이 실제 부품 핀인 경우"를 그 구멍의 버스에 모읍니다.
+  const busGroups = new Map(); // busId -> [pinEl, ...] (실제 부품 핀만)
+  wires.forEach(w => {
+    [[w.from, w.to], [w.to, w.from]].forEach(([hole, other]) => {
+      if (!hole || !hole.dataset || !hole.dataset.bus || !hole.classList || !hole.classList.contains('bb-hole')) return;
+      if (!pinIndexOf.has(other)) return;
+      const busId = hole.dataset.bus;
+      if (!busGroups.has(busId)) busGroups.set(busId, []);
+      const arr = busGroups.get(busId);
+      if (!arr.includes(other)) arr.push(other);
+    });
+  });
+  busGroups.forEach(pinsArr => {
+    if (pinsArr.length < 2) return;
+    pinsArr.sort((p1, p2) => nodes[pinIndexOf.get(p1).n].cellX - nodes[pinIndexOf.get(p2).n].cellX);
+    for (let i = 0; i < pinsArr.length - 1; i++){
+      wireList.push({ a: pinIndexOf.get(pinsArr[i]), b: pinIndexOf.get(pinsArr[i + 1]), color: WIRE_DEFAULT_COLOR, bends: [] });
+    }
+  });
+
   const maxRight = Math.max(...nodes.map(n => n.cellRight));
   const maxBottom = Math.max(...nodes.map(n => n.y + n.h + (n.kind === 'box' ? PIN_STUB + 16 : 20)));
-  return { nodes, wires: wireList, width: Math.ceil(Math.max(600, maxRight + MARGIN)), height: Math.ceil(Math.max(400, maxBottom + MARGIN)) };
+  const model = { nodes, wires: wireList, width: Math.ceil(Math.max(600, maxRight + MARGIN)), height: Math.ceil(Math.max(400, maxBottom + MARGIN)) };
+  return applySavedSchematicLayout(model);
 }
 
 // 노드 하나(보드/부품)의 회로 기호(저항 지그재그/코일/커패시터 극판/LED 다이오드) 또는 라벨
@@ -12064,16 +12217,69 @@ function schematicPopupScriptSource(){
     "  if (value) body += '<text x=\"'+cx+'\" y=\"'+(-22)+'\" font-size=\"10\" fill=\"#5ad0e6\" text-anchor=\"middle\" font-family=\"monospace\">'+svgEscP(value)+'</text>';",
     "  return body;",
     "}",
-    "function wirePathPoints(w){",
+    "function wirePathPoints(w, wi){",
     "  var an = MODEL.nodes[w.a.n], bn = MODEL.nodes[w.b.n];",
     "  var a = pinAbs(an, w.a.p), b = pinAbs(bn, w.b.p);",
     "  var pts = [a];",
     "  if (w.bends && w.bends.length){ w.bends.forEach(function(bp){ pts.push({x:bp.x, y:bp.y}); }); }",
-    "  else { var midY = (a.y + b.y) / 2; pts.push({x:a.x, y:midY}); pts.push({x:b.x, y:midY}); }",
+    "  else {",
+    "    // [겹침 완화] 사용자가 아직 꺾임점을 손대지 않은 자동 경로는 항상 a/b의 정중앙 높이로",
+    "    // 지나가서, 부품이 한 줄로 나열된 회로에서는 여러 배선이 한 줄에 완전히 포개져 보였습니다.",
+    "    // 배선 순서를 기준으로 몇 개의 '레인'에 나눠 살짝씩 높이를 어긋나게 해서(시퀀스/래더",
+    "    // 회로도에서 흔히 보이는 형태), 따로 손대지 않아도 기본 모양이 덜 겹치게 합니다.",
+    "    var LANE_STEP = 11, LANE_COUNT = 5;",
+    "    var lane = (typeof wi === 'number') ? (wi % LANE_COUNT) - (LANE_COUNT - 1) / 2 : 0;",
+    "    var midY = (a.y + b.y) / 2 + lane * LANE_STEP;",
+    "    pts.push({x:a.x, y:midY}); pts.push({x:b.x, y:midY});",
+    "  }",
     "  pts.push(b);",
     "  return pts;",
     "}",
     "function pathDFromPoints(pts){ return pts.map(function(p,i){ return (i===0?'M ':'L ') + p.x + ',' + p.y; }).join(' '); }",
+    "// [교차 타넘기] 배선끼리 화면에서 겹쳐 지나가면 연결된 것처럼 보여 헷갈리므로, 나중에",
+    "// 배열에 들어간(= 뒤에 그려지는) 전선이 앞선 전선과 만나는 자리마다 작은 반원을 넣어",
+    "// '타고 넘어가는' 모양으로 그립니다. 실제 핀에서 만나는 지점(t가 0/1 근처)은 EPS로 제외해",
+    "// 진짜 연결점(점으로 표시됨)이 타넘기로 잘못 그려지지 않게 합니다.",
+    "function segSegIntersectionPointSch(p1, p2, p3, p4){",
+    "  var EPS = 0.02;",
+    "  var rX = p2.x - p1.x, rY = p2.y - p1.y;",
+    "  var sX = p4.x - p3.x, sY = p4.y - p3.y;",
+    "  var denom = rX * sY - rY * sX;",
+    "  if (Math.abs(denom) < 1e-9) return null;",
+    "  var qpX = p3.x - p1.x, qpY = p3.y - p1.y;",
+    "  var t = (qpX * sY - qpY * sX) / denom;",
+    "  var u = (qpX * rY - qpY * rX) / denom;",
+    "  if (t <= EPS || t >= 1 - EPS || u <= EPS || u >= 1 - EPS) return null;",
+    "  return { t: t, x: p1.x + rX * t, y: p1.y + rY * t };",
+    "}",
+    "var WIRE_HOP_RADIUS_SCH = 6;",
+    "function pathDFromPointsWithHops(pts, crossingsBySeg){",
+    "  if (!crossingsBySeg || !crossingsBySeg.size) return pathDFromPoints(pts);",
+    "  var d = 'M ' + pts[0].x + ',' + pts[0].y;",
+    "  for (var si = 0; si < pts.length - 1; si++){",
+    "    var segA = pts[si], segB = pts[si+1];",
+    "    var hits = (crossingsBySeg.get(si) || []).slice().sort(function(a,b){ return a.t - b.t; });",
+    "    if (!hits.length){ d += ' L ' + segB.x + ',' + segB.y; continue; }",
+    "    var segLen = Math.hypot(segB.x-segA.x, segB.y-segA.y) || 1;",
+    "    var ux = (segB.x-segA.x)/segLen, uy = (segB.y-segA.y)/segLen;",
+    "    var cursorT = 0;",
+    "    for (var hi = 0; hi < hits.length; hi++){",
+    "      var hit = hits[hi];",
+    "      var nextT = hi === hits.length-1 ? 1 : hits[hi+1].t;",
+    "      var availBefore = (hit.t - cursorT) * segLen;",
+    "      var availAfter = (nextT - hit.t) * segLen;",
+    "      var hopHalf = Math.min(WIRE_HOP_RADIUS_SCH, availBefore * 0.45, availAfter * 0.45);",
+    "      if (hopHalf < 1.5){ cursorT = hit.t; continue; }",
+    "      var beforeT = hit.t - hopHalf/segLen, afterT = hit.t + hopHalf/segLen;",
+    "      var bx = segA.x + ux*segLen*beforeT, by = segA.y + uy*segLen*beforeT;",
+    "      var ax = segA.x + ux*segLen*afterT, ay = segA.y + uy*segLen*afterT;",
+    "      d += ' L ' + bx + ',' + by + ' A ' + hopHalf + ' ' + hopHalf + ' 0 0 1 ' + ax + ',' + ay;",
+    "      cursorT = afterT;",
+    "    }",
+    "    d += ' L ' + segB.x + ',' + segB.y;",
+    "  }",
+    "  return d;",
+    "}",
     "function distToSegment(p, v, w2){",
     "  var l2 = Math.pow(w2.x-v.x,2) + Math.pow(w2.y-v.y,2);",
     "  if (l2 === 0) return Math.hypot(p.x-v.x, p.y-v.y);",
@@ -12108,9 +12314,22 @@ function schematicPopupScriptSource(){
     "  clearSvg();",
     "  var bgRect = el('rect', {x:0,y:0,width:MODEL.width,height:MODEL.height,fill:'#0b0e12'});",
     "  svgRoot.appendChild(bgRect);",
+    "  var allWirePts = MODEL.wires.map(function(w, wi){ return wirePathPoints(w, wi); });",
     "  MODEL.wires.forEach(function(w, wi){",
-    "    var pts = wirePathPoints(w);",
-    "    var d = pathDFromPoints(pts);",
+    "    var pts = allWirePts[wi];",
+    "    var crossingsBySeg = new Map();",
+    "    for (var oi = 0; oi < wi; oi++){",
+    "      var oPts = allWirePts[oi];",
+    "      for (var si = 0; si < pts.length - 1; si++){",
+    "        for (var sj = 0; sj < oPts.length - 1; sj++){",
+    "          var xhit = segSegIntersectionPointSch(pts[si], pts[si+1], oPts[sj], oPts[sj+1]);",
+    "          if (!xhit) continue;",
+    "          if (!crossingsBySeg.has(si)) crossingsBySeg.set(si, []);",
+    "          crossingsBySeg.get(si).push(xhit);",
+    "        }",
+    "      }",
+    "    }",
+    "    var d = crossingsBySeg.size ? pathDFromPointsWithHops(pts, crossingsBySeg) : pathDFromPoints(pts);",
     "    var hit = el('path', {d:d, fill:'none', stroke:'transparent', 'stroke-width':'12', 'pointer-events':'stroke', class:'sch-wire', 'data-wire-idx':wi});",
     "    svgRoot.appendChild(hit);",
     "    var path = el('path', {d:d, fill:'none', stroke:w.color, 'stroke-width':'2', class:'sch-wire', 'data-wire-idx':wi, 'pointer-events':'none'});",
@@ -12133,7 +12352,7 @@ function schematicPopupScriptSource(){
     "  // 부품을 모두 그린 뒤 마지막에 한 번 더 그립니다.",
     "  MODEL.wires.forEach(function(w, wi){",
     "    (w.bends||[]).forEach(function(bp, bi){",
-    "      svgRoot.appendChild(el('rect', {x:bp.x-5, y:bp.y-5, width:10, height:10, class:'sch-bend', 'data-wire-idx':wi, 'data-bend-idx':bi}));",
+    "      svgRoot.appendChild(el('circle', {cx:bp.x, cy:bp.y, r:5, class:'sch-bend', 'data-wire-idx':wi, 'data-bend-idx':bi}));",
     "    });",
     "  });",
     "  fitCanvasToContent(bgRect);",
@@ -12152,12 +12371,20 @@ function schematicPopupScriptSource(){
     "function addBendPoint(wireIdx, e){",
     "  var w = MODEL.wires[wireIdx];",
     "  var pt = getSvgPoint(e);",
-    "  var pts = wirePathPoints(w);",
-    "  if (!w.bends || !w.bends.length){ w.bends = pts.slice(1, pts.length-1).map(function(p){ return {x:p.x, y:p.y}; }); pts = wirePathPoints(w); }",
+    "  var pts = wirePathPoints(w, wireIdx);",
+    "  if (!w.bends || !w.bends.length){ w.bends = pts.slice(1, pts.length-1).map(function(p){ return {x:p.x, y:p.y}; }); pts = wirePathPoints(w, wireIdx); }",
     "  var bestSeg = 0, bestDist = Infinity;",
     "  for (var i=0;i<pts.length-1;i++){ var d = distToSegment(pt, pts[i], pts[i+1]); if (d < bestDist){ bestDist = d; bestSeg = i; } }",
     "  w.bends.splice(bestSeg, 0, { x: pt.x, y: pt.y });",
     "  renderAll();",
+    "  syncToOpener();",
+    "}",
+    "function removeBendPoint(wireIdx, bendIdx){",
+    "  var w = MODEL.wires[wireIdx];",
+    "  if (!w.bends) return;",
+    "  w.bends.splice(bendIdx, 1);",
+    "  renderAll();",
+    "  syncToOpener();",
     "}",
     "svgRoot.addEventListener('mousedown', function(e){",
     "  var t = e.target;",
@@ -12180,6 +12407,8 @@ function schematicPopupScriptSource(){
     "});",
     "svgRoot.addEventListener('dblclick', function(e){",
     "  var t = e.target;",
+    "  var bendEl = t.closest ? t.closest('.sch-bend') : null;",
+    "  if (bendEl){ removeBendPoint(parseInt(bendEl.getAttribute('data-wire-idx'),10), parseInt(bendEl.getAttribute('data-bend-idx'),10)); return; }",
     "  var wireEl = t.closest ? t.closest('.sch-wire') : null;",
     "  if (!wireEl) return;",
     "  addBendPoint(parseInt(wireEl.getAttribute('data-wire-idx'),10), e);",
@@ -12198,7 +12427,21 @@ function schematicPopupScriptSource(){
     "    renderAll();",
     "  }",
     "});",
-    "document.addEventListener('mouseup', function(){ dragNode = null; dragBend = null; });",
+    "// [저장 연동] 부품을 옮기거나 회전하거나 배선 꺾임점을 손댈 때마다, 지금 배치를 opener",
+    "// 창(메인 시뮬레이터)에 postMessage로 보내둡니다 — window.opener는 file:// 환경에서 팝업이",
+    "// 별도의(origin이 다른 것처럼 취급되는) 실행 환경이라 직접 함수 호출/DOM 접근은 안 되지만,",
+    "// postMessage는 origin이 달라도 항상 쓸 수 있어 이 팝업을 계속 '자기완결형'으로 유지하면서도",
+    "// 메인 창에는 최신 배치를 알려줄 수 있습니다. 메인 창은 이 배치를 기억해 두었다가 프로젝트",
+    "// 저장(JSON)에 함께 담고, 나중에 다시 이 회로도를 열 때 그대로 되살립니다.",
+    "function syncToOpener(){",
+    "  if (!window.opener) return;",
+    "  try { window.opener.postMessage({ type: 'k-arduino-sim-schematic-layout', model: MODEL }, '*'); } catch (e) {}",
+    "}",
+    "document.addEventListener('mouseup', function(){",
+    "  var wasDragging = !!(dragNode || dragBend);",
+    "  dragNode = null; dragBend = null;",
+    "  if (wasDragging) syncToOpener();",
+    "});",
     "document.addEventListener('keydown', function(e){",
     "  if (e.key.toLowerCase() !== 'r' || e.ctrlKey || e.metaKey || e.altKey) return;",
     "  if (selectedNodeIdx < 0) return;",
@@ -12208,8 +12451,10 @@ function schematicPopupScriptSource(){
     "  var node = MODEL.nodes[selectedNodeIdx];",
     "  node.rot = ((node.rot||0) + 90) % 360;",
     "  renderAll();",
+    "  syncToOpener();",
     "});",
     "renderAll();",
+    "syncToOpener();",
   ].join('\n');
 }
 
@@ -12245,6 +12490,7 @@ function openSchematicView(){
   .sch-node{cursor:move;}
   .sch-node.selected{cursor:move;}
   .sch-bend{fill:#ffd23f;stroke:#0b0e12;stroke-width:1;cursor:grab;}
+  .sch-bend:hover{fill:#fff;}
   .sch-bend:active{cursor:grabbing;}
   .sch-wire{cursor:pointer;}
 </style></head>
@@ -13482,6 +13728,9 @@ function serializeProject(){
     app: 'k-arduino-sim', version: 2, savedAt: new Date().toISOString(), lang: currentLang,
     projectName, bgColor: canvasBgColor,
     boards, components, wires: wireList,
+    // [회로도 배치 저장] "📐 회로도 그리기" 팝업에서 옮기거나 회전하거나 꺾어 정리해 둔 모습을
+    // 함께 저장합니다 — 없으면(회로도를 한 번도 연 적 없으면) null.
+    schematic: savedSchematicLayout || null,
   };
 }
 
@@ -13535,6 +13784,7 @@ function saveProjectToFile(){
 
 function restoreProjectState(data){
   clearCanvasAll();
+  savedSchematicLayout = data.schematic || null;
   if (data.lang && data.lang !== currentLang) setLanguage(data.lang);
   const nameInput = document.getElementById('projectNameInput');
   if (nameInput) nameInput.value = data.projectName || tr('toolbar.untitledProject');
