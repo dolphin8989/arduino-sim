@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver2026.09.15c</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9906</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -208,6 +208,32 @@
   }
   .wire-editor .we-del:hover{background:#3a1a17;}
 
+  /* [신기능] 보드를 뺀 모든 부품 오른쪽 위에 붙는 작은 "?" 도움말 버튼과, 눌렀을 때 뜨는
+     연결 설명 팝업 — "어디를 연결해서 어떻게 동작되는지 알 수가 없다"는 요청에 따라, 각 핀의
+     실제 역할(이미 hover 툴팁으로 갖고 있던 title 텍스트)을 클릭 한 번으로 볼 수 있게 합니다. */
+  .comp-help-btn{
+    position:absolute; top:-7px; right:-7px; width:17px; height:17px; border-radius:50%;
+    background:var(--amber); color:#1a1206; border:1px solid rgba(0,0,0,.35);
+    font-family:'IBM Plex Mono',monospace; font-size:.62rem; font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:6;
+    box-shadow:0 1px 4px rgba(0,0,0,.5); padding:0;
+  }
+  .comp-help-btn:hover{filter:brightness(1.12); transform:scale(1.08);}
+  .comp-help-btn.active{background:var(--teal-strong);}
+  .comp-help-popup{
+    position:fixed; z-index:210; width:238px; max-height:320px; overflow-y:auto;
+    background:linear-gradient(160deg,#232830,#171b21); border:1px solid var(--border-strong);
+    border-radius:10px; padding:10px 11px; box-shadow:0 14px 30px rgba(0,0,0,.55);
+    font-family:'Pretendard','Noto Sans KR',sans-serif;
+  }
+  .comp-help-popup .chp-title{font-size:.8rem; font-weight:700; color:var(--text); margin-bottom:5px;}
+  .comp-help-popup .chp-blurb{font-size:.66rem; color:var(--text-dim); line-height:1.4; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--border);}
+  .comp-help-popup .chp-row{display:flex; align-items:flex-start; gap:6px; margin-bottom:6px;}
+  .comp-help-popup .chp-dot{width:9px; height:9px; border-radius:50%; margin-top:3px; flex:none; border:1px solid rgba(0,0,0,.4);}
+  .comp-help-popup .chp-label{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:700; color:var(--text); min-width:34px;}
+  .comp-help-popup .chp-desc{font-size:.66rem; color:var(--text-dim); line-height:1.35; flex:1;}
+  .comp-help-popup .chp-empty{font-size:.66rem; color:var(--text-faint);}
+
   /* 저장/불러오기 결과 등을 짧게 알려주는 토스트 메시지 */
   .toast{
     position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(8px);
@@ -357,8 +383,15 @@
     transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
   }
   .led-dome.on{box-shadow:0 0 16px 4px rgba(255,80,40,.85);}
-  .led-val{font-family:'IBM Plex Mono',monospace; font-size:.56rem; color:var(--teal-strong); min-height:1em;}
-  .led-cur{font-family:'IBM Plex Mono',monospace; font-size:.54rem; min-height:1em; text-align:center; line-height:1.25;}
+  /* [버그 수정] min-height는 "최소" 높이만 보장할 뿐이라, 꺼져 있을 때("0%", 빈 문자열)와
+     켜져서 값이 길어졌을 때("41% · 5.0V", "15.6/20mA (78%)")의 실제 줄 수가 달라지면 이 두
+     글자 상자의 실제 높이가 달라지고, 그 아래 핀 줄(.comp-pin-row)이 그만큼 위아래로 밀려서
+     시뮬레이션 실행 중 브레드보드 구멍과 다리 위치가 어긋나 보이는 문제가 있었습니다. 항상
+     같은 위치를 지키도록 min-height 대신 "내용과 무관하게 고정된" height로 바꾸고(최대 2줄
+     분량으로 넉넉히 잡음), overflow:hidden으로 혹시 더 길어져도 상자 밖으로 새어나가 레이아웃을
+     밀지 않게 막았습니다.*/
+  .led-val{font-family:'IBM Plex Mono',monospace; font-size:.56rem; color:var(--teal-strong); height:2.3em; line-height:1.15; overflow:hidden;}
+  .led-cur{font-family:'IBM Plex Mono',monospace; font-size:.54rem; height:2.5em; text-align:center; line-height:1.25; overflow:hidden;}
   .led-color-select{
     width:100%; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px;
     font-size:.58rem; padding:1px 2px; cursor:pointer; font-family:'IBM Plex Mono',monospace;
@@ -965,6 +998,19 @@
   .pin-mini.mm-probe-red{border-color:#ff3b3b;}
   .pin-mini.mm-probe-blk{border-color:#6b7684; background:#1a1a1a;}
 
+  /* ---------- AC 클램프미터(후크미터, 비접촉식) ---------- */
+  .comp-clampmeter{width:138px; padding:10px 10px 11px; background:linear-gradient(160deg,#3a2f1c,#231a0f); border:1px solid #5f4a28; border-radius:12px; text-align:center; box-shadow:0 8px 18px rgba(0,0,0,.4);}
+  .cm-title{font-size:.58rem; color:#e6c98a; font-family:'IBM Plex Mono',monospace; margin-bottom:6px; letter-spacing:.02em; line-height:1.3;}
+  .cm-jaw{width:52px; height:46px; margin:0 auto 6px;}
+  .cm-jaw svg{width:100%; height:100%; display:block;}
+  .cm-screen{background:#20180d; border-radius:4px; padding:6px 6px; margin-bottom:6px; display:flex; align-items:baseline; justify-content:center; gap:5px; box-shadow:inset 0 2px 4px rgba(0,0,0,.5); min-height:1.3em;}
+  .cm-screen .cm-value{font-family:'IBM Plex Mono',monospace; font-size:.95rem; font-weight:700; color:#ffce54; letter-spacing:.01em;}
+  .cm-unit{font-family:'IBM Plex Mono',monospace; font-size:.54rem; color:#c99a4a;}
+  .comp-clampmeter.cm-dc-warn .cm-screen{box-shadow:inset 0 2px 4px rgba(0,0,0,.5), 0 0 0 1px #ff5c5c;}
+  .comp-clampmeter.cm-dc-warn .cm-value, .comp-clampmeter.cm-dc-warn .cm-unit{color:#ff8a7a;}
+  .cm-hint{font-size:.55rem; color:#a68a5c; line-height:1.3; margin-bottom:7px;}
+  .pin-mini.cm-probe{border-color:#e6c98a;}
+
   /* ---------- Character LCD (16x2) ---------- */
   .comp-lcd{width:200px; padding:10px; background:linear-gradient(160deg,#2a3038,#181c22); border:1px solid var(--border-strong); border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
   .lcd-title{font-size:.6rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:6px;}
@@ -1109,6 +1155,11 @@
     display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; letter-spacing:.5px;}
   .serial-logs{flex:1; padding:8px 14px; font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:#63e07a;
     overflow-y:auto; white-space:pre-wrap; background:#07090c;}
+  /* [신기능] ESP32 내장 블루투스(SerialBT) 원격 입력 — 휴대폰 앱이 보낼 문자를 사람이 대신 타이핑해 보냅니다 */
+  .bt-remote-panel{border-top:1px solid var(--border); flex:0 0 auto; background:var(--bg-panel-2);}
+  .bt-remote-row{display:flex; gap:8px; padding:8px 14px;}
+  .bt-remote-input{flex:1; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px; padding:5px 8px; font-size:.72rem; font-family:'IBM Plex Mono',monospace;}
+  .bt-remote-row .btn{font-size:.68rem; padding:5px 12px;}
   .example-buttons{display:flex; flex-wrap:wrap; gap:8px; margin:10px 14px 0; flex:0 0 auto;}
   .example-buttons .btn{font-size:.72rem; padding:6px 12px;}
   .example-section-label{flex-basis:100%; font-size:.62rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; letter-spacing:.5px; margin:4px 0 -2px;}
@@ -1125,7 +1176,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver2026.09.15c</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9906</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1467,7 +1518,7 @@
       </div>
       <div class="palette-group" data-group="measure">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.measure">계측 &amp; 신호/스위칭</span><span class="pg-count">7</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.measure">계측 &amp; 신호/스위칭</span><span class="pg-count">8</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('scope')">
@@ -1479,6 +1530,10 @@
           <div class="palette-item" onclick="spawnComponent('multimeter')">
             <div class="swatch"><div style="width:24px;height:18px;border-radius:3px;background:linear-gradient(160deg,#3a3f37,#23261f);border:1px solid #4a4f3f;display:flex;align-items:center;justify-content:center;"><div style="width:16px;height:8px;background:#b9c9a4;border-radius:1px;"></div></div></div>
             <span data-i18n="palette.multimeter">디지털 멀티미터</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('clampmeter')">
+            <div class="swatch"><svg width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="20" rx="3" fill="#2c2116"/><path d="M15 4 A8 8 0 1 0 23 12" fill="none" stroke="#e6c98a" stroke-width="2.6" stroke-linecap="round"/><circle cx="15" cy="11" r="1.6" fill="#e6c98a"/></svg></div>
+            <span data-i18n="palette.clampmeter">AC 클램프미터<br>(후크미터)</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('dac')">
             <div class="swatch"><svg width="30" height="20" viewBox="0 0 30 20"><rect width="30" height="20" rx="3" fill="#2c3038"/><path d="M2,16 L10,16 L14,4 L18,16 L28,16" fill="none" stroke="#3ddc84" stroke-width="1.4"/></svg></div>
@@ -1752,7 +1807,7 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver2026.09.15c", en: "K's Simulator Ver2026.09.15c" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9906", en: "K's Simulator Ver0.9906" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -1837,6 +1892,11 @@ const STRINGS = {
   "comp.resistor.label": { ko: "저항", en: "Resistor" },
   "comp.capacitor.label": { ko: "커패시터", en: "Capacitor" },
   "comp.capacitorE.label": { ko: "전해 커패시터", en: "Electrolytic Cap." },
+  "comp.clamp.title": { ko: "AC 클램프미터(후크미터)", en: "AC Clamp Meter (Hook Meter)" },
+  "comp.clamp.hint": { ko: "비접촉식(집게) — 여기선 A/B를 측정할 가지에 직렬로 끼워 표현", en: "Non-contact clamp — here shown as A/B wired in series with the branch" },
+  "comp.clamp.aTitle": { ko: "A (측정할 가지에 직렬로 — 비접촉 클램프를 단순화한 표현)", en: "A (in series with the branch — a simplified stand-in for the non-contact clamp)" },
+  "comp.clamp.bTitle": { ko: "B (측정할 가지의 나머지 쪽으로)", en: "B (to the rest of the branch)" },
+  "comp.clamp.dcWarn": { ko: "DC 감지 안됨", en: "DC not detected" },
   "comp.inductor.label": { ko: "인덕터", en: "Inductor" },
   "comp.relay.title": { ko: "릴레이 모듈", en: "Relay Module" },
   "comp.relay220.title": { ko: "AC 220V 코일 릴레이", en: "AC 220V Coil Relay" },
@@ -1937,6 +1997,8 @@ const STRINGS = {
   "comp.electromagnet.on": { ko: "● 전자석 작동 중", en: "● Magnetized" },
   "bom.electromagnet": { ko: "전자석", en: "Electromagnet" },
   "palette.electromagnet": { ko: "전자석<br>(전류 → 자기장 → 클립 부착)", en: "Electromagnet<br>(current → magnetism → paperclips)" },
+  "comp.help.btnTitle": { ko: "연결 방법 보기", en: "Show wiring help" },
+  "comp.help.noPins": { ko: "연결 핀 정보 없음", en: "No pin info" },
   "comp.fuse.title": { ko: "퓨즈", en: "Fuse" },
   "comp.fuse.ratedLabel": { ko: "정격 전류", en: "Rated current" },
   "comp.fuse.ok": { ko: "● 정상", en: "● OK" },
@@ -2129,6 +2191,7 @@ const STRINGS = {
   "palette.dcmotorenc": { ko: "DC 모터<br>(엔코더 포함)", en: "DC Motor<br>(with encoder)" },
   "palette.lcd": { ko: "캐릭터 LCD<br>(16x2)", en: "Character LCD<br>(16x2)" },
   "palette.ldr": { ko: "조도 센서 (LDR)", en: "Light Sensor (LDR)" },
+  "palette.clampmeter": { ko: "AC 클램프미터<br>(후크미터)", en: "AC Clamp Meter<br>(Hook Meter)" },
   "palette.led": { ko: "LED", en: "LED" },
   "palette.motor3ph": { ko: "3상 유도전동기", en: "3-Phase Induction Motor" },
   "palette.motordriver": { ko: "모터 드라이버<br>(L298N)", en: "Motor Driver<br>(L298N)" },
@@ -2195,6 +2258,9 @@ const STRINGS = {
   "popup.exRs485Motor": { ko: "RS-485 버스 서보모터", en: "RS-485 Bus Servo Motor" },
   "popup.regCycles0": { ko: "레지스터 직접제어(DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)", en: "Direct register control (DDRx/PORTx): <b>0</b> cycles (<b>0.00µs</b>)" },
   "popup.serialHead": { ko: "빌드 콘솔 / 시리얼 모니터", en: "Build Console / Serial Monitor" },
+  "popup.btRemoteHead": { ko: "블루투스(SerialBT) 원격 입력", en: "Bluetooth (SerialBT) Remote Input" },
+  "popup.btRemotePh": { ko: "휴대폰 앱이 보낼 문자를 여기 입력…", en: "Type what the phone app would send…" },
+  "popup.btRemoteSend": { ko: "전송", en: "Send" },
   "psu.dcPlusTitle": { ko: "DC + (선택한 전압)", en: "DC + (selected voltage)" },
   "psu.groundTitle": { ko: "접지 (PE)", en: "Ground (PE)" },
   "psu.hotTitle": { ko: "Hot / 활선 (L, 220V)", en: "Hot / Live (L, 220V)" },
@@ -2229,7 +2295,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver2026.09.15c", en: "K's Arduino Simulator Ver2026.09.15c" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9906", en: "K's Arduino Simulator Ver0.9906" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -2542,7 +2608,9 @@ function transpileCppToJs(cppCode) {
   js = js.replace(/\bLiquidCrystal\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new LiquidCrystal($2);');
   js = js.replace(/\bAdafruit_SSD1306\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new Adafruit_SSD1306($2);');
 
-  const supportedClasses = ['TFT_eSPI', 'Adafruit_ST7789', 'Adafruit_ILI9341', 'Adafruit_ST7735', 'RS485Servo', 'Gyroscope', 'Accelerometer'];
+  // [버그 수정] BluetoothSerial 추가 — 실제 ESP32 블루투스 예제가 거의 전부 쓰는 "BluetoothSerial
+  // SerialBT;" 선언문이 이 화이트리스트에 없어서 컴파일 오류로 이어지던 문제를 고쳤습니다.
+  const supportedClasses = ['TFT_eSPI', 'Adafruit_ST7789', 'Adafruit_ILI9341', 'Adafruit_ST7735', 'RS485Servo', 'Gyroscope', 'Accelerometer', 'BluetoothSerial'];
   supportedClasses.forEach(cls => {
     js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*=\\s*${cls}\\s*\\([^)]*\\)\\s*;`, 'g'), `let $1 = new ${cls}();`);
     js = js.replace(new RegExp(`\\b${cls}\\s+(\\w+)\\s*\\([^)]*\\)\\s*;`, 'g'), `let $1 = new ${cls}();`);
@@ -2612,8 +2680,33 @@ function transpileCppToJs(cppCode) {
   js = js.replace(/\bdelay\s*\(/g, 'await delay(');
   js = js.replace(/\bdelayMicroseconds\s*\(/g, 'await delayMicroseconds(');
 
+  // [버그 수정] C++의 작은따옴표 문자 리터럴('1', '\n' 등)은 실제로는 문자열이 아니라 정수(아스키
+  // 코드) 값입니다 — 그래서 Serial.read()/SerialBT.read()가 돌려주는 정수와 'if (c == \'1\')'
+  // 처럼 직접 비교하는, 시리얼/블루투스 명령 처리에서 아주 흔히 쓰이는 패턴이 지금까지 전혀
+  // 동작하지 않았습니다(위 마스킹 단계에서 작은따옴표 문자열까지 큰따옴표와 똑같이 취급해 그대로
+  // JS 문자열로 복원했기 때문에, 예를 들어 c=49일 때 'c == "1"'이 되어 JS의 느슨한 동등 비교로도
+  // 항상 false만 나왔습니다). 복원 단계에서 작은따옴표로 감싸인, 진짜 C++ char 리터럴(글자 하나
+  // 또는 \n·\t·\0 같은 이스케이프 하나)만 골라 그에 해당하는 아스키 코드 숫자로 바꿔 줍니다
+  // (큰따옴표 문자열은 지금까지처럼 그대로 복원되므로 다른 코드에는 영향이 없습니다).
+  // 트레이드오프: 이 변환은 문맥(비교/대입/출력)을 가리지 않고 모든 작은따옴표 char 리터럴에
+  // 똑같이 적용됩니다 — 그래서 Serial.print('A')처럼 글자를 직접 출력에 넘기는 드문 경우는
+  // (예전엔 "A"라는 글자로 보였지만) 이제 아스키 코드 숫자(65)로 보입니다. 대신 '값 비교'라는,
+  // 시리얼/블루투스 명령 처리 예제에서 압도적으로 더 흔히 쓰이는 패턴이 정상 동작하게 됩니다.
+  const CHAR_ESCAPE_CODES = { n: 10, t: 9, r: 13, '0': 0, '\\': 92, "'": 39, '"': 34, a: 7, b: 8, f: 12, v: 11 };
+  function charLiteralToCode(inner){
+    if (inner.length === 1) return inner.charCodeAt(0);
+    if (inner.length === 2 && inner[0] === '\\' && Object.prototype.hasOwnProperty.call(CHAR_ESCAPE_CODES, inner[1])){
+      return CHAR_ESCAPE_CODES[inner[1]];
+    }
+    return null;
+  }
   strPool.forEach((str, idx) => {
-    js = js.replace(`__STR_TOKEN_${idx}__`, str);
+    let replacement = str;
+    if (str.length >= 3 && str[0] === "'" && str[str.length - 1] === "'"){
+      const code = charLiteralToCode(str.slice(1, -1));
+      if (code !== null) replacement = String(code);
+    }
+    js = js.replace(`__STR_TOKEN_${idx}__`, replacement);
   });
 
   return js;
@@ -3033,6 +3126,7 @@ function deployToMCU(board, rawCode) {
   mcu.oledCursor = { line: 0, col: 0 };
   mcu.ledMatrix = Array.from({length:8}, () => new Array(12).fill(0));
   serialRxBuffer[board] = ''; // 실제 MCU 리셋처럼, 새 펌웨어를 올릴 때 UART 수신 버퍼도 비웁니다.
+  btRxBuffer[board] = ''; // SerialBT(블루투스) 수신 버퍼도 함께 리셋합니다.
   i2cRxBuffer[board] = []; // I2C 수신 버퍼도 함께 리셋합니다.
   mcu._i2cAddr = null;      // Wire.begin(addr)으로 지정하기 전까지는 "내 주소" 없음(마스터 전용 상태).
   mcu._i2cTxAddr = null;    // beginTransmission()으로 열어 둔 전송 대상 주소(없으면 null).
@@ -3532,14 +3626,44 @@ function deployToMCU(board, rawCode) {
         mode: function() {}
       };
 
-      // BluetoothSerial(SerialBT.h) — 시리얼처럼 print/println만 지원하는 단순화된 스텁입니다.
-      const SerialBT = {
-        begin: function(name) { logSerial('[BT] ' + (name !== undefined ? name : 'ESP32') + ' 페어링 대기 중...', '${board}'); },
-        available: function() { return 0; },
-        read: function() { return -1; },
-        print: function(v) { logSerial(String(v), '${board}'); },
-        println: function(v) { logSerial(String(v !== undefined ? v : ''), '${board}'); }
-      };
+      // [버그 수정] BluetoothSerial(SerialBT.h) — 지금까지는 이걸 그냥 const 객체(SerialBT)로
+      // 미리 만들어 뒀는데, 실제 ESP32 블루투스 예제는 거의 전부 맨 위에 "BluetoothSerial
+      // SerialBT;" 라고 스스로 선언하고 씁니다. 그런데 이 시뮬레이터의 코드 변환기
+      // (transpileCppToJs)는 "클래스명 변수명;" 형태를 인식하는 화이트리스트(supportedClasses)
+      // 를 따로 두고 있었고, 거기 BluetoothSerial이 빠져 있었습니다 — 그래서 "BluetoothSerial
+      // SerialBT;" 줄이 자바스크립트 문법 오류("Unexpected identifier 'SerialBT'")를 내며 그
+      // 즉시 컴파일이 실패했습니다. TFT_eSPI 등과 똑같이 실제 클래스(class)로 바꾸고
+      // supportedClasses에 등록해, 학생이 그대로 복사해 온 표준 선언문이 "let SerialBT = new
+      // BluetoothSerial();"로 정상 변환되도록 고쳤습니다. Serial과 똑같이 print/println은
+      // 로그에 남기고, available()/read()/readString()은 btRxBuffer['${board}']에서 꺼내
+      // 씁니다 — 그 버퍼는 보드 팝업의 "블루투스(SerialBT) 원격 입력" 칸(sendBtRemoteInput())
+      // 에서 채워집니다(실제로는 휴대폰의 블루투스 앱이 보낼 데이터를, 이 시뮬레이터에서는
+      // 사람이 직접 타이핑해 대신 보내는 것으로 단순화했습니다).
+      class BluetoothSerial {
+        begin(name) { logSerial('[BT] ' + (name !== undefined ? name : 'ESP32') + ' 페어링 대기 중...', '${board}'); }
+        available() { return (btRxBuffer['${board}'] || '').length; }
+        read() {
+          const buf = btRxBuffer['${board}'] || '';
+          if (!buf.length) return -1;
+          btRxBuffer['${board}'] = buf.slice(1);
+          return buf.charCodeAt(0);
+        }
+        readString() {
+          const buf = btRxBuffer['${board}'] || '';
+          btRxBuffer['${board}'] = '';
+          return buf;
+        }
+        readStringUntil(terminator) {
+          const buf = btRxBuffer['${board}'] || '';
+          const t = (typeof terminator === 'number') ? String.fromCharCode(terminator) : String(terminator);
+          const idx = buf.indexOf(t);
+          if (idx === -1) { btRxBuffer['${board}'] = ''; return buf; }
+          btRxBuffer['${board}'] = buf.slice(idx + t.length);
+          return buf.slice(0, idx);
+        }
+        print(v) { logSerial(String(v), '${board}'); }
+        println(v) { logSerial(String(v !== undefined ? v : ''), '${board}'); }
+      }
 
       // Touch — 7인치 터치 보드(esp32t)의 화면을 마우스로 클릭/드래그하면 그 좌표가 실시간으로
       // mcuVM['${board}'].touch에 기록됩니다(bindTouchScreenEvents). 실제 TFT_eSPI의
@@ -3644,10 +3768,10 @@ function deployToMCU(board, rawCode) {
       return { setup: __user_setup, loop: __user_loop };
     `;
 
-    const runner = new AsyncFunction('mcuVM', 'logSerial', 'boardPinReading', '__regs', 'boardDomId', 'serialRxBuffer', '__serialTransmit', 'i2cRxBuffer', '__i2cTransfer', '__i2cRequestFrom', 'canRxQueue', '__canTransmit', 'canfdRxQueue', '__canfdTransmit', '__dbgCheckpoint', fullExecution);
+    const runner = new AsyncFunction('mcuVM', 'logSerial', 'boardPinReading', '__regs', 'boardDomId', 'serialRxBuffer', 'btRxBuffer', '__serialTransmit', 'i2cRxBuffer', '__i2cTransfer', '__i2cRequestFrom', 'canRxQueue', '__canTransmit', 'canfdRxQueue', '__canfdTransmit', '__dbgCheckpoint', fullExecution);
     mcu.bootTimeMs = performance.now();
 
-    runner(mcuVM, logSerial, boardPinReading, makeRegs(board), boardDomId, serialRxBuffer, __serialTransmit, i2cRxBuffer, __i2cTransfer, __i2cRequestFrom, canRxQueue, __canTransmit, canfdRxQueue, __canfdTransmit, __dbgCheckpoint).then(instance => {
+    runner(mcuVM, logSerial, boardPinReading, makeRegs(board), boardDomId, serialRxBuffer, btRxBuffer, __serialTransmit, i2cRxBuffer, __i2cTransfer, __i2cRequestFrom, canRxQueue, __canTransmit, canfdRxQueue, __canfdTransmit, __dbgCheckpoint).then(instance => {
       if (mcu.gen !== myGen) return; // 그 사이 재컴파일/재배포되었으면 이 결과는 버립니다.
       mcu.loopFn = instance.loop;
       mcu.isCompiled = true;
@@ -3826,7 +3950,7 @@ function makeDraggable(el){
   el.addEventListener('mousedown', (e) => {
     // 핀/터치스크린은 각자 다른 용도(배선 연결, 터치 그림)로 마우스를 쓰므로 절대 드래그를
     // 가로채면 안 됩니다 — 완전히 그대로 둡니다.
-    if (e.target.closest('.pin, .pin-mini, .tft-screen, .comp-scope canvas, .scope-zoom-handle')) return;
+    if (e.target.closest('.pin, .pin-mini, .tft-screen, .comp-scope canvas, .scope-zoom-handle, .comp-help-btn')) return;
     // 저항값 입력칸, 모드 선택 셀렉트, 커패시터 극성 버튼, 리셋 버튼처럼 부품 "중앙"을 차지하고
     // 있는 조작 요소는, 그냥 누르기만 하면(움직임 없이 떼면) 원래대로 클릭/포커스/값 변경이
     // 되어야 하지만, 누른 채로 조금이라도 끌면 그 순간부터 부품 자체를 드래그하는 것으로
@@ -4709,8 +4833,8 @@ function spawnComponent(type, dropX, dropY){
       <div class="oersted-compass"><div class="oersted-needle" id="${id}_needle"></div></div>
       <div class="oersted-readout" id="${id}_readout">0.0 mA</div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" data-i18n-title="comp.oersted.aTitle" title="전류 입력 A"></div>
-        <div class="pin-mini" data-pin="${id}_B" data-i18n-title="comp.oersted.bTitle" title="전류 출력 B"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_A" data-i18n-title="comp.oersted.aTitle" title="전류 입력 A"></div><span class="pin-cap">A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_B" data-i18n-title="comp.oersted.bTitle" title="전류 출력 B"></div><span class="pin-cap">B</span></div>
       </div>`;
   } else if (type === 'diode'){
     // 다이오드 — 애노드(A)가 캐소드(K)보다 순방향 전압(약 0.6V) 이상 높을 때만 통전(순방향 바이어스),
@@ -4738,9 +4862,9 @@ function spawnComponent(type, dropX, dropY){
       <div class="transistor-body" id="${id}_body"><div class="transistor-led" id="${id}_led"></div></div>
       <div class="transistor-status" id="${id}_status" data-i18n="comp.transistor.off">○ OFF (C-E 차단)</div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_B" data-i18n-title="comp.transistor.bTitle" title="베이스 (B) ← 제어 신호"></div>
-        <div class="pin-mini" data-pin="${id}_C" data-i18n-title="comp.transistor.cTitle" title="컬렉터 (C)"></div>
-        <div class="pin-mini" data-pin="${id}_E" data-i18n-title="comp.transistor.eTitle" title="이미터 (E)"></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_B" data-i18n-title="comp.transistor.bTitle" title="베이스 (B) ← 제어 신호"></div><span class="pin-cap cap-sig">B</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_C" data-i18n-title="comp.transistor.cTitle" title="컬렉터 (C)"></div><span class="pin-cap">C</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_E" data-i18n-title="comp.transistor.eTitle" title="이미터 (E)"></div><span class="pin-cap">E</span></div>
       </div>`;
   } else if (type === 'transformer'){
     // 변압기 — 1차(P1/P2)는 실제 배선에 영향을 주지 않는 "측정 전용" 핀입니다(전압계처럼 회로에
@@ -4842,8 +4966,8 @@ function spawnComponent(type, dropX, dropY){
       <div class="fuse-status" id="${id}_status" data-i18n="comp.fuse.ok">● 정상</div>
       <button type="button" class="fuse-replace-btn" onclick="fuseReplace('${id}')" data-i18n="comp.fuse.replaceBtn">🔧 교체</button>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" data-i18n-title="comp.fuse.aTitle" title="입력 A"></div>
-        <div class="pin-mini" data-pin="${id}_B" data-i18n-title="comp.fuse.bTitle" title="출력 B"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_A" data-i18n-title="comp.fuse.aTitle" title="입력 A"></div><span class="pin-cap">A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_B" data-i18n-title="comp.fuse.bTitle" title="출력 B"></div><span class="pin-cap">B</span></div>
       </div>`;
   } else if (type === 'btmodule'){
     div.classList.add('comp-btmodule');
@@ -4858,10 +4982,10 @@ function spawnComponent(type, dropX, dropY){
         <span class="bt-switch-label" data-i18n="comp.bt.remoteSend">원격 명령 전송</span>
       </div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
-        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
-        <div class="pin-mini" data-pin="${id}_RXD" data-i18n-title="comp.bt.rxdTitle" title="RXD ← 보드 TX (보드가 보내는 데이터)"></div>
-        <div class="pin-mini" data-pin="${id}_TXD" data-i18n-title="comp.bt.txdTitle" title="TXD → 보드 RX (보드가 받는 데이터)"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_RXD" data-i18n-title="comp.bt.rxdTitle" title="RXD ← 보드 TX (보드가 보내는 데이터)"></div><span class="pin-cap cap-sig">RXD</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_TXD" data-i18n-title="comp.bt.txdTitle" title="TXD → 보드 RX (보드가 받는 데이터)"></div><span class="pin-cap cap-sig">TXD</span></div>
       </div>`;
   } else if (type === 'wifiap'){
     div.classList.add('comp-wifiap');
@@ -4878,9 +5002,9 @@ function spawnComponent(type, dropX, dropY){
         <span class="ap-switch-label" data-i18n="comp.ap.power">전원</span>
       </div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_V" title="VCC"></div>
-        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
-        <div class="pin-mini" data-pin="${id}_SIG" data-i18n-title="comp.ap.sigTitle" title="SIG → 보드 디지털 핀 (수신 신호)"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SIG" data-i18n-title="comp.ap.sigTitle" title="SIG → 보드 디지털 핀 (수신 신호)"></div><span class="pin-cap cap-sig">SIG</span></div>
       </div>`;
   } else if (type === 'canmodule'){
     // CAN 통신 모듈(고정 500kbps High-Speed CAN, 실제 MCP2515류 SPI-CAN 브레이크아웃처럼).
@@ -4929,8 +5053,8 @@ function spawnComponent(type, dropX, dropY){
       </select>
       <input type="range" min="0" max="255" value="128" class="dac-level">
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_OUT" data-i18n-title="comp.dac.outTitle" title="DAC 출력"></div>
-        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_OUT" data-i18n-title="comp.dac.outTitle" title="DAC 출력"></div><span class="pin-cap cap-sig">OUT</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
       </div>`;
   } else if (type === 'motordriver'){
     div.classList.add('comp-motordriver');
@@ -4952,14 +5076,14 @@ function spawnComponent(type, dropX, dropY){
       <div class="lcd-title" data-i18n="comp.lcd.title">캐릭터 LCD 16x2 (HD44780, 4-bit)</div>
       <div class="lcd-screen" id="${id}_screen">                \n                </div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_VSS" title="VSS (GND)"></div>
-        <div class="pin-mini" data-pin="${id}_VDD" title="VDD (5V)"></div>
-        <div class="pin-mini" data-pin="${id}_RS" title="RS"></div>
-        <div class="pin-mini" data-pin="${id}_E" title="Enable" data-i18n-title="comp.lcd.eTitle"></div>
-        <div class="pin-mini" data-pin="${id}_D4" title="D4"></div>
-        <div class="pin-mini" data-pin="${id}_D5" title="D5"></div>
-        <div class="pin-mini" data-pin="${id}_D6" title="D6"></div>
-        <div class="pin-mini" data-pin="${id}_D7" title="D7"></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_VSS" title="VSS (GND)"></div><span class="pin-cap cap-gnd">VSS</span></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_VDD" title="VDD (5V)"></div><span class="pin-cap cap-vcc">VDD</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_RS" title="RS"></div><span class="pin-cap cap-sig">RS</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_E" title="Enable" data-i18n-title="comp.lcd.eTitle"></div><span class="pin-cap cap-sig">E</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_D4" title="D4"></div><span class="pin-cap cap-sig">D4</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_D5" title="D5"></div><span class="pin-cap cap-sig">D5</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_D6" title="D6"></div><span class="pin-cap cap-sig">D6</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_D7" title="D7"></div><span class="pin-cap cap-sig">D7</span></div>
       </div>`;
   } else if (type === 'oled'){
     div.classList.add('comp-oled');
@@ -4967,10 +5091,10 @@ function spawnComponent(type, dropX, dropY){
       <div class="oled-title" data-i18n="comp.oled.title">OLED 0.96" (SSD1306, I2C, 텍스트 전용 모델)</div>
       <div class="oled-screen" id="${id}_screen"></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_VCC" title="VCC (3V3/5V)"></div>
-        <div class="pin-mini" data-pin="${id}_GND" title="GND"></div>
-        <div class="pin-mini" data-pin="${id}_SCL" data-i18n-title="comp.oled.sclTitle" title="SCL → 보드 A5"></div>
-        <div class="pin-mini" data-pin="${id}_SDA" data-i18n-title="comp.oled.sdaTitle" title="SDA → 보드 A4"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_VCC" title="VCC (3V3/5V)"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_GND" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SCL" data-i18n-title="comp.oled.sclTitle" title="SCL → 보드 A5"></div><span class="pin-cap cap-sig">SCL</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SDA" data-i18n-title="comp.oled.sdaTitle" title="SDA → 보드 A4"></div><span class="pin-cap cap-sig">SDA</span></div>
       </div>`;
   } else if (type.startsWith('sensor-')){
     const key = type.split('-')[1];
@@ -5005,8 +5129,8 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="comp-label"><span data-i18n="comp.resistor.label">저항</span> <span class="res-display">220 Ω</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div>
-        <div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div><span class="pin-cap">A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div><span class="pin-cap">B</span></div>
       </div>`;
   } else if (type === 'powercable'){
     div.classList.add('comp-powercable', 'resistive-2pin');
@@ -5019,8 +5143,8 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="comp-label"><span data-i18n="comp.powercable.label">파워케이블</span> <span class="res-display">0.5 Ω</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" title="A"></div>
-        <div class="pin-mini" data-pin="${id}_B" title="B"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_A" title="A"></div><span class="pin-cap">A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_B" title="B"></div><span class="pin-cap">B</span></div>
       </div>`;
   } else if (type === 'capacitor'){
     div.classList.add('comp-capacitor', 'capacitive-2pin');
@@ -5037,8 +5161,8 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="comp-label"><span data-i18n="comp.capacitor.label">커패시터</span> <span class="cap-display">100 nF</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div>
-        <div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div><span class="pin-cap">A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div><span class="pin-cap">B</span></div>
       </div>`;
   } else if (type === 'capacitor-e'){
     div.classList.add('comp-capacitor-e', 'capacitive-2pin');
@@ -5085,8 +5209,8 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="comp-label"><span data-i18n="comp.inductor.label">인덕터</span> <span class="ind-display">10 mH</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div>
-        <div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_A" title="Leg A" data-i18n-title="pin.legA"></div><span class="pin-cap">A</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_B" title="Leg B" data-i18n-title="pin.legB"></div><span class="pin-cap">B</span></div>
       </div>`;
   } else if (type === 'relay'){
     div.classList.add('comp-relay');
@@ -5104,14 +5228,14 @@ function spawnComponent(type, dropX, dropY){
         <div class="relay-armlabel" id="${id}_armlabel" data-i18n="relay.deenergized">NC</div>
       </div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_VCC" title="VCC (코일 전원)"></div>
-        <div class="pin-mini" data-pin="${id}_GND" title="GND"></div>
-        <div class="pin-mini" data-pin="${id}_IN" data-i18n-title="relay.inTitle" title="IN ← 보드 디지털 핀"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_VCC" title="VCC (코일 전원)"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_GND" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN" data-i18n-title="relay.inTitle" title="IN ← 보드 디지털 핀"></div><span class="pin-cap cap-sig">IN</span></div>
       </div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_COM" title="COM"></div>
-        <div class="pin-mini" data-pin="${id}_NO" data-i18n-title="relay.noTitle" title="NO (평소 열림)"></div>
-        <div class="pin-mini" data-pin="${id}_NC" data-i18n-title="relay.ncTitle" title="NC (평소 닫힘)"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_COM" title="COM"></div><span class="pin-cap">COM</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_NO" data-i18n-title="relay.noTitle" title="NO (평소 열림)"></div><span class="pin-cap">NO</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_NC" data-i18n-title="relay.ncTitle" title="NC (평소 닫힘)"></div><span class="pin-cap">NC</span></div>
       </div>`;
   } else if (type === 'relay220'){
     // AC 220V 코일 릴레이: 5V 릴레이 모듈과 달리 IN/VCC/GND 로직 핀이 아니라 코일 자체가
@@ -5129,13 +5253,13 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="acm-badge">AC 220V</div>
       <div class="comp-pin-row">
-        <div class="pin-mini role-vcc" data-pin="${id}_L" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V, 코일 전원)"></div>
-        <div class="pin-mini role-sig" data-pin="${id}_N" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N, 코일 전원)"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_L" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V, 코일 전원)"></div><span class="pin-cap cap-vcc">L</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_N" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N, 코일 전원)"></div><span class="pin-cap cap-sig">N</span></div>
       </div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_COM" title="COM"></div>
-        <div class="pin-mini" data-pin="${id}_NO" data-i18n-title="relay.noTitle" title="NO (평소 열림)"></div>
-        <div class="pin-mini" data-pin="${id}_NC" data-i18n-title="relay.ncTitle" title="NC (평소 닫힘)"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_COM" title="COM"></div><span class="pin-cap">COM</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_NO" data-i18n-title="relay.noTitle" title="NO (평소 열림)"></div><span class="pin-cap">NO</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_NC" data-i18n-title="relay.ncTitle" title="NC (평소 닫힘)"></div><span class="pin-cap">NC</span></div>
       </div>`;
   } else if (type === 'motor3ph'){
     div.classList.add('comp-motor3ph');
@@ -5144,9 +5268,9 @@ function spawnComponent(type, dropX, dropY){
       <div class="m3ph-badge">3φ IM</div>
       <div class="comp-label"><span data-i18n="comp.motor3ph.label">3상 유도전동기</span><span id="${id}_speed" data-i18n="motor.stopped">정지</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini psu-r" data-pin="${id}_L1" data-i18n-title="comp.rPhase" title="R상 (L1)"></div>
-        <div class="pin-mini psu-s" data-pin="${id}_L2" data-i18n-title="comp.sPhase" title="S상 (L2)"></div>
-        <div class="pin-mini psu-t" data-pin="${id}_L3" data-i18n-title="comp.tPhase" title="T상 (L3)"></div>
+        <div class="pin-col"><div class="pin-mini psu-r" data-pin="${id}_L1" data-i18n-title="comp.rPhase" title="R상 (L1)"></div><span class="pin-cap">L1</span></div>
+        <div class="pin-col"><div class="pin-mini psu-s" data-pin="${id}_L2" data-i18n-title="comp.sPhase" title="S상 (L2)"></div><span class="pin-cap">L2</span></div>
+        <div class="pin-col"><div class="pin-mini psu-t" data-pin="${id}_L3" data-i18n-title="comp.tPhase" title="T상 (L3)"></div><span class="pin-cap">L3</span></div>
       </div>`;
   } else if (type === 'acmotor'){
     div.classList.add('comp-acmotor');
@@ -5155,8 +5279,8 @@ function spawnComponent(type, dropX, dropY){
       <div class="acm-badge">AC 220V</div>
       <div class="comp-label"><span data-i18n="comp.acmotor.label">단상 AC 모터(220V)</span><span id="${id}_speed" data-i18n="motor.stopped">정지</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini role-vcc" data-pin="${id}_L" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V)"></div>
-        <div class="pin-mini role-sig" data-pin="${id}_N" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N)"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_L" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V)"></div><span class="pin-cap cap-vcc">L</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_N" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N)"></div><span class="pin-cap cap-sig">N</span></div>
       </div>`;
   } else if (type === 'acmotorctrl'){
     // AC 모터 컨트롤러: LIN/NIN으로 들어온 AC 220V 전원을, EN 핀(보드의 PWM/아날로그 신호,
@@ -5170,13 +5294,13 @@ function spawnComponent(type, dropX, dropY){
     div.innerHTML = `
       <div class="acmctrl-title" data-i18n="comp.acmotorctrl.title">AC 모터 컨트롤러<br>(속도 조절기)</div>
       <div class="comp-pin-row">
-        <div class="pin-mini role-vcc" data-pin="${id}_LIN" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V)"></div>
-        <div class="pin-mini role-sig" data-pin="${id}_NIN" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N)"></div>
-        <div class="pin-mini role-pwm" data-pin="${id}_EN" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM)"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_LIN" data-i18n-title="psu.hotTitle" title="Hot / 활선 (L, 220V)"></div><span class="pin-cap cap-vcc">LIN</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_NIN" data-i18n-title="psu.neutralTitle" title="Neutral / 중성선 (N)"></div><span class="pin-cap cap-sig">NIN</span></div>
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_EN" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM)"></div><span class="pin-cap cap-pwm">EN</span></div>
       </div>
       <div class="comp-pin-row md-out-row">
-        <div class="pin-mini role-vcc" data-pin="${id}_LOUT" data-i18n-title="comp.acCtrlLoutTitle" title="출력 L → 모터"></div>
-        <div class="pin-mini role-sig" data-pin="${id}_NOUT" data-i18n-title="comp.acCtrlNoutTitle" title="출력 N → 모터"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_LOUT" data-i18n-title="comp.acCtrlLoutTitle" title="출력 L → 모터"></div><span class="pin-cap" style="color:var(--text-faint)">LOUT</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_NOUT" data-i18n-title="comp.acCtrlNoutTitle" title="출력 N → 모터"></div><span class="pin-cap" style="color:var(--text-faint)">NOUT</span></div>
       </div>`;
   } else if (type === 'bulb220'){
     // 220V 백열전구: acmotor와 동일한 단순화 규약을 따릅니다 — L(활선) 핀이 AC 전원에 물려 있고
@@ -5228,12 +5352,12 @@ function spawnComponent(type, dropX, dropY){
       </div>
       <div class="ls-ch-label"><span>HV (5V)</span><span>LV (3.3V)</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_HV1" data-i18n-title="comp.lsCh1HvTitle" title="채널1 (5V측 신호)"></div>
-        <div class="pin-mini" data-pin="${id}_LV1" data-i18n-title="comp.lsCh1LvTitle" title="채널1 (3.3V측 신호)"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_HV1" data-i18n-title="comp.lsCh1HvTitle" title="채널1 (5V측 신호)"></div><span class="pin-cap">HV1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_LV1" data-i18n-title="comp.lsCh1LvTitle" title="채널1 (3.3V측 신호)"></div><span class="pin-cap">LV1</span></div>
       </div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_HV2" data-i18n-title="comp.lsCh2HvTitle" title="채널2 (5V측 신호)"></div>
-        <div class="pin-mini" data-pin="${id}_LV2" data-i18n-title="comp.lsCh2LvTitle" title="채널2 (3.3V측 신호)"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_HV2" data-i18n-title="comp.lsCh2HvTitle" title="채널2 (5V측 신호)"></div><span class="pin-cap">HV2</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_LV2" data-i18n-title="comp.lsCh2LvTitle" title="채널2 (3.3V측 신호)"></div><span class="pin-cap">LV2</span></div>
       </div>`;
   } else if (type === 'bldcmotor'){
     div.classList.add('comp-bldcmotor');
@@ -5241,24 +5365,24 @@ function spawnComponent(type, dropX, dropY){
       <div class="motor-body"><div class="motor-fan" id="${id}_fan"></div></div>
       <div class="comp-label"><span data-i18n="comp.bldcmotor.label">BLDC 모터</span><span id="${id}_speed" data-i18n="motor.stopped">정지</span></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_U" data-i18n-title="comp.uPhase" title="U상"></div>
-        <div class="pin-mini" data-pin="${id}_V" data-i18n-title="comp.vPhase" title="V상"></div>
-        <div class="pin-mini" data-pin="${id}_W" data-i18n-title="comp.wPhase" title="W상"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_U" data-i18n-title="comp.uPhase" title="U상"></div><span class="pin-cap">U</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_V" data-i18n-title="comp.vPhase" title="V상"></div><span class="pin-cap">V</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_W" data-i18n-title="comp.wPhase" title="W상"></div><span class="pin-cap">W</span></div>
       </div>`;
   } else if (type === 'bldcdriver'){
     div.classList.add('comp-bldcdriver');
     div.innerHTML = `
       <div class="bldc-title" data-i18n="comp.bldcdriver.title">BLDC 전자변속기<br>(ESC / 드라이버)</div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_V" data-i18n-title="comp.battVcc" title="배터리/전원 VCC"></div>
-        <div class="pin-mini" data-pin="${id}_G" title="GND"></div>
-        <div class="pin-mini" data-pin="${id}_IN1" data-i18n-title="comp.dirTitle" title="방향 제어 (디지털)"></div>
-        <div class="pin-mini" data-pin="${id}_ENA" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM)"></div>
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.battVcc" title="배터리/전원 VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN1" data-i18n-title="comp.dirTitle" title="방향 제어 (디지털)"></div><span class="pin-cap cap-sig">IN1</span></div>
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENA" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM)"></div><span class="pin-cap cap-pwm">ENA</span></div>
       </div>
       <div class="comp-pin-row md-out-row">
-        <div class="pin-mini" data-pin="${id}_U" data-i18n-title="comp.uOutTitle" title="U상 출력"></div>
-        <div class="pin-mini" data-pin="${id}_V_OUT" data-i18n-title="comp.vOutTitle" title="V상 출력"></div>
-        <div class="pin-mini" data-pin="${id}_W" data-i18n-title="comp.wOutTitle" title="W상 출력"></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_U" data-i18n-title="comp.uOutTitle" title="U상 출력"></div><span class="pin-cap" style="color:var(--text-faint)">U</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_V_OUT" data-i18n-title="comp.vOutTitle" title="V상 출력"></div><span class="pin-cap" style="color:var(--text-faint)">V</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_W" data-i18n-title="comp.wOutTitle" title="W상 출력"></div><span class="pin-cap" style="color:var(--text-faint)">W</span></div>
       </div>`;
   } else if (type === 'dcmotor-enc'){
     div.classList.add('comp-dcmotor-enc');
@@ -5266,10 +5390,10 @@ function spawnComponent(type, dropX, dropY){
       <div class="motor-body"><div class="motor-fan" id="${id}_fan"></div><div class="enc-disk"></div></div>
       <div class="comp-label"><span data-i18n="comp.dcmotorenc.label">DC 모터+엔코더</span><span id="${id}_speed" data-i18n="motor.stopped">정지</span></div>
       <div class="enc-badge" id="${id}_pulsehz">0 Hz</div>
-      <div class="comp-pin-row"><div class="pin-mini" data-pin="${id}_TA" data-i18n-title="comp.termA" title="모터 단자 A"></div><div class="pin-mini" data-pin="${id}_TB" data-i18n-title="comp.termB" title="모터 단자 B"></div></div>
+      <div class="comp-pin-row"><div class="pin-col"><div class="pin-mini" data-pin="${id}_TA" data-i18n-title="comp.termA" title="모터 단자 A"></div><span class="pin-cap">TA</span></div><div class="pin-col"><div class="pin-mini" data-pin="${id}_TB" data-i18n-title="comp.termB" title="모터 단자 B"></div><span class="pin-cap">TB</span></div></div>
       <div class="comp-pin-row">
-        <div class="pin-mini" data-pin="${id}_ENCA" data-i18n-title="comp.encaTitle" title="엔코더 A상 펄스 출력 → 보드 디지털 핀"></div>
-        <div class="pin-mini" data-pin="${id}_ENCG" data-i18n-title="comp.encgTitle" title="엔코더 GND"></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ENCA" data-i18n-title="comp.encaTitle" title="엔코더 A상 펄스 출력 → 보드 디지털 핀"></div><span class="pin-cap cap-sig">ENCA</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_ENCG" data-i18n-title="comp.encgTitle" title="엔코더 GND"></div><span class="pin-cap cap-gnd">ENCG</span></div>
       </div>`;
   } else if (type === 'stepper'){
     div.classList.add('comp-stepper');
@@ -5323,9 +5447,32 @@ function spawnComponent(type, dropX, dropY){
         <div class="probe-wrap"><div class="pin-mini mm-probe-red" data-pin="${id}_PROBE_P" data-i18n-title="comp.mm.probeP" title="+ 프로브 (빨강)"></div><span class="probe-cap">+</span></div>
         <div class="probe-wrap"><div class="pin-mini mm-probe-blk" data-pin="${id}_PROBE_N" data-i18n-title="comp.mm.probeN" title="COM 프로브 (검정)"></div><span class="probe-cap">COM</span></div>
       </div>`;
+  } else if (type === 'clampmeter'){
+    // AC 클램프미터(후크미터) — 실제로는 전선을 끊지 않고 "집게로 걸어" 비접촉으로 측정하는
+    // 도구이지만, 이 시뮬레이터의 배선 방식(핀-핀 전선 연결) 안에서 그 동작을 표현하기 위해
+    // 오실로스코프의 전류(I) 채널·외르스텟 실험의 도선과 똑같이 "거의 0Ω인 이상적 도선"
+    // (resistive-2pin, 1µΩ)을 직렬로 끼우는 방식으로 단순화했습니다 — 실제 클램프가 회로에
+    // 전혀 부담을 주지 않는 것과 전기적으로 동일합니다(자세한 설명은 "?" 도움말 참고).
+    // 실제 후크미터 대부분(전자기 유도식)은 교류(AC) 자기장만 감지하고 직류(DC)는 감지하지
+    // 못합니다 — 이 교육적 한계를 그대로 재현하기 위해 updateClampMeter()에서 ω=0(DC)일 때는
+    // 일부러 "DC 감지 안됨"으로 표시하고 값을 보여주지 않습니다.
+    div.classList.add('comp-clampmeter', 'resistive-2pin');
+    div.dataset.ohms = String(1e-6);
+    div.innerHTML = `
+      <div class="cm-title" data-i18n="comp.clamp.title">AC 클램프미터(후크미터)</div>
+      <div class="cm-jaw">
+        <svg viewBox="0 0 52 46"><path d="M26 6 A18 18 0 1 0 44 26" fill="none" stroke="#e6c98a" stroke-width="6.5" stroke-linecap="round"/><circle cx="26" cy="24" r="3.4" fill="#e6c98a"/></svg>
+      </div>
+      <div class="cm-screen"><span class="cm-value" id="${id}_val">0.00</span><span class="cm-unit" id="${id}_unit">A AC</span></div>
+      <div class="cm-hint" data-i18n="comp.clamp.hint">비접촉식(집게) — 여기선 A/B를 측정할 가지에 직렬로 끼워 표현</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini cm-probe" data-pin="${id}_A" data-i18n-title="comp.clamp.aTitle" title="A (측정할 가지에 직렬로 — 비접촉 클램프를 단순화한 표현)"></div><span class="pin-cap">A</span></div>
+        <div class="pin-col"><div class="pin-mini cm-probe" data-pin="${id}_B" data-i18n-title="comp.clamp.bTitle" title="B (측정할 가지의 나머지 쪽으로)"></div><span class="pin-cap">B</span></div>
+      </div>`;
   }
 
   document.getElementById('canvasInner').appendChild(div);
+  attachHelpButton(div, type); // [신기능] 보드를 뺀 모든 부품에 연결법 안내 "?" 버튼을 붙임
   applyI18n(div);
   makeDraggable(div);
   bindPinEvents();
@@ -5487,6 +5634,19 @@ function toggleBtRemote(id){
   el.dataset.state = wasOn ? '0' : '1';
   document.getElementById(`${id}_toggle`).classList.toggle('on', !wasOn);
   logSerial(`[${tr('log.bluetooth')}] ${id} ${tr('log.remoteSent')}: ${!wasOn ? 'HIGH (1)' : 'LOW (0)'}`);
+}
+// [버그 수정] ESP32 보드 팝업의 "블루투스(SerialBT) 원격 입력" 칸 — 이 텍스트를 보내면
+// btRxBuffer[board]에 쌓여, 그 보드 코드의 SerialBT.available()/read()/readString()으로 그대로
+// "수신"됩니다. 실제로는 휴대폰의 블루투스 앱이 보낼 데이터를 사람이 직접 타이핑해 대신
+// 보내는 것으로 단순화했습니다(줄바꿈을 붙여 보내, readStringUntil('\n') 패턴도 그대로 씁니다).
+function sendBtRemoteInput(board){
+  const input = document.getElementById(`btRemoteInput${board.toUpperCase()}`);
+  if (!input) return;
+  const text = input.value;
+  if (!text) return;
+  btRxBuffer[board] = (btRxBuffer[board] || '') + text + '\n';
+  logSerial(`[${tr('log.bluetooth')}] ${tr('log.remoteSent')}: "${text}"`, board);
+  input.value = '';
 }
 function toggleApPower(id){
   const sw = document.getElementById(`${id}_switch`);
@@ -6290,6 +6450,39 @@ function measuredCurrentMA(anyPinOnEdge, refEl){
   return I ? I.re * 1000 : 0;
 }
 
+/* ---------- 🔬 전기 실험실: AC 클램프미터(후크미터) ---------- */
+// 오실로스코프의 전류(I) 채널·외르스텟 실험과 완전히 같은 acReachablePsu→psuSourceParams→
+// acDcMultiSourceSolve→edgeCurrentByRef 경로로 이 클램프(resistive-2pin, 1µΩ)에 흐르는 실제
+// 전류의 크기(진폭)를 구해 실효값(RMS = 진폭/√2)으로 표시합니다. 실제 대부분의 후크미터(전자기
+// 유도식 클램프)는 변화하는 자기장(=교류)만 감지할 수 있고 직류에는 반응하지 않으므로, ω=0(DC)
+// 회로에 걸려 있을 때는 일부러 "DC 감지 안됨"으로 표시하고 값을 내지 않습니다 — 실제 계측기의
+// 한계를 그대로 가르치기 위한 의도적인 설계입니다.
+function updateClampMeter(el){
+  const valEl = document.getElementById(`${el.id}_val`);
+  const unitEl = document.getElementById(`${el.id}_unit`);
+  if (!valEl || !unitEl) return;
+  el.classList.remove('cm-dc-warn');
+  if (!isSimulating){ valEl.textContent = '0.00'; unitEl.textContent = 'A AC'; return; }
+  const aPin = el.querySelector('[data-pin$="_A"]');
+  const psu = aPin ? acReachablePsu(aPin) : null;
+  const params = psu ? psuSourceParams(psu) : null;
+  if (!params || !params.knownPairs || !params.knownPairs.length){
+    valEl.textContent = '0.00'; unitEl.textContent = 'A AC'; return;
+  }
+  if (params.omega === 0){
+    valEl.textContent = '--';
+    unitEl.textContent = tr('comp.clamp.dcWarn');
+    el.classList.add('cm-dc-warn');
+    return;
+  }
+  const solved = acDcMultiSourceSolve(params.knownPairs, params.omega);
+  const I = solved ? solved.edgeCurrentByRef(el) : null;
+  const amp = I ? Math.hypot(I.re, I.im) : 0;
+  const rms = amp / Math.SQRT2;
+  valEl.textContent = rms.toFixed(2);
+  unitEl.textContent = 'A AC';
+}
+
 /* ---------- 🔬 전기 실험실: 변압기 ---------- */
 function transformerRatioChanged(id){
   const el = document.getElementById(id);
@@ -6420,11 +6613,29 @@ function updateFuseVisual(el){
 // 매 틱 실제 전류(mA)를 구해 정격(A)을 초과하면 영구적으로 "끊어짐" 상태로 전환합니다 — 실제
 // 퓨즈처럼 전류가 다시 정상으로 돌아와도 저절로 복구되지 않고, "교체" 버튼을 눌러야만 정상으로
 // 돌아옵니다.
+// [버그 수정] 예전에는 오실로스코프 전류(I) 채널과 같은 measuredCurrentMA()로 전류를 쟀는데,
+// 그 함수는 acReachablePsu()로 ".comp-psu" 부품을 찾아야만 동작합니다 — 그래서 보드 자체의
+// 5V/GND만으로(별도 PSU 부품 없이) 구성한, 수업에서 훨씬 흔한 회로에서는 항상 0mA로 나와
+// 실제로 정격을 아무리 초과해도 퓨즈가 절대 끊어지지 않는 문제가 있었습니다. 멀티미터의 DC
+// 전류(dcA) 모드가 쓰는 것과 똑같은 범용 저항망 엔진(nearestSourceInfo)으로 바꿔, PSU 유무와
+// 무관하게(보드 전원이든 PSU든 배터리든) 항상 정확히 동작하도록 고쳤습니다.
+function fuseMeasuredMA(el){
+  if (!isSimulating) return 0;
+  const aPin = el.querySelector('[data-pin$="_A"]');
+  const bPin = el.querySelector('[data-pin$="_B"]');
+  if (!aPin || !bPin) return 0;
+  const edgesExcl = resistiveEdges().filter(e => !(e.legA === aPin && e.legB === bPin));
+  const nearA = nearestSourceInfo(aPin, edgesExcl);
+  const nearB = nearestSourceInfo(bPin, edgesExcl);
+  if (!nearA || !nearB) return 0;
+  const totalR = nearA.distR + nearB.distR;
+  if (totalR <= 0) return 0;
+  return Math.abs(readingToVolts(nearA.reading) - readingToVolts(nearB.reading)) / totalR * 1000;
+}
 function fuseCheck(el){
   if (el.dataset.blown === '1'){ el.dataset.ohms = String(FUSE_BLOWN_OHMS); updateFuseVisual(el); return; }
   if (!isSimulating) return;
-  const aPin = el.querySelector('[data-pin$="_A"]');
-  const mA = aPin ? measuredCurrentMA(aPin, el) : 0;
+  const mA = fuseMeasuredMA(el);
   const ratedA = parseFloat(el.dataset.rated || '1');
   if (Math.abs(mA) > ratedA * 1000){
     el.dataset.blown = '1';
@@ -6934,6 +7145,124 @@ function openWireEditor(wireObj, clientX, clientY){
   activeWireEditor = box;
 }
 document.addEventListener('click', () => closeWireEditor());
+
+/* ================= [신기능] 부품별 "?" 연결 도움말 ================= */
+// 팔레트 항목(.palette-item)에 이미 있는 data-i18n 라벨을 그대로 재사용해 "type → 부품 이름"
+// 사전을 만듭니다 — 부품마다 제각각인 내부 제목 클래스(.comp-label, .relay-title, .mm-title…)를
+// 일일이 따라다니지 않아도, 팔레트에 이미 잘 정리된 이름을 그대로 신뢰할 수 있습니다.
+const PALETTE_LABEL_BY_TYPE = {};
+document.querySelectorAll('.palette-item[onclick^="spawnComponent"]').forEach(item => {
+  const m = item.getAttribute('onclick').match(/spawnComponent\('([^']+)'\)/);
+  const span = item.querySelector('[data-i18n]');
+  if (m && span) PALETTE_LABEL_BY_TYPE[m[1]] = span.getAttribute('data-i18n');
+});
+// 핀 목록만으로는 "왜/어떻게" 동작하는지 감이 안 오는, 특히 자주 헷갈리는 모듈 위주로만 한두
+// 문장짜리 보충 설명을 답니다(나머지는 핀 설명만으로 충분히 명확합니다).
+const COMP_HELP_BLURB = {
+  breadboard: { ko: '부품 다리를 구멍 가까이 가져가면 자동으로 꽂혀 연결됩니다. 같은 세로줄(위/아래 5칸)이나 +/− 가로 레일은 전부 내부에서 하나로 이어진 버스입니다 — 그 줄 안 아무 구멍에 꽂아도 서로 통합니다.', en: 'Drag a leg near a hole and it auto-plugs in. Each column (5 holes) and the +/− rails are internally bused — any hole on the same line is electrically the same node.' },
+  relay:      { ko: 'VCC·GND에 코일 전원을 넣고 IN에 보드 디지털 핀을 연결하면, IN이 HIGH일 때 코일이 여자되어 COM이 NC에서 NO로 전환됩니다 — 결국 COM·NO·NC는 "보드 신호로 여닫는 스위치"입니다.', en: 'Power the coil via VCC/GND and drive IN from a board digital pin — when IN goes HIGH the coil energizes and COM switches from NC to NO.' },
+  relay220:   { ko: '코일 자체가 220V로 직접 여자됩니다(별도 5V 제어 신호 없음) — L/N에 220V를 걸면 COM이 NC에서 NO로 전환되는 스위치로 동작합니다.', en: 'The coil itself is energized directly by 220V AC — no separate 5V control signal; COM switches from NC to NO.' },
+  transistor: { ko: 'B(베이스)에 작은 신호/전류를 흘리면 C-E(컬렉터-이미터) 사이가 스위치처럼 닫힙니다 — 큰 부하는 C-E 쪽에, 제어 신호는 B에 저항과 함께 연결하세요.', en: 'A small signal into B (base) closes the C-E path like a switch — put the load on C-E and drive B (with a series resistor) from your control signal.' },
+  motordriver:{ ko: 'VCC/GND는 모터 전원, IN1/IN2는 보드 디지털 핀(방향 제어), OUT1/OUT2는 모터로 나갑니다 — 로직 전원과 모터 전원이 분리되어 있는 경우가 많으니 핀 설명을 확인하세요.', en: 'VCC/GND powers the motor, IN1/IN2 (from board pins) set direction, OUT1/OUT2 go to the motor. Logic and motor power are often separate — check each pin.' },
+  a4988:      { ko: 'STEP 핀에 펄스를 줄 때마다 한 스텝씩 움직이고 DIR로 방향을 정합니다 — VMOT/GND는 모터 전원, VDD/GND는 로직 전원으로 서로 다릅니다.', en: 'Each pulse on STEP advances one step; DIR sets direction. VMOT/GND (motor power) and VDD/GND (logic power) are separate rails.' },
+  levelshifter:{ko: '한쪽(LV)은 보드의 낮은 전압(예: 3.3V), 반대쪽(HV)은 더 높은 전압(예: 5V) 로직에 연결해 신호를 안전하게 변환합니다 — 양쪽 GND는 반드시 공통으로 연결하세요.', en: 'One side (LV) connects to the lower-voltage logic (e.g. 3.3V), the other (HV) to the higher one (e.g. 5V). Always tie both GNDs together.' },
+  dac:        { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 통신하면, OUT 핀에서 설정한 전압이 실제 아날로그 신호로 나옵니다.', en: 'Power via VCC/GND, talk to the board over SDA/SCL (I2C), and OUT outputs the analog voltage you set.' },
+  btmodule:   { ko: 'VCC/GND로 전원을 넣고 보드의 TX↔RXD, RX↔TXD를 서로 엇갈리게 연결해 시리얼 통신으로 무선 데이터를 주고받습니다.', en: 'Power via VCC/GND, cross-connect board TX↔RXD and RX↔TXD, and it relays serial data over Bluetooth.' },
+  wifiap:     { ko: 'VCC/GND로 전원을 넣고 보드와 TX/RX(시리얼) 또는 SDA/SCL로 연결하면, AT 명령/네트워크 데이터를 주고받는 무선 AP로 동작합니다.', en: 'Power via VCC/GND, connect TX/RX (serial) or SDA/SCL to the board — it acts as a Wi-Fi AP relaying AT commands/data.' },
+  rs485servo: { ko: 'VCC/GND는 서보 전원, SIG는 RS-485 버스 데이터선입니다 — 여러 대를 VCC-VCC, SIG-SIG, GND-GND로 데이지체인처럼 나란히 이어 붙일 수 있습니다.', en: 'VCC/GND powers the servo, SIG carries RS-485 bus data — chain several units VCC-VCC, SIG-SIG, GND-GND in a daisy chain.' },
+  ultrasonic: { ko: 'VCC/GND로 전원을 넣고, TRIG에 짧은 펄스를 보내면 ECHO에서 그 왕복 시간만큼 HIGH가 유지됩니다 — 그 시간으로 거리를 계산합니다.', en: 'Power via VCC/GND; a short pulse on TRIG makes ECHO stay HIGH for the round-trip time, which encodes distance.' },
+  gyro:       { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 연결하면 X/Y/Z 세 축의 각속도(°/s) 값을 읽어올 수 있습니다.', en: 'Power via VCC/GND, connect SDA/SCL (I2C) to the board to read X/Y/Z angular velocity.' },
+  accel:      { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 연결하면 X/Y/Z 세 축의 가속도(g) 값을 읽어올 수 있습니다.', en: 'Power via VCC/GND, connect SDA/SCL (I2C) to the board to read X/Y/Z acceleration.' },
+  canmodule:  { ko: 'VCC/GND로 전원을 넣고 CANH/CANL 두 선을 다른 CAN 모듈과 그대로 나란히 이으면 버스로 통신합니다(극성 없음).', en: 'Power via VCC/GND; wire CANH/CANL straight across to other CAN nodes — the bus has no polarity.' },
+  canfdmodule:{ ko: 'VCC/GND로 전원을 넣고 CANH/CANL 두 선을 다른 CAN FD 모듈과 그대로 나란히 이으면 버스로 통신합니다(극성 없음).', en: 'Power via VCC/GND; wire CANH/CANL straight across to other CAN FD nodes — the bus has no polarity.' },
+  scope:      { ko: '각 채널의 A·B 두 핀을 측정하려는 지점 사이에 직렬로 끼워 넣으면(전류) 또는 A를 측정점·B를 GND에 연결하면(전압) 파형이 그려집니다.', en: 'Insert a channel\'s A/B pins in series with the point you want (current), or A to the point and B to GND (voltage), to see the waveform.' },
+  multimeter: { ko: '빨강(+) 프로브와 검정(COM) 프로브를 측정하려는 두 지점에 각각 대고, 모드를 DCV/ACV/저항/전류 중에서 고르면 값이 표시됩니다.', en: 'Touch the red (+) and black (COM) probes to the two points you want to measure, then pick DCV/ACV/Ω/A mode.' },
+  clampmeter: { ko: '실제 후크미터는 전선을 끊지 않고 집게로 걸기만 하는 비접촉식 도구입니다. 이 시뮬레이터에서는 A·B 두 핀을 측정하려는 가지에 직렬로 끼우는 것으로 그 동작을 표현합니다(집게처럼 회로에 전혀 부담을 주지 않는 이상적인 도선). 대부분의 후크미터처럼 교류(AC) 전류만 실효값으로 측정할 수 있고, 직류(DC) 회로에서는 "DC 감지 안됨"으로 표시됩니다 — 실제 전자기 유도식 클램프의 한계와 같습니다.', en: 'A real clamp meter is non-contact — you hook it around a wire without cutting it. This simulator represents that by wiring its A/B pins in series with the branch you want to measure (an ideal wire, just like a real clamp adds no load to the circuit). Like most clamp meters, it only measures AC current (RMS); on a DC circuit it shows "DC not detected" — matching the real limitation of induction-based clamps.' },
+  generator:  { ko: '손잡이를 돌리는 속도에 비례해 V/G(GND) 사이에 전압이 발생합니다 — 직류 발전기입니다.', en: 'Cranking the handle generates a voltage across V/G(GND) proportional to crank speed — a simple DC generator.' },
+  transformer:{ ko: '1차(입력) 쪽에 AC 전압을 걸면 권수비(N2/N1)만큼 곱해진 전압이 2차(출력) 쪽 V/G에 나타납니다 — DC를 걸면 2차에는 아무것도 나오지 않습니다.', en: 'AC on the primary is scaled by the turns ratio (N2/N1) onto the secondary V/G — DC on the primary yields nothing on the secondary.' },
+  electromagnet:{ko: 'VCC/GND로 코일에 전류를 흘리면 전자석이 되어 자성을 띱니다 — 흐르는 전류가 클수록 자기장이 강해집니다.', en: 'Current through VCC/GND magnetizes the coil into an electromagnet — more current means a stronger field.' },
+  oersted:    { ko: '도선의 A-B 사이에 전류가 흐르면 옆의 나침반 바늘이 그 전류 방향·세기에 비례해 꺾입니다(외르스텟 실험 재현).', en: 'Current flowing A→B deflects the nearby compass needle in proportion to current — recreates Oersted\'s experiment.' },
+  toggleswitch:{ ko: 'T1-T2는 극성이 없는 단순 스위치 접점입니다 — 클릭해서 켜면(ON) 두 단자가 도선처럼 이어지고, 끄면 끊어집니다.', en: 'T1/T2 are a plain non-polarized switch contact — click ON to join them like a wire, OFF to open the circuit.' },
+  wallswitch: { ko: '가정용 로커(paddle) 스위치와 같습니다 — 클릭으로 ON/OFF 하며 두 단자를 잇거나 끊습니다.', en: 'Works like a household paddle switch — click to toggle the two terminals connected or open.' },
+  btn:        { ko: '누르고 있는 동안만 두 단자(T1-T2)가 이어지는 순간 접점 스위치입니다 — 극성이 없습니다.', en: 'A momentary contact switch — T1/T2 connect only while held down. No polarity.' },
+  pot:        { ko: '가변저항입니다 — 양 끝(VCC/GND)에 전원을 걸고 가운데 슬라이더(SIG, 와이퍼)에서 그 사이 어느 전압이든 뽑아 쓸 수 있습니다.', en: 'A potentiometer — power the two ends (VCC/GND) and read any in-between voltage off the middle wiper (SIG).' },
+  servo:      { ko: 'VCC/GND로 전원을 넣고 SIG에 보드의 PWM 핀을 연결하면, 그 펄스 폭에 따라 축이 원하는 각도로 회전합니다.', en: 'Power via VCC/GND, drive SIG from a board PWM pin — pulse width sets the shaft angle.' },
+  stepper:    { ko: '보드의 여러 디지털 핀으로 코일 순서를 바꿔가며 신호를 주면 한 스텝씩 정밀하게 회전합니다 — 정확한 위치 제어가 필요할 때 씁니다.', en: 'Board digital pins step the coils in sequence — gives precise, one-step-at-a-time rotation control.' },
+};
+let activeHelpPopup = null, activeHelpBtn = null;
+function closeComponentHelp(){
+  if (activeHelpPopup){ activeHelpPopup.remove(); activeHelpPopup = null; }
+  if (activeHelpBtn){ activeHelpBtn.classList.remove('active'); activeHelpBtn = null; }
+}
+const ROLE_DOT_COLOR = { vcc:'#ff4d4d', gnd:'#8a8a8a', sig:'var(--teal-strong)', pwm:'var(--pwm)', plain:'#5a6472' };
+function pinRoleOf(pin){
+  if (pin.classList.contains('role-vcc')) return 'vcc';
+  if (pin.classList.contains('role-gnd')) return 'gnd';
+  if (pin.classList.contains('role-pwm')) return 'pwm';
+  if (pin.classList.contains('role-sig')) return 'sig';
+  return 'plain';
+}
+function openComponentHelp(compEl, type, btn){
+  closeComponentHelp();
+  // 부품마다 제각각인 내부 제목 클래스를 따라다니는 대신, 팔레트에 이미 정리된 이름을 최우선으로
+  // 신뢰합니다(정확·다국어 모두 보장) — 못 찾을 때만 부품 자신의 제목 요소를, 그마저 없으면
+  // type 문자열 그대로를 보여줍니다.
+  let name = PALETTE_LABEL_BY_TYPE[type] ? tr(PALETTE_LABEL_BY_TYPE[type]) : '';
+  if (!name){
+    const nameEl = compEl.querySelector('.comp-label, [class$="-title"]');
+    name = nameEl ? nameEl.textContent.replace(/\s+/g, ' ').trim() : type;
+  }
+  // 브레드보드의 구멍(.bb-hole)은 수백 개가 전부 "같은 버스 라인"일 뿐 각자 다른 의미를 갖는
+  // 핀이 아니므로 목록에서 제외합니다(블러브 설명만으로 충분합니다).
+  const pins = Array.from(compEl.querySelectorAll('.pin-mini[data-pin]:not(.bb-hole), .pin[data-pin]'));
+  const rows = pins.map(pin => {
+    const capEl = pin.parentElement ? pin.parentElement.querySelector('.pin-cap, .probe-cap') : null;
+    const label = capEl ? capEl.textContent.trim() : (pin.dataset.pin || '').split('_').pop();
+    const desc = pin.getAttribute('title') || '';
+    return { label, desc, role: pinRoleOf(pin) };
+  });
+  const blurb = COMP_HELP_BLURB[type] ? (COMP_HELP_BLURB[type][currentLang] || COMP_HELP_BLURB[type].ko) : '';
+  const popup = document.createElement('div');
+  popup.className = 'comp-help-popup';
+  popup.innerHTML = `
+    <div class="chp-title">${name}</div>
+    ${blurb ? `<div class="chp-blurb">${blurb}</div>` : ''}
+    ${rows.length ? rows.map(r => `
+      <div class="chp-row">
+        <div class="chp-dot" style="background:${ROLE_DOT_COLOR[r.role]}"></div>
+        <div class="chp-label">${r.label || ''}</div>
+        <div class="chp-desc">${r.desc || ''}</div>
+      </div>`).join('') : (blurb ? '' : `<div class="chp-empty" data-i18n="comp.help.noPins">연결 핀 정보 없음</div>`)}
+  `;
+  popup.onclick = (e) => e.stopPropagation();
+  document.body.appendChild(popup);
+  const br = btn.getBoundingClientRect();
+  const pw = 238, ph = popup.getBoundingClientRect().height;
+  let left = br.right + 8, top = br.top;
+  if (left + pw + 8 > window.innerWidth) left = br.left - pw - 8;
+  if (left < 4) left = 4;
+  if (top + ph + 8 > window.innerHeight) top = Math.max(4, window.innerHeight - ph - 8);
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+  activeHelpPopup = popup;
+  activeHelpBtn = btn;
+  btn.classList.add('active');
+}
+function attachHelpButton(compEl, type){
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'comp-help-btn';
+  btn.textContent = '?';
+  btn.title = tr('comp.help.btnTitle');
+  btn.setAttribute('data-i18n-title', 'comp.help.btnTitle');
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    if (activeHelpBtn === btn){ closeComponentHelp(); return; }
+    openComponentHelp(compEl, type, btn);
+  };
+  compEl.appendChild(btn);
+}
+document.addEventListener('click', () => closeComponentHelp());
 
 // LCD/OLED처럼 "값"이 아니라 텍스트 화면 버퍼를 표시하는 부품이, 자신의 어떤 핀이든 net을 통해
 // 어느 보드에 연결되어 있는지 찾습니다. (특정 핀의 역할(RS/E/D4~7 등)까지는 검증하지 않고,
@@ -7518,6 +7847,18 @@ function buildAcNetworkGraph(){
     if (!e.legA || !e.legB) return;
     edges.push({ i: nodeIdFor(e.legA), j: nodeIdFor(e.legB), type: 'R', value: 0, ref: null });
   });
+  // [버그 수정] 220V 백열전구/LED 형광등 바 자신이 소모하는 부하 저항(BULB220_OHMS/
+  // LEDTUBE220_OHMS)은 지금까지 DC 전용 저항망(resistiveEdges, 전구 자신의 밝기·mA 표시에만
+  // 쓰임)에만 들어 있었고, 오실로스코프 전류(I) 채널·외르스텟 실험·AC 클램프미터가 함께 쓰는
+  // 이 AC 회로망에는 빠져 있었습니다 — 그래서 전구/형광등 바로 흐르는 실제 전류를 이 계측기들로
+  // 재려고 직렬로 끼우면, 전구를 거쳐 반대쪽(중성선)까지 이어지는 길이 이 그래프 안에는 전혀
+  // 없어(전구가 마치 끊긴 회로처럼 보임) 항상 0A로만 나오는 문제가 있었습니다. 퓨즈가 예전에
+  // PSU 유무와 무관하게 항상 정확히 동작하도록 고친 것과 같은 이유로, 여기서도 빠짐없이
+  // 포함시켜야 합니다.
+  bulb220ContactEdges().concat(ledtube220ContactEdges()).forEach(e => {
+    if (!e.legA || !e.legB) return;
+    edges.push({ i: nodeIdFor(e.legA), j: nodeIdFor(e.legB), type: 'R', value: e.ohms, ref: null });
+  });
   // 오실로스코프의 "전류(I)" 채널: A/B 두 핀 사이를 아주 작은 저항(이상적 전류계, 1µΩ)으로
   // 직렬 연결합니다. 사용자가 측정하려는 가지에 이 두 핀을 끼워 넣으면(직렬로 배선하면) 그
   // 가지에 흐르는 실제 전류가 그대로 이 간선의 전류가 됩니다.
@@ -7736,7 +8077,20 @@ function acReachablePsu(startEl){
     const a = el.querySelector('[data-pin$="_A"]'), b = el.querySelector('[data-pin$="_B"]');
     if (a && b) allEdgePins.push([a, b]);
   });
-  relayContactEdges().concat(motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges()).forEach(e => { if (e.legA && e.legB) allEdgePins.push([e.legA, e.legB]); });
+  relayContactEdges().concat(motorCtrlContactEdges(), transistorContactEdges(), toggleSwitchContactEdges(), bulb220ContactEdges(), ledtube220ContactEdges()).forEach(e => { if (e.legA && e.legB) allEdgePins.push([e.legA, e.legB]); });
+  // [버그 수정] 오실로스코프 전류(I) 채널·AC 클램프미터처럼 회로에 "직렬로" 끼워 넣는 계측기의
+  // A-B 간선은 buildAcNetworkGraph()의 실제 해석(행렬 풀이)에는 이미 포함되어 있었지만, 이
+  // 도달성 판정(allEdgePins)에는 클램프미터(resistive-2pin이라 위에서 이미 잡힘)와 달리
+  // 오실로스코프 전류 채널만 빠져 있었습니다 — 그래서 그 전류 프로브를 "거쳐야만" 전원에 닿는
+  // 지점(예: 전류 프로브 너머의 인덕터/커패시터 양단)을 전압(V) 모드로 재려고 하면, 실제로는
+  // 거의 0Ω이라 회로가 그대로 이어져 있는데도 acReachablePsu가 "전원을 못 찾음"으로 잘못
+  // 판단해 값이 안 나오는 문제가 있었습니다.
+  document.querySelectorAll('.comp-scope').forEach(sc => {
+    ['1', '2', '3', '4'].forEach(n => {
+      const a = sc.querySelector(`[data-pin$="_CH${n}A"]`), b = sc.querySelector(`[data-pin$="_CH${n}B"]`);
+      if (a && b) allEdgePins.push([a, b]);
+    });
+  });
 
   const seenNets = [netOf(startEl)];
   let idx = 0;
@@ -7851,6 +8205,14 @@ function logBusActivity(kind, entry){
 }
 
 const serialRxBuffer = {};
+// [버그 수정] ESP32 내장 블루투스(SerialBT)용 수신 버퍼 — serialRxBuffer(보드 간 UART 배선)와
+// 완전히 별개입니다. 지금까지 SerialBT.available()/read()가 항상 0/-1만 돌려주는 빈 스텁이라,
+// 휴대폰 앱에서 "1"/"0" 같은 글자를 보내 LED를 켜고 끄는 식의(ESP32 블루투스 예제로 아주 흔한
+// 패턴) 학생 코드는 이 시뮬레이터에서 아무리 기다려도 영원히 아무것도 "수신"할 수 없었습니다.
+// 이제 보드 팝업의 "블루투스(SerialBT) 원격 입력" 칸에 글자를 입력해 보내면 이 버퍼에 쌓이고,
+// SerialBT.available()/read()/readString()이 그걸 꺼내 쓰도록 고쳤습니다(Serial의 UART
+// 수신부와 완전히 같은 방식).
+const btRxBuffer = {};
 // I2C 버스: 보드 종류별로 SDA/SCL 핀 이름이 다릅니다 — R3/R4는 A4/A5(아두이노 Uno의 실제 I2C
 // 핀), ESP32 계열은 GPIO21/GPIO22(ESP32의 실제 기본 I2C 핀)를 그대로 따릅니다.
 const I2C_PINS = {
@@ -8432,6 +8794,7 @@ function toggleSimulation(){
     document.querySelectorAll('.comp-stepper').forEach(st => driveStepper(st.id, parseFloat(st.dataset.angle || '0'), false, parseFloat(st.dataset.stepCount || '0')));
     document.querySelectorAll('.comp-relay, .comp-relay220').forEach(relay => updateRelayVisual(relay.id, false));
     document.querySelectorAll('.comp-multimeter').forEach(mm => updateMultimeter(mm.id));
+    document.querySelectorAll('.comp-clampmeter').forEach(updateClampMeter);
     // 220V 백열전구 / LED 형광등 바: 위 전원 자동 off로 인해 다음 틱에서 어차피 꺼지겠지만,
     // 물리 루프 자체가 멈췄으므로 다음 틱이 오지 않습니다 — 그래서 여기서 바로 꺼진 모습으로
     // 되돌립니다.
@@ -8996,6 +9359,27 @@ function runTick(){
       } else {
         const pEl = sc.querySelector(`[data-pin$="_${ch}"]`);
         r = pEl ? resistiveReading(pEl) : null;
+        // [버그 수정] resistiveReading()은 DC 전용 저항망(resistiveEdges)만 쓰는데, 그 안에서
+        // 인덕터는 그냥 "도선"(0Ω)으로, 커패시터는 아예 "끊긴 것"으로 단순화되어 있습니다 — 그래서
+        // R-L-C가 섞인 실제 AC 회로에서 인덕터/커패시터 양단 전압을 이 전압(V) 모드로 재면 위상은
+        // 커녕 크기도 틀리게(또는 0V/미접속으로) 나왔습니다. 전류(I) 채널과 똑같은 복소수 회로망
+        // 해석기로 이 지점이 진짜 교류 전원에 물려 있는지 먼저 확인해, 그렇다면 위상까지 정확한
+        // 전압으로 덮어씁니다(스위치 켜진 AC 전원이 없으면 원래의 resistiveReading 결과를 그대로
+        // 씁니다 — 디지털/PWM/DC 등 다른 모든 프로브 동작은 손대지 않습니다).
+        if (pEl && isSimulating){
+          const psuV = acReachablePsu(pEl);
+          const paramsV = psuV ? psuSourceParams(psuV) : null;
+          if (paramsV && paramsV.omega > 0 && paramsV.knownPairs && paramsV.knownPairs.length){
+            const solvedV = acDcMultiSourceSolve(paramsV.knownPairs, paramsV.omega);
+            const V = solvedV ? solvedV.nodeVoltage(pEl) : null;
+            if (V){
+              const vPeak = cAbs(V), phaseDeg = cAngleDeg(V);
+              const t = Date.now();
+              const instant = vPeak * Math.sin((t / 1000) * 2 * Math.PI * 60 + phaseDeg * Math.PI / 180);
+              r = { type: 'ac', v: instant, rms: vPeak / Math.SQRT2, phaseDeg, wave: 'ac' };
+            }
+          }
+        }
         if (pEl && r){
           const net = netOf(pEl);
           for (const el of net){ if (el !== pEl && el.dataset.pin){ sourceName = el.dataset.pin; break; } }
@@ -9064,6 +9448,9 @@ function runTick(){
 
   // 10. 디지털 멀티미터: 모드(DCV/ACV/Ω/DCA)에 맞춰 두 프로브 사이 값을 실시간으로 측정해 표시
   document.querySelectorAll('.comp-multimeter').forEach(mm => updateMultimeter(mm.id));
+
+  // 10b. AC 클램프미터(후크미터): 실시간 실효전류(A) 표시 — DC 회로에서는 감지 불가로 표시
+  document.querySelectorAll('.comp-clampmeter').forEach(updateClampMeter);
 
   // 11. 엔코더 DC 모터 펄스 배지(Hz) — 아직 아무 데도 연결되지 않았어도 회전 중이면 표시되어야 하므로
   //     배선 여부와 무관하게 매 틱 갱신합니다.
@@ -9546,6 +9933,14 @@ function buildBoardPopupHTML(key, type){
         <div class="serial-head"><span data-i18n="popup.serialHead">빌드 콘솔 / 시리얼 모니터</span><span>9600 baud</span></div>
         <div class="serial-logs" id="serialLogs${KEY}"></div>
       </div>
+      ${isEsp32 ? `
+      <div class="bt-remote-panel">
+        <div class="serial-head"><span data-i18n="popup.btRemoteHead">블루투스(SerialBT) 원격 입력</span></div>
+        <div class="bt-remote-row">
+          <input type="text" class="bt-remote-input" id="btRemoteInput${KEY}" data-i18n-ph="popup.btRemotePh" placeholder="휴대폰 앱이 보낼 문자를 여기 입력…" onkeydown="if(event.key==='Enter') sendBtRemoteInput('${key}')">
+          <button class="btn ghost" onclick="sendBtRemoteInput('${key}')" data-i18n="popup.btRemoteSend">전송</button>
+        </div>
+      </div>` : ''}
     </div>`;
   document.body.appendChild(div);
   applyI18n(div);
