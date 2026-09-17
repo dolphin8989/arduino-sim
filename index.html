@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9913</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9915</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -467,6 +467,7 @@
   .scope-hold-btn.held{background:#3a2f0d; color:#f2a53d; border-color:#f2a53d;}
   @keyframes scopeArmedPulse{0%,100%{opacity:1;} 50%{opacity:.55;}}
   .scope-zoom-btn.active{background:#0d2a3a; color:#5ad0e6; border-color:#5ad0e6;}
+  .scope-measure-btn.active{background:#3a0d2a; color:#ff5ac8; border-color:#ff5ac8;}
   .scope-screen{background:#03150c; border:2px solid #0a0c0e; border-radius:5px; padding:3px; position:relative;}
   .comp-scope canvas{display:block; width:100%; height:150px;}
   .comp-scope canvas.zoomable{cursor:grab;}
@@ -476,6 +477,19 @@
     background:rgba(216,232,74,.12); border-left:2px solid #d8e84a; border-right:2px solid #d8e84a;
   }
   .scope-zoom-handle:hover, .scope-zoom-handle.dragging{background:rgba(216,232,74,.28);}
+  /* ---------- 오실로스코프 측정 커서 (Δt·주파수) — 줌 핸들과 같은 드래그 방식, 색만 분홍으로 구분 ---------- */
+  .scope-measure-handle{
+    position:absolute; top:3px; bottom:3px; width:9px; margin-left:-4.5px; cursor:ew-resize; z-index:7;
+    background:rgba(255,90,200,.12); border-left:2px dashed #ff5ac8; border-right:2px dashed #ff5ac8;
+  }
+  .scope-measure-handle:hover, .scope-measure-handle.dragging{background:rgba(255,90,200,.3);}
+  .scope-measure-readout{
+    display:none; align-items:center; flex-wrap:wrap; gap:6px 16px; margin:0 2px 9px; padding:6px 9px;
+    background:#1c0d18; border:1px solid #ff5ac8; border-radius:5px; font-family:'IBM Plex Mono',monospace;
+    font-size:.68rem; color:#ff9ad6;
+  }
+  .scope-measure-readout.active{display:flex;}
+  .scope-measure-readout b{color:#ffd3ee;}
   .scope-controls{
     display:grid; grid-template-columns:repeat(3, 1fr); gap:5px 12px; margin:9px 0; padding:9px 0;
     border-top:1px solid #34383f; border-bottom:1px solid #34383f;
@@ -1286,7 +1300,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9913</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9915</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1988,7 +2002,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9913", en: "K's Simulator Ver0.9913" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9915", en: "K's Simulator Ver0.9915" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -2283,6 +2297,9 @@ const STRINGS = {
   "relay.energized": { ko: "동작 (NO)", en: "Energized (NO)" },
   "relay.deenergized": { ko: "대기 (NC)", en: "Idle (NC)" },
   "comp.sPhase": { ko: "S상 (L2)", en: "Phase S (L2)" },
+  "comp.scope.measureBtn": { ko: "📏 측정", en: "📏 Measure" },
+  "comp.scope.measureBtnOff": { ko: "📏 측정 해제", en: "📏 Unmeasure" },
+  "comp.scope.measureTitle": { ko: "화면 안에 커서 2개를 놓아 그 사이의 시간(Δt)과 주파수(1/Δt)를 잽니다. 파형의 같은 위상(예: 두 상승 엣지)에 커서를 맞추면 주기를 바로 읽을 수 있습니다.", en: "Places two cursors on screen and measures the time (Δt) and frequency (1/Δt) between them. Line them up with the same point on two cycles (e.g. two rising edges) to read the period directly." },
   "comp.scope.holdBtn": { ko: "⏸ 정지", en: "⏸ Hold" },
   "comp.scope.holdTitle": { ko: "화면을 정지/재개합니다 (실제 스코프의 RUN/STOP, 아래쪽 트리거 버튼과는 별개로 동작합니다)", en: "Freeze/resume the display (like a real scope RUN/STOP — works independently of the Trigger button below)" },
   "comp.scope.triggerBtn": { ko: "🔺 트리거 OFF", en: "🔺 Trigger OFF" },
@@ -2499,6 +2516,7 @@ const STRINGS = {
   "popup.compile": { ko: "▶ 컴파일 &amp; 빌드 업로드", en: "▶ Compile &amp; Build Upload" },
   "popup.exAnalog": { ko: "A0 가변저항 &amp; D9 PWM", en: "A0 Potentiometer &amp; D9 PWM" },
   "popup.exApiVsReg": { ko: "13번(API) vs 12번(레지스터)", en: "Pin 13 (API) vs Pin 12 (Register)" },
+  "popup.exApiVsRegBurst": { ko: "13번 vs 12번 속도차 (오실로스코프 버스트)", en: "Pin 13 vs 12 Speed (Oscilloscope Burst)" },
   "popup.exPortFullR3": { ko: "PORTD 전체 8핀 일괄 제어", en: "Full 8-Pin PORTD Control" },
   "popup.exRegisterMega": { ko: "DDR/PORT 레지스터 직접제어(D13=PB7)", en: "Direct DDR/PORT Register Control (D13=PB7)" },
   "popup.exApiVsRegMega": { ko: "13번(API) vs 12번(레지스터)", en: "Pin 13 (API) vs Pin 12 (Register)" },
@@ -2574,7 +2592,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9913", en: "K's Arduino Simulator Ver0.9913" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9915", en: "K's Arduino Simulator Ver0.9915" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "schematic.title": { ko: "회로도 보기", en: "Schematic View" },
@@ -2867,7 +2885,7 @@ const boardInstances = {};
 // 없는 상태(0)로 시작합니다.
 const boardSpawnCount = { r4: 0, r3: 0 };
 
-// [버그 수정 Ver0.9913] 아두이노 String 클래스에는 자바스크립트 문자열에 없는 메서드가 몇 개
+// [버그 수정 Ver0.9915] 아두이노 String 클래스에는 자바스크립트 문자열에 없는 메서드가 몇 개
 // 있습니다(toInt/toFloat/equals/equalsIgnoreCase/c_str). indexOf/substring/trim/replace/
 // startsWith/endsWith/toUpperCase/toLowerCase/charAt/concat은 이름과 동작이 JS 문자열과
 // 그대로 같아서 문제없지만, 이 다섯 개는 JS에 아예 없어서 실제 하드웨어에서는 멀쩡한 코드가
@@ -2949,7 +2967,7 @@ function transpileCppToJs(cppCode) {
   // setFont()가 인자를 무시) 인자 자체를 통째로 비웁니다.
   js = js.replace(/\.setFont\s*\([^)]*\)/g, '.setFont()');
 
-  // [버그 수정 Ver0.9913] 아두이노 String 클래스의 length()는 "함수 호출"이지만(예:
+  // [버그 수정 Ver0.9915] 아두이노 String 클래스의 length()는 "함수 호출"이지만(예:
   // rawData.length() < 5), 자바스크립트 문자열의 length는 함수가 아니라 "속성"이라
   // 그대로 두면 실행 중에 "rawData.length is not a function"으로 멈춥니다. 인자가 없는
   // .length() 호출만 골라 .length로 바꿔 문법을 맞춥니다(다른 .length 관련 오탐 없음 —
@@ -3068,7 +3086,7 @@ function transpileCppToJs(cppCode) {
     if (str.length >= 3 && str[0] === "'" && str[str.length - 1] === "'"){
       const code = charLiteralToCode(str.slice(1, -1));
       if (code !== null){
-        // [버그 수정 Ver0.9913] 위 트레이드오프(모든 작은따옴표 char 리터럴을 무조건 아스키
+        // [버그 수정 Ver0.9915] 위 트레이드오프(모든 작은따옴표 char 리터럴을 무조건 아스키
         // 코드로 바꿈)가 .indexOf(',', fromIndex) 같은 "문자열에서 이 글자를 찾아라" 패턴에서는
         // 정반대로 깨집니다 — rawData.indexOf(44, ...)가 되어버리면 자바스크립트가 44를
         // 문자열 "44"로 취급해 찾다가 못 찾고(-1) 항상 실패합니다(실제로 학생의 CSV 파싱
@@ -4015,7 +4033,7 @@ function deployToMCU(board, rawCode) {
       // 씁니다 — 그 버퍼는 보드 팝업의 "블루투스(SerialBT) 원격 입력" 칸(sendBtRemoteInput())
       // 에서 채워집니다(실제로는 휴대폰의 블루투스 앱이 보낼 데이터를, 이 시뮬레이터에서는
       // 사람이 직접 타이핑해 대신 보내는 것으로 단순화했습니다).
-      // [버그 수정 Ver0.9913] 실제 BluetoothSerial 라이브러리에는 begin/available/read류 말고도
+      // [버그 수정 Ver0.9915] 실제 BluetoothSerial 라이브러리에는 begin/available/read류 말고도
       // setPin/connect/disconnect/hasClient/connected/isReady/end/flush/peek/write 같은 함수가
       // 더 있는데, 지금까지는 이 중 일부만 흉내 내고 있어서 학생이 실제 하드웨어에서는 멀쩡히
       // 돌아가는 코드를 그대로 넣었을 때 "SerialBT.setPin is not a function" 같은 [MCU Runtime
@@ -4381,7 +4399,7 @@ function makeDraggable(el){
   el.addEventListener('mousedown', (e) => {
     // 핀/터치스크린은 각자 다른 용도(배선 연결, 터치 그림)로 마우스를 쓰므로 절대 드래그를
     // 가로채면 안 됩니다 — 완전히 그대로 둡니다.
-    if (e.target.closest('.pin, .pin-mini, .tft-screen, .comp-scope canvas, .scope-zoom-handle, .comp-help-btn')) return;
+    if (e.target.closest('.pin, .pin-mini, .tft-screen, .comp-scope canvas, .scope-zoom-handle, .scope-measure-handle, .comp-help-btn')) return;
     // 저항값 입력칸, 모드 선택 셀렉트, 커패시터 극성 버튼, 리셋 버튼처럼 부품 "중앙"을 차지하고
     // 있는 조작 요소는, 그냥 누르기만 하면(움직임 없이 떼면) 원래대로 클릭/포커스/값 변경이
     // 되어야 하지만, 누른 채로 조금이라도 끌면 그 순간부터 부품 자체를 드래그하는 것으로
@@ -4863,10 +4881,15 @@ function spawnComponent(type, dropX, dropY){
     div.classList.add('comp-scope');
     div.innerHTML = `
       <div class="scope-head"><span>4CH OSCILLOSCOPE</span><div class="scope-head-btns">
+        <button class="scope-measure-btn" id="${id}_measurebtn" onclick="toggleScopeMeasure('${id}')" data-i18n-title="comp.scope.measureTitle" title="화면 안에 커서 2개를 놓아 그 사이의 시간(Δt)과 주파수(1/Δt)를 잽니다. 파형의 같은 위상(예: 두 상승 엣지)에 커서를 맞추면 주기를 바로 읽을 수 있습니다." data-i18n="comp.scope.measureBtn">📏 측정</button>
         <button class="scope-zoom-btn" id="${id}_zoombtn" onclick="toggleScopeZoom('${id}')" data-i18n-title="comp.scope.zoomTitle" title="화면 안의 두 라인을 드래그해 그 구간만 확대해서 봅니다. 확대 중에는 빈 화면을 드래그해 상하좌우로 이동할 수 있습니다." data-i18n="comp.scope.zoomBtn">🔍 확대</button>
         <button class="scope-hold-btn" id="${id}_holdbtn" onclick="toggleScopeHold('${id}')" data-i18n-title="comp.scope.holdTitle" title="화면을 정지/재개합니다 (실제 스코프의 RUN/STOP, 아래쪽 트리거 버튼과는 별개로 동작합니다)" data-i18n="comp.scope.holdBtn">⏸ 정지</button>
       </div></div>
       <div class="scope-screen" id="${id}_screen"><canvas id="${id}_canvas" width="700" height="150"></canvas></div>
+      <div class="scope-measure-readout" id="${id}_measureout">
+        <span>Δt: <b id="${id}_measuredt">—</b></span>
+        <span>f: <b id="${id}_measurefreq">—</b></span>
+      </div>
       <div class="scope-controls">
         <label class="timediv-label">TIME/DIV<select id="${id}_timediv" onchange="drawScope('${id}')">
           <option value="0.001">1 µs</option>
@@ -8229,7 +8252,7 @@ const COMP_HELP_BLURB = {
   accel:      { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 연결하면 X/Y/Z 세 축의 가속도(g) 값을 읽어올 수 있습니다.', en: 'Power via VCC/GND, connect SDA/SCL (I2C) to the board to read X/Y/Z acceleration.' },
   canmodule:  { ko: 'VCC/GND로 전원을 넣고 CANH/CANL 두 선을 다른 CAN 모듈과 그대로 나란히 이으면 버스로 통신합니다(극성 없음).', en: 'Power via VCC/GND; wire CANH/CANL straight across to other CAN nodes — the bus has no polarity.' },
   canfdmodule:{ ko: 'VCC/GND로 전원을 넣고 CANH/CANL 두 선을 다른 CAN FD 모듈과 그대로 나란히 이으면 버스로 통신합니다(극성 없음).', en: 'Power via VCC/GND; wire CANH/CANL straight across to other CAN FD nodes — the bus has no polarity.' },
-  scope:      { ko: '각 채널의 A·B 두 핀을 측정하려는 지점 사이에 직렬로 끼워 넣으면(전류) 또는 A를 측정점·B를 GND에 연결하면(전압) 파형이 그려집니다.', en: 'Insert a channel\'s A/B pins in series with the point you want (current), or A to the point and B to GND (voltage), to see the waveform.' },
+  scope:      { ko: '각 채널의 A·B 두 핀을 측정하려는 지점 사이에 직렬로 끼워 넣으면(전류) 또는 A를 측정점·B를 GND에 연결하면(전압) 파형이 그려집니다. "📏 측정" 버튼을 누르면 화면에 커서 2개가 생기는데, 파형의 같은 위상(예: 두 상승 엣지)에 맞춰 드래그하면 그 사이의 시간(Δt)과 주파수(1/Δt)를 바로 읽을 수 있습니다.', en: 'Insert a channel\'s A/B pins in series with the point you want (current), or A to the point and B to GND (voltage), to see the waveform. Press "📏 Measure" to drop two cursors on screen — line them up with the same point on two cycles (e.g. two rising edges) to read the time between them (Δt) and its frequency (1/Δt) directly.' },
   multimeter: { ko: '빨강(+) 프로브와 검정(COM) 프로브를 측정하려는 두 지점에 각각 대고, 모드를 DCV/ACV/저항/전류 중에서 고르면 값이 표시됩니다.', en: 'Touch the red (+) and black (COM) probes to the two points you want to measure, then pick DCV/ACV/Ω/A mode.' },
   clampmeter: { ko: '실제 후크미터는 전선을 끊지 않고 집게로 걸기만 하는 비접촉식 도구입니다. 이 시뮬레이터에서는 A·B 두 핀을 측정하려는 가지에 직렬로 끼우는 것으로 그 동작을 표현합니다(집게처럼 회로에 전혀 부담을 주지 않는 이상적인 도선). 대부분의 후크미터처럼 교류(AC) 전류만 실효값으로 측정할 수 있고, 직류(DC) 회로에서는 "DC 감지 안됨"으로 표시됩니다 — 실제 전자기 유도식 클램프의 한계와 같습니다.', en: 'A real clamp meter is non-contact — you hook it around a wire without cutting it. This simulator represents that by wiring its A/B pins in series with the branch you want to measure (an ideal wire, just like a real clamp adds no load to the circuit). Like most clamp meters, it only measures AC current (RMS); on a DC circuit it shows "DC not detected" — matching the real limitation of induction-based clamps.' },
   generator:  { ko: '손잡이를 돌리는 속도에 비례해 V/G(GND) 사이에 전압이 발생합니다 — 직류 발전기입니다.', en: 'Cranking the handle generates a voltage across V/G(GND) proportional to crank speed — a simple DC generator.' },
@@ -9603,6 +9626,15 @@ const scopeZoom = {}; // id -> { lo, hi } (0~1)
 const scopeVOffset = {}; // id -> 세로 이동량(px)
 let scopeHandleDrag = null; // { id, side }
 let scopePanDrag = null; // { id, startX, startY, startLo, startHi, startVOffset }
+
+/* ---- 오실로스코프 측정 커서(Δt·주파수) ----
+   줌 핸들과 똑같은 방식(화면 폭 대비 0~1 비율로 저장, 드래그로 좌우 이동)으로 커서 2개를
+   두되, 확대/이동 목적이 아니라 그 두 커서 사이의 실제 시간차(Δt)와 그 역수인 주파수를
+   읽어 주는 용도입니다. 비율(a/b)만 저장해 두면, drawScope()가 매 프레임 다시 계산하는
+   windowMs(줌 상태에 따라 달라지는 "현재 화면에 걸쳐 있는 총 시간")를 그대로 곱해서
+   Δt를 구하므로 — 줌 중이든 아니든, 신호가 계속 흐르는 live 상태든 항상 정확합니다. */
+const scopeMeasure = {}; // id -> { a, b } (0~1, 캔버스 폭 기준)
+let scopeMeasureDrag = null; // { id, which }
 function scopeZoomHandleEl(id, side){ return document.getElementById(`${id}_zoom${side}`); }
 function updateScopeZoomHandles(id){
   const z = scopeZoom[id];
@@ -9642,6 +9674,49 @@ function toggleScopeZoom(id){
       });
     }
     updateScopeZoomHandles(id);
+  }
+  drawScope(id);
+}
+function scopeMeasureHandleEl(id, which){ return document.getElementById(`${id}_meas${which}`); }
+function updateScopeMeasureHandles(id){
+  const m = scopeMeasure[id];
+  const a = scopeMeasureHandleEl(id, 'a'), b = scopeMeasureHandleEl(id, 'b');
+  if (!m || !a || !b) return;
+  a.style.left = (m.a * 100) + '%';
+  b.style.left = (m.b * 100) + '%';
+}
+function toggleScopeMeasure(id){
+  const btn = document.getElementById(`${id}_measurebtn`);
+  const out = document.getElementById(`${id}_measureout`);
+  const screen = document.getElementById(`${id}_screen`);
+  if (scopeMeasure[id]){
+    // 측정 해제 — 커서 핸들을 지우고 읽음값도 "—"로 되돌립니다.
+    delete scopeMeasure[id];
+    scopeMeasureHandleEl(id, 'a')?.remove();
+    scopeMeasureHandleEl(id, 'b')?.remove();
+    if (btn){ btn.classList.remove('active'); btn.textContent = tr('comp.scope.measureBtn'); }
+    if (out){ out.classList.remove('active'); }
+    const dtEl = document.getElementById(`${id}_measuredt`), fEl = document.getElementById(`${id}_measurefreq`);
+    if (dtEl) dtEl.textContent = '—';
+    if (fEl) fEl.textContent = '—';
+  } else {
+    scopeMeasure[id] = { a: 0.4, b: 0.6 };
+    if (btn){ btn.classList.add('active'); btn.textContent = tr('comp.scope.measureBtnOff'); }
+    if (out){ out.classList.add('active'); }
+    if (screen && !scopeMeasureHandleEl(id, 'a')){
+      ['a', 'b'].forEach(which => {
+        const h = document.createElement('div');
+        h.className = 'scope-measure-handle';
+        h.id = `${id}_meas${which}`;
+        h.addEventListener('mousedown', (e) => {
+          e.stopPropagation(); e.preventDefault();
+          scopeMeasureDrag = { id, which };
+          h.classList.add('dragging');
+        });
+        screen.appendChild(h);
+      });
+    }
+    updateScopeMeasureHandles(id);
   }
   drawScope(id);
 }
@@ -9687,6 +9762,17 @@ document.addEventListener('mousemove', (e) => {
     scopeVOffset[id] = startVOffset + (e.clientY - startY);
     updateScopeZoomHandles(id);
     drawScope(id);
+  } else if (scopeMeasureDrag){
+    const { id, which } = scopeMeasureDrag;
+    const cvs = document.getElementById(`${id}_canvas`);
+    const m = scopeMeasure[id];
+    if (!cvs || !m) return;
+    const rect = cvs.getBoundingClientRect();
+    let frac = (e.clientX - rect.left) / rect.width;
+    frac = Math.max(0, Math.min(1, frac));
+    m[which] = frac;
+    updateScopeMeasureHandles(id);
+    drawScope(id);
   }
 });
 document.addEventListener('mouseup', () => {
@@ -9695,6 +9781,10 @@ document.addEventListener('mouseup', () => {
     scopeHandleDrag = null;
   }
   scopePanDrag = null;
+  if (scopeMeasureDrag){
+    scopeMeasureHandleEl(scopeMeasureDrag.id, scopeMeasureDrag.which)?.classList.remove('dragging');
+    scopeMeasureDrag = null;
+  }
 });
 
 // ---- 오실로스코프 프로토콜 디코드 (CAN/CAN FD, 시리얼="232", I2C, RS-485) ----
@@ -10665,6 +10755,18 @@ const SCOPE_VDIV = 8;  // 화면 세로 칸 수
 // API 호출(56사이클)과 레지스터 직접 접근(2사이클)의 실행 시간 차이가 만드는 엣지의 미세한
 // 시간차를 그대로 그립니다. 굵은(coarse) 모드는 100ms마다 폴링한 값이라 이 차이가 보이지 않습니다.
 const SCOPE_FINE_THRESHOLD_MS = 1;
+// 측정 커서 Δt/주파수를 사람이 읽기 좋은 단위(µs/ms/s, Hz/kHz)로 자동 변환합니다.
+function formatScopeMeasureTime(ms){
+  if (!isFinite(ms)) return '—';
+  if (ms < 1) return `${(ms * 1000).toFixed(1)} µs`;
+  if (ms < 1000) return `${ms.toFixed(ms < 10 ? 2 : 1)} ms`;
+  return `${(ms / 1000).toFixed(3)} s`;
+}
+function formatScopeMeasureFreq(hz){
+  if (!isFinite(hz)) return '—';
+  if (hz >= 1000) return `${(hz / 1000).toFixed(2)} kHz`;
+  return `${hz.toFixed(hz < 10 ? 2 : 1)} Hz`;
+}
 function drawScope(id){
   const cvs = document.getElementById(`${id}_canvas`);
   if (!cvs) return;
@@ -10773,6 +10875,27 @@ function drawScope(id){
     }
     drawCoarseTrace(scopeBuffers[key], voltsDiv, color);
   });
+
+  // ---- 측정 커서(Δt·주파수) — 두 커서의 화면상 비율(a/b)에 방금 계산한 windowMs(줌 상태까지
+  // 반영된 "현재 화면에 걸쳐 있는 총 시간")를 곱해 실제 시간차를 구합니다. 파형의 같은 위상
+  // (예: 두 번의 상승 엣지)에 커서를 맞추면 그 Δt가 바로 신호의 주기이고, 1000/Δt(ms)가 Hz
+  // 단위 주파수입니다. 매 프레임(runTick마다) 다시 그려지므로 재생 중에도 실시간으로 갱신됩니다.
+  if (scopeMeasure[id]){
+    const m = scopeMeasure[id];
+    ctx.save();
+    ctx.strokeStyle = '#ff5ac8'; ctx.lineWidth = 1.4;
+    ctx.setLineDash([4, 3]);
+    [m.a, m.b].forEach(frac => {
+      const x = Math.round(frac * cvs.width) + 0.5;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, cvs.height); ctx.stroke();
+    });
+    ctx.restore();
+    const dtMs = Math.abs(m.a - m.b) * windowMs;
+    const dtEl = document.getElementById(`${id}_measuredt`);
+    const fEl = document.getElementById(`${id}_measurefreq`);
+    if (dtEl) dtEl.textContent = formatScopeMeasureTime(dtMs);
+    if (fEl) fEl.textContent = dtMs > 0 ? formatScopeMeasureFreq(1000 / dtMs) : '—';
+  }
 }
 
 /* ============ Popups & UI Helpers ============ */
@@ -11070,7 +11193,7 @@ function buildBoardPopupHTML(key, type){
     : isEsp32 ? 'Target: ESP32-WROOM-32 (Xtensa LX6 dual-core @ 240MHz)'
     : 'Target: Renesas RA4M1 (ARM Cortex-M4 @ 48MHz)';
   const toolchain = (type === 'r3' || type === 'mega') ? 'AVR-GCC' : isEsp32 ? 'Xtensa-GCC' : 'C/C++ GCC';
-  // [Ver0.9913] 예전엔 여기서 보드 종류별 "빠른 실행" 예제 버튼을 10개 안팎씩 직접 만들어
+  // [Ver0.9915] 예전엔 여기서 보드 종류별 "빠른 실행" 예제 버튼을 10개 안팎씩 직접 만들어
   // 팝업 안에 늘어놓았는데, 정적 R4/R3 팝업(popupR4/popupR3)은 이미 오래전부터 그렇게 안 하고
   // 버튼 하나(컴파일)만 두고 나머지는 오른쪽 예제 갤러리로 안내하고 있었습니다 — 정작 나중에
   // 추가된 Mega/ESP32 계열은 이 정리가 안 되어 있어서 팝업이 훨씬 더 복잡해 보였습니다. 예제
@@ -11442,6 +11565,15 @@ function loadExampleCode(board, type){
     editor.value = currentLang === 'en'
       ? `// Compares the same action (turning a pin on/off) implemented two ways:\n// pin 12 via the DDR/PORT registers, pin 13 via the standard API.\n// Pin 13 = PB5, Pin 12 = PB4 (Uno's D8-D13 all belong to PORTB).\n//\n// Deliberately written as "pin 12 (register) first -> pin 13 (API) second":\n// a register access is almost instant (1-2 instructions, ~2 cycles), while\n// digitalWrite() costs ~56 more cycles for the pin->port lookup and\n// interrupt disable/enable. So even though both lines run "at the same time",\n// the pin voltages actually change at slightly different moments -- zoom the\n// oscilloscope's TIME/DIV very small (e.g. 10us, 20us) and you'll see pin 12\n// rise first, with pin 13 following just after.\n// (At 5ms/div or slower it switches to the coarse 100ms polling mode, and\n// this tiny difference disappears -- you'll just see the 500ms square wave\n// from the real delay() timing.)\n\nconst int ledApiPin = 13;  // pin controlled via the API\n\nvoid setup() {\n  Serial.begin(9600);\n\n  // --- Pin 12: direct DDR register control ---\n  DDRB |= (1 << PB4);   // same effect as pinMode(12, OUTPUT)\n\n  // --- Pin 13: standard Arduino API ---\n  pinMode(ledApiPin, OUTPUT);\n\n  Serial.println("Pin12=register(first), Pin13=API(second), blinking together.");\n}\n\nvoid loop() {\n  // Pin 12 ON: direct register control (near-instant)\n  PORTB |= (1 << PB4);\n  // Pin 13 ON: standard API (~56 cycles slower than the register)\n  digitalWrite(ledApiPin, HIGH);\n\n  Serial.println("12(REG)=HIGH, 13(API)=HIGH");\n  delay(500);\n\n  // Pin 12 OFF: direct register control\n  PORTB &= ~(1 << PB4);\n  // Pin 13 OFF: standard API\n  digitalWrite(ledApiPin, LOW);\n\n  Serial.println("12(REG)=LOW,  13(API)=LOW");\n  delay(500);\n}`
       : `// 같은 동작(핀 켜고 끄기)을 12번 핀은 DDR/PORT 레지스터로, 13번 핀은 표준 API로 구현해 비교합니다.\n// 13번 핀 = PB5, 12번 핀 = PB4 (Uno의 D8~D13은 모두 PORTB에 속해 있습니다).\n//\n// 일부러 "12번(레지스터) 먼저 -> 13번(API) 나중" 순서로 적었습니다: 레지스터 접근은 명령어\n// 1~2개(약 2사이클)로 거의 즉시 반응하지만, digitalWrite()는 핀->포트 조회 + 인터럽트\n// disable/enable까지 거치느라 약 56사이클이 더 걸립니다. 그래서 두 줄을 "동시에" 실행시켜도\n// 실제로 핀 전압이 바뀌는 시점은 미묘하게 어긋납니다 — 오실로스코프의 TIME/DIV를 아주 작게\n// (예: 10µs, 20µs) 줄이면 12번이 먼저 올라가고 13번이 살짝 늦게 따라 올라가는 게 보입니다.\n// (TIME/DIV를 5ms 이상으로 두면 100ms 주기로 값을 읽는 굵은 모드로 전환되어 이 미세한\n// 차이는 보이지 않고, 대신 실제 delay() 타이밍에 따른 500ms 사각파만 보입니다.)\n\nconst int ledApiPin = 13;  // API 방식으로 제어할 핀\n\nvoid setup() {\n  Serial.begin(9600);\n\n  // --- 12번 핀: DDR 레지스터 직접 제어 방식 ---\n  DDRB |= (1 << PB4);   // pinMode(12, OUTPUT)과 동일한 효과\n\n  // --- 13번 핀: 표준 Arduino API 방식 ---\n  pinMode(ledApiPin, OUTPUT);\n\n  Serial.println("12번=레지스터(먼저), 13번=API(나중)로 동시에 점멸합니다.");\n}\n\nvoid loop() {\n  // 12번 핀 ON: 레지스터 직접 제어 (거의 즉시 반응)\n  PORTB |= (1 << PB4);\n  // 13번 핀 ON: 표준 API (레지스터보다 ~56사이클 늦게 반응)\n  digitalWrite(ledApiPin, HIGH);\n\n  Serial.println("12(REG)=HIGH, 13(API)=HIGH");\n  delay(500);\n\n  // 12번 핀 OFF: 레지스터 직접 제어\n  PORTB &= ~(1 << PB4);\n  // 13번 핀 OFF: 표준 API\n  digitalWrite(ledApiPin, LOW);\n\n  Serial.println("12(REG)=LOW,  13(API)=LOW");\n  delay(500);\n}`;
+  } else if (type === 'api_vs_register_burst'){
+    // 위 'api_vs_register' 예제는 토글을 한 번씩만 하기 때문에 펄스 폭이 겨우 3~4µs라, 500ms
+    // 주기 안에서 그 순간을 마우스로 딱 맞혀 오실로스코프를 정지시키기가 사실상 불가능합니다.
+    // 이 예제는 같은 토글을 1000번씩 묶어("버스트") 지속적인 사각파로 만들어 눈으로 쉽게
+    // 잡을 수 있게 했습니다. 실제로 16MHz 우노에서 돌려서 확인한 수치를 주석에 그대로 적어
+    // 두었습니다(API 56사이클 vs 레지스터 2사이클의 정확히 15배 차이).
+    editor.value = currentLang === 'en'
+      ? `// Compares how FAST pin 13 (API) vs pin 12 (register) can toggle, by repeating the\n// same toggle 1000 times in a row ("burst") so it shows up as a steady, easy-to-catch\n// square wave on the oscilloscope -- unlike the single-toggle 'api_vs_register'\n// example, whose ~4us pulse is nearly impossible to land the mouse on.\n//\n// Measured on a 16MHz Uno R3:\n//   Pin 13 (API, digitalWrite)     -> ~133 kHz square wave, burst lasts ~7.5ms\n//   Pin 12 (register, PORTB)       -> ~2 MHz   square wave, burst lasts ~0.5ms\n//   (exactly 15x apart -- one digitalWrite() call costs 56 cycles, one register\n//    access costs 2 cycles)\n//\n// How to see it:\n//   1) This example auto-places an oscilloscope: CH1 = pin 13, CH2 = pin 12, GND wired.\n//   2) Click "Hold" a few times until a burst lands on screen.\n//   3) TIME/DIV: try 5~10us for pin 13, 0.2~0.5us for pin 12.\n//   4) Turn on "Measure" and drag the two cursors onto two rising edges of the same\n//      channel -- the readout shows the period (dt) and frequency (f) directly.\n\nconst int ledApiPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  DDRB |= (1 << PB4);       // pin 12 as output via register (same as pinMode(12, OUTPUT))\n  pinMode(ledApiPin, OUTPUT);\n}\n\nvoid loop() {\n  Serial.println("Pin 13 (API): toggling 1000 times...");\n  for (int i = 0; i < 1000; i++) {\n    digitalWrite(ledApiPin, HIGH);\n    digitalWrite(ledApiPin, LOW);\n  }\n\n  Serial.println("Pin 12 (register): toggling 1000 times...");\n  for (int i = 0; i < 1000; i++) {\n    PORTB |= (1 << PB4);\n    PORTB &= ~(1 << PB4);\n  }\n\n  delay(100);\n}`
+      : `// 13번(API) vs 12번(레지스터)이 얼마나 "빨리" 토글할 수 있는지, 같은 토글을 1000번씩 묶어\n// ("버스트") 비교합니다. 바로 위 'api_vs_register' 예제는 한 번만 토글해서 펄스 폭이\n// 3~4µs밖에 안 되다 보니 마우스로 그 순간을 잡기가 사실상 불가능한데, 이 예제는 지속적인\n// 사각파로 만들어서 눈으로 쉽게 잡을 수 있게 했습니다.\n//\n// 16MHz 우노 R3에서 실제로 돌려서 확인한 수치입니다:\n//   13번(API, digitalWrite)     -> 약 133kHz 사각파, 버스트 지속시간 약 7.5ms\n//   12번(레지스터, PORTB 직접)  -> 약 2MHz   사각파, 버스트 지속시간 약 0.5ms\n//   (정확히 15배 차이 — digitalWrite() 1회 = 56사이클, 레지스터 접근 1회 = 2사이클)\n//\n// 확인하는 방법:\n//   1) 이 예제를 고르면 오실로스코프가 자동으로 배치됩니다: CH1=13번, CH2=12번, GND도 연결됨.\n//   2) "⏸ 정지" 버튼을 몇 번 눌러서 버스트 구간이 화면에 걸리도록 시도해 보세요.\n//   3) TIME/DIV는 13번은 5~10µs, 12번은 0.2~0.5µs 근처가 보기 좋습니다.\n//   4) "📏 측정"을 켜고 같은 채널의 상승 엣지 2개에 커서를 맞추면 주기(Δt)와 주파수(f)가\n//      바로 읽힙니다 — 13번과 12번의 주파수를 비교해 보세요.\n\nconst int ledApiPin = 13;\n\nvoid setup() {\n  Serial.begin(9600);\n  DDRB |= (1 << PB4);       // 12번을 레지스터로 출력 설정 (pinMode(12, OUTPUT)과 동일한 효과)\n  pinMode(ledApiPin, OUTPUT);\n}\n\nvoid loop() {\n  Serial.println("13번(API) 1000회 토글...");\n  for (int i = 0; i < 1000; i++) {\n    digitalWrite(ledApiPin, HIGH);\n    digitalWrite(ledApiPin, LOW);\n  }\n\n  Serial.println("12번(레지스터) 1000회 토글...");\n  for (int i = 0; i < 1000; i++) {\n    PORTB |= (1 << PB4);\n    PORTB &= ~(1 << PB4);\n  }\n\n  delay(100);\n}`;
   } else if (type === 'port_full'){
     editor.value = currentLang === 'en'
       ? `// R3 full-port control example -- one PORTD register write moves all 8 pins (D0~D7)\n// at once. ATmega328P lines D0~D7 up 1:1 with PORTD's 8 bits, so a single byte write\n// changes all 8 pins in exactly ONE clock cycle -- calling digitalWrite() 8 times would\n// take 8 separate ~56-cycle API calls instead. This is the advantage R4 can't fully\n// match, because its D0~D7 pins are scattered across two different ports (see the\n// R4 'port_wide' example).\n//\n// Wiring: an LED+resistor on every pin D0~D7, so the raw 8-bit value is directly\n// visible as a binary counter (D7 = most significant bit, D0 = least significant).\n// NOTE: D0/D1 normally double as Serial RX/TX -- this sketch deliberately skips\n// Serial.begin() so the full 8-bit port stays free for LED output.\n\nvoid setup() {\n  DDRD = 0xFF; // Set D0~D7 all to OUTPUT at once (same effect as calling pinMode() 8 times, but in 1 cycle)\n}\n\nvoid loop() {\n  for (int i = 0; i <= 255; i++) {\n    PORTD = i; // Write all 8 pins in a single instruction (0b00000000 ~ 0b11111111)\n    delay(120);\n  }\n}`
@@ -12273,6 +12405,7 @@ const R3_EXAMPLE_DEFS = [
   { key: 'counter', titleKey: 'popup.exCounter' },
   { key: 'register', titleKey: 'popup.exRegister' },
   { key: 'api_vs_register', titleKey: 'popup.exApiVsReg' },
+  { key: 'api_vs_register_burst', titleKey: 'popup.exApiVsRegBurst' },
   { key: 'port_full', titleKey: 'popup.exPortFullR3' },
   { key: 'relay', titleKey: 'popup.exRelay' },
   { sectionLabel: 'popup.motorSectionTitle' },
@@ -12479,6 +12612,29 @@ function wireDcMotorExample(board, key){
   document.getElementById(`${psu}_switch`).click();
 }
 
+// R3 예제: 13번(API) vs 12번(레지스터) 속도차 버스트 비교 — 오실로스코프를 자동으로 배치하고
+// CH1=13번, CH2=12번, GND를 전부 연결해 둡니다. 학생이 직접 배선하지 않아도 바로 "⏸ 정지" +
+// "📏 측정"만으로 결과를 확인할 수 있게 하기 위함입니다. R3 전용(D12/D13=PORTB 매핑에 의존)
+// 예제라 다른 보드 파라미터는 받지 않습니다.
+function wireApiVsRegBurstExample(board, key){
+  if (!boardInstances[board]) spawnBoard(board);
+  const boardEl = document.getElementById(boardDomId[board]);
+  if (!boardEl) return;
+  const pos = elCanvasPos(boardEl);
+  const d13Pin = boardEl.querySelector('[data-pin="D13"]');
+  const d12Pin = boardEl.querySelector('[data-pin="D12"]');
+  const gndPin = boardEl.querySelector('[data-pin="GND_D"]');
+  const scope = placeExp('scope', key, pos.x + 640, pos.y + 20);
+  taggedWire(key, d13Pin, document.querySelector(`#${scope} [data-pin$="_CH1"]`));
+  taggedWire(key, d12Pin, document.querySelector(`#${scope} [data-pin$="_CH2"]`));
+  taggedWire(key, gndPin, document.querySelector(`#${scope} [data-pin$="_GND"]`));
+  // 13번(API)은 펄스가 넓어(약 3.75µs) 5µs/div, 12번(레지스터)은 훨씬 좁아(약 0.25µs) 그 20배인
+  // 12번 채널 기준으로는 화면이 너무 빡빡하므로, 우선 13번 파형이 한눈에 들어오는 5µs/div로
+  // 맞춰 둡니다 — 12번을 볼 때는 학생이 직접 0.2~0.5µs로 낮추면 됩니다(예제 코드 주석 참고).
+  const timeDivSel = document.getElementById(`${scope}_timediv`);
+  if (timeDivSel){ timeDivSel.value = '0.005'; }
+}
+
 // R3/R4 예제: 서보모터 — 이 시뮬레이터는 Servo 라이브러리 대신, SIG 핀의 PWM 듀티(analogWrite
 // 0~255)를 그대로 0~180도로 환산해서 보여줍니다(7761번째 줄의 서보 각도 갱신 로직 참고).
 function wireServoExample(board, key){
@@ -12606,6 +12762,8 @@ function runCodeExample(board, key){
     wireAcMotorExample(board, key);
   } else if (key === 'rs485_servo_single'){
     wireRs485MotorExample(board, key);
+  } else if (key === 'api_vs_register_burst'){
+    wireApiVsRegBurstExample(board, key);
   }
   loadExampleCode(board, key);
   openBoardPopup(board);
