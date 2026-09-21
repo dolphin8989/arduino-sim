@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9964</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9967</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -652,6 +652,14 @@
   .rpi-pinname.l{text-align:right;}
   .rpi-pinname.r{text-align:left;}
   .rpi-pinnum{text-align:center; opacity:.55;}
+  /* [Ver0.9966, 2부] 40핀 GPIO 헤더와는 별개인 물리 HDMI 포트 한 줄 — 실제 라즈베리파이도
+     HDMI 포트가 GPIO 헤더와 분리된 별도 커넥터이므로 그 배치를 그대로 반영했습니다. */
+  .rpi-ports{display:flex; justify-content:center; margin:6px 0 2px;}
+  .rpi-ports .pin-col{gap:2px;}
+  /* HDMI 모니터가 실제로 연결되어 있음을 캔버스에서도 한눈에 알 수 있도록 아이콘에 은은한
+     녹색 발광을 줍니다(팝업을 열지 않아도 보임). */
+  .comp-hdmimonitor.hdmi-connected .deco-icon{filter:drop-shadow(0 0 5px #3ddc84);}
+  .comp-hdmimonitor .deco-icon{cursor:pointer;}
 
   .comp-diagramdeco{padding:10px; background:linear-gradient(160deg,#232833,#14171e); border:1px solid #4a5468; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
   .comp-diagramdeco.comp-hdmimonitor{width:150px;}
@@ -923,6 +931,41 @@
   .diode-bar{width:3px; height:22px; background:#d0d0d0; border-radius:1px;}
   .diode-status{font-size:.6rem; color:var(--text-dim); margin-top:2px;}
   .diode-status.conducting{color:#8ee68a;}
+  /* 쇼트키 다이오드 — 일반 다이오드와 완전히 같은 시각 구조(diode-body/tri/bar/status)를 그대로
+     재사용하되, 테두리만 눈에 띄게 구분합니다(문턱전압이 낮다는 것을 색으로도 암시). */
+  .comp-schottky{border-color:#8a6a2a;}
+  .comp-schottky .diode-tri{border-left-color:#ffb454;}
+  .comp-schottky .diode-tri.conducting{border-left-color:#8ee68a;}
+
+  /* ---------- 배터리/PMIC 실습: 충전식 배터리 / CC-CV 충전기 / DC-DC 벅 컨버터 ---------- */
+  .comp-battery{width:168px; padding:11px; background:linear-gradient(160deg,#17281d,#0b150e); border:1px solid #1c3a24; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .comp-battery select.battery-rated-volt{
+    width:100%; margin-bottom:7px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong);
+    border-radius:4px; font-size:.66rem; padding:3px; cursor:pointer;
+  }
+  .battery-cell{display:flex; align-items:flex-end; justify-content:center; gap:0; height:44px; margin-bottom:6px;}
+  .battery-cell-body{width:52px; height:40px; border:2px solid #3ddc84; border-radius:3px; position:relative; overflow:hidden; background:#04120a;}
+  .battery-cell-nub{width:12px; height:7px; background:#3ddc84; border-radius:2px 2px 0 0; margin-bottom:-1px;}
+  .battery-cell-fill{position:absolute; left:0; right:0; bottom:0; background:linear-gradient(180deg,#5cffb0,#0b5d3e); transition:height .2s;}
+  .battery-readout{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:#7dffb0; text-align:center; margin-bottom:2px;}
+  .battery-percent{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600; color:#3ddc84; text-align:center; margin-bottom:7px;}
+
+  .comp-cccv, .comp-buck{width:178px; padding:11px; background:linear-gradient(160deg,#1a2530,#0d141c); border:1px solid #2a3f4f; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .comp-cccv .psu-title, .comp-buck .psu-title{margin-bottom:6px;}
+  .reg-row{display:flex; align-items:center; gap:6px; margin-bottom:5px; font-size:.62rem; color:var(--text-dim);}
+  .reg-row label{flex:0 0 auto; white-space:nowrap;}
+  .reg-row input[type="range"]{flex:1; min-width:0;}
+  .reg-row input[type="number"]{
+    width:52px; background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:4px;
+    font-size:.62rem; padding:2px 3px; font-family:'IBM Plex Mono',monospace;
+  }
+  .reg-readout{
+    background:#04120a; border:1px solid #1c3a24; border-radius:4px; color:#5ad0e6; font-family:'IBM Plex Mono',monospace;
+    font-size:.64rem; padding:3px 4px; margin-bottom:7px; text-align:center; text-shadow:0 0 4px rgba(90,208,230,.5);
+  }
+  .reg-warn{font-size:.6rem; color:#ffb454; margin-bottom:6px; display:none;}
+  .reg-warn.show{display:block;}
+  .comp-cccv .comp-pin-row, .comp-buck .comp-pin-row{flex-wrap:wrap; gap:5px 7px; justify-content:center;}
 
   .comp-transistor{width:126px; padding:10px; background:linear-gradient(160deg,#2a3648,#161c26); border:1px solid #3a4a5f; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
   .transistor-body{width:56px; height:56px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#454b53,#20242a 75%); border:2px solid #575d66; margin:6px auto; position:relative;}
@@ -1473,6 +1516,138 @@
   .blockly-workspace .blocklyToolboxCategoryLabel{ color:#1a1a1a !important; }
   .block-editor-unavailable{padding:14px; font-size:.78rem; color:var(--text-dim); line-height:1.6;}
 
+  /* ============ 🖥️ [Ver0.9966, 2부] 라즈베리파이 HDMI 가상 모니터 팝업 + 3단 HMI 샌드박스 ============
+     Pyodide 같은 외부 실행 엔진은 전혀 쓰지 않습니다 — Tkinter/Web 탭은 실제 파이썬·플라스크를
+     실행하지 않는 순수 정적/모크 화면이고, 노코드 HMI 탭만 클릭 이벤트로 가상 GPIO 상태를 바꾸는
+     가벼운 자체 상호작용을 제공합니다. 팝업 자체는 기존 .board-popup 프레임(드래그/리사이즈/
+     최대화)을 그대로 재사용합니다. */
+  #popupMonitor .popup-head b{font-size:.8rem;}
+  #popupMonitor #monitorTabs{margin:8px 14px 0;}
+  #monitorScreen{position:relative; flex:1; display:flex; min-height:0; margin:8px 14px 14px;
+    background:#000; border-radius:6px; overflow:hidden; border:1px solid #222;}
+  #monitorScreen .no-signal-overlay{position:absolute; inset:0; z-index:5; display:none; flex-direction:column;
+    align-items:center; justify-content:center; gap:6px; background:#000; font-family:'IBM Plex Mono',monospace;}
+  #monitorScreen.no-signal .no-signal-overlay{display:flex;}
+  #monitorScreen .no-signal-overlay .ns-icon{font-size:1.8rem; opacity:.5;}
+  #monitorScreen .no-signal-overlay b{font-size:.78rem; letter-spacing:1px; color:#565f6b;}
+  #monitorScreen .no-signal-overlay span{font-size:.62rem; color:#3a4048;}
+
+  .monitor-tab-view{display:none; flex:1; min-height:0;}
+  .monitor-tab-view.active{display:flex;}
+
+  /* --- 탭1: 노코드 HMI --- */
+  #hmiCanvas{position:relative; flex:1; min-height:0; overflow:hidden;
+    background:linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0/16px 16px,
+      linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/16px 16px, #0c1116;}
+  #hmiCanvas .hmi-empty-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:#3a4048; font-size:.68rem; text-align:center; padding:20px; pointer-events:none;}
+  .hmi-widget-palette{width:104px; flex:0 0 auto; background:#12161c; border-left:1px solid #232830;
+    padding:8px 6px; display:flex; flex-direction:column; gap:6px; overflow-y:auto;}
+  .hmi-palette-item{display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 4px;
+    background:#1b212a; border:1px solid #2b323d; border-radius:7px; cursor:pointer; font-size:.56rem;
+    color:var(--text-dim); text-align:center; user-select:none;}
+  .hmi-palette-item:hover{background:#232b36; border-color:#3a4453;}
+  .hmi-palette-item .hp-icon{font-size:1.05rem;}
+  .hmi-palette-clear{margin-top:auto;}
+
+  .hmi-widget{position:absolute; cursor:grab; user-select:none; display:flex; flex-direction:column; align-items:center;}
+  .hmi-widget:active{cursor:grabbing;}
+  .hmi-widget .hmi-w-del{position:absolute; top:-8px; right:-8px; width:15px; height:15px; line-height:14px;
+    text-align:center; font-size:.6rem; background:#3a1418; color:#ff8a8a; border:1px solid #6b2029;
+    border-radius:50%; cursor:pointer; opacity:0; transition:opacity .1s;}
+  .hmi-widget:hover .hmi-w-del{opacity:1;}
+  .hmi-widget .hmi-w-label{font-size:.52rem; color:#7c8695; font-family:'IBM Plex Mono',monospace;
+    margin-top:2px; white-space:nowrap;}
+
+  .hmi-w-button{width:56px; height:30px; border-radius:7px; background:linear-gradient(160deg,#3a4250,#262c36);
+    border:1px solid #4a5361; display:flex; align-items:center; justify-content:center; font-size:.62rem;
+    color:#dfe4ea; box-shadow:0 2px 4px rgba(0,0,0,.4);}
+  .hmi-w-button.pin-on{background:linear-gradient(160deg,#1c8a52,#0d5a34); border-color:#3ddc84; color:#fff;}
+
+  .hmi-w-toggle{width:42px; height:22px; border-radius:11px; background:#2c333d; border:1px solid #3a4250; position:relative;}
+  .hmi-w-toggle .tg-knob{position:absolute; top:1px; left:1px; width:18px; height:18px; border-radius:50%;
+    background:#8b93a1; transition:transform .12s;}
+  .hmi-w-toggle.pin-on{background:#0b5d3e;}
+  .hmi-w-toggle.pin-on .tg-knob{transform:translateX(20px); background:#3ddc84;}
+
+  .hmi-w-lamp{width:26px; height:26px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#3a1414,#1a0808 70%);
+    border:1px solid #050505; box-shadow:0 2px 4px rgba(0,0,0,.4);}
+  .hmi-w-lamp.pin-on{background:radial-gradient(circle at 35% 30%,#ffb0b0,#ff3d3d 70%); box-shadow:0 0 10px #ff3d3d;}
+
+  .hmi-w-gauge{width:52px; height:52px; border-radius:50%; background:conic-gradient(#3ddc84 calc(var(--pct,0) * 1%), #262c36 0);
+    display:flex; align-items:center; justify-content:center; border:1px solid #3a4250;}
+  .hmi-w-gauge span{width:38px; height:38px; border-radius:50%; background:#12161c; display:flex; align-items:center;
+    justify-content:center; font-size:.56rem; color:#dfe4ea; font-family:'IBM Plex Mono',monospace;}
+
+  /* --- 탭2: Tkinter GUI (모크) --- */
+  #viewTkinter{flex-direction:column; align-items:center; padding:14px; gap:10px; background:#14181e; overflow:auto;}
+  #tkinterCanvas{background:#eceff4; border:1px solid #444; border-radius:2px; box-shadow:0 4px 14px rgba(0,0,0,.4);}
+  .tkinter-console{width:400px; max-width:100%; background:#0c0f13; border:1px solid #232830; border-radius:5px;
+    font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:#8fdc9a;}
+  .tkinter-console-head{padding:4px 8px; background:#181d24; border-bottom:1px solid #232830; color:var(--text-dim);
+    display:flex; justify-content:space-between;}
+  .tkinter-console-body{height:78px; overflow-y:auto; padding:5px 8px; white-space:pre-wrap; line-height:1.5;}
+
+  /* --- 탭3: Web / Flask (모크) --- */
+  #viewWeb{flex-direction:column;}
+  .web-addr-bar{display:flex; align-items:center; gap:6px; padding:7px 10px; background:#20242b;
+    border-bottom:1px solid #2b313a; flex:0 0 auto;}
+  .web-addr-bar .web-dot{width:8px; height:8px; border-radius:50%; flex:0 0 auto;}
+  .web-addr-bar input{flex:1; background:#12161c; border:1px solid #2b313a; border-radius:5px; padding:5px 8px;
+    font-size:.68rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+  .web-addr-bar button{font-size:.72rem; padding:4px 9px; background:#1b212a; border:1px solid #2b313a;
+    color:var(--text-dim); border-radius:5px; cursor:pointer;}
+  .web-addr-bar button:hover{background:#232b36;}
+  #webIframe{flex:1; width:100%; border:none; background:#fff;}
+
+  /* --- 탭4: ROS(Robot Operating System) 모크 [Ver0.9967, 3부] --- */
+  #viewRos{flex-direction:row; gap:0;}
+  .ros-main{flex:1; display:flex; flex-direction:column; min-width:0; min-height:0;}
+  .ros-toolbar{display:flex; align-items:center; gap:6px; padding:7px 10px; background:#181d24;
+    border-bottom:1px solid #232830; flex:0 0 auto; flex-wrap:wrap;}
+  .ros-toolbar select{background:#12161c; border:1px solid #2b313a; color:var(--text-dim); border-radius:5px;
+    padding:4px 6px; font-size:.68rem;}
+  .ros-toolbar button{font-size:.68rem; padding:4px 10px; border-radius:5px; cursor:pointer; border:1px solid #2b313a;}
+  .ros-toolbar .ros-run-btn{background:#0b5d3e; border-color:#1c8a52; color:#dfffe8;}
+  .ros-toolbar .ros-run-btn:hover{background:#0d7449;}
+  .ros-toolbar .ros-stop-btn{background:#3a1418; border-color:#6b2029; color:#ffb0b0;}
+  .ros-toolbar .ros-stop-btn:hover{background:#4a1a20;}
+  .ros-toolbar .ros-status{margin-left:auto; font-size:.62rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+  .ros-toolbar .ros-status.active{color:#3ddc84;}
+
+  #rosGraphWrap{position:relative; flex:1; min-height:0; background:#0c1116; overflow:auto;}
+  #rosGraphSvg{width:100%; height:100%; min-height:140px; display:block;}
+  .ros-graph-empty-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:#3a4048; font-size:.66rem; text-align:center; padding:20px; pointer-events:none;}
+  .ros-node-box{fill:#1b212a; stroke:#4a5361; stroke-width:1;}
+  .ros-node-label{fill:#dfe4ea; font-size:9px; font-family:'IBM Plex Mono',monospace;}
+  .ros-topic-pill{fill:#182226; stroke:#2f6b5f; stroke-width:1;}
+  .ros-topic-label{fill:#8fdc9a; font-size:8.5px; font-family:'IBM Plex Mono',monospace;}
+  .ros-edge-pub{stroke:#3ddc84; stroke-width:1.4; fill:none;}
+  .ros-edge-sub{stroke:#ffb454; stroke-width:1.2; fill:none; stroke-dasharray:3 2;}
+  .ros-flash{filter:drop-shadow(0 0 5px #3ddc84);}
+
+  .ros-console{flex:0 0 auto; border-top:1px solid #232830; background:#0f1318; padding:6px 10px;
+    display:flex; flex-direction:column; gap:4px; max-height:150px;}
+  .ros-console-row{display:flex; align-items:center; gap:6px;}
+  .ros-console-row select, .ros-console-row input{background:#12161c; border:1px solid #2b313a; color:var(--text-dim);
+    border-radius:5px; padding:4px 6px; font-size:.66rem;}
+  .ros-console-row input{flex:1; font-family:'IBM Plex Mono',monospace;}
+  .ros-console-row button{font-size:.66rem; padding:4px 10px; border-radius:5px; cursor:pointer; background:#1b212a;
+    border:1px solid #2b313a; color:var(--text-dim);}
+  .ros-console-row button:hover{background:#232b36;}
+  .ros-echo-log{height:56px; overflow-y:auto; font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:#8fdc9a;
+    background:#0c0f13; border:1px solid #202730; border-radius:4px; padding:4px 6px; white-space:pre-wrap; line-height:1.45;}
+
+  .ros-sidebar{width:150px; flex:0 0 auto; background:#12161c; border-left:1px solid #232830; padding:8px;
+    display:flex; flex-direction:column; gap:10px; overflow-y:auto;}
+  .ros-sidebar h4{margin:0 0 4px; font-size:.62rem; color:var(--text-dim); font-weight:600;}
+  .ros-stat-line{font-size:.6rem; color:#7c8695; font-family:'IBM Plex Mono',monospace; line-height:1.5; white-space:pre-line;}
+  #rosPoseCanvas{background:#0c0f13; border:1px solid #232830; border-radius:5px;}
+  .ros-battery-bar{width:100%; height:14px; background:#232830; border:1px solid #2b313a; border-radius:4px; overflow:hidden;}
+  .ros-battery-fill{height:100%; background:linear-gradient(90deg,#3ddc84,#1c8a52); transition:width .3s;}
+  .ros-tf-list{font-size:.58rem; color:#7c8695; font-family:'IBM Plex Mono',monospace; line-height:1.6;}
+
   /* ============ 🤖 하단 Gemini AI 회로 어시스턴트 (Ver0.9962) ============ */
   /* [Ver0.9963 수정] 처음엔 position:fixed로 캔버스 위에 떠 있게 했었는데, 그러면 실제 문서
      흐름(body는 header/workspace/footer를 세로로 쌓는 flex 컨테이너)에서 빠져나와 캔버스
@@ -1520,7 +1695,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9964</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9967</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1685,7 +1860,7 @@
       </div>
       <div class="palette-group" data-group="power">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.power">전원 장치</span><span class="pg-count">5</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.power">전원 장치</span><span class="pg-count">9</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('psu')">
@@ -1707,6 +1882,22 @@
           <div class="palette-item" onclick="spawnComponent('generator')">
             <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:#2c3138;border:2px solid #e8d38a;"></div></div>
             <span data-i18n="palette.generator">손잡이 발전기<br>(전자기유도, DC/AC 선택)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('battery')">
+            <div class="swatch"><div style="width:18px;height:24px;border-radius:2px 2px 4px 4px;background:linear-gradient(180deg,#3ddc84,#0b5d3e);border:1px solid #1c3a24;"></div></div>
+            <span data-i18n="palette.battery">충전식 배터리<br>(1.5/3.7/9/12/19.6V, 잔량 표시)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('cccv')">
+            <div class="swatch"><div style="width:24px;height:18px;border-radius:2px;background:#26303a;border:1px solid #5ad0e6;"></div></div>
+            <span data-i18n="palette.cccv">CC/CV 충전기 모듈<br>(전압·전류제한 조절)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('buck')">
+            <div class="swatch"><div style="width:24px;height:18px;border-radius:2px;background:#26303a;border:1px solid #ffb454;"></div></div>
+            <span data-i18n="palette.buck">DC-DC 벅 컨버터<br>(1.5~24V 가변 강압)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('schottky')">
+            <div class="swatch"><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:14px solid #ffb454;"></div></div>
+            <span data-i18n="palette.schottky">쇼트키 다이오드<br>(낮은 Vf, 역류 방지)</span>
           </div>
         </div>
       </div>
@@ -2275,6 +2466,108 @@ void loop() {
     </div>
   </div>
 
+  <!-- [Ver0.9966, 2부] 🖥️ 라즈베리파이 HDMI 가상 모니터 팝업 — 캔버스 위 comp-hdmimonitor 부품을
+       더블클릭하면 열리는 싱글턴 팝업입니다(모니터가 여러 개 있어도 이 팝업 하나를 공유하고,
+       openMonitorPopup(compId)가 매번 대상만 바꿔 씁니다). 기존 .board-popup 프레임(드래그/
+       리사이즈/최대화)을 그대로 재사용합니다. -->
+  <div class="board-popup" id="popupMonitor" hidden style="left:46%; top:50px; width:660px; height:600px;">
+    <div class="popup-head" data-drag-handle>
+      <b id="monitorPopupTitle">🖥️ HDMI 모니터</b>
+      <button class="btn ghost popup-max-btn" id="maxBtnMonitor" onclick="toggleMonitorPopupMaximize()" data-i18n-title="popup.maximizeTitle" title="최대화 (창을 화면 가득 채우기)">⛶</button>
+      <button class="btn ghost" onclick="closeMonitorPopup()" data-i18n="popup.close">닫기 ✕</button>
+    </div>
+    <div class="editor-tabs" id="monitorTabs">
+      <button class="editor-tab active" id="tabBtnNocode" onclick="switchMonitorTab('nocode')" data-i18n="monitor.tabNocode">🎛 노코드 HMI</button>
+      <button class="editor-tab" id="tabBtnTkinter" onclick="switchMonitorTab('tkinter')" data-i18n="monitor.tabTkinter">🐍 Tkinter GUI</button>
+      <button class="editor-tab" id="tabBtnWeb" onclick="switchMonitorTab('web')" data-i18n="monitor.tabWeb">🌐 Web / Flask</button>
+      <button class="editor-tab" id="tabBtnRos" onclick="switchMonitorTab('ros')" data-i18n="monitor.tabRos">🤖 ROS</button>
+    </div>
+    <div id="monitorScreen" class="no-signal">
+      <div class="no-signal-overlay">
+        <div class="ns-icon">🚫</div>
+        <b data-i18n="monitor.noSignal">NO HDMI SIGNAL</b>
+        <span data-i18n="monitor.noSignalHint">라즈베리파이의 HDMI 포트와 전선으로 연결하세요</span>
+      </div>
+      <div class="monitor-tab-view active" id="viewNocode">
+        <div id="hmiCanvas">
+          <div class="hmi-empty-hint" id="hmiEmptyHint" data-i18n="monitor.hmiEmptyHint">오른쪽 위젯을 클릭하면 여기에 배치됩니다</div>
+        </div>
+        <div class="hmi-widget-palette">
+          <div class="hmi-palette-item" onclick="addHmiWidget('button')"><span class="hp-icon">🔘</span><span data-i18n="monitor.widgetButton">버튼</span></div>
+          <div class="hmi-palette-item" onclick="addHmiWidget('toggle')"><span class="hp-icon">🎚️</span><span data-i18n="monitor.widgetToggle">토글</span></div>
+          <div class="hmi-palette-item" onclick="addHmiWidget('lamp')"><span class="hp-icon">🔴</span><span data-i18n="monitor.widgetLamp">LED 램프</span></div>
+          <div class="hmi-palette-item" onclick="addHmiWidget('gauge')"><span class="hp-icon">📊</span><span data-i18n="monitor.widgetGauge">게이지</span></div>
+          <div class="hmi-palette-item hmi-palette-clear" onclick="clearHmiCanvas()"><span class="hp-icon">🗑️</span><span data-i18n="monitor.widgetClear">모두 지우기</span></div>
+        </div>
+      </div>
+      <div class="monitor-tab-view" id="viewTkinter">
+        <canvas id="tkinterCanvas" width="400" height="300"></canvas>
+        <div class="tkinter-console">
+          <div class="tkinter-console-head"><span data-i18n="monitor.tkConsoleHead">Python 3 — Tkinter (모크)</span><span>mainloop()</span></div>
+          <div class="tkinter-console-body" id="tkinterConsoleBody"></div>
+        </div>
+      </div>
+      <div class="monitor-tab-view" id="viewWeb">
+        <div class="web-addr-bar">
+          <div class="web-dot" style="background:#3ddc84;"></div>
+          <input type="text" id="webAddressBar" value="http://localhost:5000">
+          <button onclick="reloadWebIframe()" data-i18n-title="monitor.webReloadTitle" title="새로고침">⟲</button>
+        </div>
+        <iframe id="webIframe" sandbox="allow-scripts"></iframe>
+      </div>
+      <!-- [Ver0.9967, 3부] 🤖 ROS(Robot Operating System) 모크 탭 — Pyodide 등 외부 엔진은 여전히
+           쓰지 않지만, 발행(publish)이 실제로 구독 중인 노드의 JS 콜백을 호출하는 진짜 pub/sub
+           로직으로 동작합니다(rosPublish/rosSubscribe, 아래 스크립트 참고). -->
+      <div class="monitor-tab-view" id="viewRos">
+        <div class="ros-main">
+          <div class="ros-toolbar">
+            <select id="rosLaunchSelect">
+              <option value="teleop_demo">teleop_demo.launch</option>
+              <option value="sensor_demo">sensor_demo.launch</option>
+            </select>
+            <button class="ros-run-btn" onclick="rosLaunchStart()" data-i18n="monitor.rosLaunchBtn">▶ roslaunch</button>
+            <button class="ros-stop-btn" onclick="rosLaunchStop()" data-i18n="monitor.rosStopBtn">■ 정지</button>
+            <span class="ros-status" id="rosStatusText" data-i18n="monitor.rosStoppedStatus">⚪ 정지됨</span>
+          </div>
+          <div id="rosGraphWrap">
+            <svg id="rosGraphSvg"></svg>
+            <div class="ros-graph-empty-hint" id="rosGraphEmptyHint" data-i18n="monitor.rosGraphEmptyHint">위에서 launch 파일을 골라 "▶ roslaunch"를 눌러보세요</div>
+          </div>
+          <div class="ros-console">
+            <div class="ros-console-row">
+              <span style="font-size:.6rem;color:var(--text-dim);" data-i18n="monitor.rosTopicLabel">topic:</span>
+              <select id="rosTopicSelect" onchange="rosTopicSelectChanged()"></select>
+            </div>
+            <div class="ros-echo-log" id="rosEchoLog"></div>
+            <div class="ros-console-row">
+              <input type="text" id="rosPubMsgInput" placeholder='{"linear":0.5,"angular":0}'>
+              <button onclick="rosPublishFromConsole()" data-i18n="monitor.rosPubBtn">발행(pub)</button>
+            </div>
+          </div>
+        </div>
+        <div class="ros-sidebar">
+          <div>
+            <h4 data-i18n="monitor.rosStatsHead">📊 상태</h4>
+            <div class="ros-stat-line" id="rosStatsLine">노드 0 · 토픽 0</div>
+          </div>
+          <div>
+            <h4 data-i18n="monitor.rosBatteryHead">🔋 배터리</h4>
+            <div class="ros-battery-bar"><div class="ros-battery-fill" id="rosBatteryFill" style="width:0%;"></div></div>
+            <div class="ros-stat-line" id="rosBatteryText">—</div>
+          </div>
+          <div>
+            <h4 data-i18n="monitor.rosPoseHead">📍 Pose (odom)</h4>
+            <canvas id="rosPoseCanvas" width="120" height="120"></canvas>
+          </div>
+          <div>
+            <h4 data-i18n="monitor.rosTfHead">🌳 TF Tree</h4>
+            <div class="ros-tf-list" id="rosTfList">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="board-popup" id="bomModal" hidden style="left:36%; top:120px; width:380px; height:440px; resize:both;">
     <div class="popup-head" data-drag-handle>
       <b data-i18n="bom.title">BOM List (부품 목록)</b>
@@ -2373,7 +2666,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9964", en: "K's Simulator Ver0.9964" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9967", en: "K's Simulator Ver0.9967" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -2611,6 +2904,38 @@ const STRINGS = {
   "comp.diode.aTitle": { ko: "애노드 (+, Anode)", en: "Anode (+)" },
   "comp.diode.kTitle": { ko: "캐소드 (−, Cathode)", en: "Cathode (−)" },
   "bom.diode": { ko: "다이오드", en: "Diode" },
+  "comp.schottky.title": { ko: "쇼트키 다이오드", en: "Schottky Diode" },
+  "comp.schottky.aTitle": { ko: "애노드 (+, Anode)", en: "Anode (+)" },
+  "comp.schottky.kTitle": { ko: "캐소드 (−, Cathode) — 역류 방지 방향", en: "Cathode (−) — blocks reverse (back-feed) current" },
+  "bom.schottky": { ko: "쇼트키 다이오드", en: "Schottky Diode" },
+  "palette.schottky": { ko: "쇼트키 다이오드<br>(낮은 Vf, 역류 방지)", en: "Schottky Diode<br>(low Vf, reverse-current block)" },
+  "comp.battery.title": { ko: "충전식 배터리", en: "Rechargeable Battery" },
+  "comp.battery.ratedLabel": { ko: "정격 전압", en: "Rated voltage" },
+  "comp.battery.vTitle": { ko: "전지 출력 (+)", en: "Battery output (+)" },
+  "comp.battery.gTitle": { ko: "전지 출력 기준(공통, −)", en: "Battery output reference (common, −)" },
+  "bom.battery": { ko: "충전식 배터리", en: "Rechargeable Battery" },
+  "palette.battery": { ko: "충전식 배터리<br>(1.5/3.7/9/12/19.6V, 잔량 표시)", en: "Rechargeable Battery<br>(1.5/3.7/9/12/19.6V, shows charge %)" },
+  "comp.cccv.title": { ko: "CC/CV 충전기 모듈", en: "CC/CV Charger Module" },
+  "comp.cccv.voltLabel": { ko: "출력 전압", en: "Output voltage" },
+  "comp.cccv.currentLabel": { ko: "전류 제한(CC)", en: "Current limit (CC)" },
+  "comp.cccv.inpTitle": { ko: "입력 전원 (+, VIN+)", en: "Power input (+, VIN+)" },
+  "comp.cccv.innTitle": { ko: "입력 전원 (−, VIN−)", en: "Power input (−, VIN−)" },
+  "comp.cccv.vTitle": { ko: "충전 출력 (+, VOUT+)", en: "Charge output (+, VOUT+)" },
+  "comp.cccv.gTitle": { ko: "충전 출력 기준(공통, VOUT−)", en: "Charge output reference (common, VOUT−)" },
+  "comp.cccv.unpowered": { ko: "⚠ 입력 전원 없음", en: "⚠ No input power" },
+  "comp.cccv.overCC": { ko: "⚠ 전류 제한 초과(CC 동작)", en: "⚠ Over current limit (CC mode)" },
+  "bom.cccv": { ko: "CC/CV 충전기 모듈", en: "CC/CV Charger Module" },
+  "palette.cccv": { ko: "CC/CV 충전기 모듈<br>(전압·전류제한 조절)", en: "CC/CV Charger Module<br>(adjustable voltage &amp; current limit)" },
+  "comp.buck.title": { ko: "DC-DC 벅 컨버터", en: "DC-DC Buck Converter" },
+  "comp.buck.voltLabel": { ko: "출력 전압", en: "Output voltage" },
+  "comp.buck.inpTitle": { ko: "입력 전원 (+, IN+)", en: "Power input (+, IN+)" },
+  "comp.buck.innTitle": { ko: "입력 전원 (−, IN−)", en: "Power input (−, IN−)" },
+  "comp.buck.vTitle": { ko: "강압 출력 (+, OUT+)", en: "Stepped-down output (+, OUT+)" },
+  "comp.buck.gTitle": { ko: "강압 출력 기준(공통, OUT−)", en: "Stepped-down output reference (common, OUT−)" },
+  "comp.buck.unpowered": { ko: "⚠ 입력 전원 없음", en: "⚠ No input power" },
+  "bom.buck": { ko: "DC-DC 벅 컨버터", en: "DC-DC Buck Converter" },
+  "palette.buck": { ko: "DC-DC 벅 컨버터<br>(1.5~24V 가변 강압)", en: "DC-DC Buck Converter<br>(1.5~24V adjustable step-down)" },
+  "toast.batteryShort": { ko: "배터리 2개가 보호소자(쇼트키 다이오드·저항) 없이 직접 병렬 연결되었습니다 — 단락 위험!", en: "Two batteries are directly paralleled with no protection (Schottky diode/resistor) — short-circuit risk!" },
   "comp.transistor.title": { ko: "트랜지스터 (NPN)", en: "Transistor (NPN)" },
   "comp.transistor.on": { ko: "● ON (C-E 통전)", en: "● ON (C-E conducting)" },
   "comp.transistor.off": { ko: "○ OFF (C-E 차단)", en: "○ OFF (C-E blocked)" },
@@ -2783,6 +3108,32 @@ const STRINGS = {
   "releaseNotes.close": { ko: "닫기", en: "Close" },
   "comp.rpi.deco": { ko: "(회로도 전용 · 시뮬레이션 안 됨)", en: "(diagram only · not simulated)" },
   "comp.hdmimonitor.title": { ko: "HDMI 모니터", en: "HDMI Monitor" },
+  "comp.rpi.hdmiTitle": { ko: "HDMI OUT (더블클릭한 HDMI 모니터 부품의 팝업에서 화면 확인)", en: "HDMI OUT (double-click a connected HDMI Monitor part to view its screen)" },
+  "monitor.tabNocode": { ko: "🎛 노코드 HMI", en: "🎛 No-code HMI" },
+  "monitor.tabTkinter": { ko: "🐍 Tkinter GUI", en: "🐍 Tkinter GUI" },
+  "monitor.tabWeb": { ko: "🌐 Web / Flask", en: "🌐 Web / Flask" },
+  "monitor.noSignal": { ko: "NO HDMI SIGNAL", en: "NO HDMI SIGNAL" },
+  "monitor.noSignalHint": { ko: "라즈베리파이의 HDMI 포트와 전선으로 연결하세요", en: "Wire the Raspberry Pi's HDMI port to this monitor" },
+  "monitor.hmiEmptyHint": { ko: "오른쪽 위젯을 클릭하면 여기에 배치됩니다", en: "Click a widget on the right to place it here" },
+  "monitor.widgetButton": { ko: "버튼", en: "Button" },
+  "monitor.widgetToggle": { ko: "토글", en: "Toggle" },
+  "monitor.widgetLamp": { ko: "LED 램프", en: "LED Lamp" },
+  "monitor.widgetGauge": { ko: "게이지", en: "Gauge" },
+  "monitor.widgetClear": { ko: "모두 지우기", en: "Clear All" },
+  "monitor.tkConsoleHead": { ko: "Python 3 — Tkinter (모크)", en: "Python 3 — Tkinter (mock)" },
+  "monitor.webReloadTitle": { ko: "새로고침", en: "Reload" },
+  "monitor.tabRos": { ko: "🤖 ROS", en: "🤖 ROS" },
+  "monitor.rosLaunchBtn": { ko: "▶ roslaunch", en: "▶ roslaunch" },
+  "monitor.rosStopBtn": { ko: "■ 정지", en: "■ Stop" },
+  "monitor.rosStoppedStatus": { ko: "⚪ 정지됨", en: "⚪ Stopped" },
+  "monitor.rosRunningPrefix": { ko: "🟢 roscore 실행 중 — ", en: "🟢 roscore running — " },
+  "monitor.rosGraphEmptyHint": { ko: "위에서 launch 파일을 골라 \"▶ roslaunch\"를 눌러보세요", en: "Pick a launch file above and click \"▶ roslaunch\"" },
+  "monitor.rosTopicLabel": { ko: "topic:", en: "topic:" },
+  "monitor.rosPubBtn": { ko: "발행(pub)", en: "Publish" },
+  "monitor.rosStatsHead": { ko: "📊 상태", en: "📊 Status" },
+  "monitor.rosBatteryHead": { ko: "🔋 배터리", en: "🔋 Battery" },
+  "monitor.rosPoseHead": { ko: "📍 Pose (odom)", en: "📍 Pose (odom)" },
+  "monitor.rosTfHead": { ko: "🌳 TF Tree", en: "🌳 TF Tree" },
   "comp.usbsound.title": { ko: "USB 사운드 모듈", en: "USB Sound Module" },
   "comp.speaker.title": { ko: "스피커", en: "Speaker" },
   "comp.custom.defaultName": { ko: "커스텀 부품", en: "Custom Part" },
@@ -3034,7 +3385,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9964", en: "K's Arduino Simulator Ver0.9964" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9967", en: "K's Arduino Simulator Ver0.9967" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -5736,6 +6087,22 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9967', ko: [
+      '🤖 HDMI 모니터 팝업에 4번째 탭 "ROS"를 추가했습니다 — 상단에서 launch 파일(teleop_demo.launch 또는 sensor_demo.launch)을 고르고 "▶ roslaunch"를 누르면 그 안에 정의된 노드들이 한 번에 떠서, 오른쪽에 노드↔토픽 연결 관계를 화살표로 보여주는 그래프가 그려집니다(발행은 초록 실선, 구독은 주황 점선, 메시지가 지나갈 때마다 잠깐 반짝입니다)',
+      '📡 이번엔 겉보기만 그럴듯한 게 아니라 실제로 동작하는 발행-구독(pub/sub) 로직입니다 — rosPublish()가 그 토픽을 구독 중인 노드에 실제로 등록된 JS 콜백을 진짜로 호출합니다. 예를 들어 teleop_demo에서 /cmd_vel을 발행하면 robot_state_node가 실제로 그 콜백에서 오도메트리를 적분해 /odom을 다시 발행하고, 그 값이 오른쪽 Pose 미니맵에 실시간으로 그려집니다(배터리도 함께 서서히 감소)',
+      '🖥 하단에는 rostopic echo/pub을 흉내 낸 미니 콘솔을 뒀습니다 — 토픽을 고르면 그 토픽에 실제로 발행되는 메시지만 실시간으로 로그에 쌓이고, 직접 메시지를 입력해 발행(pub) 버튼을 누르면 그 즉시 진짜 구독 콜백이 호출됩니다. 오른쪽 사이드바에는 노드·토픽·메시지 수 요약, 배터리, Pose, TF Tree를 모아 볼 수 있는 로봇 상태 대시보드도 함께 넣었습니다',
+      '⚠️ 이번에도 Pyodide 같은 외부 코드 실행 엔진은 전혀 쓰지 않았습니다 — roscore·노드·토픽은 전부 이 페이지 안에서만 도는 자체 자료구조(rosMaster)이고, 실제 ROS·네트워크 통신과는 무관합니다. "▶ roslaunch"로 시작한 데모는 배경에서 계속 도므로, 정지 버튼이나 새 프로젝트 시작으로 정리하지 않는 한 팝업을 닫아도 계속 동작합니다',
+  ]},
+  { ver: 'Ver0.9966', ko: [
+      '🖥️ 라즈베리파이 부품에 물리 HDMI 포트 핀을 새로 추가했습니다(40핀 GPIO 헤더와는 별개). 이 핀을 "HDMI 모니터" 부품의 HDMI 핀과 전선으로 이으면, HDMI 모니터를 더블클릭했을 때 뜨는 가상 화면 팝업이 "NO HDMI SIGNAL" 대기 화면 대신 실제 화면을 보여줍니다(전선을 빼면 즉시 다시 대기 화면으로) — 캔버스 위 부품 아이콘도 연결되면 은은하게 빛납니다',
+      '🎛 그 팝업 안에 화면 모드 3개를 탭으로 넣었습니다: ① 노코드 HMI — 버튼/토글/LED램프/게이지 위젯을 클릭해 배치하고(드래그로 재배치도 가능), 위젯을 누르면 가상 GPIO 상태가 즉시 토글됩니다. ② Tkinter GUI — 노코드 탭에서 만든 위젯들의 현재 상태를 좌표 기반 캔버스에 그대로 반영해 보여주는 모크 화면(진짜 파이썬은 실행하지 않습니다). ③ Web/Flask — 가짜 주소창(localhost:5000)과 새로고침 버튼, 그 안에 완전히 격리된(sandbox) 샘플 대시보드 한 장',
+      '⚠️ 요청하신 대로 Pyodide 같은 외부 코드 실행 엔진은 전혀 쓰지 않았습니다 — Tkinter/Flask 탭은 순수 정적 화면이고, 상태가 "연동되는 느낌"을 주는 부분은 전부 이 페이지 안에서만 도는 가벼운 자체 클릭 이벤트(rpiPinState)입니다',
+  ]},
+  { ver: 'Ver0.9965', ko: [
+      '🔋 "전원 장치" 팔레트에 배터리/PMIC 실습용 부품 4종을 추가했습니다 — 충전식 배터리(정격 1.5/3.7/9/12/19.6V 중 선택, 지금 충전 전압·잔량% 실시간 표시), CC/CV 충전기 모듈(VIN에 물린 전원을 받아 VOUT을 슬라이더로 정한 전압·전류제한으로 출력), DC-DC 벅 컨버터(1.5~24V 가변 강압), 쇼트키 다이오드(일반 다이오드보다 훨씬 낮은 순방향전압 0.25V, 배터리 역류 방지용). 배터리의 +단자에 정격보다 높은 전압을 걸어두면(충전기·벅 컨버터·PSU 등) 실제 충전기처럼 전압이 서서히 오르며 충전됩니다',
+      '⚡ 배터리 2개를 보호소자(쇼트키 다이오드·저항) 없이 +끼리·−끼리 직접 병렬로 이으면("무보호 병렬 충전") 실제로는 위험한 배선이라, 단락(쇼트) 스파크 애니메이션과 경고 메시지로 즉시 알려줍니다 — 사이에 쇼트키 다이오드나 저항을 하나라도 넣으면 경고가 사라집니다(Playwright로 두 경우 모두 직접 재현해 검증)',
+      '🧪 신규 부품 4종 모두 AI 회로 어시스턴트의 실시간 부품 카탈로그에도 자동으로 포함되어, "9V 배터리로 LED 켜는 회로 만들어줘"처럼 자연어로도 바로 배치할 수 있습니다',
+  ]},
   { ver: 'Ver0.9964', ko: [
       '🔧 실제 Gemini Key로 테스트해 보니 "models/gemini-1.5-flash is not found" 오류가 났습니다 — 이미 없어진 모델 이름이었습니다. gemini-3.8-flash(2026년 9월 현재 최신 Flash 모델, 공식 문서로 확인)를 기본으로 쓰고, 혹시 이 이름도 나중에 또 없어지면 gemini-2.5-flash → gemini-2.0-flash 순서로 자동으로 다음 모델을 시도하도록 만들었습니다(모델 이름이 또 바뀌어도 이번처럼 코드를 고쳐야만 동작하는 일이 최대한 없도록). API Key 오류처럼 모델과 무관한 오류는 그 자리에서 바로 사용자에게 보여줍니다',
       '🔑 API Key 입력칸에서 Enter를 누르면(또는 회로/코드 생성이 그 Key로 한 번 성공하면) 이 브라우저에 저장되고 입력칸이 "🔑 Key 저장됨 (변경)" 작은 버튼으로 접힙니다 — 매번 다시 넣어야 하는 것처럼 보이던 문제를 고쳤습니다. 저장된 Key가 있으면 새로고침해도 처음부터 접힌 채로 보이고, 버튼을 누르면 언제든 다시 펼쳐서 바꿀 수 있습니다',
@@ -6430,6 +6797,11 @@ function deleteComponent(el){
   el.remove();
   updateAllWires();
   updateLegend();
+  // [Ver0.9966, 2부] 지운 부품이 라즈베리파이나 HDMI 모니터였을 수 있으니 전체 모니터 연결
+  // 상태를 다시 훑고, 지금 팝업이 보고 있던 모니터 자체가 지워졌다면 팝업도 닫습니다.
+  if (typeof updateMonitorHdmiStatus === 'function') updateMonitorHdmiStatus();
+  const monPopup = document.getElementById('popupMonitor');
+  if (monPopup && !monPopup.hidden && monPopup.dataset.targetComp === el.id) closeMonitorPopup();
 }
 
 // 캔버스 배경색 — 상단 툴바의 색상 선택기로 바꿉니다. CSS 변수(--bg-canvas) 하나만 바꾸면
@@ -6460,6 +6832,10 @@ function clearCanvasAll(){
   // 캔버스를 통째로 비우면 예전 회로도 배치 정보도 더 이상 의미가 없으므로 같이 초기화합니다.
   // (프로젝트를 불러오는 경우에는 restoreProjectState가 바로 이어서 불러온 회로도로 덮어씁니다.)
   savedSchematicLayout = null;
+  // [Ver0.9967, 3부] ROS 탭에서 roslaunch로 띄워둔 데모 인터벌이 있다면 여기서 정리합니다 —
+  // 그렇지 않으면 새 프로젝트를 시작하거나 다른 프로젝트를 불러온 뒤에도 이전 세션의
+  // setInterval이 백그라운드에서 계속 돌아 메시지를 발행하는 누수가 생깁니다.
+  if (typeof rosStopLaunch === 'function') rosStopLaunch();
 }
 
 // 툴바의 "새 프로젝트 시작" 버튼 — 확인창을 띄운 뒤 캔버스(부품·보드·전선)를 전부 지우고,
@@ -6935,6 +7311,9 @@ function spawnComponent(type, dropX, dropY){
     }).join('');
     div.innerHTML = `
       <div class="rpi-title">🖥️ ${modelLabel}<span class="rpi-sub" data-i18n="comp.rpi.deco">(회로도 전용 · 시뮬레이션 안 됨)</span></div>
+      <div class="rpi-ports">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_HDMI" data-i18n-title="comp.rpi.hdmiTitle" title="HDMI OUT (더블클릭한 HDMI 모니터 부품의 팝업에서 화면 확인)"></div><span class="pin-cap cap-sig">HDMI</span></div>
+      </div>
       <div class="rpi-header">${rowsHtml}</div>`;
   } else if (type === 'hdmimonitor'){
     div.classList.add('comp-diagramdeco', 'comp-hdmimonitor');
@@ -7191,6 +7570,112 @@ function spawnComponent(type, dropX, dropY){
       <div class="comp-pin-row">
         <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" data-i18n-title="comp.diode.aTitle" title="애노드 (+, Anode)"></div><span class="pin-cap cap-vcc">A</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_B" data-i18n-title="comp.diode.kTitle" title="캐소드 (−, Cathode)"></div><span class="pin-cap cap-gnd">K</span></div>
+      </div>`;
+  } else if (type === 'schottky'){
+    // 쇼트키 다이오드 — 일반 다이오드(comp-diode)와 완전히 같은 인프라(diodeUpdate,
+    // resistiveEdges/buildAcNetworkGraph, schematicKindOf의 'diode' 기호)를 comp-diode 클래스
+    // 공유로 그대로 재사용하되, comp-schottky 클래스로 문턱전압(Vf)만 훨씬 낮게(약 0.25V,
+    // 일반 실리콘 다이오드의 0.6V보다 낮음) 구분합니다 — diodeUpdate()가 이 클래스를 보고 Vf를
+    // 고릅니다. 배터리를 병렬로 충전할 때 이 낮은 Vf 덕분에 전압 손실이 적으면서도, 한쪽
+    // 배터리에서 다른 쪽으로 전류가 거꾸로 흘러들어가는 역류(back-feed)를 막아줍니다.
+    div.classList.add('comp-diode', 'comp-schottky', 'resistive-2pin');
+    div.dataset.ohms = String(DIODE_REVERSE_OHMS);
+    div.dataset.conducting = '0';
+    div.innerHTML = `
+      <div class="comp-label" data-i18n="comp.schottky.title">쇼트키 다이오드</div>
+      <div class="diode-body"><div class="diode-tri" id="${id}_tri"></div><div class="diode-bar"></div></div>
+      <div class="diode-status" id="${id}_status" data-i18n="comp.diode.off">✕ 차단 (역방향)</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" data-i18n-title="comp.schottky.aTitle" title="애노드 (+, Anode)"></div><span class="pin-cap cap-vcc">A</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_B" data-i18n-title="comp.schottky.kTitle" title="캐소드 (−, Cathode) — 역류 방지 방향"></div><span class="pin-cap cap-gnd">K</span></div>
+      </div>`;
+  } else if (type === 'battery'){
+    // 충전용 2차 전지(리튬이온/니켈수소 등을 단순화) — comp-psu + dataset.mode='battery'로 기존
+    // PSU 인프라(psuSourceParams/acReachablePsu/externalSourceOnNet)를 그대로 재사용해 "전원"
+    // 역할을 하지만, 소금물 전지·과일 전지와 달리 전압이 고정이 아니라 자기 자신의 "지금 충전
+    // 상태"(dataset.chargeVoltage)를 그대로 출력합니다. 이 값은 runTick()에서 batteryTickUpdate()가
+    // 매 틱 갱신합니다 — V+ 단자에 정격보다 높은 전압(충전기·PSU 등)이 걸리면 서서히 그 쪽으로
+    // 충전되고, 안 걸려 있으면 지금 충전 전압을 그대로 유지합니다(자연 방전은 단순화를 위해
+    // 생략). 정격 전압을 바꾸면 그 값으로 다시 리셋됩니다(batteryRatedVoltChanged).
+    div.classList.add('comp-psu', 'comp-battery');
+    div.dataset.mode = 'battery';
+    div.dataset.ratedVoltage = '3.7';
+    div.dataset.chargeVoltage = '3.7';
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.battery.title">충전식 배터리</div>
+      <select class="battery-rated-volt" onchange="batteryRatedVoltChanged('${id}')" data-i18n-title="comp.battery.ratedLabel" title="정격 전압">
+        <option value="1.5">1.5 V</option>
+        <option value="3.7" selected>3.7 V</option>
+        <option value="9">9 V</option>
+        <option value="12">12 V</option>
+        <option value="19.6">19.6 V</option>
+      </select>
+      <div class="battery-cell">
+        <div class="battery-cell-nub"></div>
+        <div class="battery-cell-body"><div class="battery-cell-fill" id="${id}_fill" style="height:100%;"></div></div>
+      </div>
+      <div class="battery-readout" id="${id}_readout">3.70 V</div>
+      <div class="battery-percent" id="${id}_percent">100%</div>
+      <div class="psu-switch on" id="${id}_switch"><div class="knob"></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.battery.vTitle" title="전지 출력 (+)"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.battery.gTitle" title="전지 출력 기준(공통, −)"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>`;
+  } else if (type === 'cccv'){
+    // CC/CV(정전류/정전압) 충전기 모듈 — VIN+/VIN-는 변압기의 P1/P2와 완전히 같은 "측정 전용"
+    // 핀입니다(resistive-2pin이 아니라 회로에 부담을 주지 않음). regulatorInputVoltage()로 그
+    // 두 핀에 실제로 걸린 입력 전압을 읽은 뒤, 사용자가 슬라이더로 정한 목표 전압을(입력 전압을
+    // 넘을 수 없게 클램프해) VOUT+/VOUT-(comp-psu 관례상 _V/_G)에 그대로 냅니다 — comp-psu +
+    // dataset.mode='cccv'로 기존 PSU 인프라를 재사용합니다. 전류 제한(CC) 값은 이 교육용
+    // 단순화 모델에서는 출력 전압을 실시간으로 깎아내리는 완전한 정전류 동작까지는 하지 않고,
+    // 지금 추정 출력 전류(옴의 법칙, 벤치 전원 공급기와 같은 방식)가 그 값을 넘으면 경고만
+    // 표시합니다(updateRegulatorDisplays).
+    div.classList.add('comp-psu', 'comp-cccv');
+    div.dataset.mode = 'cccv';
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.cccv.title">CC/CV 충전기 모듈</div>
+      <div class="reg-row">
+        <label data-i18n="comp.cccv.voltLabel">출력 전압</label>
+        <input type="range" min="0" max="24" step="0.1" value="5" class="cccv-volt" id="${id}_volt" oninput="regulatorSliderInput('${id}')">
+        <input type="number" min="0" max="24" step="0.1" value="5" class="cccv-volt-num" id="${id}_voltnum" oninput="regulatorNumberInput('${id}')">
+      </div>
+      <div class="reg-row">
+        <label data-i18n="comp.cccv.currentLabel">전류 제한(CC)</label>
+        <input type="number" min="0.01" max="10" step="0.01" value="1.0" class="cccv-cc" id="${id}_cc">
+        <span style="font-size:.6rem;color:var(--text-faint);">A</span>
+      </div>
+      <div class="reg-readout" id="${id}_readout">0.00 V · 0.00 A</div>
+      <div class="reg-warn" id="${id}_warn" data-i18n="comp.cccv.unpowered">⚠ 입력 전원 없음</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_INP" data-i18n-title="comp.cccv.inpTitle" title="입력 전원 (+, VIN+)"></div><span class="pin-cap">VIN+</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_INN" data-i18n-title="comp.cccv.innTitle" title="입력 전원 (−, VIN−)"></div><span class="pin-cap">VIN−</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.cccv.vTitle" title="충전 출력 (+, VOUT+)"></div><span class="pin-cap cap-vcc">VOUT+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.cccv.gTitle" title="충전 출력 기준(공통, VOUT−)"></div><span class="pin-cap cap-gnd">VOUT−</span></div>
+      </div>`;
+  } else if (type === 'buck'){
+    // DC-DC 강압(벅) 컨버터 — cccv와 완전히 같은 구조(IN+/IN- 측정 전용, OUT+/OUT-는 comp-psu
+    // _V/_G 관례)이되, 전류 제한 설정 없이 순수하게 "입력 전압을 넘지 않는 범위에서 슬라이더로
+    // 정한 전압으로 강압"하는 동작만 합니다.
+    div.classList.add('comp-psu', 'comp-buck');
+    div.dataset.mode = 'buck';
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.buck.title">DC-DC 벅 컨버터</div>
+      <div class="reg-row">
+        <label data-i18n="comp.buck.voltLabel">출력 전압</label>
+        <input type="range" min="1.5" max="24" step="0.1" value="5" class="buck-volt" id="${id}_volt" oninput="regulatorSliderInput('${id}')">
+        <input type="number" min="1.5" max="24" step="0.1" value="5" class="buck-volt-num" id="${id}_voltnum" oninput="regulatorNumberInput('${id}')">
+      </div>
+      <div class="reg-readout" id="${id}_readout">0.00 V</div>
+      <div class="reg-warn" id="${id}_warn" data-i18n="comp.buck.unpowered">⚠ 입력 전원 없음</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_INP" data-i18n-title="comp.buck.inpTitle" title="입력 전원 (+, IN+)"></div><span class="pin-cap">IN+</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_INN" data-i18n-title="comp.buck.innTitle" title="입력 전원 (−, IN−)"></div><span class="pin-cap">IN−</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.buck.vTitle" title="강압 출력 (+, OUT+)"></div><span class="pin-cap cap-vcc">OUT+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.buck.gTitle" title="강압 출력 기준(공통, OUT−)"></div><span class="pin-cap cap-gnd">OUT−</span></div>
       </div>`;
   } else if (type === 'transistor'){
     // 트랜지스터(NPN 단순화 모델) — 베이스(B)에 문턱 전압(약 0.6V, 실제 Vbe) 이상이 걸리면 그
@@ -8208,6 +8693,10 @@ function spawnComponent(type, dropX, dropY){
     renderCoincellStack(div); updateCoincellReadout(div);
   } else if (type === 'fruitbatt'){
     renderFruitbattVisual(div); updateFruitbattReadout(div);
+  } else if (type === 'battery'){
+    updateBatteryReadout(div); // 스폰 직후에도 기본 정격/충전 전압이 바로 보이도록
+  } else if (type === 'cccv' || type === 'buck'){
+    updateRegulatorDisplay(div);
   }
   return id;
 }
@@ -9279,16 +9768,18 @@ function updateFruitbattReadout(el){
 // 이를 피하려고 A/K 두 핀 모두 "다이오드 자신의 엣지를 뺀 나머지 회로만"의 관점에서 독립적으로
 // 전압을 구해 비교합니다 — 실제로 다이오드를 잠깐 떼어냈을 때 양끝에 걸리는 전압을 재는 것과 같습니다.
 const DIODE_VF = 0.6; // 실제 실리콘 다이오드 순방향 전압(Vf)과 비슷한 교육용 문턱값
+const SCHOTTKY_VF = 0.25; // 쇼트키 다이오드는 실리콘 다이오드보다 문턱전압이 훨씬 낮습니다(실측 0.2~0.4V대의 교육용 근사)
 const DIODE_FORWARD_OHMS = 1;
 const DIODE_REVERSE_OHMS = 1e8;
 function diodeUpdate(el){
   if (!isSimulating){ el.dataset.ohms = String(DIODE_REVERSE_OHMS); el.dataset.conducting = '0'; updateDiodeVisual(el); return; }
+  const vf = el.classList.contains('comp-schottky') ? SCHOTTKY_VF : DIODE_VF; // [배터리/PMIC] 쇼트키는 comp-diode를 공유하되 문턱전압만 낮춥니다
   const aPin = el.querySelector('[data-pin$="_A"]');
   const bPin = el.querySelector('[data-pin$="_B"]');
   const edgesExcl = resistiveEdges().filter(e => !(e.legA && e.legA.closest('.comp-diode') === el));
   const va = aPin ? readingToVolts(resistiveReading(aPin, edgesExcl)) : 0;
   const vb = bPin ? readingToVolts(resistiveReading(bPin, edgesExcl)) : 0;
-  const forward = (va - vb) > DIODE_VF;
+  const forward = (va - vb) > vf;
   el.dataset.ohms = String(forward ? DIODE_FORWARD_OHMS : DIODE_REVERSE_OHMS);
   el.dataset.conducting = forward ? '1' : '0';
   updateDiodeVisual(el);
@@ -9301,6 +9792,176 @@ function updateDiodeVisual(el){
     status.classList.toggle('conducting', on);
     status.dataset.i18n = on ? 'comp.diode.on' : 'comp.diode.off';
     status.textContent = tr(status.dataset.i18n);
+  }
+}
+
+/* ---------- 🔋 배터리/PMIC 실습: 충전식 배터리 / CC-CV 충전기 / DC-DC 벅 컨버터 ---------- */
+// 충전식 배터리(comp-battery)는 소금물 동전 전지·과일 전지와 달리 "지금 충전된 전압"이라는
+// 자기 자신의 상태(dataset.chargeVoltage)를 갖고, 그 값을 psuSourceParams/externalSourceOnNet이
+// 그대로 전원 전압으로 씁니다. runTick()에서 batteryTickUpdate()가 매 틱, "내 V+ 단자에 지금
+// 외부에서 실제로 걸리고 있는 전압"(resistiveReading — diodeUpdate와 같은 방식으로 자기 자신은
+// 자동으로 제외됨, externalSourceOnNet의 el===pinEl 스킵 덕분)을 읽어, 그 값이 지금 내 충전
+// 전압보다 높을 때만(=충전기/PSU 등에 물려 있을 때만) RC 충전곡선과 비슷한 형태로 서서히
+// 그 목표치를 향해 다가가게 합니다. 아무 것도 안 물려 있거나 더 낮은 전압만 걸려 있으면(=부하만
+// 걸려 있으면) 그냥 지금 충전 전압을 그대로 유지합니다(자연 방전은 교육용 단순화를 위해 생략).
+const BATTERY_CHARGE_TAU_SEC = 6; // 충전 전압이 목표치의 상당 부분까지 다가가는 데 걸리는 대략적인 시간(초) — 교육용 데모 속도
+const BATTERY_TICK_SEC = 0.025; // runTick 물리 틱 간격(25ms)과 동일하게 맞춤
+const BATTERY_OVERCHARGE_CAP = 1.1; // 정격의 110%를 넘는 과충전은 흔한 배터리 보호회로처럼 상한을 둡니다(교육용 단순화)
+function batteryRatedVoltChanged(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const sel = el.querySelector('.battery-rated-volt');
+  const rated = sel ? parseFloat(sel.value) : 3.7;
+  el.dataset.ratedVoltage = String(rated);
+  el.dataset.chargeVoltage = String(rated); // 정격을 바꾸면 "새 배터리로 교체"한 것으로 보고 그 정격 전압으로 리셋
+  updateBatteryReadout(el);
+}
+function batteryVoltage(el){
+  const v = parseFloat(el.dataset.chargeVoltage || el.dataset.ratedVoltage || '3.7');
+  return isFinite(v) ? v : 3.7;
+}
+function updateBatteryReadout(el){
+  const rated = parseFloat(el.dataset.ratedVoltage || '3.7') || 3.7;
+  const chargeV = batteryVoltage(el);
+  const percent = Math.max(0, Math.min(100, Math.round((chargeV / rated) * 100)));
+  const readout = document.getElementById(`${el.id}_readout`);
+  const percentEl = document.getElementById(`${el.id}_percent`);
+  const fill = document.getElementById(`${el.id}_fill`);
+  if (readout) readout.textContent = `${chargeV.toFixed(2)} V`;
+  if (percentEl) percentEl.textContent = `${percent}%`;
+  if (fill) fill.style.height = `${percent}%`;
+}
+// runTick()의 배터리 단계에서 매 틱 호출됩니다 — diode/트랜지스터 등과 같은 순서상 이유로,
+// 이 배터리가 곧 전원으로 쓰이므로(psuSourceParams) 뒤쪽 저항망 계산 전에 상태가 최신이어야
+// 합니다(다만 배터리 자신은 저항 엣지가 아니므로 실제로는 순서에 민감하지 않습니다 — 단지
+// 발전기/코인셀과 같은 자리에 나란히 둔 것입니다).
+function batteryTickUpdate(el){
+  if (!isSimulating) return;
+  const rated = parseFloat(el.dataset.ratedVoltage || '3.7') || 3.7;
+  let chargeV = batteryVoltage(el);
+  const vPin = el.querySelector('[data-pin$="_V"]');
+  const applied = vPin ? readingToVolts(resistiveReading(vPin)) : 0;
+  if (applied > chargeV + 0.02){
+    chargeV += (applied - chargeV) * (BATTERY_TICK_SEC / BATTERY_CHARGE_TAU_SEC);
+    chargeV = Math.min(chargeV, rated * BATTERY_OVERCHARGE_CAP);
+    el.dataset.chargeVoltage = String(chargeV);
+  }
+  updateBatteryReadout(el);
+}
+// 배터리 2개를 쇼트키 다이오드나 저항 없이(=netOf()로 직결, 즉 순수 전선/브레드보드 버스로만
+// 연결) 병렬로 이으면 실제로는 위험한 단락(두 전지의 전압 차만큼 아주 큰 전류가 순간적으로
+// 흐를 수 있음)입니다. netOf()는 저항이 있는 부품(resistive-2pin, 쇼트키 다이오드 포함)의
+// 다리를 절대 건너뛰지 않으므로(898번째 줄 근처 netOf 참고), "두 배터리의 +단자가 같은
+// netOf() 안에 있다"는 것 자체가 곧 "그 사이에 저항이나 다이오드가 전혀 없다"는 뜻입니다.
+// +단자끼리, −단자끼리 모두 직결되어 있을 때(=진짜 "병렬 연결" 배선)만 위험한 상황으로
+// 판정합니다. dataset.shorted 플래그로 스파크/토스트가 매 틱(25ms) 반복되지 않게 막고,
+// 배선을 고쳐 더는 위험하지 않게 되면 플래그를 지워 다음에 또 잘못 연결하면 다시 경고합니다.
+function checkBatteryParallelShort(){
+  if (!isSimulating) return;
+  const batteries = Array.from(document.querySelectorAll('.comp-battery'));
+  const shortedNow = new Set();
+  for (let i = 0; i < batteries.length; i++){
+    for (let j = i + 1; j < batteries.length; j++){
+      const a = batteries[i], b = batteries[j];
+      const aV = a.querySelector('[data-pin$="_V"]'), aG = a.querySelector('[data-pin$="_G"]');
+      const bV = b.querySelector('[data-pin$="_V"]'), bG = b.querySelector('[data-pin$="_G"]');
+      if (!aV || !aG || !bV || !bG) continue;
+      const pairShorted = netOf(aV).has(bV) && netOf(aG).has(bG);
+      if (pairShorted){
+        shortedNow.add(a); shortedNow.add(b);
+        if (a.dataset.shorted !== '1' || b.dataset.shorted !== '1'){
+          spawnShortSpark(a); spawnShortSpark(b);
+          showToast(tr('toast.batteryShort'), true);
+          logSerial(`[${tr('comp.battery.title')}] ${tr('toast.batteryShort')}`, 'both');
+        }
+      }
+    }
+  }
+  batteries.forEach(el => { el.dataset.shorted = shortedNow.has(el) ? '1' : '0'; });
+}
+
+// CC/CV 충전기 모듈·DC-DC 벅 컨버터 공용: IN+/IN-(변압기 P1/P2와 같은 "측정 전용" 핀 — 회로에
+// 부담을 주지 않음)에 실제로 걸린 입력 전압을 읽습니다. 시뮬레이션 중이 아니거나 핀이 없으면 0.
+function regulatorInputVoltage(el){
+  if (!isSimulating) return 0;
+  const inP = el.querySelector('[data-pin$="_INP"]');
+  const inN = el.querySelector('[data-pin$="_INN"]');
+  if (!inP || !inN) return 0;
+  const vp = readingToVolts(resistiveReading(inP));
+  const vn = readingToVolts(resistiveReading(inN));
+  return vp - vn;
+}
+const REGULATOR_MIN_VIN = 1.0; // 이보다 입력 전압이 낮으면 "전원이 안 물려 있다"로 취급(꺼짐)
+const REGULATOR_DROPOUT_V = 0.3; // 강압형 레귤레이터의 최소 드롭아웃 전압(교육용 근사) — 출력이 입력을 넘어설 수 없음
+function buckOutputVoltage(el){
+  const vin = regulatorInputVoltage(el);
+  if (vin < REGULATOR_MIN_VIN) return null;
+  const slider = el.querySelector('.buck-volt');
+  const target = slider ? parseFloat(slider.value) : 5;
+  return Math.max(0, Math.min(target, vin - REGULATOR_DROPOUT_V));
+}
+function cccvOutputVoltage(el){
+  const vin = regulatorInputVoltage(el);
+  if (vin < REGULATOR_MIN_VIN) return null;
+  const slider = el.querySelector('.cccv-volt');
+  const target = slider ? parseFloat(slider.value) : 5;
+  return Math.max(0, Math.min(target, vin - REGULATOR_DROPOUT_V));
+}
+// 슬라이더↔숫자입력 두 컨트롤을 서로 동기화합니다(2채널 가변 전원 공급기의 숫자 입력과 같은
+// 자리이되, 여기서는 슬라이더도 함께 두어 스마트폰에서도 손가락으로 조절하기 쉽게 했습니다).
+function regulatorSliderInput(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const slider = el.querySelector('.cccv-volt, .buck-volt');
+  const num = el.querySelector('.cccv-volt-num, .buck-volt-num');
+  if (slider && num) num.value = slider.value;
+  updateRegulatorDisplay(el);
+}
+function regulatorNumberInput(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const slider = el.querySelector('.cccv-volt, .buck-volt');
+  const num = el.querySelector('.cccv-volt-num, .buck-volt-num');
+  if (slider && num){
+    const min = parseFloat(slider.min), max = parseFloat(slider.max);
+    let v = parseFloat(num.value);
+    if (!isFinite(v)) v = min;
+    v = Math.max(min, Math.min(max, v));
+    num.value = v; slider.value = v;
+  }
+  updateRegulatorDisplay(el);
+}
+// runTick()에서 매 틱 호출되어 CC/CV·벅 컨버터의 출력 전압/추정 전류(벤치 전원 공급기와 같은
+// 방식의 옴의 법칙 추정)를 표시하고, 입력 전원이 없거나(cccv 한정) 전류 제한을 넘으면 경고를 보여줍니다.
+function updateRegulatorDisplay(el){
+  const readout = document.getElementById(`${el.id}_readout`);
+  const warn = document.getElementById(`${el.id}_warn`);
+  if (!readout) return;
+  const isCccv = el.classList.contains('comp-cccv');
+  if (!isSimulating){
+    readout.textContent = isCccv ? '0.00 V · 0.00 A' : '0.00 V';
+    if (warn) warn.classList.remove('show');
+    return;
+  }
+  const outV = isCccv ? cccvOutputVoltage(el) : buckOutputVoltage(el);
+  if (outV == null){
+    readout.textContent = isCccv ? '0.00 V · 0.00 A' : '0.00 V';
+    if (warn){ warn.dataset.i18n = isCccv ? 'comp.cccv.unpowered' : 'comp.buck.unpowered'; warn.textContent = tr(warn.dataset.i18n); warn.classList.add('show'); }
+    return;
+  }
+  if (!isCccv){
+    readout.textContent = `${outV.toFixed(2)} V`;
+    if (warn) warn.classList.remove('show');
+    return;
+  }
+  const vPin = el.querySelector('[data-pin$="_V"]'), gPin = el.querySelector('[data-pin$="_G"]');
+  const r = (vPin && gPin) ? resistancePathBetween(vPin, gPin) : null;
+  const estA = (r == null || r < 0.05) ? 0 : outV / r;
+  readout.textContent = `${outV.toFixed(2)} V · ${estA.toFixed(2)} A`;
+  const ccLimit = parseFloat(el.querySelector('.cccv-cc')?.value || '1.0') || 1.0;
+  if (warn){
+    if (estA > ccLimit){ warn.dataset.i18n = 'comp.cccv.overCC'; warn.textContent = tr(warn.dataset.i18n); warn.classList.add('show'); }
+    else warn.classList.remove('show');
   }
 }
 
@@ -9831,6 +10492,8 @@ function createWire(pinA, pinB){
     addWirePoint(wireObj, localX, localY);
   });
   updateLegend();
+  // [Ver0.9966, 2부] 새 전선이 라즈베리파이-HDMI 모니터 결선을 완성/변경했을 수 있으므로 갱신.
+  if (typeof updateMonitorHdmiStatus === 'function') updateMonitorHdmiStatus();
   return wireObj;
 }
 
@@ -10178,6 +10841,8 @@ function deleteWire(wireObj){
   wires = wires.filter(w => w !== wireObj);
   closeWireEditor();
   updateLegend();
+  // [Ver0.9966, 2부] 전선을 지워 라즈베리파이-HDMI 모니터 결선이 끊어졌을 수 있으므로 갱신.
+  if (typeof updateMonitorHdmiStatus === 'function') updateMonitorHdmiStatus();
 }
 
 function setWireColor(wireObj, color){
@@ -10259,6 +10924,10 @@ const COMP_HELP_BLURB = {
   clampmeter: { ko: '실제 후크미터는 전선을 끊지 않고 집게로 걸기만 하는 비접촉식 도구입니다. 이 시뮬레이터에서는 A·B 두 핀을 측정하려는 가지에 직렬로 끼우는 것으로 그 동작을 표현합니다(집게처럼 회로에 전혀 부담을 주지 않는 이상적인 도선). 대부분의 후크미터처럼 교류(AC) 전류만 실효값으로 측정할 수 있고, 직류(DC) 회로에서는 "DC 감지 안됨"으로 표시됩니다 — 실제 전자기 유도식 클램프의 한계와 같습니다.', en: 'A real clamp meter is non-contact — you hook it around a wire without cutting it. This simulator represents that by wiring its A/B pins in series with the branch you want to measure (an ideal wire, just like a real clamp adds no load to the circuit). Like most clamp meters, it only measures AC current (RMS); on a DC circuit it shows "DC not detected" — matching the real limitation of induction-based clamps.' },
   generator:  { ko: '손잡이를 돌리는 속도에 비례해 V/G(GND) 사이에 전압이 발생합니다 — 직류 발전기입니다.', en: 'Cranking the handle generates a voltage across V/G(GND) proportional to crank speed — a simple DC generator.' },
   transformer:{ ko: '1차(입력) 쪽에 AC 전압을 걸면 권수비(N2/N1)만큼 곱해진 전압이 2차(출력) 쪽 V/G에 나타납니다 — DC를 걸면 2차에는 아무것도 나오지 않습니다.', en: 'AC on the primary is scaled by the turns ratio (N2/N1) onto the secondary V/G — DC on the primary yields nothing on the secondary.' },
+  battery:{ ko: '+/− 단자로 전원처럼 씁니다. 드롭다운에서 정격 전압(1.5/3.7/9/12/19.6V)을 고르세요. +단자에 정격보다 높은 전압(CC/CV 충전기·벅 컨버터·PSU 등)을 걸어두면 서서히 충전되어 표시된 전압·잔량(%)이 오릅니다 — 배터리 2개를 쇼트키 다이오드나 저항 없이 +끼리·−끼리 직결하면(병렬 충전) 위험한 단락으로 판정해 경고합니다.', en: 'Use +/− like any power source. Pick a rated voltage (1.5/3.7/9/12/19.6V) from the dropdown. Apply a voltage higher than rated to + (from a CC/CV charger, buck converter, PSU, etc.) and it charges gradually, raising the shown voltage/percent — paralleling two batteries +to+/−to− with no Schottky diode or resistor is flagged as a dangerous short.' },
+  cccv:{ ko: 'VIN+/VIN-에 입력 전원(배터리·PSU 등)을 연결하면, 슬라이더로 정한 전압이 VOUT+/VOUT-에 나옵니다(입력 전압을 넘을 수 없음). 전류 제한(CC) 값을 넘는 부하가 걸리면 경고가 뜹니다 — 입력이 없으면 출력도 없습니다.', en: 'Wire a source (battery, PSU, etc.) to VIN+/VIN-; VOUT+/VOUT- outputs the slider-set voltage (never higher than the input). A load past the CC current-limit setting shows a warning — no input means no output.' },
+  buck:{ ko: 'IN+/IN-에 입력 전원을 연결하면, 슬라이더로 정한 전압(1.5~24V, 입력 전압을 넘을 수 없음)이 OUT+/OUT-에 나옵니다 — 배터리보다 더 낮은 정전압이 필요한 부하에 씁니다.', en: 'Wire a source to IN+/IN-; OUT+/OUT- outputs the slider-set voltage (1.5~24V, never higher than the input) — use it to step a battery down to a lower fixed voltage for a load.' },
+  schottky:{ ko: '일반 다이오드와 같은 A(애노드)→K(캐소드) 한쪽 방향 소자이지만 문턱전압(Vf)이 훨씬 낮습니다(약 0.25V) — 배터리 2개를 병렬로 충전할 때 K쪽을 공통(+) 버스에 물려 각 배터리 사이의 역류(back-feed)를 막는 용도로 씁니다.', en: 'A one-way A(anode)→K(cathode) device like a regular diode, but with a much lower forward voltage (Vf ≈ 0.25V) — put its K side on the shared (+) bus when parallel-charging two batteries to block back-feed current between them.' },
   electromagnet:{ko: 'VCC/GND로 코일에 전류를 흘리면 전자석이 되어 자성을 띱니다 — 흐르는 전류가 클수록 자기장이 강해집니다.', en: 'Current through VCC/GND magnetizes the coil into an electromagnet — more current means a stronger field.' },
   oersted:    { ko: '도선의 A-B 사이에 전류가 흐르면 옆의 나침반 바늘이 그 전류 방향·세기에 비례해 꺾입니다(외르스텟 실험 재현).', en: 'Current flowing A→B deflects the nearby compass needle in proportion to current — recreates Oersted\'s experiment.' },
   toggleswitch:{ ko: 'T1-T2는 극성이 없는 단순 스위치 접점입니다 — 클릭해서 켜면(ON) 두 단자가 도선처럼 이어지고, 끄면 끊어집니다.', en: 'T1/T2 are a plain non-polarized switch contact — click ON to join them like a wire, OFF to open the circuit.' },
@@ -10466,6 +11135,12 @@ function externalSourceOnNet(pinEl){
         if (psu.dataset.mode === 'coincell' && pid.endsWith('_V')) return { type: 'volt', v: coincellVoltage(psu) };
         if (psu.dataset.mode === 'fruitbatt' && pid.endsWith('_V')) return { type: 'volt', v: fruitbattVoltage(psu) };
         if (psu.dataset.mode === 'transformer' && pid.endsWith('_V')) return transformerReading(psu);
+        // [배터리/PMIC] 충전식 배터리는 코인셀/과일전지와 같은 방식(항상 켜진 화학 전지, 지금
+        // 충전 전압을 그대로 DC로). CC/CV 충전기·벅 컨버터는 변압기 2차와 같은 방식(입력이
+        // 없으면 null=전원 없음)으로, 입력 전압을 클램프한 출력을 냅니다.
+        if (psu.dataset.mode === 'battery' && pid.endsWith('_V')) return { type: 'volt', v: batteryVoltage(psu) };
+        if (psu.dataset.mode === 'cccv' && pid.endsWith('_V')){ const v = cccvOutputVoltage(psu); return v == null ? null : { type: 'volt', v }; }
+        if (psu.dataset.mode === 'buck' && pid.endsWith('_V')){ const v = buckOutputVoltage(psu); return v == null ? null : { type: 'volt', v }; }
         const m = pid.match(/(_L1|_L2|_L3|_L)$/);
         if (m && psu.dataset.mode !== 'dc') return psuAcReading(psu, m[1]);
       }
@@ -11349,6 +12024,13 @@ function psuSourceParams(psuEl){
     const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
     if (!hotEl || !gndEl) return null;
     return { knownPairs: [{ el: hotEl, V: cx(fruitbattVoltage(psuEl), 0) }, { el: gndEl, V: cx(0, 0) }], omega: 0 };
+  }
+  // 충전식 배터리 — 소금물 동전 전지와 같은 이유(늘 켜져 있는 화학 전지)로, "지금 충전된
+  // 전압"(batteryTickUpdate가 매 틱 갱신하는 dataset.chargeVoltage)을 그대로 DC로 냅니다.
+  if (mode === 'battery'){
+    const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
+    if (!hotEl || !gndEl) return null;
+    return { knownPairs: [{ el: hotEl, V: cx(batteryVoltage(psuEl), 0) }, { el: gndEl, V: cx(0, 0) }], omega: 0 };
   }
   // 변압기 — 1차에 걸린 실제 교류 전압(측정 전용 P1/P2)에 권수비(N2/N1)를 곱해 2차 출력으로
   // 그대로 냅니다. 1차가 비어있거나 DC(ω=0)면 2차는 전원으로 취급되지 않습니다(null).
@@ -12347,6 +13029,15 @@ function toggleSimulation(){
       if (handle) handle.style.transform = 'rotate(0deg)';
       updateGeneratorReadout(gen);
     });
+    // [배터리/PMIC] CC/CV 충전기·벅 컨버터: 입력이 끊긴 것과 같으므로 표시값을 0으로 되돌립니다
+    // (충전식 배터리는 코인셀/과일전지와 같이 "항상 켜짐" 전원이라 실제 건전지처럼 값을 그대로
+    // 유지합니다 — 위 covers).
+    document.querySelectorAll('.comp-cccv, .comp-buck').forEach(el => {
+      const readout = document.getElementById(`${el.id}_readout`);
+      const warn = document.getElementById(`${el.id}_warn`);
+      if (readout) readout.textContent = el.classList.contains('comp-cccv') ? '0.00 V · 0.00 A' : '0.00 V';
+      if (warn) warn.classList.remove('show');
+    });
     // 2채널 가변 전원 공급기: 위에서 채널 스위치를 이미 껐으니 표시값도 0으로 되돌립니다.
     document.querySelectorAll('.comp-benchpsu').forEach(bp => {
       [1, 2].forEach(ch => {
@@ -12612,6 +13303,17 @@ function runTick(){
     if (handle) handle.style.transform = `rotate(${angle}deg)`;
     updateGeneratorReadout(gen);
   });
+
+  // 0-3b. [배터리/PMIC] 충전식 배터리의 충전 전압/잔량을 매 틱 갱신합니다 — V+ 단자에 정격보다
+  // 높은 전압(충전기·PSU 등)이 실제로 걸려 있을 때만 서서히 그 쪽으로 충전됩니다. 그다음
+  // 보호소자(쇼트키 다이오드·저항) 없이 배터리 2개가 직결 병렬로 이어져 있는 위험한 배선을
+  // 감지해 스파크/경고를 띄웁니다 — 둘 다 이 배터리가 곧 전원으로 쓰이므로(psuSourceParams)
+  // 뒤쪽 저항망 계산 전에 최신이어야 합니다.
+  document.querySelectorAll('.comp-battery').forEach(batteryTickUpdate);
+  checkBatteryParallelShort();
+
+  // 0-3c. [배터리/PMIC] CC/CV 충전기·DC-DC 벅 컨버터의 출력 표시(전압/추정 전류)를 갱신합니다.
+  document.querySelectorAll('.comp-cccv, .comp-buck').forEach(updateRegulatorDisplay);
 
   // 0-4. 다이오드의 순방향/역방향 상태(=지금 틱의 dataset.ohms)를 먼저 정해 둡니다 — 이 값이
   // 곧 resistiveEdges()/buildAcNetworkGraph() 양쪽의 실제 회로 저항이 되므로, 뒤쪽 단계(LED 등)가
@@ -13350,6 +14052,626 @@ function makePopupDraggable(popup){
   document.addEventListener('mouseup', () => { dragging = false; });
 }
 document.querySelectorAll('.board-popup').forEach(makePopupDraggable);
+
+/* ============================================================================
+ * 🖥️ [Ver0.9966, 2부] 라즈베리파이 HDMI 가상 모니터 팝업 + 3단 HMI 샌드박스
+ *
+ * [설계 메모] Pyodide 같은 외부 실행 엔진은 전혀 쓰지 않습니다 — Tkinter/Web 탭은 실제
+ * 파이썬·플라스크를 실행하지 않는 순수 정적/모크 화면이고, 노코드 HMI 탭만 클릭 이벤트로
+ * 가상 GPIO 상태(rpiPinState)를 바꾸는 가벼운 자체 상호작용을 제공합니다(기존 Ver0.9964
+ * 아키텍처 그대로 — 독립된 이름의 함수/전역만 새로 추가하고 기존 코드는 건드리지 않음).
+ * 팝업(#popupMonitor)은 캔버스 위의 comp-hdmimonitor 부품이 몇 개든 하나를 공유하는
+ * 싱글턴이며, openMonitorPopup(compId)가 열 때마다 대상 부품 id만 새로 지정합니다.
+ * ============================================================================ */
+
+// comp-rpi 부품의 새 HDMI 포트 핀이 comp-hdmimonitor 부품의 기존 HDMI 핀과 같은 net(전선/
+// 브레드보드 버스)에 물려 있는지 netOf()로 판별합니다. 두 부품 모두 핀 접미사가 "_HDMI"로
+// 같습니다(hdmimonitor는 이미 예전부터 이 접미사를 쓰고 있어, 새로 추가하는 rpi 쪽 핀도 같은
+// 접미사로 맞췄습니다 — 실제 HDMI 케이블처럼 "같은 이름의 포트끼리 잇는다"는 느낌).
+function rpiConnectedToMonitor(monitorEl){
+  const hdmiPin = monitorEl && monitorEl.querySelector('[data-pin$="_HDMI"]');
+  if (!hdmiPin) return null;
+  const net = netOf(hdmiPin);
+  for (const el of net){
+    if (el === hdmiPin || !el.dataset) continue;
+    const pid = el.dataset.pin || '';
+    if (pid.endsWith('_HDMI') && el.closest('.comp-rpi')) return el.closest('.comp-rpi');
+  }
+  return null;
+}
+
+// 캔버스 위 HDMI 모니터 부품(들)의 연결 상태를 갱신합니다. monitorId를 생략하면 캔버스에 있는
+// 모든 모니터를 한 번에 훑습니다(전선을 잇거나 끊을 때, 부품을 지울 때, 프로젝트를 불러올 때
+// 호출됩니다 — 개수가 많지 않아 매번 전체를 다시 훑어도 가볍습니다).
+function updateMonitorHdmiStatus(monitorId){
+  const monitors = monitorId
+    ? [document.getElementById(monitorId)].filter(Boolean)
+    : Array.from(document.querySelectorAll('.comp-hdmimonitor'));
+  const popup = document.getElementById('popupMonitor');
+  monitors.forEach(monitorEl => {
+    const connected = !!rpiConnectedToMonitor(monitorEl);
+    monitorEl.dataset.hdmiConnected = connected ? '1' : '0';
+    monitorEl.classList.toggle('hdmi-connected', connected);
+    if (popup && !popup.hidden && popup.dataset.targetComp === monitorEl.id){
+      document.getElementById('monitorScreen')?.classList.toggle('no-signal', !connected);
+    }
+  });
+}
+
+// 팝업 하나를 여러 모니터 부품이 공유하므로, 열 때마다 대상 부품 id를 새로 지정하고 그
+// 부품에 지금 라즈베리파이가 연결되어 있는지 즉시 검사해 화면(no-signal 오버레이)을 맞춥니다.
+function openMonitorPopup(compId){
+  const popup = document.getElementById('popupMonitor');
+  const monitorEl = document.getElementById(compId);
+  if (!popup || !monitorEl) return;
+  popup.dataset.targetComp = compId;
+  const title = document.getElementById('monitorPopupTitle');
+  if (title) title.textContent = `🖥️ ${tr('comp.hdmimonitor.title')} — ${compId}`;
+  popup.hidden = false;
+  popup.style.zIndex = ++popupZTop;
+  updateMonitorHdmiStatus(compId);
+  drawTkinterMockUi();
+}
+function closeMonitorPopup(){
+  const popup = document.getElementById('popupMonitor');
+  if (popup) popup.hidden = true;
+}
+// toggleBoardPopupMaximize()와 똑같은 로직이지만, popupMonitor/maxBtnMonitor는 board 키
+// 규칙(popup${KEY.toUpperCase()})을 따르는 동적 보드 팝업이 아니라 고정 ID의 정적 싱글턴
+// 팝업이라 그 함수를 그대로 재사용할 수 없어 이름을 다르게 하여 독립적으로 둡니다.
+function toggleMonitorPopupMaximize(){
+  const p = document.getElementById('popupMonitor');
+  if (!p) return;
+  const btn = document.getElementById('maxBtnMonitor');
+  if (p.classList.contains('maximized')){
+    p.classList.remove('maximized');
+    p.style.left = p.dataset.preMaxLeft || '';
+    p.style.top = p.dataset.preMaxTop || '';
+    p.style.width = p.dataset.preMaxWidth || '';
+    p.style.height = p.dataset.preMaxHeight || '';
+    p.style.resize = 'both';
+    if (btn){ btn.textContent = '⛶'; btn.title = tr('popup.maximizeTitle'); btn.dataset.i18nTitle = 'popup.maximizeTitle'; }
+  } else {
+    const rect = p.getBoundingClientRect();
+    p.dataset.preMaxLeft = p.style.left || (rect.left + 'px');
+    p.dataset.preMaxTop = p.style.top || (rect.top + 'px');
+    p.dataset.preMaxWidth = p.style.width || (rect.width + 'px');
+    p.dataset.preMaxHeight = p.style.height || (rect.height + 'px');
+    p.classList.add('maximized');
+    p.style.left = '2vw'; p.style.top = '2vh'; p.style.width = '96vw'; p.style.height = '92vh';
+    p.style.resize = 'none';
+    if (btn){ btn.textContent = '🗗'; btn.title = tr('popup.restoreTitle'); btn.dataset.i18nTitle = 'popup.restoreTitle'; }
+  }
+  p.style.zIndex = ++popupZTop;
+}
+
+// 3개 모드 탭 전환 — .editor-tabs/.editor-tab(코드/블록 에디터 탭과 같은 스타일)을 재사용합니다.
+function switchMonitorTab(tabName){
+  const NAMES = ['nocode', 'tkinter', 'web', 'ros'];
+  NAMES.forEach(name => {
+    const cap = name.charAt(0).toUpperCase() + name.slice(1);
+    document.getElementById(`tabBtn${cap}`)?.classList.toggle('active', name === tabName);
+    document.getElementById(`view${cap}`)?.classList.toggle('active', name === tabName);
+  });
+  if (tabName === 'tkinter') drawTkinterMockUi();
+  // [Ver0.9967, 3부] ROS 탭은 숨겨져 있던 동안(display:none) SVG의 실제 렌더 너비를 알 수
+  // 없으므로, 탭이 보이게 된 직후 다시 그려야 그래프가 팝업 폭에 맞게 정확히 배치됩니다.
+  if (tabName === 'ros') drawRosGraph();
+}
+
+// comp-hdmimonitor 부품을 더블클릭하면 바로 팝업을 엽니다(comp-custom의 기존 더블클릭 편집
+// 진입 동선과 같은 패턴).
+document.addEventListener('dblclick', (e) => {
+  const compEl = e.target.closest && e.target.closest('.comp-hdmimonitor');
+  if (compEl) openMonitorPopup(compEl.id);
+});
+
+/* ---------- 탭1: 노코드 HMI — 위젯 클릭 → 가상 GPIO 상태(rpiPinState) 토글 ---------- */
+// 실제 라즈베리파이 GPIO 시뮬레이션이 아니라, "위젯을 조작하면 뭔가 반응한다"는 것을 보여주는
+// 완전히 자체적인(독립된 네임스페이스의) mock 상태 저장소입니다. 키는 위젯 DOM id.
+const rpiPinState = {};
+let hmiWidgetSeq = 0;
+const HMI_PIN_POOL = [17, 27, 22, 23, 24, 25, 5, 6, 12, 13, 16, 26];
+
+function addHmiWidget(kind){
+  const canvas = document.getElementById('hmiCanvas');
+  if (!canvas) return;
+  hmiWidgetSeq++;
+  const widgetId = `hmiw_${hmiWidgetSeq}`;
+  const gpio = HMI_PIN_POOL[(hmiWidgetSeq - 1) % HMI_PIN_POOL.length];
+  rpiPinState[widgetId] = 0;
+  const div = document.createElement('div');
+  div.className = 'hmi-widget';
+  div.id = widgetId;
+  div.dataset.kind = kind;
+  div.dataset.gpio = String(gpio);
+  const col = (hmiWidgetSeq - 1) % 4, row = Math.floor((hmiWidgetSeq - 1) / 4);
+  div.style.left = (14 + col * 74) + 'px';
+  div.style.top = (14 + row * 74) + 'px';
+  const inner = kind === 'button' ? `<div class="hmi-w-button">▶</div>`
+    : kind === 'toggle' ? `<div class="hmi-w-toggle"><div class="tg-knob"></div></div>`
+    : kind === 'lamp' ? `<div class="hmi-w-lamp"></div>`
+    : `<div class="hmi-w-gauge" style="--pct:0;"><span>0%</span></div>`;
+  div.innerHTML = `<div class="hmi-w-del" onclick="event.stopPropagation(); removeHmiWidget('${widgetId}')">✕</div>${inner}<div class="hmi-w-label">${kind === 'gauge' ? 'ADC' : 'GPIO'}${gpio}</div>`;
+  makeHmiWidgetDraggable(div, canvas, () => toggleHmiWidget(widgetId));
+  canvas.appendChild(div);
+  const hint = document.getElementById('hmiEmptyHint');
+  if (hint) hint.style.display = 'none';
+}
+
+function removeHmiWidget(widgetId){
+  document.getElementById(widgetId)?.remove();
+  delete rpiPinState[widgetId];
+  const canvas = document.getElementById('hmiCanvas');
+  const hint = document.getElementById('hmiEmptyHint');
+  if (hint && canvas && !canvas.querySelector('.hmi-widget')) hint.style.display = '';
+  drawTkinterMockUi();
+}
+
+function clearHmiCanvas(){
+  document.querySelectorAll('#hmiCanvas .hmi-widget').forEach(w => { delete rpiPinState[w.id]; w.remove(); });
+  const hint = document.getElementById('hmiEmptyHint');
+  if (hint) hint.style.display = '';
+  drawTkinterMockUi();
+}
+
+function toggleHmiWidget(widgetId){
+  const el = document.getElementById(widgetId);
+  if (!el) return;
+  const kind = el.dataset.kind, gpio = el.dataset.gpio;
+  if (kind === 'gauge'){
+    const next = ((rpiPinState[widgetId] || 0) + 25) % 125; // 0→25→50→75→100→0 순환
+    rpiPinState[widgetId] = next;
+    const gaugeEl = el.querySelector('.hmi-w-gauge');
+    gaugeEl?.style.setProperty('--pct', String(next));
+    const label = gaugeEl?.querySelector('span');
+    if (label) label.textContent = `${next}%`;
+    logTkinterConsole(`[ADC${gpio}] ${next}%`);
+    return;
+  }
+  const next = rpiPinState[widgetId] ? 0 : 1;
+  rpiPinState[widgetId] = next;
+  const visEl = el.querySelector(kind === 'button' ? '.hmi-w-button' : kind === 'toggle' ? '.hmi-w-toggle' : '.hmi-w-lamp');
+  visEl?.classList.toggle('pin-on', !!next);
+  logTkinterConsole(`[GPIO${gpio}] -> ${next ? 'HIGH' : 'LOW'}`);
+}
+
+// 위젯 드래그(캔버스 안에서 재배치) — 클릭과 드래그를 구분하기 위해, mousedown 지점에서
+// 일정 거리 이상 움직였을 때만 "드래그"로 간주하고, 그렇지 않으면 mouseup 시점에 onClick을
+// 호출합니다(팝업 드래그의 makePopupDraggable()과 같은 mousedown/mousemove/mouseup 패턴).
+function makeHmiWidgetDraggable(el, canvas, onClick){
+  let dragging = false, moved = false, startX = 0, startY = 0, offX = 0, offY = 0;
+  el.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.hmi-w-del')) return;
+    dragging = true; moved = false;
+    startX = e.clientX; startY = e.clientY;
+    const rect = el.getBoundingClientRect(), canvasRect = canvas.getBoundingClientRect();
+    offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+    e.stopPropagation();
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    if (Math.abs(e.clientX - startX) > 2 || Math.abs(e.clientY - startY) > 2) moved = true;
+    if (!moved) return;
+    const canvasRect = canvas.getBoundingClientRect();
+    const maxX = Math.max(0, canvasRect.width - el.offsetWidth), maxY = Math.max(0, canvasRect.height - el.offsetHeight);
+    el.style.left = Math.max(0, Math.min(maxX, e.clientX - canvasRect.left - offX)) + 'px';
+    el.style.top = Math.max(0, Math.min(maxY, e.clientY - canvasRect.top - offY)) + 'px';
+  });
+  document.addEventListener('mouseup', (e) => {
+    if (!dragging) return;
+    dragging = false;
+    if (!moved && !(e.target.closest && e.target.closest('.hmi-w-del'))) onClick();
+  });
+}
+
+/* ---------- 탭2: Tkinter GUI (모크) — 실제 파이썬 엔진 없이, 노코드 탭의 rpiPinState를
+   그대로 반영하는 좌표 기반 캔버스 뷰포트입니다. "연동되는 느낌"을 주기 위한 순수 시각 효과일
+   뿐, 실행되는 코드는 전혀 없습니다(Canvas 2D API로 매번 다시 그리는 정적 그림). ---------- */
+function drawTkinterMockUi(){
+  const canvas = document.getElementById('tkinterCanvas');
+  if (!canvas || !canvas.getContext) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#eceff4'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#2c3e50'; ctx.font = '13px sans-serif';
+  ctx.fillText('Raspberry Pi GPIO Control (Tkinter mock)', 14, 24);
+  ctx.strokeStyle = '#c7ccd4'; ctx.strokeRect(10, 34, canvas.width - 20, canvas.height - 48);
+  const entries = Object.keys(rpiPinState);
+  ctx.font = '12px monospace';
+  if (!entries.length){
+    ctx.fillStyle = '#8892a0';
+    ctx.fillText(tr('monitor.hmiEmptyHint'), 24, 60);
+  } else {
+    entries.forEach((wid, i) => {
+      const widgetEl = document.getElementById(wid);
+      const gpio = widgetEl ? widgetEl.dataset.gpio : '?';
+      const kind = widgetEl ? widgetEl.dataset.kind : '';
+      const val = rpiPinState[wid];
+      const label = kind === 'gauge' ? `ADC${gpio}: ${val}%` : `GPIO${gpio}: ${val ? 'HIGH' : 'LOW'}`;
+      ctx.fillStyle = val ? '#1c8a52' : '#5a6472';
+      ctx.fillText(`● ${label}`, 24, 58 + i * 20);
+    });
+  }
+}
+function logTkinterConsole(msg){
+  const body = document.getElementById('tkinterConsoleBody');
+  if (body){
+    const time = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+    body.textContent += `[${time}] ${msg}\n`;
+    body.scrollTop = body.scrollHeight;
+  }
+  drawTkinterMockUi();
+}
+
+/* ---------- 탭3: Web / Flask (모크) — 실제 서버 없이 <iframe sandbox> 안에 srcdoc으로
+   완전히 격리된(부모 페이지와 통신하지 않는) 정적 HTML/JS 데모 한 장을 넣어 둡니다. ---------- */
+const WEB_IFRAME_DEFAULT_SRCDOC = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  body{margin:0; font-family:-apple-system,sans-serif; background:#f4f6f9; color:#222; padding:18px;}
+  h2{margin:0 0 4px; font-size:1rem;} p{margin:0 0 14px; color:#666; font-size:.78rem;}
+  .card{background:#fff; border:1px solid #e1e5ea; border-radius:8px; padding:14px; max-width:280px; box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  button{background:#2563eb; color:#fff; border:none; border-radius:6px; padding:8px 14px; font-size:.8rem; cursor:pointer;}
+  button:hover{background:#1d4ed8;}
+  #st{display:inline-block; margin-left:10px; font-weight:600;}
+  #st.on{color:#16a34a;} #st.off{color:#9aa2ad;}
+</style></head>
+<body>
+  <div class="card">
+    <h2>🌐 Flask Dashboard (mock)</h2>
+    <p>app.route('/') · localhost:5000</p>
+    <button onclick="var s=document.getElementById('st'); var on=s.classList.toggle('on'); s.classList.toggle('off', !on); s.textContent = on ? 'ON' : 'OFF';">LED 토글</button>
+    <span id="st" class="off">OFF</span>
+  </div>
+</body></html>`;
+function reloadWebIframe(){
+  const iframe = document.getElementById('webIframe');
+  if (!iframe) return;
+  iframe.srcdoc = '';
+  requestAnimationFrame(() => { iframe.srcdoc = WEB_IFRAME_DEFAULT_SRCDOC; });
+}
+reloadWebIframe(); // 페이지 로드 시 기본 데모 화면을 한 번 채워 둡니다.
+
+/* ============================================================================
+ * 🤖 [Ver0.9967, 3부] ROS(Robot Operating System) 모크 — HDMI 모니터 팝업의 4번째 탭
+ *
+ * [설계 메모] 이번에도 Pyodide 같은 외부 실행 엔진은 쓰지 않지만, 2부의 노코드 HMI/Tkinter
+ * 탭과 달리 이번엔 "그럴듯해 보이기만" 하는 정적 화면이 아니라 실제로 동작하는 발행-구독
+ * (pub/sub) 로직입니다 — rosPublish()가 그 토픽을 구독 중인 노드에 실제로 등록된 JS 콜백을
+ * 호출하고, 그 콜백이 다시 다른 토픽을 발행하는 식으로 메시지가 진짜로 흘러갑니다(예:
+ * teleop_demo에서 /cmd_vel 구독 콜백이 오도메트리를 적분해 /odom을 발행 → 오른쪽 Pose
+ * 미니맵이 실제로 그 값을 받아 그려짐). roscore·노드·토픽은 전부 이 페이지 안에서만 도는
+ * 자체 자료구조(rosMaster)일 뿐, 실제 ROS나 네트워크 통신과는 무관합니다.
+ * ============================================================================ */
+const rosMaster = { nodes: {}, topics: {}, launchActive: null, intervalHandles: [], robotState: null, loggedCount: 0 };
+const rosSubscriberCallbacks = {}; // nodeName -> topicName -> [callback, ...]
+let rosEchoTopic = null;
+
+function rosSanitize(name){ return String(name).replace(/[^a-zA-Z0-9]/g, '_'); }
+
+function rosEnsureTopic(name, type = 'std_msgs/String'){
+  if (!rosMaster.topics[name]) rosMaster.topics[name] = { type, msgCount: 0, lastMsg: null, lastMsgTime: 0, subscribers: new Set(), publishers: new Set() };
+  return rosMaster.topics[name];
+}
+// 노드를 "등록"하는 것은 실제 roscore에 노드가 떠서 자신의 발행/구독 목록을 알리는 것과
+// 같습니다 — 이 목록이 그대로 노드 그래프의 구조(어느 화살표를 그릴지)가 됩니다.
+function rosRegisterNode(name, { pubs = [], subs = [] } = {}){
+  rosMaster.nodes[name] = { pubs: new Set(pubs), subs: new Set(subs) };
+  pubs.forEach(t => rosEnsureTopic(t).publishers.add(name));
+  subs.forEach(t => rosEnsureTopic(t).subscribers.add(name));
+}
+// 실제 rospy의 Subscriber(topic, callback)와 같은 역할 — 이 콜백이 rosPublish()에서 진짜로
+// 호출됩니다(단순히 화면에 로그만 찍는 흉내가 아닙니다).
+function rosSubscribe(nodeName, topicName, callback){
+  rosSubscriberCallbacks[nodeName] = rosSubscriberCallbacks[nodeName] || {};
+  (rosSubscriberCallbacks[nodeName][topicName] = rosSubscriberCallbacks[nodeName][topicName] || []).push(callback);
+}
+// 실제 rospy의 Publisher.publish(msg)와 같은 역할 — 그 토픽을 구독 중인 모든 노드의 콜백을
+// 실제로 호출해 메시지를 전달합니다(진짜 pub/sub). 화면 갱신(에코 로그·그래프 반짝임·
+// 대시보드)은 그 전달이 끝난 뒤 부수효과로 따라옵니다.
+function rosPublish(topicName, msg, fromNode){
+  const t = rosEnsureTopic(topicName);
+  t.msgCount++; t.lastMsg = msg; t.lastMsgTime = Date.now();
+  t.subscribers.forEach(subName => {
+    (rosSubscriberCallbacks[subName]?.[topicName] || []).forEach(cb => {
+      try { cb(msg, fromNode); } catch (e){ console.error('[ROS mock] subscriber callback error:', e); }
+    });
+  });
+  if (topicName === rosEchoTopic) rosAppendEcho(topicName, msg);
+  rosUpdateDashboard(topicName, msg);
+  rosFlashActivity(topicName);
+  rosUpdateStatsLine();
+}
+
+// 발행/구독 순간 그 토픽 필과 관련 화살표를 잠깐 반짝여, 메시지가 "지금 막 지나갔다"는 것을
+// 시각적으로 보여줍니다(구조를 다시 그리는 무거운 drawRosGraph() 대신, 이미 그려진 SVG
+// 요소에 클래스만 잠깐 붙였다 떼는 가벼운 방식).
+function rosFlashActivity(topicName){
+  const pill = document.getElementById(`ros_topic_${rosSanitize(topicName)}`);
+  if (pill){ pill.classList.add('ros-flash'); setTimeout(() => pill.classList.remove('ros-flash'), 250); }
+  const t = rosMaster.topics[topicName];
+  if (!t) return;
+  t.publishers.forEach(n => {
+    const e = document.getElementById(`ros_edge_pub_${rosSanitize(n)}_${rosSanitize(topicName)}`);
+    if (e){ e.classList.add('ros-flash'); setTimeout(() => e.classList.remove('ros-flash'), 250); }
+  });
+  t.subscribers.forEach(n => {
+    const e = document.getElementById(`ros_edge_sub_${rosSanitize(n)}_${rosSanitize(topicName)}`);
+    if (e){ e.classList.add('ros-flash'); setTimeout(() => e.classList.remove('ros-flash'), 250); }
+  });
+}
+
+// rqt_graph를 단순화한 2열(노드 | 토픽) 배치 — 왼쪽에 노드 박스, 오른쪽에 토픽 필을 세로로
+// 나열하고, 발행은 초록 실선(노드→토픽), 구독은 주황 점선(토픽→노드) 화살표로 잇습니다.
+function drawRosGraph(){
+  const svg = document.getElementById('rosGraphSvg');
+  const hint = document.getElementById('rosGraphEmptyHint');
+  if (!svg) return;
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const nodeNames = Object.keys(rosMaster.nodes);
+  const topicNames = Object.keys(rosMaster.topics);
+  if (hint) hint.style.display = nodeNames.length ? 'none' : 'flex';
+  if (!nodeNames.length) return;
+  const wrap = document.getElementById('rosGraphWrap');
+  const NS = 'http://www.w3.org/2000/svg';
+  const W = Math.max(380, wrap ? wrap.clientWidth : 380);
+  const rowH = 44;
+  const H = Math.max(140, Math.max(nodeNames.length, topicNames.length) * rowH + 20);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMin meet');
+
+  const NODE_HW = 64, TOPIC_HW = 50; // 노드 박스/토픽 필의 반너비
+  const nodeX = 78, topicX = W - 78;
+  const nodePos = {}, topicPos = {};
+  nodeNames.forEach((n, i) => { nodePos[n] = { x: nodeX, y: 30 + i * rowH }; });
+  topicNames.forEach((t, i) => { topicPos[t] = { x: topicX, y: 30 + i * rowH }; });
+
+  const defs = document.createElementNS(NS, 'defs');
+  defs.innerHTML = `
+    <marker id="rosArrowPub" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#3ddc84"/></marker>
+    <marker id="rosArrowSub" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ffb454"/></marker>`;
+  svg.appendChild(defs);
+
+  function addEdge(x1, y1, x2, y2, cls, id){
+    const path = document.createElementNS(NS, 'path');
+    const mx = (x1 + x2) / 2;
+    path.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+    path.setAttribute('class', cls);
+    path.setAttribute('marker-end', cls === 'ros-edge-pub' ? 'url(#rosArrowPub)' : 'url(#rosArrowSub)');
+    if (id) path.id = id;
+    svg.appendChild(path);
+  }
+  // 엣지를 먼저 그려서 노드/토픽 도형 아래로 깔리게 합니다.
+  nodeNames.forEach(n => {
+    const np = nodePos[n];
+    rosMaster.nodes[n].pubs.forEach(t => {
+      const tp = topicPos[t]; if (!tp) return;
+      addEdge(np.x + NODE_HW, np.y, tp.x - TOPIC_HW, tp.y, 'ros-edge-pub', `ros_edge_pub_${rosSanitize(n)}_${rosSanitize(t)}`);
+    });
+    rosMaster.nodes[n].subs.forEach(t => {
+      const tp = topicPos[t]; if (!tp) return;
+      addEdge(tp.x - TOPIC_HW, tp.y + 10, np.x + NODE_HW, np.y + 10, 'ros-edge-sub', `ros_edge_sub_${rosSanitize(n)}_${rosSanitize(t)}`);
+    });
+  });
+  nodeNames.forEach(n => {
+    const p = nodePos[n];
+    const rect = document.createElementNS(NS, 'rect');
+    rect.setAttribute('x', p.x - NODE_HW); rect.setAttribute('y', p.y - 14);
+    rect.setAttribute('width', NODE_HW * 2); rect.setAttribute('height', 28); rect.setAttribute('rx', 6);
+    rect.setAttribute('class', 'ros-node-box'); rect.id = `ros_node_${rosSanitize(n)}`;
+    svg.appendChild(rect);
+    const label = document.createElementNS(NS, 'text');
+    label.setAttribute('x', p.x); label.setAttribute('y', p.y + 4);
+    label.setAttribute('text-anchor', 'middle'); label.setAttribute('class', 'ros-node-label');
+    label.textContent = n;
+    svg.appendChild(label);
+  });
+  topicNames.forEach(t => {
+    const p = topicPos[t];
+    const rect = document.createElementNS(NS, 'rect');
+    rect.setAttribute('x', p.x - TOPIC_HW); rect.setAttribute('y', p.y - 12);
+    rect.setAttribute('width', TOPIC_HW * 2); rect.setAttribute('height', 24); rect.setAttribute('rx', 12);
+    rect.setAttribute('class', 'ros-topic-pill'); rect.id = `ros_topic_${rosSanitize(t)}`;
+    svg.appendChild(rect);
+    const label = document.createElementNS(NS, 'text');
+    label.setAttribute('x', p.x); label.setAttribute('y', p.y + 4);
+    label.setAttribute('text-anchor', 'middle'); label.setAttribute('class', 'ros-topic-label');
+    label.textContent = t;
+    svg.appendChild(label);
+  });
+}
+
+// /odom·/battery_state처럼 사이드바 대시보드가 특별히 아는 토픽이면 그 패널을 갱신합니다.
+function rosUpdateDashboard(topicName, msg){
+  if (topicName === '/odom' && msg && typeof msg.x === 'number') rosDrawPose(msg);
+  if (topicName === '/battery_state' && msg && typeof msg.percentage === 'number'){
+    const pct = Math.max(0, Math.min(100, msg.percentage));
+    const fill = document.getElementById('rosBatteryFill');
+    const text = document.getElementById('rosBatteryText');
+    if (fill) fill.style.width = `${pct}%`;
+    if (text) text.textContent = `${msg.percentage.toFixed(1)}%`;
+  }
+}
+// 2D 격자 위에 로봇의 현재 pose(x,y,theta)를 점 + 진행방향 화살표로 그립니다 — Tkinter 탭의
+// drawTkinterMockUi()와 같은 순수 Canvas 2D 정적 그림입니다.
+function rosDrawPose(pose){
+  const canvas = document.getElementById('rosPoseCanvas');
+  if (!canvas || !canvas.getContext) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height, scale = 12, cx = W / 2, cy = H / 2;
+  ctx.fillStyle = '#0c0f13'; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = '#1c222b';
+  for (let gx = 0; gx <= W; gx += 12){ ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+  for (let gy = 0; gy <= H; gy += 12){ ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+  const px = cx + pose.x * scale, py = cy - pose.y * scale;
+  ctx.strokeStyle = '#3ddc84'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.cos(pose.theta) * 14, py - Math.sin(pose.theta) * 14); ctx.stroke();
+  ctx.fillStyle = '#3ddc84'; ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+}
+function rosUpdateStatsLine(){
+  const el = document.getElementById('rosStatsLine');
+  if (!el) return;
+  const nodeCount = Object.keys(rosMaster.nodes).length;
+  const topicCount = Object.keys(rosMaster.topics).length;
+  const totalMsgs = Object.values(rosMaster.topics).reduce((s, t) => s + t.msgCount, 0);
+  let line = `노드 ${nodeCount} · 토픽 ${topicCount} · 메시지 ${totalMsgs}건`;
+  if (rosMaster.loggedCount) line += `\nlogger_node 수신 ${rosMaster.loggedCount}건`;
+  el.textContent = line;
+}
+function rosAppendEcho(topicName, msg){
+  const log = document.getElementById('rosEchoLog');
+  if (!log) return;
+  const time = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+  log.textContent += `[${time}] ${topicName}: ${JSON.stringify(msg)}\n`;
+  log.scrollTop = log.scrollHeight;
+}
+// rostopic echo 대상을 고르는 드롭다운 — 지금 등록된 토픽 목록으로 채웁니다.
+function refreshRosTopicSelect(){
+  const sel = document.getElementById('rosTopicSelect');
+  if (!sel) return;
+  const prev = sel.value;
+  const names = Object.keys(rosMaster.topics);
+  sel.innerHTML = names.map(t => `<option value="${t}">${t}</option>`).join('');
+  if (names.includes(prev)) sel.value = prev;
+  rosEchoTopic = sel.value || null;
+}
+function rosTopicSelectChanged(){
+  const sel = document.getElementById('rosTopicSelect');
+  rosEchoTopic = sel ? (sel.value || null) : null;
+  const log = document.getElementById('rosEchoLog');
+  if (log) log.textContent = '';
+}
+// rostopic pub 흉내 — 사람이 직접 토픽에 메시지를 발행합니다. 실제 rosPublish()를 그대로
+// 타므로, 구독 중인 노드가 있으면(예: teleop_demo의 /cmd_vel → robot_state_node) 그 콜백이
+// 정말로 호출되어 대시보드(Pose)까지 실시간으로 반응합니다.
+function rosPublishFromConsole(){
+  const sel = document.getElementById('rosTopicSelect');
+  const input = document.getElementById('rosPubMsgInput');
+  if (!sel || !sel.value) return;
+  let msg;
+  try { msg = JSON.parse(input.value); } catch (e){ msg = { data: input.value }; }
+  rosPublish(sel.value, msg, '/rostopic_pub_cli');
+}
+
+// launch 파일 2종 — roslaunch로 여러 노드를 한 번에 띄우는 개념을 보여줍니다. wireUp()은
+// 노드 사이의 실제 구독 콜백(=메시지가 진짜 흐르는 로직)을 등록하고, demoTick()은 사람이나
+// 센서가 주기적으로 값을 발행하는 것을 흉내 내는 최초 발행원입니다.
+const ROS_LAUNCH_PRESETS = {
+  teleop_demo: {
+    label: 'teleop_demo.launch',
+    tickMs: 700,
+    nodes: [
+      { name: '/teleop_node', pubs: ['/cmd_vel'], subs: [] },
+      { name: '/robot_state_node', pubs: ['/odom', '/battery_state'], subs: ['/cmd_vel'] },
+    ],
+    tf: [{ parent: 'odom', child: 'base_link' }, { parent: 'base_link', child: 'laser_link' }],
+    wireUp(state){
+      // /cmd_vel을 실제로 구독해서 오도메트리를 적분한 뒤 /odom으로 다시 발행합니다 —
+      // "발행 → 구독 콜백 → 또 다른 발행"으로 이어지는 진짜 메시지 흐름입니다.
+      rosSubscribe('/robot_state_node', '/cmd_vel', (msg) => {
+        const st = state.robotState; if (!st) return;
+        st.theta += (msg.angular || 0) * 0.5;
+        st.x += Math.cos(st.theta) * (msg.linear || 0) * 0.5;
+        st.y += Math.sin(st.theta) * (msg.linear || 0) * 0.5;
+        rosPublish('/odom', { x: +st.x.toFixed(2), y: +st.y.toFixed(2), theta: +st.theta.toFixed(2) }, '/robot_state_node');
+      });
+    },
+    demoTick(state){
+      const t = Date.now() / 1000;
+      const linear = +(0.3 + 0.2 * Math.sin(t / 2)).toFixed(2);
+      const angular = +(0.4 * Math.sin(t / 3)).toFixed(2);
+      rosPublish('/cmd_vel', { linear, angular }, '/teleop_node');
+      if (state.robotState){
+        state.robotState.battery = Math.max(0, state.robotState.battery - 0.15);
+        rosPublish('/battery_state', { percentage: +state.robotState.battery.toFixed(1) }, '/robot_state_node');
+      }
+    },
+  },
+  sensor_demo: {
+    label: 'sensor_demo.launch',
+    tickMs: 900,
+    nodes: [
+      { name: '/lidar_node', pubs: ['/scan'], subs: [] },
+      { name: '/imu_node', pubs: ['/imu/data'], subs: [] },
+      { name: '/logger_node', pubs: [], subs: ['/scan', '/imu/data'] },
+    ],
+    tf: [{ parent: 'base_link', child: 'laser_link' }, { parent: 'base_link', child: 'imu_link' }],
+    wireUp(state){
+      rosSubscribe('/logger_node', '/scan', () => { state.loggedCount = (state.loggedCount || 0) + 1; rosUpdateStatsLine(); });
+      rosSubscribe('/logger_node', '/imu/data', () => { state.loggedCount = (state.loggedCount || 0) + 1; rosUpdateStatsLine(); });
+    },
+    demoTick(){
+      const ranges = Array.from({ length: 8 }, () => +(0.5 + Math.random() * 3).toFixed(2));
+      rosPublish('/scan', { ranges }, '/lidar_node');
+      rosPublish('/imu/data', { ax: +(Math.random() * 0.4 - 0.2).toFixed(2), ay: +(Math.random() * 0.4 - 0.2).toFixed(2), az: 9.81 }, '/imu_node');
+    },
+  },
+};
+
+function rosRenderTfList(preset){
+  const el = document.getElementById('rosTfList');
+  if (!el) return;
+  el.innerHTML = (preset.tf || []).map(e => `${e.parent} → ${e.child}`).join('<br>') || '—';
+}
+function updateRosLaunchStatusUi(){
+  const status = document.getElementById('rosStatusText');
+  if (!status) return;
+  if (rosMaster.launchActive){
+    const preset = ROS_LAUNCH_PRESETS[rosMaster.launchActive];
+    status.textContent = tr('monitor.rosRunningPrefix') + (preset ? preset.label : rosMaster.launchActive);
+    status.classList.add('active');
+  } else {
+    status.textContent = tr('monitor.rosStoppedStatus');
+    status.classList.remove('active');
+  }
+}
+function clearRosDashboard(){
+  const battFill = document.getElementById('rosBatteryFill'); if (battFill) battFill.style.width = '0%';
+  const battText = document.getElementById('rosBatteryText'); if (battText) battText.textContent = '—';
+  const tf = document.getElementById('rosTfList'); if (tf) tf.innerHTML = '—';
+  const canvas = document.getElementById('rosPoseCanvas');
+  if (canvas && canvas.getContext) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  const log = document.getElementById('rosEchoLog'); if (log) log.textContent = '';
+  rosUpdateStatsLine();
+}
+// roslaunch 실행 — 먼저 이전에 떠 있던 launch를 깨끗이 정리한 뒤, 고른 preset의 노드들을
+// roscore에 등록하고, 노드 사이 구독 배선(wireUp)과 최초 발행 인터벌(demoTick)을 시작합니다.
+function rosLaunch(key){
+  rosStopLaunch();
+  const preset = ROS_LAUNCH_PRESETS[key];
+  if (!preset) return;
+  rosMaster.launchActive = key;
+  rosMaster.robotState = { x: 0, y: 0, theta: 0, battery: 100 };
+  rosMaster.loggedCount = 0;
+  preset.nodes.forEach(n => rosRegisterNode(n.name, { pubs: n.pubs, subs: n.subs }));
+  if (preset.wireUp) preset.wireUp(rosMaster);
+  rosRenderTfList(preset);
+  const handle = setInterval(() => preset.demoTick(rosMaster), preset.tickMs || 800);
+  rosMaster.intervalHandles.push(handle);
+  updateRosLaunchStatusUi();
+  drawRosGraph();
+  refreshRosTopicSelect();
+  rosUpdateStatsLine();
+}
+function rosStopLaunch(){
+  rosMaster.intervalHandles.forEach(h => clearInterval(h));
+  rosMaster.intervalHandles = [];
+  rosMaster.nodes = {};
+  rosMaster.topics = {};
+  rosMaster.robotState = null;
+  rosMaster.loggedCount = 0;
+  Object.keys(rosSubscriberCallbacks).forEach(k => delete rosSubscriberCallbacks[k]);
+  rosMaster.launchActive = null;
+  updateRosLaunchStatusUi();
+  drawRosGraph();
+  refreshRosTopicSelect();
+  clearRosDashboard();
+}
+function rosLaunchStart(){
+  const sel = document.getElementById('rosLaunchSelect');
+  if (sel) rosLaunch(sel.value);
+}
+function rosLaunchStop(){ rosStopLaunch(); }
 
 const serialBuf = {};
 function logSerial(msg, target = 'r4'){
@@ -15155,6 +16477,7 @@ function BOM_LABELS_FN(){ return {
   relay: tr('comp.relay.title'), relay220: tr('bom.relay220'), wallswitch: tr('bom.wallswitch'), benchpsu: tr('bom.benchpsu'),
   ac220: tr('bom.ac220'), ac3phase: tr('bom.ac3phase'), generator: tr('bom.generator'),
   coincell: tr('bom.coincell'), fruitbatt: tr('bom.fruitbatt'), oersted: tr('bom.oersted'),
+  battery: tr('bom.battery'), cccv: tr('bom.cccv'), buck: tr('bom.buck'), schottky: tr('bom.schottky'),
   diode: tr('bom.diode'), transistor: tr('bom.transistor'),
   transformer: tr('bom.transformer'), parallelwires: tr('bom.parallelwires'),
   electromagnet: tr('bom.electromagnet'), fuse: tr('bom.fuse'),
@@ -15229,7 +16552,7 @@ function schematicKindOf(ownerEl){
   // T1/T2)인 소자만 골라 표준 기호를 추가했습니다 — 모드(DC/AC단상/AC3상)에 따라 핀 구성이
   // 바뀌는 범용 PSU/AC220/3상/변압기는 아직 상자(box)로 남겨둡니다(잘못된 2핀 기호를 붙이면
   // 오히려 더 헷갈리기 때문). 건전지/과일전지/발전기는 항상 V/G 2핀만 있어 안전합니다.
-  if (ownerEl.classList.contains('comp-coincell') || ownerEl.classList.contains('comp-fruitbatt') || ownerEl.classList.contains('comp-generator')) return 'battery';
+  if (ownerEl.classList.contains('comp-coincell') || ownerEl.classList.contains('comp-fruitbatt') || ownerEl.classList.contains('comp-generator') || ownerEl.classList.contains('comp-battery')) return 'battery';
   if (ownerEl.classList.contains('comp-dcmotor')) return 'motor';
   return 'box';
 }
@@ -17222,6 +18545,8 @@ function restoreProjectState(data){
 
   updateAllWires();
   updateLegend();
+  // [Ver0.9966, 2부] 불러온 프로젝트에 이미 라즈베리파이-HDMI 모니터 결선이 있을 수 있으므로 갱신.
+  if (typeof updateMonitorHdmiStatus === 'function') updateMonitorHdmiStatus();
 }
 
 function handleProjectFileSelected(inputEl){
@@ -17293,7 +18618,7 @@ function collapseNonBoardPaletteGroupsByDefault(){
  * (buildAiComponentCatalog) — 코드가 바뀌면 카탈로그도 자동으로 같이 바뀌므로, AI가 존재하지
  * 않는 핀 이름을 지어내 배선이 조용히 실패하는 사고를 원천적으로 막습니다.
  * ============================================================================ */
-const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','bulb220','canfdmodule','canmodule','capacitor','capacitor-e','clampmeter','coincell','contactor','dac','dcmotor','dcmotor-enc','diode','electromagnet','eocr','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','lcd','led','ledtube220','levelshifter','mccb','motor3ph','motordriver','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','scope','selectorswitch','sensor-humid','sensor-ldr','sensor-temp','servo','speaker','stepper','terminalblock','timer','toggleswitch','transformer','transistor','ultrasonic','usbsound','wallswitch','wifiap'];
+const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','bulb220','canfdmodule','canmodule','capacitor','capacitor-e','cccv','clampmeter','coincell','contactor','dac','dcmotor','dcmotor-enc','diode','electromagnet','eocr','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','lcd','led','ledtube220','levelshifter','mccb','motor3ph','motordriver','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-humid','sensor-ldr','sensor-temp','servo','speaker','stepper','terminalblock','timer','toggleswitch','transformer','transistor','ultrasonic','usbsound','wallswitch','wifiap'];
 // ('custom'은 사용자가 직접 그리는 빈 부품이라 AI가 고를 이유가 없어 목록에서 뺐습니다.)
 const AI_BOARD_TYPES = ['r3', 'r4', 'mega', 'esp32b', 'esp32d', 'esp32t'];
 
