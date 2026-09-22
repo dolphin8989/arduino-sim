@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9974</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9980</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -326,6 +326,60 @@
   .ep-card .ep-desc{font-size:.66rem; color:var(--text-faint); line-height:1.4;}
   .ep-section-label{font-size:.64rem; color:var(--text-faint); font-family:'IBM Plex Mono',monospace; letter-spacing:.5px; padding-top:8px; margin-top:2px; border-top:1px solid var(--border);}
 
+  /* [Ver0.9976] 도킹 코드 에디터 패널 — "부품 드래그·오실로스코프 채널"에 이어 들어온 피드백
+     ("에디터가 여러 개 뜰 때 마다 화면 곳곳에 흩어져 겹치고, 어디 있는지 찾기 힘들다")에 따라,
+     보드별 코드 에디터 팝업을 자유롭게 떠다니던 창 대신 예제 갤러리(.example-panel)와 똑같은
+     flex 형제 패턴으로 화면 오른쪽에 고정 도킹합니다. 실제 팝업 DOM(#popupR4/#popupR3/동적
+     보드 팝업)의 내용은 그대로 재사용하고, ensureEditorDockHasPopup()이 열릴 때 이 패널의
+     body 안으로 옮겨 담습니다(HDMI 모니터/BOM 목록 팝업은 이 클래스가 없어 영향받지 않음). */
+  .editor-dock{
+    width:640px; max-width:92vw; min-width:380px; flex:0 0 auto; position:relative;
+    background:var(--bg-panel); border-left:1px solid var(--border); display:flex; flex-direction:column;
+    z-index:9; overflow:hidden; transition:width .22s ease;
+  }
+  .editor-dock[hidden]{display:none;}
+  .editor-dock.collapsed{pointer-events:none;}
+  .editor-dock.maximized{width:min(1400px,92vw) !important;}
+  /* .editor-dock 자체가 overflow:hidden이라(폭이 0으로 줄어드는 슬라이드 애니메이션 중
+     안쪽 내용이 패널 밖으로 삐져나와 보이지 않게 하기 위함), 이 손잡이도 패널 경계
+     "안쪽"에 완전히 들어와 있어야 실제로 클릭/드래그가 됩니다(바깥으로 걸치면 잘려서
+     히트테스트가 되지 않습니다). */
+  .editor-dock-resizer{position:absolute; left:0; top:0; bottom:0; width:6px; cursor:ew-resize; z-index:10;}
+  .editor-dock-resizer:hover, .editor-dock-resizer.dragging{background:rgba(120,200,220,.18);}
+  .editor-dock-tabs{
+    display:flex; overflow-x:auto; flex:0 0 auto; background:var(--bg-panel-2);
+    border-bottom:1px solid var(--border); scrollbar-width:thin;
+  }
+  .editor-dock-tab{
+    display:flex; align-items:center; gap:6px; padding:8px 10px; font-size:.7rem; color:var(--text-faint);
+    background:transparent; border:none; border-right:1px solid var(--border); border-bottom:2px solid transparent;
+    cursor:pointer; font-family:inherit; white-space:nowrap; flex:0 0 auto;
+  }
+  .editor-dock-tab:hover{color:var(--text-dim);}
+  .editor-dock-tab.active{color:var(--teal); border-bottom-color:var(--teal); background:var(--bg-panel);}
+  .editor-dock-tab .edt-close{border-radius:3px; padding:0 3px; opacity:.6;}
+  .editor-dock-tab .edt-close:hover{opacity:1; background:rgba(255,255,255,.14);}
+  .editor-dock-body{flex:1; position:relative; min-height:0; overflow:hidden;}
+  .editor-dock-empty{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text-faint); font-size:.74rem;}
+  /* 도킹 상태에서는 팝업 자체의 위치/크기(left·top·width·height·resize)를 전부 패널이
+     대신하므로, 기존 자유 플로팅용 규칙을 이 자리에서만 무효화합니다. */
+  .editor-dock-body .board-popup.code-editor-popup{
+    position:absolute; inset:0; width:auto; height:auto; max-width:none; max-height:none;
+    min-width:0; min-height:0; border:none; border-radius:0; box-shadow:none; resize:none;
+    z-index:1; display:none;
+  }
+  .editor-dock-body .board-popup.code-editor-popup.dock-active{display:flex;}
+  .code-editor-popup .popup-head{cursor:default;}
+  .editor-dock-handle{
+    position:absolute; top:50%; right:0; transform:translateY(-50%); z-index:19;
+    background:var(--bg-panel-2); border:1px solid var(--border-strong); border-right:none;
+    border-radius:8px 0 0 8px; padding:11px 6px; cursor:pointer; writing-mode:vertical-rl;
+    font-family:'Pretendard','Noto Sans KR',sans-serif; font-size:.7rem; color:var(--text-dim);
+    box-shadow:-3px 0 10px rgba(0,0,0,.3);
+  }
+  .editor-dock-handle:hover{color:var(--teal); border-color:var(--teal);}
+  .editor-dock-handle[hidden]{display:none;}
+
   /* Legend — 캔버스 좌하단에 항상 떠 있는 HUD라, 스크롤로 그 아래에 보드가 오면 클릭/드래그를
      가로채던 문제가 있었습니다. 컨테이너 자체는 pointer-events:none으로 클릭을 통과시키고,
      실제로 눌러야 하는 목록(전선 항목 클릭 -> 색상 편집)에만 auto로 되돌립니다. */
@@ -454,6 +508,22 @@
   .comp-pot .pot-title{font-size:.66rem; color:var(--text-dim); margin-bottom:6px; font-family:'IBM Plex Mono',monospace;}
   .comp-pot input[type=range]{width:100%; accent-color:var(--teal); cursor:pointer; margin:2px 0 4px;}
   .comp-pot .pot-value{font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:var(--teal-strong); margin-bottom:8px;}
+
+  /* [기능 추가 Ver0.9979] 디지털(클릭식 트리거) 센서 카드 공용 스타일 — SENSOR_DEFS의 슬라이더
+     자리에 "클릭하면 상태가 바뀌는 버튼"이 대신 들어갑니다. */
+  .dsensor-trig{
+    margin:2px 0 8px; padding:6px 4px; border-radius:6px; background:#2a2f37; border:1px solid #454c57;
+    font-family:'IBM Plex Mono',monospace; font-size:.6rem; text-align:center; cursor:pointer;
+    color:#9fb0c4; user-select:none; line-height:1.3;
+  }
+  .dsensor-trig.active{ background:#5a1414; border-color:#e6493d; color:#ffd9d4; }
+  .comp-joystick .joy-axis-row, .comp-temphumid .joy-axis-row{
+    display:flex; align-items:center; gap:6px; margin-bottom:4px;
+  }
+  .joy-axis-label{ font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:var(--text-dim); width:14px; }
+  .joy-axis-row input[type=range]{ flex:1; accent-color:var(--teal); cursor:pointer; }
+  .joy-axis-val{ font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:var(--teal-strong); width:34px; text-align:right; }
+  .comp-buzzer .buzzer-dome{ display:flex; align-items:center; justify-content:center; font-size:1.1rem; background:transparent !important; }
 
   .comp-btn{
     width:64px; height:64px; background:#e7e4dc; border-radius:9px; display:flex; align-items:center; justify-content:center;
@@ -1439,10 +1509,41 @@
   }
   /* 디버거가 지금 멈춰 있는 줄: 거터 배경을 강조합니다. */
   .code-linenumbers .gline.cur-line{background:#3a2f0d; color:#f2c94c;}
-  .code-editor{
-    flex:1; margin:0; background:#0a0d12; color:#cde6ff; font-family:'IBM Plex Mono',monospace;
-    font-size:.82rem; padding:14px; border:none; outline:none; resize:none; line-height:1.55; tab-size:2;
+  /* [Ver0.9976] 문법 강조 — textarea 자체는 글자를 투명하게 만들어 캐럿(입력 커서)만
+     보이게 하고, 그 바로 아래(z-index로) 정확히 같은 자리·폰트·줄간격의 <pre><code> 층에
+     색칠된 HTML을 겹쳐서 "보이는 건 강조된 글자, 실제 입력은 투명한 textarea"인 것처럼
+     보이게 하는 흔한 기법입니다. 두 층의 폰트/패딩/줄높이가 한 픽셀이라도 어긋나면 캐럿과
+     글자가 서로 안 맞아 보이므로, 아래 두 규칙(.code-highlight, .code-editor)에 폰트 관련
+     값을 반드시 동일하게 유지해야 합니다. 스크롤 동기화는 initCodeEditor()의 scroll
+     리스너가 담당합니다. */
+  .code-editor-surface{flex:1; position:relative; min-height:0;}
+  .code-highlight, .code-editor-surface > .code-editor{
+    position:absolute; inset:0; margin:0; padding:14px; font-family:'IBM Plex Mono',monospace;
+    font-size:.82rem; line-height:1.55; tab-size:2; box-sizing:border-box;
+    white-space:pre-wrap; word-wrap:break-word; overflow:auto;
   }
+  .code-highlight{
+    background:#0a0d12; color:#cde6ff; pointer-events:none; z-index:1;
+    /* textarea와 스크롤이 어긋나 보이는 프레임을 막기 위해, 실제 스크롤은 textarea에서만
+       받고(overflow:auto 유지) 이 층은 JS가 scrollTop/scrollLeft를 그대로 옮겨 적습니다. */
+  }
+  .code-highlight code{font:inherit; white-space:inherit; color:inherit;}
+  .code-editor-surface > .code-editor{
+    background:transparent; color:transparent; caret-color:#cde6ff; border:none; outline:none;
+    resize:none; z-index:2;
+  }
+  /* ::selection도 투명 텍스트를 따라가 안 보이게 되므로, 선택 영역만은 옅은 하이라이트
+     배경으로 눈에 보이게 되돌립니다. */
+  .code-editor-surface > .code-editor::selection{background:rgba(120,180,255,.35); color:transparent;}
+  .tok-comment{color:#6a9955; font-style:italic;}
+  .tok-string{color:#ce9178;}
+  .tok-number{color:#b5cea8;}
+  .tok-keyword{color:#c586c0;}
+  .tok-type{color:#4ec9b0;}
+  .tok-constant{color:#569cd6;}
+  .tok-preproc{color:#9b9b9b; font-style:italic;}
+  .tok-function{color:#dcdcaa;}
+  .tok-variable{color:#9cdcfe;}
   /* 디버그 바 (Ver 0.992): 브레이크포인트에 걸려 일시정지된 동안만 나타나는 계속/한 줄씩 실행
      컨트롤입니다. */
   .debug-bar{
@@ -1809,7 +1910,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9974</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9980</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -2134,7 +2235,7 @@
       </div>
       <div class="palette-group" data-group="sensor">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.sensor">센서</span><span class="pg-count">8</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.sensor">센서</span><span class="pg-count">45</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('ultrasonic')">
@@ -2168,6 +2269,157 @@
           <div class="palette-item" onclick="spawnComponent('pmsensor')">
             <div class="swatch"><div style="width:22px;height:16px;border-radius:2px;background:linear-gradient(160deg,#3a2e1c,#241c10);border:1px solid #8f6a2a;"></div></div>
             <span data-i18n="palette.pmsensor">미세먼지 센서<br>(PM2.5/PM10)</span>
+          </div>
+          <!-- [기능 추가 Ver0.9979] 37in1류 센서 키트 대량 추가 — 이 아래로 사용자가 사진으로
+               보여준 센서 키트 부품들과, 사용자가 명시적으로 요청한 수위 센서·IR 거리 센서
+               4종을 팔레트에 추가합니다. -->
+          <div class="palette-item" onclick="spawnComponent('sensor-water')">
+            <div class="swatch">💧</div>
+            <span data-i18n="palette.water">수위 감지 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-irdist9m')">
+            <div class="swatch">📡</div>
+            <span data-i18n="palette.irdist9m">IR 거리 센서 (9m)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-irdist6m')">
+            <div class="swatch">📡</div>
+            <span data-i18n="palette.irdist6m">IR 거리 센서 (6m)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-irdist2m')">
+            <div class="swatch">📡</div>
+            <span data-i18n="palette.irdist2m">IR 거리 센서 (2m)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-irdist3cm')">
+            <div class="swatch">📡</div>
+            <span data-i18n="palette.irdist3cm">IR 거리 센서 (3cm 근접)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-soundsm')">
+            <div class="swatch">🎤</div>
+            <span data-i18n="palette.soundsm">소형 사운드 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-soundbig')">
+            <div class="swatch">🎙️</div>
+            <span data-i18n="palette.soundbig">고감도 사운드 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-linhall')">
+            <div class="swatch">🧲</div>
+            <span data-i18n="palette.linhall">리니어 홀 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-anahall')">
+            <div class="swatch">🧲</div>
+            <span data-i18n="palette.anahall">아날로그 홀 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-anatemp')">
+            <div class="swatch">🌡️</div>
+            <span data-i18n="palette.anatemp">아날로그 온도 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-tempmod')">
+            <div class="swatch">🌡️</div>
+            <span data-i18n="palette.tempmod">온도 센서 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-heartbeat')">
+            <div class="swatch">❤️</div>
+            <span data-i18n="palette.heartbeat">심박 센서 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('sensor-rotary')">
+            <div class="swatch">🔄</div>
+            <span data-i18n="palette.rotary">로터리 엔코더<br>(간이형)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-avoid')">
+            <div class="swatch">🚧</div>
+            <span data-i18n="palette.avoid">장애물 감지 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-tracking')">
+            <div class="swatch">⬛</div>
+            <span data-i18n="palette.tracking">라인 트레킹 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-touch')">
+            <div class="swatch">👆</div>
+            <span data-i18n="palette.touch">터치 센서 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-flame')">
+            <div class="swatch">🔥</div>
+            <span data-i18n="palette.flame">화염 감지 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-minireed')">
+            <div class="swatch">🧷</div>
+            <span data-i18n="palette.minireed">미니 리드 스위치</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-reed')">
+            <div class="swatch">🧷</div>
+            <span data-i18n="palette.reed">리드 스위치 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-shock')">
+            <div class="swatch">💥</div>
+            <span data-i18n="palette.shock">충격 감지 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-ballswitch')">
+            <div class="swatch">⚪</div>
+            <span data-i18n="palette.ballswitch">볼 스위치 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-tilt')">
+            <div class="swatch">📐</div>
+            <span data-i18n="palette.tilt">틸트 스위치 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-lightcup')">
+            <div class="swatch">🥃</div>
+            <span data-i18n="palette.lightcup">라이트컵 스위치</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-tap')">
+            <div class="swatch">👊</div>
+            <span data-i18n="palette.tap">Tap 모듈<br>(노크 센서)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-lightblock')">
+            <div class="swatch">🚦</div>
+            <span data-i18n="palette.lightblock">Light Blocking 모듈<br>(포토인터럽터)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-irrecv')">
+            <div class="swatch">📶</div>
+            <span data-i18n="palette.irrecv">IR 수신 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-hallmag')">
+            <div class="swatch">🧲</div>
+            <span data-i18n="palette.hallmag">홀 마그네틱 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('dsensor-digitaltemp')">
+            <div class="swatch">🌡️</div>
+            <span data-i18n="palette.digitaltemp">디지털 온도 센서<br>(임계값형)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('joystick')">
+            <div class="swatch">🕹️</div>
+            <span data-i18n="palette.joystick">조이스틱 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('temphumid')">
+            <div class="swatch">💧🌡️</div>
+            <span data-i18n="palette.temphumid">온습도 센서 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('twocolorled')">
+            <div class="swatch"><div style="width:16px;height:16px;border-radius:50%;background:conic-gradient(#e6493d 0deg 180deg,#3ddc84 180deg 360deg);"></div></div>
+            <span data-i18n="palette.twocolorled">2컬러 LED 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('smdrgb')">
+            <div class="swatch"><div style="width:12px;height:12px;border-radius:2px;background:conic-gradient(#ff5c5c,#4ee06a,#5aa9e6,#ff5c5c);"></div></div>
+            <span data-i18n="palette.smdrgb">SMD RGB 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('flash7color')">
+            <div class="swatch">🌈</div>
+            <span data-i18n="palette.flash7color">7색 자동 변환 LED</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('laser')">
+            <div class="swatch">🔴</div>
+            <span data-i18n="palette.laser">레이저 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('iremit')">
+            <div class="swatch">📤</div>
+            <span data-i18n="palette.iremit">IR 발신 모듈</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('buzzerpassive')">
+            <div class="swatch">🔊</div>
+            <span data-i18n="palette.buzzerpassive">패시브 부저</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('buzzeractive')">
+            <div class="swatch">🔔</div>
+            <span data-i18n="palette.buzzeractive">액티브 부저</span>
           </div>
         </div>
       </div>
@@ -2417,8 +2669,17 @@
     <div class="example-panel-body" id="galleryBody"></div>
   </aside>
 
+  <!-- [Ver0.9976] 도킹 코드 에디터 패널 — 평소엔 hidden으로 화면에서 완전히 빠져 있다가,
+       openBoardPopup()으로 코드 에디터를 처음 열 때 폭이 매끄럽게 펼쳐지며 나타납니다. -->
+  <aside class="editor-dock" id="editorDock" hidden>
+    <div class="editor-dock-resizer" id="editorDockResizer"></div>
+    <div class="editor-dock-tabs" id="editorDockTabs"></div>
+    <div class="editor-dock-body" id="editorDockBody"></div>
+  </aside>
+  <button class="editor-dock-handle" id="editorDockHandle" onclick="toggleEditorDock()" hidden data-i18n="dock.handleLabel" data-i18n-title="dock.handleTitle" title="코드 에디터">💻 코드 에디터</button>
+
   <!-- R4 Code & Toolchain Popup -->
-  <div class="board-popup" id="popupR4" hidden style="left:58%; top:60px;">
+  <div class="board-popup code-editor-popup" id="popupR4" hidden style="left:58%; top:60px;">
     <div class="popup-head" data-drag-handle>
       <b>Uno R4 WiFi — C/C++ GCC Toolchain &amp; Serial</b>
       <div class="code-export-group" data-i18n-title="popup.exportTitle" title="이 에디터의 코드만 파일로 내보냅니다 (프로젝트 저장과는 별개입니다)">
@@ -2455,6 +2716,8 @@
       </div>
       <div class="code-editor-wrap" id="codeEditorPaneR4">
       <div class="code-linenumbers" id="lineNumR4">1</div>
+      <div class="code-editor-surface">
+      <pre class="code-highlight" id="codeHighlightR4" aria-hidden="true"><code></code></pre>
       <textarea id="codeEditorR4" class="code-editor" spellcheck="false">// Arduino Uno R4 WiFi sketch
 int loopCounter = 0;
 const int ledPin = 13;
@@ -2478,6 +2741,7 @@ void loop() {
   Serial.println(loopCounter);
   delay(200);
 }</textarea>
+      </div>
       </div>
       <div class="block-editor-pane" id="blockEditorPaneR4" style="display:none;">
         <div class="block-editor-toolbar">
@@ -2509,7 +2773,7 @@ void loop() {
   </div>
 
   <!-- R3 Code & Toolchain Popup -->
-  <div class="board-popup" id="popupR3" hidden style="left:55%; top:100px;">
+  <div class="board-popup code-editor-popup" id="popupR3" hidden style="left:55%; top:100px;">
     <div class="popup-head" data-drag-handle>
       <b>Uno R3 — AVR-GCC Toolchain &amp; Serial</b>
       <div class="code-export-group" data-i18n-title="popup.exportTitle" title="이 에디터의 코드만 파일로 내보냅니다 (프로젝트 저장과는 별개입니다)">
@@ -2546,6 +2810,8 @@ void loop() {
       </div>
       <div class="code-editor-wrap" id="codeEditorPaneR3">
       <div class="code-linenumbers" id="lineNumR3">1</div>
+      <div class="code-editor-surface">
+      <pre class="code-highlight" id="codeHighlightR3" aria-hidden="true"><code></code></pre>
       <textarea id="codeEditorR3" class="code-editor" spellcheck="false">// Arduino Uno R3 sketch
 int cnt = 0;
 const int ledPin = 13;
@@ -2562,6 +2828,7 @@ void loop() {
   Serial.println(cnt);
   delay(300);
 }</textarea>
+      </div>
       </div>
       <div class="block-editor-pane" id="blockEditorPaneR3" style="display:none;">
         <div class="block-editor-toolbar">
@@ -2852,7 +3119,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9974", en: "K's Simulator Ver0.9974" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9980", en: "K's Simulator Ver0.9980" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -2905,6 +3172,25 @@ const STRINGS = {
   "comp.encgTitle": { ko: "엔코더 GND", en: "Encoder GND" },
   "comp.lcd.title": { ko: "캐릭터 LCD 16x2 (HD44780, 4-bit)", en: "Character LCD 16x2 (HD44780, 4-bit)" },
   "comp.led.colorSelect": { ko: "LED 색상 선택", en: "LED color" },
+  // [기능 추가 Ver0.9979] 새 부품 이름표
+  "comp.joystick.title": { ko: "조이스틱 모듈", en: "Joystick Module" },
+  "comp.joystick.xTitle": { ko: "X축 (Analog)", en: "X axis (Analog)" },
+  "comp.joystick.yTitle": { ko: "Y축 (Analog)", en: "Y axis (Analog)" },
+  "comp.joystick.swTitle": { ko: "누름 버튼 (풀업, Digital)", en: "Press button (pull-up, Digital)" },
+  "comp.joystick.swUp": { ko: "⚪ SW 버튼 (클릭하여 누르기)", en: "⚪ SW button (click to press)" },
+  "comp.joystick.swDown": { ko: "🔴 SW 버튼 눌림 (클릭하여 떼기)", en: "🔴 SW button pressed (click to release)" },
+  "comp.temphumid.title": { ko: "온습도 센서 모듈", en: "Temp & Humidity Sensor" },
+  "comp.temphumid.t": { ko: "온도", en: "Temp" },
+  "comp.temphumid.h": { ko: "습도", en: "Humidity" },
+  "comp.temphumid.tTitle": { ko: "온도 신호", en: "Temperature signal" },
+  "comp.temphumid.hTitle": { ko: "습도 신호", en: "Humidity signal" },
+  "comp.twocolorled.title": { ko: "2컬러 LED", en: "Two-Color LED" },
+  "comp.flash7color.title": { ko: "7색 자동 변환 LED", en: "7-Color Auto-Flash LED" },
+  "comp.laser.title": { ko: "레이저 모듈", en: "Laser Module" },
+  "comp.iremit.title": { ko: "IR 발신 모듈", en: "IR Emitter Module" },
+  "comp.buzzerpassive.title": { ko: "패시브 부저", en: "Passive Buzzer" },
+  "comp.buzzeractive.title": { ko: "액티브 부저", en: "Active Buzzer" },
+  "comp.smdrgb.title": { ko: "SMD RGB 모듈", en: "SMD RGB Module" },
   "comp.led.curTitle": { ko: "정격(20mA) 대비 실제 전류 — 100% 이상(빨강)이면 과전류로 실제라면 LED가 탈 수 있는 상태, 100% 미만(파랑)이면 안전", en: "Actual current vs. rating (20mA) — 100% or more (red) is overcurrent that could burn out a real LED; under 100% (blue) is safe" },
   "comp.md.out1Title": { ko: "모터 출력 1 → DC 모터 단자 1", en: "Motor output 1 → DC motor terminal 1" },
   "comp.md.out2Title": { ko: "모터 출력 2 → DC 모터 단자 2", en: "Motor output 2 → DC motor terminal 2" },
@@ -3493,6 +3779,44 @@ const STRINGS = {
   "palette.gyro": { ko: "3축 자이로 센서<br>(I2C)", en: "3-Axis Gyroscope<br>(I2C)" },
   "palette.accel": { ko: "3축 가속도 센서<br>(I2C)", en: "3-Axis Accelerometer<br>(I2C)" },
   "palette.pmsensor": { ko: "미세먼지 센서<br>(PM2.5/PM10)", en: "Dust Sensor<br>(PM2.5/PM10)" },
+  // [기능 추가 Ver0.9979] 37in1류 센서 키트 대량 추가 — 팔레트 라벨
+  "palette.water": { ko: "수위 감지 센서", en: "Water Level Sensor" },
+  "palette.irdist9m": { ko: "IR 거리 센서 (9m)", en: "IR Distance (9m)" },
+  "palette.irdist6m": { ko: "IR 거리 센서 (6m)", en: "IR Distance (6m)" },
+  "palette.irdist2m": { ko: "IR 거리 센서 (2m)", en: "IR Distance (2m)" },
+  "palette.irdist3cm": { ko: "IR 거리 센서 (3cm 근접)", en: "IR Distance (3cm)" },
+  "palette.soundsm": { ko: "소형 사운드 센서", en: "Small Sound Sensor" },
+  "palette.soundbig": { ko: "고감도 사운드 센서", en: "Big Sound Sensor" },
+  "palette.linhall": { ko: "리니어 홀 센서", en: "Linear Hall Sensor" },
+  "palette.anahall": { ko: "아날로그 홀 센서", en: "Analog Hall Sensor" },
+  "palette.anatemp": { ko: "아날로그 온도 센서", en: "Analog Temp Sensor" },
+  "palette.tempmod": { ko: "온도 센서 모듈", en: "Temp Sensor Module" },
+  "palette.heartbeat": { ko: "심박 센서 모듈", en: "Heartbeat Sensor" },
+  "palette.rotary": { ko: "로터리 엔코더<br>(간이형)", en: "Rotary Encoder<br>(simplified)" },
+  "palette.avoid": { ko: "장애물 감지 센서", en: "Obstacle Avoid Sensor" },
+  "palette.tracking": { ko: "라인 트레킹 센서", en: "Line Tracking Sensor" },
+  "palette.touch": { ko: "터치 센서 모듈", en: "Touch Sensor" },
+  "palette.flame": { ko: "화염 감지 모듈", en: "Flame Sensor" },
+  "palette.minireed": { ko: "미니 리드 스위치", en: "Mini Reed Switch" },
+  "palette.reed": { ko: "리드 스위치 모듈", en: "Reed Switch" },
+  "palette.shock": { ko: "충격 감지 센서", en: "Shock Sensor" },
+  "palette.ballswitch": { ko: "볼 스위치 모듈", en: "Ball Switch" },
+  "palette.tilt": { ko: "틸트 스위치 모듈", en: "Tilt Switch" },
+  "palette.lightcup": { ko: "라이트컵 스위치", en: "Light Cup Switch" },
+  "palette.tap": { ko: "Tap 모듈<br>(노크 센서)", en: "Tap Module<br>(Knock Sensor)" },
+  "palette.lightblock": { ko: "Light Blocking 모듈<br>(포토인터럽터)", en: "Light Blocking Module" },
+  "palette.irrecv": { ko: "IR 수신 모듈", en: "IR Receiver" },
+  "palette.hallmag": { ko: "홀 마그네틱 모듈", en: "Hall Magnetic" },
+  "palette.digitaltemp": { ko: "디지털 온도 센서<br>(임계값형)", en: "Digital Temp Sensor" },
+  "palette.joystick": { ko: "조이스틱 모듈", en: "Joystick Module" },
+  "palette.temphumid": { ko: "온습도 센서 모듈", en: "Temp & Humidity Sensor" },
+  "palette.twocolorled": { ko: "2컬러 LED 모듈", en: "Two-Color LED" },
+  "palette.smdrgb": { ko: "SMD RGB 모듈", en: "SMD RGB Module" },
+  "palette.flash7color": { ko: "7색 자동 변환 LED", en: "7-Color Flash LED" },
+  "palette.laser": { ko: "레이저 모듈", en: "Laser Module" },
+  "palette.iremit": { ko: "IR 발신 모듈", en: "IR Emitter" },
+  "palette.buzzerpassive": { ko: "패시브 부저", en: "Passive Buzzer" },
+  "palette.buzzeractive": { ko: "액티브 부저", en: "Active Buzzer" },
   "comp.pmsensor.title": { ko: "미세먼지 센서", en: "Dust Sensor" },
   "comp.pmsensor.txTitle": { ko: "TX → 보드 디지털 핀 (SoftwareSerial RX로, PMS.h/SdsDustSensor.h)", en: "TX → board digital pin (as SoftwareSerial RX, for PMS.h/SdsDustSensor.h)" },
   "comp.pmsensor.aoutTitle": { ko: "AOUT → 보드 아날로그 핀 (GP2Y1010AU0F류 analogRead 직접 사용)", en: "AOUT → board analog pin (raw analogRead, GP2Y1010AU0F-style)" },
@@ -3504,6 +3828,8 @@ const STRINGS = {
   "popup.apiCyclesPrefix": { ko: "API 호출(pinMode/digitalWrite 등)", en: "API calls (pinMode/digitalWrite, etc.)" },
   "popup.regCyclesPrefix": { ko: "레지스터 직접제어(DDRx/PORTx)", en: "Direct register control (DDRx/PORTx)" },
   "popup.close": { ko: "닫기 ✕", en: "Close ✕" },
+  "dock.handleLabel": { ko: "💻 코드 에디터", en: "💻 Code Editor" },
+  "dock.handleTitle": { ko: "코드 에디터 패널 펼치기/접기", en: "Expand/collapse the code editor panel" },
   "popup.maximizeTitle": { ko: "최대화 (창을 화면 가득 채우기)", en: "Maximize (fill the screen)" },
   "popup.restoreTitle": { ko: "원래 크기로 되돌리기", en: "Restore to previous size" },
   "popup.compile": { ko: "▶ 컴파일 &amp; 빌드 업로드", en: "▶ Compile &amp; Build Upload" },
@@ -3592,13 +3918,49 @@ const STRINGS = {
   "sensor.ldr": { ko: "조도 센서 (LDR)", en: "Light Sensor (LDR)" },
   "sensor.temp": { ko: "온도 센서", en: "Temperature Sensor" },
   "sensor.humid": { ko: "습도 센서", en: "Humidity Sensor" },
+  // [기능 추가 Ver0.9979] 37in1류 센서 키트 부품 대량 추가 — 수위/IR거리 4종(사용자 요청)을
+  // 비롯해 사진 속 아날로그형 센서들을 기존 SENSOR_DEFS(슬라이더 기반 3핀 VCC/SIG/GND) 패턴에
+  // 그대로 얹었습니다.
+  "sensor.water": { ko: "수위 감지 센서", en: "Water Level Sensor" },
+  "sensor.irdist9m": { ko: "IR 거리 센서 (9m)", en: "IR Distance Sensor (9m)" },
+  "sensor.irdist6m": { ko: "IR 거리 센서 (6m)", en: "IR Distance Sensor (6m)" },
+  "sensor.irdist2m": { ko: "IR 거리 센서 (2m)", en: "IR Distance Sensor (2m)" },
+  "sensor.irdist3cm": { ko: "IR 거리 센서 (3cm 근접)", en: "IR Distance Sensor (3cm)" },
+  "sensor.soundsm": { ko: "소형 사운드 센서 모듈", en: "Small Sound Sensor" },
+  "sensor.soundbig": { ko: "고감도 사운드 센서 모듈", en: "High-Sensitivity Sound Sensor" },
+  "sensor.linhall": { ko: "리니어 홀 센서", en: "Linear Hall Sensor" },
+  "sensor.anahall": { ko: "아날로그 홀 센서", en: "Analog Hall Sensor" },
+  "sensor.anatemp": { ko: "아날로그 온도 센서", en: "Analog Temperature Sensor" },
+  "sensor.tempmod": { ko: "온도 센서 모듈", en: "Temperature Sensor Module" },
+  "sensor.heartbeat": { ko: "심박 센서 모듈", en: "Heartbeat Sensor" },
+  "sensor.rotary": { ko: "로터리 엔코더 모듈 (회전 각도, 간이형)", en: "Rotary Encoder Module (simplified angle)" },
+  // [기능 추가 Ver0.9979] 디지털(클릭식 트리거) 센서 그룹 — 카드를 클릭하면 감지됨/감지안됨이
+  // 토글되며, DO 핀에 그 상태가 그대로 실립니다.
+  "dsensor.on": { ko: "🔴 감지됨 (클릭하여 해제)", en: "🔴 Detected (click to clear)" },
+  "dsensor.off": { ko: "⚪ 감지 안됨 (클릭하여 감지)", en: "⚪ Not detected (click to trigger)" },
+  "dsensor.avoid": { ko: "장애물 감지 센서", en: "Obstacle Avoidance Sensor" },
+  "dsensor.tracking": { ko: "라인 트레킹 센서", en: "Line Tracking Sensor" },
+  "dsensor.touch": { ko: "터치 센서 모듈", en: "Touch Sensor Module" },
+  "dsensor.flame": { ko: "화염 감지 모듈", en: "Flame Sensor Module" },
+  "dsensor.minireed": { ko: "미니 리드 스위치", en: "Mini Reed Switch" },
+  "dsensor.reed": { ko: "리드 스위치 모듈", en: "Reed Switch Module" },
+  "dsensor.shock": { ko: "충격 감지 센서 모듈", en: "Shock Sensor Module" },
+  "dsensor.ballswitch": { ko: "볼 스위치 모듈", en: "Ball Switch Module" },
+  "dsensor.tilt": { ko: "틸트 스위치 모듈", en: "Tilt Switch Module" },
+  "dsensor.lightcup": { ko: "라이트컵 스위치", en: "Light Cup Switch" },
+  "dsensor.tap": { ko: "Tap 모듈 (노크 센서)", en: "Tap Module (Knock Sensor)" },
+  "dsensor.lightblock": { ko: "Light Blocking 모듈 (포토인터럽터)", en: "Light Blocking Module (Photointerrupter)" },
+  "dsensor.irrecv": { ko: "IR 수신 모듈", en: "IR Receiver Module" },
+  "dsensor.hallmag": { ko: "홀 마그네틱 모듈", en: "Hall Magnetic Module" },
+  "dsensor.digitaltemp": { ko: "디지털 온도 센서 (임계값형)", en: "Digital Temperature Sensor (threshold)" },
+  "pin.digitalOut": { ko: "디지털 출력(DO)", en: "Digital Output (DO)" },
   "servo.underpowered": { ko: "전원 부족", en: "Underpowered" },
   "sim.runningLog": { ko: "시뮬레이션 실행 중: MCU 클록 동작 시작", en: "Simulation running: MCU clock started" },
   "sim.stopBtn": { ko: "■ 시뮬레이션 중지", en: "■ Stop Simulation" },
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9974", en: "K's Arduino Simulator Ver0.9974" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9980", en: "K's Arduino Simulator Ver0.9980" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -3922,7 +4284,10 @@ const REG_ACCESS_CYCLES = 2;
 function createMcuState(clockHz){
   return { intervalId: null, gen: 0, pinState: {}, loopFn: null, isCompiled: false, clockHz, apiCycles: 0, regCycles: 0,
     edgeLog: {}, cycleOffsetNs: 0, lcdText: ['', ''], lcdCursor: { row: 0, col: 0 }, oledLines: ['', '', '', ''], oledCursor: { line: 0, col: 0 },
-    ledMatrix: Array.from({length:8}, () => new Array(12).fill(0)) };
+    ledMatrix: Array.from({length:8}, () => new Array(12).fill(0)),
+    // [기능 추가 Ver0.9980] attachInterrupt()로 등록된 핀별 인터럽트 서비스 루틴(ISR) 레지스트리 —
+    // { [pinName]: { isr, mode, lastLevel } }. noInterrupts()/cli()는 interruptsEnabled만 끕니다.
+    interrupts: {}, interruptsEnabled: true };
 }
 const mcuVM = {
   r4: createMcuState(48e6),
@@ -3976,6 +4341,12 @@ function transpileCppToJs(cppCode) {
   js = js.replace(/#include[^\n]*/g, '');
   js = js.replace(/#define\s+(\w+)\s+(\S.*)$/gm, 'const $1 = $2;');
   js = js.replace(/#define\s+(\w+)\s*$/gm, '');
+  // [기능 추가 Ver0.9980] "volatile int counter = 0;" 처럼 인터럽트에서 공유하는 변수 앞에 흔히
+  // 붙이는 volatile 한정자는 자바스크립트에 대응 개념이 없어(이 시뮬레이터는 진짜 멀티스레드가
+  // 아니라 단일 스레드 이벤트 루프이므로 volatile이 막으려는 컴파일러 캐싱 문제 자체가 존재하지
+  // 않습니다) 제거만 하면 됩니다. 뒤의 타입 치환 규칙들이 "volatile"을 모르는 토큰으로 남겨두면
+  // "volatile let counter = 0;" 같은 구문 오류가 나므로, 다른 타입 치환보다 먼저 지워둡니다.
+  js = js.replace(/\bvolatile\s+/g, '');
 
   js = js.replace(/&Wire\b/g, 'Wire');
   js = js.replace(/\bLiquidCrystal\s+(\w+)\s*\(([^)]*)\)\s*;/g, 'let $1 = new LiquidCrystal($2);');
@@ -4690,6 +5061,10 @@ function deployToMCU(board, rawCode) {
   mcu.oledLines = ['', '', '', ''];
   mcu.oledCursor = { line: 0, col: 0 };
   mcu.ledMatrix = Array.from({length:8}, () => new Array(12).fill(0));
+  // [기능 추가 Ver0.9980] 새로 컴파일/실행할 때마다 이전 스케치가 attachInterrupt()로 등록해 둔
+  // 인터럽트 핸들러가 그대로 남아있지 않도록 초기화합니다(noInterrupts()로 끈 상태도 초기화).
+  mcu.interrupts = {};
+  mcu.interruptsEnabled = true;
   serialRxBuffer[board] = ''; // 실제 MCU 리셋처럼, 새 펌웨어를 올릴 때 UART 수신 버퍼도 비웁니다.
   btRxBuffer[board] = ''; // SerialBT(블루투스) 수신 버퍼도 함께 리셋합니다.
   i2cRxBuffer[board] = []; // I2C 수신 버퍼도 함께 리셋합니다.
@@ -4832,6 +5207,9 @@ function deployToMCU(board, rawCode) {
         flush() {}
       }
       const HIGH = 1, LOW = 0, OUTPUT = 1, INPUT = 0, INPUT_PULLUP = 2;
+      // [기능 추가 Ver0.9980] 인터럽트 모드 상수 — 실제 AVR(avr/interrupt.h)과 같은 값(LOW=0은
+      // 위 LOW와 겹치므로 재사용, CHANGE=1, FALLING=2, RISING=3)을 그대로 씁니다.
+      const RISING = 3, FALLING = 2, CHANGE = 1;
       // AVR 레지스터 비트 상수(PAn/PBn/PCn/PDn/PEn/PGn/PHn/PJn/PLn) — DDRx/PORTx 직접 제어
       // 코드에서 사용됩니다. R3/R4는 PB/PC/PD만 실제로 쓰지만, Mega는 그 외 포트도 쓰므로
       // 나머지 문자도 미리 전부 선언해 둡니다(안 쓰는 보드에서는 그냥 안 쓰이는 상수일 뿐입니다).
@@ -4932,6 +5310,58 @@ function deployToMCU(board, rawCode) {
         }
         return 0;
       }
+      // [기능 추가 Ver0.9980] attachInterrupt()/detachInterrupt()/digitalPinToInterrupt() — 실제
+      // 우노(R3)는 D2·D3 두 핀만(인터럽트 번호 0·1), 메가는 D2/D3/D18~D21 여섯 핀만 외부 인터럽트를
+      // 지원하는 반면, R4(Renesas)와 ESP32 계열은 사실상 모든 GPIO에서 지원합니다 — 실기와 똑같이
+      // 이 차이를 그대로 재현해, 우노에서 지원하지 않는 핀으로 attachInterrupt를 걸면 실기처럼
+      // 조용히 무시됩니다(콘솔에 경고만 남김).
+      //
+      // ISR은 매 물리 틱(25ms, runTick())마다 핀 상태를 검사해 실행됩니다 — 실제 MCU처럼 명령어
+      // 실행 도중 임의의 순간에 끼어드는 것은 이 시뮬레이터의 실행 구조(cooperative async 루프)상
+      // 불가능하지만, ISR 호출 자체는 await 없이(fire-and-forget) 실행되므로 setup()/loop()가
+      // delay() 등으로 멈춰 있는 동안에도 "동시에" 독립적으로 실행됩니다.
+      const __AVR_INTERRUPT_MAP = {
+        r3:   { 2: 0, 3: 1 },
+        mega: { 2: 0, 3: 1, 21: 2, 20: 3, 19: 4, 18: 5 },
+      };
+      function __boardTypeOf(boardKey){ return (boardInstances[boardKey] || {}).type || boardKey; }
+      function digitalPinToInterrupt(pin) {
+        const bt = __boardTypeOf('${board}');
+        const pinNum = parseInt(String(pin).replace(/\D/g, ''), 10);
+        const map = __AVR_INTERRUPT_MAP[bt];
+        if (map) return (pinNum in map) ? map[pinNum] : -1; // 실제 아두이노의 NOT_AN_INTERRUPT(-1)
+        return pinNum; // R4/ESP32 계열: 모든 핀이 인터럽트 가능 -> 핀 번호를 그대로 인터럽트 번호로 씁니다.
+      }
+      function __interruptPinFor(bt, num) {
+        const map = __AVR_INTERRUPT_MAP[bt];
+        if (map) {
+          const found = Object.keys(map).find(k => map[k] === num);
+          return found ? __digitalPinName(found) : null;
+        }
+        return __digitalPinName(num);
+      }
+      function attachInterrupt(interruptNumOrPin, isr, mode) {
+        const bt = __boardTypeOf('${board}');
+        const pin = __interruptPinFor(bt, interruptNumOrPin);
+        if (!pin || typeof isr !== 'function') {
+          logSerial('[경고] attachInterrupt(): 이 보드(' + bt + ')에서 지원하지 않는 인터럽트 번호/핀이거나 ISR이 함수가 아닙니다.', '${board}');
+          return;
+        }
+        const reading = boardPinReading(boardDomId['${board}'], pin);
+        mcuVM['${board}'].interrupts[pin] = { isr, mode: (mode === undefined ? CHANGE : mode), lastLevel: (reading && reading.v >= 0.5) ? 1 : 0 };
+      }
+      function detachInterrupt(interruptNumOrPin) {
+        const bt = __boardTypeOf('${board}');
+        const pin = __interruptPinFor(bt, interruptNumOrPin);
+        if (pin) delete mcuVM['${board}'].interrupts[pin];
+      }
+      // noInterrupts()/interrupts() — 표준 아두이노 API. cli()/sei()는 실제 AVR 레지스터를 직접
+      // 건드리는 어셈블리 매크로(avr/interrupt.h)지만, 교육 현장에서 이 이름 그대로도 흔히 쓰이므로
+      // 같은 동작을 하는 별칭으로 함께 제공합니다.
+      function noInterrupts() { mcuVM['${board}'].interruptsEnabled = false; }
+      function interrupts() { mcuVM['${board}'].interruptsEnabled = true; }
+      function cli() { noInterrupts(); }
+      function sei() { interrupts(); }
       // delay()/delayMicroseconds()는 이제 진짜로 시간을 멈춥니다 (Promise + setTimeout).
       // transpileCppToJs가 호출부에 await를 붙여주고, setup()/loop()는 async 함수로 실행되므로
       // 여기서 실제 지연이 일어나는 동안 다른 코드는 이어서 실행되지 않고 정확히 그 시점에 멈춥니다.
@@ -6175,6 +6605,19 @@ function deselectComponent(){
   selectedComponent = null;
 }
 
+// [Ver0.9975] "드래그가 마우스 커서와 다르게 움직인다"는 피드백 원인 — 부품을 R키로 회전시켜
+// 두면(setComponentRotation이 el.style.transform=rotate(deg)를 직접 겁니다) el.getBoundingClientRect()가
+// 돌아간 뒤의 "화면에 꽉 차는 사각형(axis-aligned bbox)"을 돌려주는데, 이건 el.style.left/top이
+// 가리키는 회전 전 좌표와 더 이상 일치하지 않습니다(특히 가로세로 길이가 다른 부품을 90°/270°로
+// 돌리면 어긋남이 커집니다). 그 어긋난 값으로 드래그 오프셋을 계산하니, 회전된 부품을 끌 때마다
+// 커서와 부품이 점점 따로 놀았습니다. 회전에 영향받지 않는 "캔버스 로컬 좌표계"(el.style.left/top과
+// 같은 좌표계)에서 직접 오프셋을 구하도록 고쳤습니다.
+function computeLocalDragOffset(el, clientX, clientY){
+  const canvasRect = document.getElementById('canvasInner').getBoundingClientRect();
+  const localX = (clientX - canvasRect.left) / canvasZoom;
+  const localY = (clientY - canvasRect.top) / canvasZoom;
+  return { x: localX - (parseFloat(el.style.left) || 0), y: localY - (parseFloat(el.style.top) || 0) };
+}
 function makeDraggable(el){
   el.addEventListener('mousedown', (e) => {
     // 핀/터치스크린은 각자 다른 용도(배선 연결, 터치 그림)로 마우스를 쓰므로 절대 드래그를
@@ -6187,8 +6630,7 @@ function makeDraggable(el){
     const interactiveTarget = e.target.closest('input, select, .btn-cap, .reset-btn, .generator-btn, .fuse-replace-btn');
     if (interactiveTarget){
       const startX = e.clientX, startY = e.clientY;
-      const rect0 = el.getBoundingClientRect();
-      const offX = (startX - rect0.left) / canvasZoom, offY = (startY - rect0.top) / canvasZoom;
+      const { x: offX, y: offY } = computeLocalDragOffset(el, startX, startY);
       const THRESHOLD = 5;
       let dragStarted = false;
       const onMove = (ev) => {
@@ -6219,8 +6661,7 @@ function makeDraggable(el){
     // 실제로 위치가 움직입니다.
     selectComponent(el);
     const startX = e.clientX, startY = e.clientY;
-    const rect0 = el.getBoundingClientRect();
-    const offX = (startX - rect0.left) / canvasZoom, offY = (startY - rect0.top) / canvasZoom;
+    const { x: offX, y: offY } = computeLocalDragOffset(el, startX, startY);
     const THRESHOLD = 5;
     let dragStarted = false;
     const onMove = (ev) => {
@@ -6328,6 +6769,27 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9980', ko: [
+      '⚡ 인터럽트(attachInterrupt/detachInterrupt/digitalPinToInterrupt)를 지원합니다 — 실제 우노(R3)는 2·3번 핀만(메가는 2/3/18~21번), R4·ESP32 계열은 모든 핀에서 RISING/FALLING/CHANGE 모드로 인터럽트를 걸 수 있고, noInterrupts()/interrupts()(cli()/sei() 별칭 포함)로 껐다 켤 수도 있습니다. ISR은 매 물리 틱(25ms)마다 핀 상태를 검사해 실행되며, delay()로 메인 loop()가 멈춰 있는 동안에도 독립적으로 실행됩니다(실제 MCU처럼 명령어 도중 끼어드는 것까지는 아니지만, "인터럽트로 버튼을 감지해 카운터를 올린다" 같은 수업용 예제에는 충분합니다) — volatile 변수 선언도 함께 지원합니다',
+  ]},
+  { ver: 'Ver0.9979', ko: [
+      '🧰 "센서" 팔레트에 37in1류 센서 키트 부품 37종을 한꺼번에 추가했습니다(팔레트 부품 수 8종 → 45종) — 수위 감지 센서, IR 거리 센서 4종(9m/6m/2m/3cm 근접), 사운드(소형/고감도), 홀 센서(리니어/아날로그), 온도(아날로그/디지털/모듈), 심박 센서, 로터리 엔코더(간이형) 같은 아날로그·가변저항형 센서 13종과, 장애물 감지·라인 트레킹·터치·화염·리드 스위치(미니/일반)·충격·볼 스위치·틸트 스위치·라이트컵·Tap·Light Blocking(포토인터럽터)·IR 수신·홀 마그네틱·디지털 온도 감지 같은 클릭식 ON/OFF 디지털 센서 15종, 그리고 조이스틱 모듈·온습도 센서 모듈(각각 전용 UI)과 2컬러 LED·SMD RGB·7색 자동 변환 LED·레이저·IR 발신·패시브/액티브 부저(기존 LED/RGB LED 발광 물리를 그대로 재사용) 7종까지 모두 포함됩니다',
+      '💧📏 사용자가 직접 요청한 수위 감지 센서와 IR 거리 감지 센서(9m·6m·2m·3cm)는 각각 독립된 팔레트 부품으로 분리되어 있어, 서로 다른 감지 거리를 가진 초음파/적외선 거리 센서 실습을 한 회로 안에서 나란히 비교해 볼 수 있습니다',
+  ]},
+  { ver: 'Ver0.9978', ko: [
+      '📈 오실로스코프로 PWM(analogWrite) 파형을 볼 때 "처음엔 삼각파처럼 보이다가 금세 거의 사각파(중간값 없음)로 뭉개지는" 문제를 고쳤습니다 — 실제 물리 틱(25ms)당 만들던 파형 표본 수가 너무 적어(2개) PWM 듀티(밝기)가 0%·50%·100% 딱 3단계로만 반올림되던 것이 원인으로, AC/전류 채널과 같은 고밀도 표본 방식으로 바꿔 듀티 값이 훨씬 촘촘한 단계로(약 16단계 이상) 정확히 표시됩니다',
+  ]},
+  { ver: 'Ver0.9977', ko: [
+      '🤖 "AI 회로 어시스턴트가 만든 부품들이 보드에서 멀리 떨어져 서로 겹쳐 보인다"는 문제를 고쳤습니다 — 부품 개수 카운터를 배치 간격으로 재활용하던 기존 방식 대신, 보드 바로 아래에 줄바꿈되는 격자 형태로 부품을 직접 배치하도록 바꿔, 세션을 오래 쓴 뒤에도 항상 보드 근처에 겹치지 않게 놓입니다',
+      '🔌 새 전선을 연결하면 자동으로 꺾임점이 2개(지그재그) 생기던 것을 1개(직각 한 번 꺾기)로 단순화했습니다 — 또한 이 자동 꺾임점이 다른 부품 몸체 위나 다른 핀 바로 옆에 찍히지 않도록, 항상 부품 바깥·핀에서 일정 거리 이상 떨어진 자리로 자동 보정됩니다',
+  ]},
+  { ver: 'Ver0.9976', ko: [
+      '🗂 "에디터가 화면 곳곳에 흩어져 겹친다"는 피드백에 따라, 보드별 코드 에디터 창을 화면 오른쪽에 고정 도킹되는 탭 패널 하나로 새로 만들었습니다 — 평소엔 감춰져 있다가 코드 에디터를 열면 매끄럽게 펼쳐지고, 여러 보드를 동시에 열면 탭으로 전환하며(보드 이름 표시), 패널 왼쪽 경계를 드래그해 폭을 조절할 수 있고, 전부 닫으면 다시 오른쪽으로 감춰집니다',
+      '🎨 코드 에디터에 문법 강조(syntax highlighting)를 추가했습니다 — 주석은 초록색 기울임, 문자열은 주황색, 숫자는 연두색, if/for/return 같은 제어문 키워드는 분홍색, int/void 같은 타입은 청록색, HIGH/LOW/INPUT 같은 상수는 파란색, 함수 호출은 노란색, 변수는 하늘색으로 구분되어 코드를 한눈에 읽기 쉬워졌습니다',
+  ]},
+  { ver: 'Ver0.9975', ko: [
+      '🖱 "부품을 드래그해서 옮기거나 팔레트에서 끌어다 놓으면 커서와 다르게 움직인다"는 피드백을 고쳤습니다 — (1) R키로 회전시켜 둔 부품을 드래그하면 회전 때문에 커서와 점점 어긋나던 문제, (2) 팔레트에서 끌어다 놓을 때 오실로스코프처럼 큰 부품이 커서 위치와 크게 동떨어진 곳에 놓이던 문제, 둘 다 실제 캔버스 좌표·실제 렌더링 크기를 기준으로 다시 계산하도록 고쳤습니다',
+  ]},
   { ver: 'Ver0.9974', ko: [
       '🔘 오실로스코프에 채널 활성화(CH1~CH4) 버튼을 추가했습니다 — 실제 오실로스코프처럼, 프로브를 연결해도 그 채널 버튼을 눌러 켜야만 파형이 화면에 보입니다(기본값은 전부 꺼짐). 여러 채널을 동시에 연결했을 때 화면이 지저분해 보이던 문제도 함께 줄었고, 프로젝트를 저장·불러오거나 예제를 실행했을 때도 채널 ON/OFF 상태가 그대로 유지됩니다',
   ]},
@@ -7045,6 +7507,9 @@ function deleteComponent(el){
     const key = el.dataset.board;
     const usesStaticPopup = key === 'r4' || key === 'r3';
     if (key && mcuVM[key]) mcuVM[key].gen = (mcuVM[key].gen || 0) + 1;
+    // [Ver0.9976] 팝업을 숨기거나 지우기 전에 먼저 도킹 패널의 탭 목록에서 빼서, 지워진
+    // 보드를 가리키는 탭이 남아있지 않게 합니다.
+    if (key && typeof removeBoardFromEditorDock === 'function') removeBoardFromEditorDock(key);
     const popup = document.getElementById(`popup${key ? key.toUpperCase() : ''}`);
     if (popup){
       if (usesStaticPopup) popup.hidden = true;
@@ -7136,8 +7601,64 @@ const SENSOR_DEFS = {
   temp: { title: tr('sensor.temp'), min: -10, max: 50, start: 24, unit: '°C' },
   // [기능 추가] DHT11/DHT22 같은 온습도 센서의 readHumidity()가 읽어올 실제 값이 있도록,
   // 온도 센서와 짝이 되는 습도 슬라이더를 같은 패턴(SENSOR_DEFS 기반 sensor-XXX)으로 추가합니다.
-  humid: { title: tr('sensor.humid'), min: 0, max: 100, start: 45, unit: '%' }
+  humid: { title: tr('sensor.humid'), min: 0, max: 100, start: 45, unit: '%' },
+  // [기능 추가 Ver0.9979] 37in1류 센서 키트 대량 추가 — 아날로그(슬라이더 기반) 그룹.
+  // 주의: type.split('-')[1]로 키를 뽑아내므로 키에 하이픈(-)을 쓰면 안 됩니다.
+  water: { title: tr('sensor.water'), min: 0, max: 100, start: 30, unit: '%' },
+  irdist9m: { title: tr('sensor.irdist9m'), min: 0, max: 900, start: 300, unit: 'cm' },
+  irdist6m: { title: tr('sensor.irdist6m'), min: 0, max: 600, start: 200, unit: 'cm' },
+  irdist2m: { title: tr('sensor.irdist2m'), min: 0, max: 200, start: 80, unit: 'cm' },
+  irdist3cm: { title: tr('sensor.irdist3cm'), min: 0, max: 30, start: 15, unit: 'mm' },
+  soundsm: { title: tr('sensor.soundsm'), min: 0, max: 100, start: 20, unit: '%' },
+  soundbig: { title: tr('sensor.soundbig'), min: 0, max: 100, start: 20, unit: '%' },
+  linhall: { title: tr('sensor.linhall'), min: -100, max: 100, start: 0, unit: 'mT' },
+  anahall: { title: tr('sensor.anahall'), min: 0, max: 100, start: 0, unit: '%' },
+  anatemp: { title: tr('sensor.anatemp'), min: -10, max: 50, start: 24, unit: '°C' },
+  tempmod: { title: tr('sensor.tempmod'), min: -10, max: 50, start: 24, unit: '°C' },
+  heartbeat: { title: tr('sensor.heartbeat'), min: 0, max: 200, start: 72, unit: 'bpm' },
+  rotary: { title: tr('sensor.rotary'), min: 0, max: 360, start: 0, unit: '°' }
 };
+
+// [기능 추가 Ver0.9979] 37in1류 센서 키트 대량 추가 — 디지털(클릭식 트리거) 그룹. SENSOR_DEFS와
+// 완전히 같은 설계 철학이지만, 결과가 아날로그 값이 아니라 ON/OFF(감지됨/감지안됨) 한 가지뿐이라
+// 슬라이더 대신 클릭해서 상태를 바꾸는 트리거 하나로 표현합니다(dsensor-XXX, 3핀 VCC/DO/GND).
+const DIGITAL_SENSOR_DEFS = {
+  avoid: { title: tr('dsensor.avoid') },
+  tracking: { title: tr('dsensor.tracking') },
+  touch: { title: tr('dsensor.touch') },
+  flame: { title: tr('dsensor.flame') },
+  minireed: { title: tr('dsensor.minireed') },
+  reed: { title: tr('dsensor.reed') },
+  shock: { title: tr('dsensor.shock') },
+  ballswitch: { title: tr('dsensor.ballswitch') },
+  tilt: { title: tr('dsensor.tilt') },
+  lightcup: { title: tr('dsensor.lightcup') },
+  tap: { title: tr('dsensor.tap') },
+  lightblock: { title: tr('dsensor.lightblock') },
+  irrecv: { title: tr('dsensor.irrecv') },
+  hallmag: { title: tr('dsensor.hallmag') },
+  digitaltemp: { title: tr('dsensor.digitaltemp') }
+};
+
+// [기능 추가 Ver0.9979] 디지털 센서 카드의 클릭식 트리거 — 클릭할 때마다 감지됨/감지안됨 상태를
+// 토글하고, 그 상태(dataset.active)를 externalSourceOnNet의 "_DO" 분기가 그대로 읽어갑니다.
+function toggleDigitalSensor(id){
+  const trig = document.getElementById(`${id}_trig`);
+  if (!trig) return;
+  const nowActive = trig.dataset.active !== '1';
+  trig.dataset.active = nowActive ? '1' : '0';
+  trig.classList.toggle('active', nowActive);
+  trig.textContent = tr(nowActive ? 'dsensor.on' : 'dsensor.off');
+}
+// 조이스틱의 SW(누름 버튼) 트리거 — 같은 방식이지만 별도 id(_swtrig)를 씁니다.
+function toggleJoystickSw(id){
+  const trig = document.getElementById(`${id}_swtrig`);
+  if (!trig) return;
+  const nowActive = trig.dataset.active !== '1';
+  trig.dataset.active = nowActive ? '1' : '0';
+  trig.classList.toggle('active', nowActive);
+  trig.textContent = tr(nowActive ? 'comp.joystick.swDown' : 'comp.joystick.swUp');
+}
 let compCount = 0;
 
 // 라즈베리파이 3/4/5가 공통으로 쓰는 물리 40핀 GPIO 헤더(J8) 배치입니다. i번째 항목이
@@ -8292,6 +8813,139 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_W" title="Wiper (Signal)" data-i18n-title="pin.wiperSignal"></div><span class="pin-cap cap-sig">SIG</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
       </div>`;
+  } else if (type.startsWith('dsensor-')){
+    // [기능 추가 Ver0.9979] 디지털(ON/OFF) 센서 카드 — 클릭식 트리거 하나로 감지 상태를 바꾸고,
+    // 그 상태가 DO 핀에 digitalRead() 값(0 또는 1)으로 그대로 실립니다(externalSourceOnNet의
+    // "_DO" 분기 참고). SENSOR_DEFS/sensor-XXX와 완전히 같은 설계 철학의 디지털판입니다.
+    const dkey = type.split('-')[1];
+    const ddef = DIGITAL_SENSOR_DEFS[dkey];
+    div.classList.add('comp-pot', 'comp-dsensor');
+    div.innerHTML = `
+      <div class="pot-title">${ddef.title}</div>
+      <div class="dsensor-trig" id="${id}_trig" data-active="0" onclick="toggleDigitalSensor('${id}')">${tr('dsensor.off')}</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_DO" title="Digital Out" data-i18n-title="pin.digitalOut"></div><span class="pin-cap cap-sig">DO</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+      </div>`;
+  } else if (type === 'joystick'){
+    // [기능 추가 Ver0.9979] 조이스틱 모듈 — X/Y 두 축은 가변저항(SENSOR_DEFS)과 같은 슬라이더
+    // 방식(analogRead용), SW 버튼은 풀업 배선의 푸시 버튼(안 누르면 HIGH, 누르면 LOW)과 같은
+    // 방식으로 동작합니다.
+    div.classList.add('comp-pot', 'comp-joystick');
+    div.innerHTML = `
+      <div class="pot-title" data-i18n="comp.joystick.title">조이스틱 모듈</div>
+      <div class="joy-axis-row"><span class="joy-axis-label">X</span><input type="range" min="0" max="1023" value="512" id="${id}_x"><span class="joy-axis-val" id="${id}_xval">512</span></div>
+      <div class="joy-axis-row"><span class="joy-axis-label">Y</span><input type="range" min="0" max="1023" value="512" id="${id}_y"><span class="joy-axis-val" id="${id}_yval">512</span></div>
+      <div class="dsensor-trig" id="${id}_swtrig" data-active="0" onclick="toggleJoystickSw('${id}')" data-i18n="comp.joystick.swUp">⚪ SW 버튼 (클릭하여 누르기)</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_JX" title="X축 (Analog)" data-i18n-title="comp.joystick.xTitle"></div><span class="pin-cap cap-sig">X</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_JY" title="Y축 (Analog)" data-i18n-title="comp.joystick.yTitle"></div><span class="pin-cap cap-sig">Y</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SW" title="누름 버튼 (풀업, Digital)" data-i18n-title="comp.joystick.swTitle"></div><span class="pin-cap cap-sig">SW</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+      </div>`;
+  } else if (type === 'temphumid'){
+    // [기능 추가 Ver0.9979] 온습도 센서 모듈(DHT11/DHT22류) — 실제로는 단선(One-Wire) 디지털
+    // 프로토콜이지만, 이 시뮬레이터에서는 온도·습도 각각 독립된 슬라이더 + 독립된 신호 핀으로
+    // 단순화해(가변저항과 같은 아날로그 읽기 방식) readTemperature()/readHumidity() 실습이
+    // 바로 되도록 만들었습니다.
+    div.classList.add('comp-pot', 'comp-temphumid');
+    div.innerHTML = `
+      <div class="pot-title" data-i18n="comp.temphumid.title">온습도 센서 모듈</div>
+      <div class="joy-axis-row"><span class="joy-axis-label" data-i18n="comp.temphumid.t">온도</span><input type="range" min="-10" max="50" value="24" id="${id}_t"><span class="joy-axis-val" id="${id}_tval">24°C</span></div>
+      <div class="joy-axis-row"><span class="joy-axis-label" data-i18n="comp.temphumid.h">습도</span><input type="range" min="0" max="100" value="45" id="${id}_h"><span class="joy-axis-val" id="${id}_hval">45%</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_THT" title="온도 신호" data-i18n-title="comp.temphumid.tTitle"></div><span class="pin-cap cap-sig">T</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_THH" title="습도 신호" data-i18n-title="comp.temphumid.hTitle"></div><span class="pin-cap cap-sig">H</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+      </div>`;
+  } else if (type === 'twocolorled'){
+    // [기능 추가 Ver0.9979] 2컬러 LED 모듈 — 전기적으로는 일반 LED(comp-led)와 완전히 동일한
+    // 2핀(A/K) 부품이며, 색상 선택을 빨강/초록 2가지로만 제한해 "2색" 모듈임을 표현합니다.
+    // .comp-led 클래스 하나로 ledUpdate/발광 물리 로직을 그대로 재사용합니다(새 물리 코드 없음).
+    div.classList.add('comp-led');
+    div.innerHTML = `
+      <div class="led-dome" id="${id}_bulb"></div>
+      <div class="led-val" id="${id}_val">0%</div>
+      <select class="led-color-select" id="${id}_color" data-i18n-title="comp.led.colorSelect" title="색상 선택">
+        <option value="red" selected>Red</option>
+        <option value="green">Green</option>
+      </select>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" title="Anode (+)" data-i18n-title="pin.anode"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_K" title="Cathode (-)" data-i18n-title="pin.cathode"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>
+      <div class="comp-label" data-i18n="comp.twocolorled.title">2컬러 LED</div>`;
+  } else if (type === 'flash7color'){
+    // [기능 추가 Ver0.9979] 7색 자동 변환 LED — 전기적으로는 comp-led와 동일하되, 켜졌을 때
+    // 무지개색으로 자동 순환하도록 runTick의 LED 갱신 블록에서 "flash7color" 클래스를 검사해
+    // 색상을 직접 계산합니다(아래 runTick 쪽 조건 추가 참고).
+    div.classList.add('comp-led', 'flash7color');
+    div.innerHTML = `
+      <div class="led-dome" id="${id}_bulb"></div>
+      <div class="led-val" id="${id}_val">0%</div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" title="Anode (+)" data-i18n-title="pin.anode"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_K" title="Cathode (-)" data-i18n-title="pin.cathode"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>
+      <div class="comp-label" data-i18n="comp.flash7color.title">7색 자동 변환 LED</div>`;
+  } else if (type === 'laser'){
+    // [기능 추가 Ver0.9979] 레이저 모듈 — 전기적으로는 comp-led와 동일(2핀 A/K), 색상은 실제
+    // 레이저 다이오드처럼 빨강 고정입니다.
+    div.classList.add('comp-led');
+    div.innerHTML = `
+      <div class="led-dome" id="${id}_bulb"></div>
+      <div class="led-val" id="${id}_val">0%</div>
+      <input type="hidden" class="led-color-select" id="${id}_color" value="red">
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" title="Anode (+)" data-i18n-title="pin.anode"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_K" title="Cathode (-)" data-i18n-title="pin.cathode"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>
+      <div class="comp-label" data-i18n="comp.laser.title">레이저 모듈</div>`;
+  } else if (type === 'iremit'){
+    // [기능 추가 Ver0.9979] IR 발신(송신) 모듈 — 전기적으로는 comp-led와 동일(2핀 A/K)한
+    // 적외선 LED입니다. 사람 눈에는 안 보이지만 학습용으로 은은한 붉은 발광으로 표시합니다.
+    div.classList.add('comp-led');
+    div.innerHTML = `
+      <div class="led-dome" id="${id}_bulb"></div>
+      <div class="led-val" id="${id}_val">0%</div>
+      <input type="hidden" class="led-color-select" id="${id}_color" value="red">
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" title="Anode (+)" data-i18n-title="pin.anode"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_K" title="Cathode (-)" data-i18n-title="pin.cathode"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>
+      <div class="comp-label" data-i18n="comp.iremit.title">IR 발신 모듈</div>`;
+  } else if (type === 'buzzerpassive' || type === 'buzzeractive'){
+    // [기능 추가 Ver0.9979] 패시브/액티브 부저 — 실제 소리 신호를 시뮬레이션하지는 않지만, "전류가
+    // 흐르면(=구동되면) 반응한다"는 전기적 동작은 LED와 완전히 같으므로 comp-led 물리를 그대로
+    // 재사용하고, 시각적으로만 스피커 아이콘 + 배경색으로 "울림"을 표현합니다.
+    div.classList.add('comp-led', 'comp-buzzer');
+    const bzTitleKey = type === 'buzzerpassive' ? 'comp.buzzerpassive.title' : 'comp.buzzeractive.title';
+    const bzTitleKo = type === 'buzzerpassive' ? '패시브 부저' : '액티브 부저';
+    div.innerHTML = `
+      <div class="led-dome buzzer-dome" id="${id}_bulb">🔊</div>
+      <div class="led-val" id="${id}_val">0%</div>
+      <input type="hidden" class="led-color-select" id="${id}_color" value="yellow">
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_A" title="+" data-i18n-title="pin.anode"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_K" title="−" data-i18n-title="pin.cathode"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>
+      <div class="comp-label" data-i18n="${bzTitleKey}">${bzTitleKo}</div>`;
+  } else if (type === 'smdrgb'){
+    // [기능 추가 Ver0.9979] SMD RGB 모듈 — 전기적으로 3색 LED(rgbled)와 완전히 동일한 4핀
+    // (R/G/B/GND) 부품이라 .comp-rgbled 클래스를 그대로 재사용합니다(새 물리 코드 없음).
+    div.classList.add('comp-rgbled');
+    div.innerHTML = `
+      <div class="rgb-dome" id="${id}_bulb" style="width:14px;height:14px;"></div>
+      <div class="rgb-pin-row">
+        <div class="pin-col"><div class="pin-mini probe-r" data-pin="${id}_R" title="Red" data-i18n-title="pin.colorR"></div><span class="pin-cap" style="color:#ff6b6b;">R</span></div>
+        <div class="pin-col"><div class="pin-mini probe-g" data-pin="${id}_G" title="Green" data-i18n-title="pin.colorG"></div><span class="pin-cap" style="color:#5ad06a;">G</span></div>
+        <div class="pin-col"><div class="pin-mini probe-b" data-pin="${id}_B" title="Blue" data-i18n-title="pin.colorB"></div><span class="pin-cap" style="color:#5aa9e6;">B</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_GND" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+      </div>
+      <div class="comp-label" data-i18n="comp.smdrgb.title">SMD RGB 모듈</div>`;
   } else if (type === 'resistor'){
     div.classList.add('comp-resistor', 'resistive-2pin');
     div.dataset.ohms = '220';
@@ -8947,6 +9601,17 @@ function spawnComponent(type, dropX, dropY){
   }
 
   document.getElementById('canvasInner').appendChild(div);
+  // [Ver0.9975] 팔레트에서 드래그해 놓을 때, 위쪽의 (dropX-40, dropY-20) 보정은 팔레트 아이콘
+  // 크기(약 80x40) 기준의 고정값이라 실제로 캔버스에 놓이는 부품 크기가 이보다 훨씬 크거나
+  // (예: 오실로스코프 800px 폭) 작으면 커서가 가리킨 지점과 실제로 놓이는 위치가 눈에 띄게
+  // 어긋났습니다. DOM에 붙인 지금 시점에는 실제 렌더링 크기(offsetWidth/Height)를 알 수 있으므로,
+  // 그 크기 기준으로 커서가 부품 정중앙에 오도록 다시 계산합니다(드래그로 놓은 경우에만 — 기본
+  // 위치에 그냥 클릭으로 생성한 경우는 건드리지 않습니다).
+  if (typeof dropX === 'number' && typeof dropY === 'number'){
+    const w = div.offsetWidth || 80, h = div.offsetHeight || 40;
+    div.style.left = Math.max(0, Math.round(dropX - w / 2)) + 'px';
+    div.style.top = Math.max(0, Math.round(dropY - h / 2)) + 'px';
+  }
   attachHelpButton(div, type); // [신기능] 보드를 뺀 모든 부품에 연결법 안내 "?" 버튼을 붙임
   applyI18n(div);
   makeDraggable(div);
@@ -9014,6 +9679,16 @@ function spawnComponent(type, dropX, dropY){
     const slider = document.getElementById(`${id}_slider`);
     const val = document.getElementById(`${id}_val`);
     slider.addEventListener('input', () => { val.textContent = slider.value + def.unit; });
+  } else if (type === 'joystick'){
+    const xs = document.getElementById(`${id}_x`), xv = document.getElementById(`${id}_xval`);
+    const ys = document.getElementById(`${id}_y`), yv = document.getElementById(`${id}_yval`);
+    xs.addEventListener('input', () => { xv.textContent = xs.value; });
+    ys.addEventListener('input', () => { yv.textContent = ys.value; });
+  } else if (type === 'temphumid'){
+    const ts = document.getElementById(`${id}_t`), tv = document.getElementById(`${id}_tval`);
+    const hs = document.getElementById(`${id}_h`), hv = document.getElementById(`${id}_hval`);
+    ts.addEventListener('input', () => { tv.textContent = ts.value + '°C'; });
+    hs.addEventListener('input', () => { hv.textContent = hs.value + '%'; });
   } else if (type === 'pmsensor'){
     const slider = document.getElementById(`${id}_slider`);
     const val = document.getElementById(`${id}_val`);
@@ -10802,36 +11477,40 @@ function createWire(pinA, pinB){
   // points: 꺾임점들 — from → points[0] → points[1] → ... → to 순서대로 이어 그립니다. 각 점은
   // canvasInner의 비확대 좌표계 기준 절대 좌표({x,y})이고, 부품이 움직여도 점 자체는 그 자리에
   // 고정됩니다(양 끝 핀만 부품을 따라갑니다). 더블클릭으로 점을 새로 추가/삭제할 수도 있습니다.
-  // [Ver0.9951 지능형 배선] 예전에는 두 핀을 잇는 대각선 직선을 3등분한 자리에 점 2개를 찍어
-  // 두었는데, 그러면 처음 만들어진 순간에는 늘 비스듬한 대각선으로 보여 실제 판넬 배선도처럼
-  // 깔끔하지 않았습니다. 이제는 두 핀 사이 거리가 더 긴 축(가로 vs 세로)을 기준으로 중간 지점에
-  // 수직/수평 꺾임 2개를 자동으로 넣어, 처음 이어지는 순간부터 직각(ㄱ자/ㄷ자) 경로로 깔끔하게
-  // 배선됩니다(핀이 이미 가로나 세로로 나란하면 자연히 거의 직선이 됩니다). 점 2개라는 기존
-  // 구조는 그대로라 드래그로 옮기거나 더블클릭으로 더 세밀하게 꺾는 기존 조작과 완전히 호환됩니다.
+  // [Ver0.9951 지능형 배선, Ver0.9977에서 꺾임점 2개→1개로 단순화] 예전에는 두 핀을 잇는
+  // 대각선 직선을 3등분한 자리에 점 2개를 찍어 지그재그(ㄷ자)로 꺾었는데, "처음 만들어질 때
+  // 꺾임점이 하나만 생기면 좋겠다"는 요청에 따라 실제 배선판처럼 직각으로 딱 한 번만 꺾는
+  // 경로(ㄱ자)로 바꿨습니다 — 두 핀 사이 거리가 더 긴 축(가로 vs 세로)으로 먼저 이동한 뒤
+  // 남은 축으로 꺾습니다(핀이 이미 가로나 세로로 나란하면 자연히 거의 직선이 됩니다).
   const p1_0 = pinCenter(pinA), p2_0 = pinCenter(pinB);
   const dx0 = p2_0.x - p1_0.x, dy0 = p2_0.y - p1_0.y;
   const initialPoints = Math.abs(dx0) >= Math.abs(dy0)
-    ? [{ x: p1_0.x + dx0 / 2, y: p1_0.y }, { x: p1_0.x + dx0 / 2, y: p2_0.y }]
-    : [{ x: p1_0.x, y: p1_0.y + dy0 / 2 }, { x: p2_0.x, y: p1_0.y + dy0 / 2 }];
-  // 자동 생성된 두 꺾임점이 하필 다른 부품 몸체 위에 떨어지면(예: 두 핀 사이에 다른 부품이
-  // 끼어 있는 경우), 그 점을 드래그로 잡는 핸들이 부품과 겹쳐 보여 혼란스럽습니다. 실제
-  // 배선 경로는 routeWireAroundComponents()가 매 프레임 알아서 우회해 "그려" 주지만, 그건
-  // 그리기 전용이고 핸들 자체는 항상 w.points의 실제 좌표에 그려지므로, 만들어지는 시점에
-  // 미리 겹치는 부품 바깥(가장 가까운 변 + 여백)으로 밀어내 둡니다(아래 routeWireAroundComponents
-  // 1단계와 동일한 방식). 두 핀이 속한 부품 자신은 당연히 검사 대상에서 제외합니다.
+    ? [{ x: p2_0.x, y: p1_0.y }]
+    : [{ x: p1_0.x, y: p2_0.y }];
+  // 자동 생성된 꺾임점이 하필 다른 부품 몸체 위나 다른 핀 바로 옆에 떨어지면(예: 두 핀 사이에
+  // 다른 부품이 끼어 있거나, 핀이 촘촘히 줄지어 있는 경우), 그 점을 드래그로 잡는 핸들이
+  // 부품·핀과 겹쳐 보여 혼란스럽고 핀을 클릭하기도 어려워집니다. 실제 배선 경로는
+  // routeWireAroundComponents()가 매 프레임 알아서 우회해 "그려" 주지만, 그건 그리기 전용이고
+  // 핸들 자체는 항상 w.points의 실제 좌표에 그려지므로, 만들어지는 시점에 미리 (1) 겹치는
+  // 부품 바깥(가장 가까운 변 + 여백)으로, (2) 다른 핀에서 일정 거리 이상 떨어지도록 밀어내
+  // 둡니다(아래 routeWireAroundComponents 1단계와 동일한 방식). 두 핀 자신(과 그 핀이 속한
+  // 부품)은 당연히 검사 대상에서 제외합니다.
   const ownerA = pinA.closest('.placed-component'), ownerB = pinB.closest('.placed-component');
   const initObstacles = wireObstacleBoxes([ownerA, ownerB].filter(Boolean));
+  const initPinCenters = wireObstaclePinCenters([pinA, pinB]);
   initialPoints.forEach(p => {
     const b = initObstacles.find(bx => wirePointInBox(p, bx));
-    if (!b) return;
-    const margin = WIRE_AVOID_MARGIN;
-    const dl = p.x - (b.x1 - margin), dr = (b.x2 + margin) - p.x;
-    const dt = p.y - (b.y1 - margin), db = (b.y2 + margin) - p.y;
-    const minD = Math.min(dl, dr, dt, db);
-    if (minD === dl) p.x = b.x1 - margin;
-    else if (minD === dr) p.x = b.x2 + margin;
-    else if (minD === dt) p.y = b.y1 - margin;
-    else p.y = b.y2 + margin;
+    if (b){
+      const margin = WIRE_AVOID_MARGIN;
+      const dl = p.x - (b.x1 - margin), dr = (b.x2 + margin) - p.x;
+      const dt = p.y - (b.y1 - margin), db = (b.y2 + margin) - p.y;
+      const minD = Math.min(dl, dr, dt, db);
+      if (minD === dl) p.x = b.x1 - margin;
+      else if (minD === dr) p.x = b.x2 + margin;
+      else if (minD === dt) p.y = b.y1 - margin;
+      else p.y = b.y2 + margin;
+    }
+    nudgePointAwayFromPins(p, initPinCenters);
   });
   wireNetIdSeq = (wireNetIdSeq || 0) + 1;
   const wireObj = { from: pinA, to: pinB, element: path, color: WIRE_DEFAULT_COLOR, points: initialPoints, pointEls: [], netId: wireNetIdSeq, labelEls: [] };
@@ -10890,6 +11569,40 @@ function wireObstacleBoxes(excludeEls){
   });
   return boxes;
 }
+// [Ver0.9977] 자동 생성/보정되는 꺾임점이 다른 핀 바로 위에 찍히지 않도록, 캔버스에 있는
+// 모든 핀(부품의 .pin-mini든 보드의 .pin이든 — 전부 data-pin 속성을 공통으로 씁니다)의
+// 중심 좌표를 모읍니다. excludePins에는 이 전선 자신의 양 끝 핀(pinA/pinB)을 넣어, 꺾임점이
+// 자기 자신의 출발/도착 핀과는 원래 가까울 수밖에 없는 것까지 밀어내지 않게 합니다.
+const WIRE_PIN_AVOID_RADIUS = 9; // px, 확대 전 좌표 기준 — 핀 하나를 딴 핀과 헷갈리지 않을 정도의 여유
+function wireObstaclePinCenters(excludePins){
+  const inner = document.getElementById('canvasInner');
+  const innerRect = inner.getBoundingClientRect();
+  const centers = [];
+  document.querySelectorAll('[data-pin]').forEach(el => {
+    if (excludePins.includes(el)) return;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    centers.push({
+      x: (r.left + r.width / 2 - innerRect.left) / canvasZoom,
+      y: (r.top + r.height / 2 - innerRect.top) / canvasZoom,
+    });
+  });
+  return centers;
+}
+// 점 p가 어느 핀 중심에서 WIRE_PIN_AVOID_RADIUS보다 가까우면, 그 핀에서 바깥 방향으로 딱
+// 그 반경만큼만 밀어냅니다(핀과 정확히 같은 좌표인 아주 드문 경우엔 그냥 아래쪽으로).
+function nudgePointAwayFromPins(p, pinCenters){
+  pinCenters.forEach(c => {
+    const dx = p.x - c.x, dy = p.y - c.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist >= WIRE_PIN_AVOID_RADIUS) return;
+    const ux = dist > 0.01 ? dx / dist : 0;
+    const uy = dist > 0.01 ? dy / dist : 1;
+    p.x = c.x + ux * WIRE_PIN_AVOID_RADIUS;
+    p.y = c.y + uy * WIRE_PIN_AVOID_RADIUS;
+  });
+  return p;
+}
 function wireSegSegIntersect(p1, p2, p3, p4){
   const d = (a, b, c) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
   const d1 = d(p3, p4, p1), d2 = d(p3, p4, p2), d3 = d(p1, p2, p3), d4 = d(p1, p2, p4);
@@ -10921,11 +11634,14 @@ function wireDetourPoints(pA, pB, box){
 // rawPts(사용자가 정한 꺾임점을 포함한 전체 경로)의 각 구간을 검사해, 부품과 겹치는 구간마다
 // 우회점을 끼워 넣은 "그리기 전용" 점 목록을 돌려줍니다.
 function wirePointInBox(p, b){ return p.x > b.x1 && p.x < b.x2 && p.y > b.y1 && p.y < b.y2; }
-function routeWireAroundComponents(rawPts, excludeEls){
+function routeWireAroundComponents(rawPts, excludeEls, excludePins){
   const boxes = wireObstacleBoxes(excludeEls);
   if (!boxes.length) return rawPts;
   const margin = WIRE_AVOID_MARGIN;
   const lastIdx = rawPts.length - 1;
+  // [Ver0.9977] 아래에서 새로 만들거나 밀어내는(=자동 생성되는) 점만 핀 회피를 적용합니다 —
+  // 사용자가 더블클릭/드래그로 직접 정해둔 점은 사용자의 의도이므로 건드리지 않습니다.
+  const pinCenters = wireObstaclePinCenters(excludePins || []);
   // 1단계: 중간 경유점(사용자가 옮긴 꺾임점)이 하필 장애물 박스 안에 들어가 있으면, 그 박스
   // 바깥의 가장 가까운 변으로 밀어냅니다. 맨 앞/뒤(진짜 핀 좌표)는 옮길 수 없으므로 그대로 둡니다.
   const adjusted = rawPts.map((p, i) => {
@@ -10935,10 +11651,12 @@ function routeWireAroundComponents(rawPts, excludeEls){
     const dl = p.x - (b.x1 - margin), dr = (b.x2 + margin) - p.x;
     const dt = p.y - (b.y1 - margin), db = (b.y2 + margin) - p.y;
     const minD = Math.min(dl, dr, dt, db);
-    if (minD === dl) return { x: b.x1 - margin, y: p.y };
-    if (minD === dr) return { x: b.x2 + margin, y: p.y };
-    if (minD === dt) return { x: p.x, y: b.y1 - margin };
-    return { x: p.x, y: b.y2 + margin };
+    let q;
+    if (minD === dl) q = { x: b.x1 - margin, y: p.y };
+    else if (minD === dr) q = { x: b.x2 + margin, y: p.y };
+    else if (minD === dt) q = { x: p.x, y: b.y1 - margin };
+    else q = { x: p.x, y: b.y2 + margin };
+    return nudgePointAwayFromPins(q, pinCenters);
   });
   // 2단계: 보정된 점들 사이 각 구간이 장애물을 관통하면 둘러가는 점을 끼워 넣습니다. 핀 자체가
   // (다른 부품과 겹쳐 놓인 예외적인 경우) 장애물 박스 안에 있다면 그 좌표는 옮길 수 없으므로,
@@ -10957,6 +11675,8 @@ function routeWireAroundComponents(rawPts, excludeEls){
       const endPinStuck = (i + 1) === lastIdx && wirePointInBox(adjusted[lastIdx], hitBox);
       if (startPinStuck || endPinStuck) break;
       const [d1, d2] = wireDetourPoints(segStart, segEnd, hitBox);
+      nudgePointAwayFromPins(d1, pinCenters);
+      nudgePointAwayFromPins(d2, pinCenters);
       out.push(d1, d2);
       segStart = d2; // 우회 지점 이후부터 남은 구간을 이어서 다시 검사
       prevHitBox = hitBox;
@@ -11046,7 +11766,7 @@ function computeWireRoutedPoints(w){
   const p1 = pinCenter(w.from), p2 = pinCenter(w.to);
   const rawPts = [p1, ...w.points, p2];
   const compA = w.from.closest('.placed-component'), compB = w.to.closest('.placed-component');
-  return routeWireAroundComponents(rawPts, [compA, compB].filter(Boolean));
+  return routeWireAroundComponents(rawPts, [compA, compB].filter(Boolean), [w.from, w.to]);
 }
 function wirePathD(w){
   const routedPts = computeWireRoutedPoints(w);
@@ -11438,6 +12158,35 @@ function externalSourceOnNet(pinEl){
     if (pid.endsWith('_W')){
       const compId = pid.replace(/_W$/, '');
       const slider = document.getElementById(`${compId}_slider`);
+      if (slider) return { type: 'analog', v: (parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min)) };
+    }
+    // [기능 추가 Ver0.9979] 디지털(클릭식 트리거) 센서(dsensor-XXX)의 DO 핀 — SENSOR_DEFS의
+    // "_W"(아날로그 슬라이더) 분기와 완전히 같은 설계이지만, 결과가 ON/OFF 한 가지뿐입니다.
+    if (pid.endsWith('_DO')){
+      const compId = pid.replace(/_DO$/, '');
+      const trig = document.getElementById(`${compId}_trig`);
+      if (trig) return { type: 'digital', v: trig.dataset.active === '1' ? 1 : 0 };
+    }
+    // [기능 추가 Ver0.9979] 조이스틱 X/Y축(아날로그) — 각각 독립된 슬라이더를 읽습니다.
+    if (pid.endsWith('_JX') || pid.endsWith('_JY')){
+      const compId = pid.replace(/_J[XY]$/, '');
+      const axis = pid.endsWith('_JX') ? 'x' : 'y';
+      const slider = document.getElementById(`${compId}_${axis}`);
+      if (slider) return { type: 'analog', v: (parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min)) };
+    }
+    // [기능 추가 Ver0.9979] 조이스틱 SW 누름 버튼 — 실제 조이스틱 모듈처럼 풀업 배선(안 누르면
+    // HIGH, 누르면 LOW)으로 동작합니다.
+    if (pid.endsWith('_SW')){
+      const compId = pid.replace(/_SW$/, '');
+      const trig = document.getElementById(`${compId}_swtrig`);
+      if (trig) return { type: 'digital', v: trig.dataset.active === '1' ? 0 : 1 };
+    }
+    // [기능 추가 Ver0.9979] 온습도 센서 모듈(temphumid)의 온도/습도 신호 핀 — 각각 독립된
+    // 슬라이더를 읽습니다(단선 프로토콜을 온도/습도 2개의 아날로그 신호로 단순화).
+    if (pid.endsWith('_THT') || pid.endsWith('_THH')){
+      const compId = pid.replace(/_TH[TH]$/, '');
+      const suf = pid.endsWith('_THT') ? 't' : 'h';
+      const slider = document.getElementById(`${compId}_${suf}`);
       if (slider) return { type: 'analog', v: (parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min)) };
     }
     if (/_T[12]$/.test(pid)){
@@ -13526,7 +14275,15 @@ function pushScopeSamples(key, reading){
   // 이번 dt(ms) 동안 만들어낼 하위 샘플 개수. 예전 100ms당 기본 8개/AC·전류 60개였던 밀도를
   // dt에 비례해 그대로 유지합니다(60Hz AC/전류 파형은 100ms 안에 6주기나 들어가므로, 기본
   // 밀도로는 너무 성기게 찍혀 사인파가 삼각파처럼 보이기 때문에 AC 계열만 훨씬 촘촘합니다).
-  const N = Math.max(1, Math.round(((reading && (reading.type === 'ac' || reading.type === 'current')) ? 60 : 8) * dt / 100));
+  // [버그 수정] PWM/에코(pwm·echo)도 바로 아래에서 "이번 dt 구간을 duty 비율만큼 HIGH로 채우는"
+  // 방식으로 그려지는데, 실제 물리 틱 주기가 약 25ms이던 기존 기본 밀도(8)로 계산하면
+  // N = round(8*25/100) = 2 밖에 안 되어, duty가 round(v*2)로 0/1/2 세 단계(=0%·50%·100%)로만
+  // 양자화됩니다 — 그 결과 대부분의 PWM 듀티 값이 완전 HIGH 또는 완전 LOW로 뭉개져(중간값 소실)
+  // 사각파처럼만 보이고, duty가 50% 부근을 지날 때만 잠깐 절반짜리 펄스가 섞여 삼각파처럼
+  // 보이다가 다시 뭉개지는 문제가 있었습니다. AC/전류와 같은 이유(해상도 부족)이므로 PWM·에코도
+  // 동일하게 고밀도로 전환해 duty 값을 훨씬 촘촘한 단계로 표현합니다.
+  const SCOPE_HIGH_DENSITY_TYPES = new Set(['ac', 'current', 'pwm', 'echo']);
+  const N = Math.max(1, Math.round(((reading && SCOPE_HIGH_DENSITY_TYPES.has(reading.type)) ? 60 : 8) * dt / 100));
   const step = dt / N;
   let volts01; // 0~1 정규화 값의 배열
   if (!reading){
@@ -13776,9 +14533,22 @@ function runTick(){
     // 애노드에만 잘못 이어진 경우 등) 전류가 흐를 수 없으므로 켜지지 않습니다.
     const lit = !!r && r.v > 0.05 && hasGroundReturnPath(kPin, edgesExclSelf);
     const level = lit ? Math.max(0.12, Math.min(1, r.v)) : 0;
-    const colorSel = led.querySelector('.led-color-select');
-    const col = LED_COLORS[colorSel ? colorSel.value : 'red'] || LED_COLORS.red;
-    const [c1, c2, c3] = lit ? col.on : col.off;
+    // [기능 추가 Ver0.9979] 7색 자동 변환 LED(flash7color) — 켜져 있는 동안 시간에 따라 색상환을
+    // 자동으로 한 바퀴 순환합니다(약 3초에 한 바퀴). LED_COLORS 표를 찾는 대신 HSL로 그때그때
+    // 색을 직접 계산해, 다른 LED 종류들과 같은 [c1,c2,c3]/glow 형식으로 맞춰 줍니다.
+    let c1, c2, c3, col;
+    if (led.classList.contains('flash7color')){
+      const hue = lit ? Math.round((Date.now() / 3000 * 360) % 360) : 0;
+      const hsl = (l, s) => `hsl(${hue},${s}%,${l}%)`;
+      c1 = lit ? hsl(88, 80) : '#8a8a8a';
+      c2 = lit ? hsl(55, 90) : '#4a4a4a';
+      c3 = lit ? hsl(32, 85) : '#1a1a1a';
+      col = { glow: lit ? `${Math.round(128 + 127 * Math.sin(hue * Math.PI / 180))},${Math.round(128 + 127 * Math.sin((hue + 120) * Math.PI / 180))},${Math.round(128 + 127 * Math.sin((hue + 240) * Math.PI / 180))}` : '0,0,0' };
+    } else {
+      const colorSel = led.querySelector('.led-color-select');
+      col = LED_COLORS[colorSel ? colorSel.value : 'red'] || LED_COLORS.red;
+      [c1, c2, c3] = lit ? col.on : col.off;
+    }
     bulb.classList.toggle('on', lit);
     bulb.style.background = `radial-gradient(circle at 35% 30%, ${c1}, ${c2} 55%, ${c3})`;
     bulb.style.boxShadow = lit
@@ -14259,6 +15029,34 @@ function runTick(){
   document.querySelectorAll('.comp-electromagnet').forEach(el => {
     updateElectromagnetVisual(el.id, electromagnetState(el));
   });
+
+  // 16. 인터럽트 서비스 루틴(ISR) 발화 — attachInterrupt()로 등록된 핀들을 이번 틱에서 최종적으로
+  // 정리된 전기 상태(위 0~15단계가 모두 끝난 뒤)를 기준으로 검사합니다. 등록된 모드(RISING(3)/
+  // FALLING(2)/CHANGE(1))에 맞는 전이가 있으면 ISR을 즉시(await 없이) 호출합니다. noInterrupts()/
+  // cli()로 꺼둔 동안에는 검사를 건너뛰므로, 그 사이에 있었던 전이는 실제 AVR과 달리 "놓친 것"으로
+  // 처리됩니다(실제 하드웨어는 플래그를 남겨 뒀다가 재개 시 바로 실행하지만, 이 정도 nuance까지는
+  // 교육용으로 단순화했습니다).
+  Object.entries(boardInstances).forEach(([key, { domId }]) => {
+    const mcu = mcuVM[key];
+    if (!mcu || !mcu.interrupts || mcu.interruptsEnabled === false) return;
+    Object.entries(mcu.interrupts).forEach(([pin, reg]) => {
+      const reading = boardPinReading(domId, pin);
+      const level = (reading && reading.v >= 0.5) ? 1 : 0;
+      const prev = reg.lastLevel;
+      reg.lastLevel = level;
+      if (level === prev) return;
+      const fires = reg.mode === 3 ? (prev === 0 && level === 1)   // RISING
+        : reg.mode === 2 ? (prev === 1 && level === 0)              // FALLING
+        : true;                                                      // CHANGE(1) — 그 외 값도 CHANGE로 취급
+      if (!fires) return;
+      try {
+        const p = reg.isr();
+        if (p && typeof p.catch === 'function') p.catch(err => logSerial('[ISR 오류] ' + (err && err.message ? err.message : err), key));
+      } catch (err) {
+        logSerial('[ISR 오류] ' + (err && err.message ? err.message : err), key);
+      }
+    });
+  });
 }
 
 const SCOPE_HDIV = 10; // 화면 가로 칸 수 (실제 오실로스코프처럼 TIME/DIV x 10칸 = 전체 화면 시간)
@@ -14422,47 +15220,140 @@ function drawScope(id){
 
 /* ============ Popups & UI Helpers ============ */
 let popupZTop = 25;
-function openBoardPopup(board){
+
+/* ============================================================================
+ * [Ver0.9976] 도킹 코드 에디터 패널
+ *
+ * 예전엔 보드별 코드 에디터가 각자 자유롭게 떠다니는 .board-popup 창이어서, 여러 보드를
+ * 동시에 코딩하면 창들이 화면 곳곳에 겹쳐 쌓여 "에디터가 너무 어렵다"는 피드백을 받았습니다.
+ * 이제 보드별 팝업 DOM(정적 popupR4/popupR3, buildBoardPopupHTML이 만드는 동적 팝업 모두)은
+ * 내용을 그대로 유지한 채 우측 도킹 패널(#editorDock) 안으로 옮겨 담기고, 탭으로 전환합니다.
+ * editorDockTabs가 "지금 도킹 패널에 열려 있는 보드 키" 목록이고, editorDockActive가 그 중
+ * 실제로 보이는 탭입니다. HDMI 모니터(#popupMonitor)/BOM 목록(#bomModal)은 이 클래스
+ * (.code-editor-popup)가 없어 완전히 별개로 예전처럼 자유 플로팅 그대로 동작합니다.
+ * ============================================================================ */
+let editorDockTabs = [];      // 도킹 패널에 열려 있는 보드 키 배열 (탭 순서)
+let editorDockActive = null;  // 현재 활성 탭의 보드 키
+
+// 보드의 코드 에디터 팝업(popupR4/popupR3/동적 생성 팝업)을 도킹 패널 body 안으로 옮겨
+// 담습니다. 이미 옮겨져 있으면 아무것도 하지 않습니다. 정적 팝업(popupR4/popupR3)은 예전
+// 자유 플로팅 시절 쓰던 인라인 left/top 스타일이 남아 있으면 새 absolute inset:0 배치와
+// 충돌하므로 제거합니다.
+function ensureEditorDockHasPopup(board){
   const p = document.getElementById(`popup${board.toUpperCase()}`);
-  if (p) { p.hidden = false; p.style.zIndex = ++popupZTop; }
+  if (!p) return null;
+  p.classList.add('code-editor-popup');
+  const body = document.getElementById('editorDockBody');
+  if (body && p.parentElement !== body){
+    p.removeAttribute('style');
+    p.classList.remove('maximized');
+    body.appendChild(p);
+  }
+  return p;
+}
+
+function renderEditorDockTabs(){
+  const tabsEl = document.getElementById('editorDockTabs');
+  if (!tabsEl) return;
+  tabsEl.innerHTML = editorDockTabs.map(key => {
+    const KEY = key.toUpperCase();
+    const inst = boardInstances[key];
+    const label = inst ? boardTypeLabel(inst.type) + (key.includes('_') ? ' #' + key.split('_')[1] : '') : KEY;
+    const active = key === editorDockActive ? ' active' : '';
+    return `<button class="editor-dock-tab${active}" data-board="${key}" onclick="switchEditorDockTab('${key}')">
+      <span>${label}</span>
+      <span class="edt-close" onclick="event.stopPropagation(); closeBoardPopup('${key}')" title="${tr('popup.close')}">✕</span>
+    </button>`;
+  }).join('');
+}
+
+function updateEditorDockHandle(){
+  const handle = document.getElementById('editorDockHandle');
+  if (!handle) return;
+  const dock = document.getElementById('editorDock');
+  handle.hidden = editorDockTabs.length === 0;
+  const isOpen = !!(dock && !dock.hidden && !dock.classList.contains('collapsed'));
+  handle.textContent = isOpen ? '▸' : '💻';
+}
+
+function switchEditorDockTab(board){
+  editorDockActive = board;
+  editorDockTabs.forEach(key => {
+    const p = document.getElementById(`popup${key.toUpperCase()}`);
+    if (p) p.classList.toggle('dock-active', key === board);
+  });
+  renderEditorDockTabs();
+}
+
+// 폭이 매끄럽게 펼쳐지는 슬라이드 애니메이션 — 드래그로 조절해 둔 폭(dock.style.width)이
+// 있으면 그 값으로, 없으면 CSS 기본값(640px)으로 복원합니다.
+function expandEditorDock(){
+  const dock = document.getElementById('editorDock');
+  if (!dock) return;
+  dock.hidden = false;
+  void dock.offsetWidth; // 강제 리플로우: hidden 해제 직후 곧바로 폭을 바꿔도 transition이 재생되게 함
+  dock.classList.remove('collapsed');
+  dock.style.width = dock.dataset.savedWidth || dock.style.width || '640px';
+  updateEditorDockHandle();
+}
+function collapseEditorDock(){
+  const dock = document.getElementById('editorDock');
+  if (!dock || dock.hidden) { updateEditorDockHandle(); return; }
+  if (dock.style.width) dock.dataset.savedWidth = dock.style.width;
+  dock.classList.add('collapsed');
+  dock.style.width = '0px';
+  setTimeout(() => { if (dock.classList.contains('collapsed')) dock.hidden = true; }, 260);
+  updateEditorDockHandle();
+}
+// 우측 가장자리 손잡이 — 탭이 하나라도 있을 때만 나타나며, 눌러서 패널을 펼치거나 접습니다.
+function toggleEditorDock(){
+  const dock = document.getElementById('editorDock');
+  if (!dock) return;
+  if (dock.hidden || dock.classList.contains('collapsed')) expandEditorDock();
+  else collapseEditorDock();
+}
+
+// 탭 목록에서 보드를 빼되, 그 보드의 팝업 DOM 자체는 지우지 않습니다(다시 openBoardPopup()
+// 하면 그대로 재사용). 보드 삭제(deleteComponent) 경로에서도 팝업을 지우기 전에 먼저
+// 호출해 도킹 상태가 지워진 보드를 계속 가리키지 않게 정리합니다.
+function removeBoardFromEditorDock(board){
+  const idx = editorDockTabs.indexOf(board);
+  if (idx === -1) return;
+  editorDockTabs.splice(idx, 1);
+  if (editorDockTabs.length === 0){
+    editorDockActive = null;
+    collapseEditorDock();
+  } else if (editorDockActive === board){
+    switchEditorDockTab(editorDockTabs[Math.max(0, idx - 1)]);
+  }
+  renderEditorDockTabs();
+}
+
+function openBoardPopup(board){
+  const p = ensureEditorDockHasPopup(board);
+  if (!p) return;
+  if (!editorDockTabs.includes(board)) editorDockTabs.push(board);
+  expandEditorDock();
+  switchEditorDockTab(board);
 }
 function closeBoardPopup(board){
   const p = document.getElementById(`popup${board.toUpperCase()}`);
-  if (p) p.hidden = true;
+  if (p) p.classList.remove('dock-active');
+  removeBoardFromEditorDock(board);
 }
-// 코드 에디터 팝업 최대화/원래크기 토글 — 처음 최대화하는 순간의 위치·크기를 그 팝업의
-// dataset에 저장해 두고, 되돌릴 때 그 값을 그대로 복원합니다(사용자가 드래그로 옮기거나
-// 모서리로 늘려둔 크기가 있었다면 그 크기로 정확히 돌아옵니다). 최대화 중에는 리사이즈
-// 손잡이와 헤더 드래그를 잠시 막아, 크기가 화면 가득 찬 상태와 사용자의 드래그/리사이즈가
-// 서로 충돌하지 않게 합니다.
+// 코드 에디터 패널 최대화/원래크기 토글 — 팝업 하나가 아니라 도킹 패널 전체의 폭을
+// 넓혀서(다른 보드 탭도 같이) 화면을 거의 가득 채웁니다.
 function toggleBoardPopupMaximize(board){
   const KEY = board.toUpperCase();
-  const p = document.getElementById(`popup${KEY}`);
-  if (!p) return;
+  const dock = document.getElementById('editorDock');
+  if (!dock) return;
   const btn = document.getElementById(`maxBtn${KEY}`);
-  if (p.classList.contains('maximized')){
-    p.classList.remove('maximized');
-    p.style.left = p.dataset.preMaxLeft || '';
-    p.style.top = p.dataset.preMaxTop || '';
-    p.style.width = p.dataset.preMaxWidth || '';
-    p.style.height = p.dataset.preMaxHeight || '';
-    p.style.resize = 'both';
-    if (btn){ btn.textContent = '⛶'; btn.title = tr('popup.maximizeTitle'); btn.dataset.i18nTitle = 'popup.maximizeTitle'; }
-  } else {
-    const rect = p.getBoundingClientRect();
-    p.dataset.preMaxLeft = p.style.left || (rect.left + 'px');
-    p.dataset.preMaxTop = p.style.top || (rect.top + 'px');
-    p.dataset.preMaxWidth = p.style.width || (rect.width + 'px');
-    p.dataset.preMaxHeight = p.style.height || (rect.height + 'px');
-    p.classList.add('maximized');
-    p.style.left = '2vw';
-    p.style.top = '2vh';
-    p.style.width = '96vw';
-    p.style.height = '92vh';
-    p.style.resize = 'none';
-    if (btn){ btn.textContent = '🗗'; btn.title = tr('popup.restoreTitle'); btn.dataset.i18nTitle = 'popup.restoreTitle'; }
+  const maximized = dock.classList.toggle('maximized');
+  if (btn){
+    btn.textContent = maximized ? '🗗' : '⛶';
+    const key = maximized ? 'popup.restoreTitle' : 'popup.maximizeTitle';
+    btn.title = tr(key); btn.dataset.i18nTitle = key;
   }
-  p.style.zIndex = ++popupZTop;
 }
 // 툴바의 "코드 에디터 & 컴파일러" 버튼: R4가 이제 처음부터 캔버스에 있지 않으므로, 없으면
 // 먼저 만들어준 뒤 그 팝업을 엽니다.
@@ -14471,7 +15362,42 @@ function openMainEditor(){
   openBoardPopup('r4');
 }
 
+// 도킹 패널 폭 드래그 리사이저 — 우측 고정 패널이라 마우스 X좌표에서 얼마나 왼쪽에 있는지로
+// 폭을 계산합니다(오른쪽 끝은 화면 끝에 고정되어 있으므로).
+(function initEditorDockResizer(){
+  const resizer = document.getElementById('editorDockResizer');
+  const dock = document.getElementById('editorDock');
+  if (!resizer || !dock) return;
+  let dragging = false;
+  resizer.addEventListener('mousedown', (e) => {
+    if (dock.classList.contains('maximized')) return;
+    dragging = true;
+    resizer.classList.add('dragging');
+    // 펼치기/접기용 width transition이 드래그 중에도 걸려 있으면, 매 mousemove마다 목표
+    // 폭을 향해 .22s 동안 서서히 따라오느라 마우스보다 계속 뒤처져 "뻑뻑하게" 느껴집니다.
+    // 드래그하는 동안만 꺼서 손가락처럼 즉시 반응하게 하고, 떼면 원래대로 되돌립니다.
+    dock.style.transition = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const dockRect = dock.getBoundingClientRect();
+    const newWidth = Math.max(380, Math.min(window.innerWidth * 0.92, dockRect.right - e.clientX));
+    dock.style.width = newWidth + 'px';
+    dock.dataset.savedWidth = newWidth + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (dragging) dock.style.transition = '';
+    dragging = false;
+    resizer.classList.remove('dragging');
+  });
+})();
+
+// 도킹된 보드 코드 에디터 팝업(.code-editor-popup)은 탭으로 관리되므로 헤더 드래그로 옮기지
+// 않습니다 — HDMI 모니터(#popupMonitor)/BOM 목록(#bomModal)처럼 이 클래스가 없는 팝업만
+// 예전처럼 자유롭게 드래그됩니다.
 function makePopupDraggable(popup){
+  if (popup.classList.contains('code-editor-popup')) return;
   const handle = popup.querySelector('[data-drag-handle]');
   if (!handle) return;
   let dragging = false, offX = 0, offY = 0;
@@ -16790,13 +17716,11 @@ function buildBoardPopupHTML(key, type){
   const defaultCode = `// ${label}${suffix} sketch\nint count = 0;\n${ledPinValue}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  count++;\n  digitalWrite(ledPin, count % 2 == 0 ? HIGH : LOW);\n  Serial.print("Board ${key} Tick: ");\n  Serial.println(count);\n  delay(200);\n}`;
 
   const div = document.createElement('div');
-  div.className = 'board-popup';
+  // [Ver0.9976] 도킹 패널 안에서 탭으로 관리되므로, 더 이상 화면에 계단식으로 흩뿌려 놓을
+  // left/top 오프셋이 필요 없습니다 — openBoardPopup()이 열릴 때 곧바로 #editorDockBody
+  // 안으로 옮겨 담습니다.
+  div.className = 'board-popup code-editor-popup';
   div.id = `popup${KEY}`;
-  // 팝업이 전부 같은 자리에 겹쳐 뜨지 않도록, 이미 열려있는 보드 팝업 수만큼 대각선으로
-  // 계단식 오프셋을 줍니다(6개마다 다시 처음 자리로 순환).
-  const cascade = Object.keys(boardInstances).length % 6;
-  div.style.left = `calc(58% + ${cascade * 28}px)`;
-  div.style.top = (60 + cascade * 34) + 'px';
   div.innerHTML = `
     <div class="popup-head" data-drag-handle>
       <b>${label}${suffix} — ${toolchain} Toolchain &amp; Serial</b>
@@ -16831,7 +17755,10 @@ function buildBoardPopupHTML(key, type){
       ${editorTabsHTML(key)}
       <div class="code-editor-wrap" id="codeEditorPane${KEY}">
       <div class="code-linenumbers" id="lineNum${KEY}">1</div>
+      <div class="code-editor-surface">
+      <pre class="code-highlight" id="codeHighlight${KEY}" aria-hidden="true"><code></code></pre>
       <textarea id="codeEditor${KEY}" class="code-editor" spellcheck="false">${defaultCode}</textarea>
+      </div>
       </div>
       ${blockEditorPaneHTML(key)}
       <div class="serial-panel">
@@ -16847,7 +17774,7 @@ function buildBoardPopupHTML(key, type){
         </div>
       </div>` : ''}
     </div>`;
-  document.body.appendChild(div);
+  (document.getElementById('editorDockBody') || document.body).appendChild(div);
   applyI18n(div);
   initCodeEditor(document.getElementById(`codeEditor${KEY}`), document.getElementById(`lineNum${KEY}`), key);
   makePopupDraggable(div);
@@ -16896,6 +17823,14 @@ function spawnBoard(type, dropX, dropY){
     if (dynSize){ el.style.width = dynSize.width + 'px'; el.style.height = dynSize.height + 'px'; }
   }
   document.getElementById('canvasInner').appendChild(el);
+  // [Ver0.9975] spawnComponent와 같은 이유로, 보드 종류마다 실제 크기가 크게 달라(R3~ESP32~대형
+  // 터치보드) 위쪽의 고정 오프셋(-90,-60)만으로는 드래그해서 놓은 위치와 커서가 자주 어긋났습니다.
+  // DOM에 붙은 뒤 실제 크기로 다시 중앙을 맞춥니다.
+  if (typeof dropX === 'number' && typeof dropY === 'number'){
+    const w = el.offsetWidth || 180, h = el.offsetHeight || 120;
+    el.style.left = Math.max(0, Math.round(dropX - w / 2)) + 'px';
+    el.style.top = Math.max(0, Math.round(dropY - h / 2)) + 'px';
+  }
 
   const topPins = type === 'mega' ? MEGA_DIGITAL_PINS_LOW : isEsp32 ? ESP32_GPIO_PINS : DIGITAL_PINS;
   const powerPins = isEsp32 ? ESP32_POWER_PINS : POWER_PINS;
@@ -17049,10 +17984,79 @@ function updateDebugUI(board){
     bar.classList.remove('active');
   }
 }
+/* ============================================================================
+ * [Ver0.9976] 코드 에디터 문법 강조 — "주석·명령어·변수 등의 색상이 바뀌면 좋겠다"는
+ * 피드백에 따라, 순수 정규식 기반의 가벼운 C/C++(아두이노 스케치) 토크나이저를 붙였습니다.
+ * 별도 라이브러리 없이, textarea 위에 겹친 투명한 글자 위로 <pre><code> 층에 색칠된 HTML을
+ * 그려서 보여주는 흔한 기법입니다(.code-highlight/.code-editor-surface CSS 참고). 실제
+ * 입력·커서·복사/붙여넣기 등은 여전히 진짜 textarea가 그대로 처리하므로, 디버거 호버
+ * (attachDebugHover)나 그 외 editor.value를 읽고 쓰는 기존 코드는 전혀 건드리지 않습니다.
+ * ============================================================================ */
+const CODE_KEYWORDS = new Set(['if','else','for','while','do','switch','case','default','break','continue','return','const','static','volatile','extern','inline','struct','class','public','private','protected','new','delete','sizeof','typedef','enum','namespace','using','template','virtual','goto']);
+const CODE_TYPES = new Set(['void','int','float','double','char','bool','boolean','byte','short','long','unsigned','signed','String','size_t','uint8_t','uint16_t','uint32_t','int8_t','int16_t','int32_t']);
+const CODE_CONSTANTS = new Set(['HIGH','LOW','INPUT','OUTPUT','INPUT_PULLUP','INPUT_PULLDOWN','LED_BUILTIN','true','false','NULL','nullptr']);
+function escapeHtmlForCode(s){
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+// 주석(//, /* */) / 문자열·문자 리터럴 / 전처리기 지시문(#include 등) / 숫자 / 식별자를
+// 한 정규식으로 훑습니다. 줄 단위가 아니라 전체 코드를 한 번에 훑는 이유는, 블록 주석
+// (/* ... */)이 여러 줄에 걸칠 수 있어 줄 단위로 끊으면 그 상태를 줄 사이에 넘겨줘야 하는
+// 번거로움이 생기기 때문입니다.
+const CODE_TOKEN_RE = /(\/\/[^\n]*)|(\/\*[\s\S]*?(?:\*\/|$))|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(#\s*\w+[^\n]*)|(\b0[xX][0-9a-fA-F]+\b|\b\d+\.?\d*(?:[eE][+-]?\d+)?[fFuUlL]*\b)|(\b[A-Za-z_]\w*\b)/g;
+function highlightCppCode(code){
+  let out = '';
+  let lastIndex = 0;
+  CODE_TOKEN_RE.lastIndex = 0;
+  let m;
+  while ((m = CODE_TOKEN_RE.exec(code))){
+    if (m.index > lastIndex) out += escapeHtmlForCode(code.slice(lastIndex, m.index));
+    const full = m[0];
+    if (m[1] || m[2]){ // 줄/블록 주석
+      out += `<span class="tok-comment">${escapeHtmlForCode(full)}</span>`;
+    } else if (m[3]){ // 문자열·문자 리터럴
+      out += `<span class="tok-string">${escapeHtmlForCode(full)}</span>`;
+    } else if (m[4]){ // 전처리기 지시문
+      out += `<span class="tok-preproc">${escapeHtmlForCode(full)}</span>`;
+    } else if (m[5]){ // 숫자
+      out += `<span class="tok-number">${escapeHtmlForCode(full)}</span>`;
+    } else if (m[6]){ // 식별자 — 키워드/타입/상수/함수호출/변수로 분류
+      const ident = m[6];
+      let cls;
+      if (CODE_KEYWORDS.has(ident)) cls = 'tok-keyword';
+      else if (CODE_TYPES.has(ident)) cls = 'tok-type';
+      else if (CODE_CONSTANTS.has(ident)) cls = 'tok-constant';
+      else {
+        const after = code.slice(CODE_TOKEN_RE.lastIndex).match(/^\s*\(/);
+        cls = after ? 'tok-function' : 'tok-variable';
+      }
+      out += `<span class="${cls}">${escapeHtmlForCode(full)}</span>`;
+    } else {
+      out += escapeHtmlForCode(full);
+    }
+    lastIndex = CODE_TOKEN_RE.lastIndex;
+  }
+  if (lastIndex < code.length) out += escapeHtmlForCode(code.slice(lastIndex));
+  // textarea가 "\n"으로 끝나면 마지막 빈 줄도 한 줄의 높이를 차지하는데, <pre>는 내용이
+  // 전혀 없는 마지막 줄의 높이를 렌더링하지 않아 두 층의 총 높이가 살짝 어긋납니다 —
+  // 공백 하나를 덧붙여 그 줄도 실제 높이를 갖게 합니다(흔히 쓰이는 보정 기법).
+  if (code.endsWith('\n')) out += ' ';
+  return out;
+}
+// textarea 값이 바뀔 때마다(입력/예제 불러오기/블록->코드 변환/프로젝트 불러오기 등,
+// refreshLineNumbers가 불리는 모든 자리에서 함께) 그 바로 아래 강조 레이어를 다시 그립니다.
+function updateCodeHighlight(ta){
+  const surface = ta.closest ? ta.closest('.code-editor-surface') : null;
+  const codeEl = surface ? surface.querySelector('.code-highlight code') : null;
+  if (!codeEl) return;
+  codeEl.innerHTML = highlightCppCode(ta.value);
+}
+
 // 줄 번호 거터를 클릭 가능한 <span> 한 줄씩으로 다시 그립니다 — 브레이크포인트가 찍힌 줄엔
 // 빨간 점(.has-bp), 지금 일시정지된 줄엔 강조 배경(.cur-line)을 붙입니다.
 function refreshLineNumbers(ta, gutter, board){
-  if (!ta || !gutter) return;
+  if (!ta) return;
+  updateCodeHighlight(ta);
+  if (!gutter) return;
   const lines = ta.value.split('\n').length;
   const st = board ? debugState[board] : null;
   const curLine = st && st.paused ? st.currentLine : null;
@@ -17125,7 +18129,12 @@ function initCodeEditor(ta, gutter, board){
   if (!ta) return;
   refreshLineNumbers(ta, gutter, board);
   ta.addEventListener('input', () => refreshLineNumbers(ta, gutter, board));
-  ta.addEventListener('scroll', () => { if (gutter) gutter.scrollTop = ta.scrollTop; });
+  ta.addEventListener('scroll', () => {
+    if (gutter) gutter.scrollTop = ta.scrollTop;
+    const surface = ta.closest('.code-editor-surface');
+    const hl = surface ? surface.querySelector('.code-highlight') : null;
+    if (hl){ hl.scrollTop = ta.scrollTop; hl.scrollLeft = ta.scrollLeft; }
+  });
   ta.addEventListener('keydown', (e) => handleEditorKeydown(e, ta));
   if (gutter && board){
     gutter.addEventListener('click', (e) => {
@@ -19547,7 +20556,7 @@ function collapseNonBoardPaletteGroupsByDefault(){
  * (buildAiComponentCatalog) — 코드가 바뀌면 카탈로그도 자동으로 같이 바뀌므로, AI가 존재하지
  * 않는 핀 이름을 지어내 배선이 조용히 실패하는 사고를 원천적으로 막습니다.
  * ============================================================================ */
-const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','bulb220','camera','canfdmodule','canmodule','capacitor','capacitor-e','cccv','clampmeter','coincell','contactor','dac','dcmotor','dcmotor-enc','diode','electromagnet','eocr','fan','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','lcd','led','ledtube220','levelshifter','lidar','mccb','motor3ph','motordriver','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-humid','sensor-ldr','sensor-temp','servo','speaker','stepper','terminalblock','timer','toggleswitch','transformer','transistor','ultrasonic','usbsound','wallswitch','wifiap'];
+const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','buzzeractive','buzzerpassive','bulb220','camera','canfdmodule','canmodule','capacitor','capacitor-e','cccv','clampmeter','coincell','contactor','dac','dcmotor','dcmotor-enc','diode','dsensor-avoid','dsensor-ballswitch','dsensor-digitaltemp','dsensor-flame','dsensor-hallmag','dsensor-irrecv','dsensor-lightblock','dsensor-lightcup','dsensor-minireed','dsensor-reed','dsensor-shock','dsensor-tap','dsensor-tilt','dsensor-touch','dsensor-tracking','electromagnet','eocr','fan','flash7color','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','iremit','joystick','laser','lcd','led','ledtube220','levelshifter','lidar','mccb','motor3ph','motordriver','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-anahall','sensor-anatemp','sensor-heartbeat','sensor-humid','sensor-irdist2m','sensor-irdist3cm','sensor-irdist6m','sensor-irdist9m','sensor-ldr','sensor-linhall','sensor-rotary','sensor-soundbig','sensor-soundsm','sensor-temp','sensor-tempmod','sensor-water','servo','smdrgb','speaker','stepper','temphumid','terminalblock','timer','toggleswitch','transformer','transistor','twocolorled','ultrasonic','usbsound','wallswitch','wifiap'];
 // ('custom'은 사용자가 직접 그리는 빈 부품이라 AI가 고를 이유가 없어 목록에서 뺐습니다.)
 const AI_BOARD_TYPES = ['r3', 'r4', 'mega', 'esp32b', 'esp32d', 'esp32t'];
 
@@ -19724,6 +20733,21 @@ async function executeCircuitBuild(plan){
     boardEl = document.getElementById(boardDomId[boardKey]);
   }
 
+  // [Ver0.9977] AI가 만든 부품이 "보드에서 멀리 떨어져 서로 겹쳐 보인다"는 피드백 원인 —
+  // spawnComponent(item.type)를 좌표 없이 부르면, 부품 고유 ID용으로 세션 내내 계속 누적되는
+  // 전역 카운터(compCount)를 배치 간격으로도 재활용하는 기존 fallback(520+compCount*22,
+  // 720+compCount*14)에 그대로 걸립니다. 이 카운터는 한 번도 초기화되지 않으므로 세션을 오래
+  // 쓸수록 보드에서 점점 더 멀어지고, 같은 회로 안에서도 부품 하나 크기(대개 60~150px)보다
+  // 훨씬 좁은 22~14px 간격만 두다 보니 서로 겹칩니다. 여기서는 그 fallback에 기대지 않고,
+  // 방금 놓은 보드 바로 아래에서부터 줄바꿈되는 격자(왼쪽에서 오른쪽, 다 차면 다음 줄)로 직접
+  // 배치합니다 — 각 부품을 캔버스에 붙인 직후 실제 렌더링 크기(offsetWidth/Height)를 재서
+  // 다음 칸으로 넘어가므로, 오실로스코프처럼 유난히 큰 부품이 섞여도 겹치지 않습니다.
+  const AI_LAYOUT_GAP = 24;
+  const AI_LAYOUT_MAX_ROW_WIDTH = 900;
+  const aiLayoutStartX = boardEl ? (parseFloat(boardEl.style.left) || 0) : 60;
+  const aiLayoutStartY = boardEl ? ((parseFloat(boardEl.style.top) || 0) + (boardEl.offsetHeight || 400) + 60) : 360;
+  let aiLayoutX = aiLayoutStartX, aiLayoutY = aiLayoutStartY, aiLayoutRowH = 0;
+
   const compEls = [];
   const compElsByIndex = new Map();
   if (plan && Array.isArray(plan.components)){
@@ -19733,6 +20757,16 @@ async function executeCircuitBuild(plan){
       const newId = spawnComponent(item.type);
       const el = newId && document.getElementById(newId);
       if (!el) return;
+      const w = el.offsetWidth || 90, h = el.offsetHeight || 70;
+      if (aiLayoutX > aiLayoutStartX && aiLayoutX + w > aiLayoutStartX + AI_LAYOUT_MAX_ROW_WIDTH){
+        aiLayoutX = aiLayoutStartX;
+        aiLayoutY += aiLayoutRowH + AI_LAYOUT_GAP;
+        aiLayoutRowH = 0;
+      }
+      el.style.left = Math.round(aiLayoutX) + 'px';
+      el.style.top = Math.round(aiLayoutY) + 'px';
+      aiLayoutX += w + AI_LAYOUT_GAP;
+      aiLayoutRowH = Math.max(aiLayoutRowH, h);
       if (item.type === 'resistor' && item.value != null && !isNaN(parseFloat(item.value))){
         const vInput = el.querySelector('.res-value');
         if (vInput){
