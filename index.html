@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9973</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9974</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -552,6 +552,21 @@
   .ch-dot.ch2{background:#5ad0e6; box-shadow:0 0 4px #5ad0e6;}
   .ch-dot.ch3{background:#ff5ac8; box-shadow:0 0 4px #ff5ac8;}
   .ch-dot.ch4{background:#7cfc8a; box-shadow:0 0 4px #7cfc8a;}
+  /* [Ver0.9974] 채널 활성화(ON/OFF) 버튼 — 실제 오실로스코프처럼, 프로브가 연결되어 있어도 이
+     버튼을 눌러 켜지 않으면 그 채널의 파형이 화면에 그려지지 않습니다(기본값 OFF). CH1~CH4 라벨을
+     누르면 그대로 토글되도록, 기존의 정적 점+텍스트 자리를 버튼으로 바꿨습니다. */
+  .scope-ch-onbtn{
+    display:flex; align-items:center; gap:4px; font-family:'IBM Plex Mono',monospace; font-size:.62rem;
+    color:var(--text-faint); background:#1a1e24; border:1px solid var(--border-strong); border-radius:4px;
+    padding:2px 6px; cursor:pointer;
+  }
+  .scope-ch-onbtn:hover{border-color:var(--teal);}
+  .scope-ch-onbtn .ch-dot{opacity:.5;}
+  .scope-ch-onbtn.on .ch-dot{opacity:1;}
+  .scope-ch-onbtn.on.ch1{background:#3a330d; color:#ffd23f; border-color:#ffd23f;}
+  .scope-ch-onbtn.on.ch2{background:#0d2a3a; color:#5ad0e6; border-color:#5ad0e6;}
+  .scope-ch-onbtn.on.ch3{background:#3a0d2a; color:#ff5ac8; border-color:#ff5ac8;}
+  .scope-ch-onbtn.on.ch4{background:#123a1a; color:#7cfc8a; border-color:#7cfc8a;}
   .scope-probe-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; padding-top:6px; border-top:1px solid #34383f;}
   .scope-probe-row .probe-wrap{display:flex; flex-direction:column; align-items:center; gap:3px;}
   .scope-probe-row .probe-cap{font-family:'IBM Plex Mono',monospace; font-size:.55rem; color:var(--text-faint);}
@@ -1794,7 +1809,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9973</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9974</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -2837,7 +2852,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9973", en: "K's Simulator Ver0.9973" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9974", en: "K's Simulator Ver0.9974" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3164,6 +3179,7 @@ const STRINGS = {
   "relay.energized": { ko: "동작 (NO)", en: "Energized (NO)" },
   "relay.deenergized": { ko: "대기 (NC)", en: "Idle (NC)" },
   "comp.sPhase": { ko: "S상 (L2)", en: "Phase S (L2)" },
+  "comp.scope.chToggleTitle": { ko: "이 버튼을 켜야 이 채널의 파형이 화면에 보입니다 — 프로브 연결 여부와는 별개입니다(실제 오실로스코프처럼).", en: "Turn this on to see this channel's waveform — independent of whether a probe is wired (just like a real oscilloscope)." },
   "comp.scope.measureBtn": { ko: "📏 측정", en: "📏 Measure" },
   "comp.scope.measureBtnOff": { ko: "📏 측정 해제", en: "📏 Unmeasure" },
   "comp.scope.measureTitle": { ko: "화면 안에 커서 2개를 놓아 그 사이의 시간(Δt)과 주파수(1/Δt)를 잽니다. 파형의 같은 위상(예: 두 상승 엣지)에 커서를 맞추면 주기를 바로 읽을 수 있습니다.", en: "Places two cursors on screen and measures the time (Δt) and frequency (1/Δt) between them. Line them up with the same point on two cycles (e.g. two rising edges) to read the period directly." },
@@ -3582,7 +3598,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9973", en: "K's Arduino Simulator Ver0.9973" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9974", en: "K's Arduino Simulator Ver0.9974" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -6312,6 +6328,9 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9974', ko: [
+      '🔘 오실로스코프에 채널 활성화(CH1~CH4) 버튼을 추가했습니다 — 실제 오실로스코프처럼, 프로브를 연결해도 그 채널 버튼을 눌러 켜야만 파형이 화면에 보입니다(기본값은 전부 꺼짐). 여러 채널을 동시에 연결했을 때 화면이 지저분해 보이던 문제도 함께 줄었고, 프로젝트를 저장·불러오거나 예제를 실행했을 때도 채널 ON/OFF 상태가 그대로 유지됩니다',
+  ]},
   { ver: 'Ver0.9973', ko: [
       '🔧 "회로도 그리기" 팝업에서 저항·커패시터·LED 같은 부품을 R키로 세로(90°/270°)로 돌렸을 때 부품명과 값 글자가 서로 겹쳐 보이던 문제를 고쳤습니다 — 세로로 돌아간 상태에서는 글자를 가로 방향이 아니라 세로 방향으로 나란히 배치해, 어느 각도로 돌려도 겹치지 않고 읽히게 했습니다',
       '📏 "회로도 그리기" 부품 기호와 칸 간격이 너무 크다는 의견에 따라, 부품 상자 크기·여백·간격을 전체적으로 절반 정도로 줄였습니다 — 저항 지그재그, 커패시터·인덕터·LED·전지·모터 기호와 글자 크기까지 함께 축소해 더 많은 부품을 한 화면에 편하게 배치할 수 있습니다',
@@ -7040,6 +7059,7 @@ function deleteComponent(el){
     armedScopes.delete(el.id);
     delete scopeZoom[el.id];
     delete scopeVOffset[el.id];
+    delete scopeChannelOn[el.id];
     ['CH1', 'CH2', 'CH3', 'CH4'].forEach(ch => {
       delete scopeBuffers[`${el.id}_${ch}`];
       delete scopeLastDigital[`${el.id}_${ch}`];
@@ -7354,7 +7374,7 @@ function spawnComponent(type, dropX, dropY){
           <option value="2000">2 s</option>
         </select></label>
         ${[1, 2, 3, 4].map(n => `
-        <label><span class="ch-dot ch${n}"></span>CH${n}
+        <label><button type="button" class="scope-ch-onbtn ch${n}" id="${id}_chonbtn${n}" data-ch="${n}" onclick="toggleScopeChannelOn('${id}','${n}')" data-i18n-title="comp.scope.chToggleTitle" title="이 버튼을 켜야 이 채널의 파형이 화면에 보입니다 — 프로브 연결 여부와는 별개입니다(실제 오실로스코프처럼)."><span class="ch-dot ch${n}"></span>CH${n}</button>
           <select class="scope-ch-mode" data-ch="${n}" onchange="scopeChannelModeChanged('${id}','${n}')" data-i18n-title="scope.chModeTitle" title="전압(V) 프로브로 쓸지, 이 가지에 직렬로 끼워 전류(A)를 잴지 선택합니다">
             <option value="v" selected data-i18n="scope.modeV">전압(V)</option>
             <option value="i" data-i18n="scope.modeI">전류(A)</option>
@@ -12983,6 +13003,31 @@ const heldScopes = new Map(); // id -> { perfNow, dateNow }
 // 자동으로 재개시킵니다(이 두 지점 외에는 서로에게 전혀 영향을 주지 않습니다).
 const armedScopes = new Set(); // id 집합
 const scopeLastDigital = {}; // `${scopeId}_${ch}` -> 직전 틱의 디지털 값(0/1), 엣지 감지용
+// [Ver0.9974] 채널 활성화(ON/OFF) — "오실로스코프에 프로브만 연결하면 신호가 다 보여서 화면이
+// 지저분하다"는 피드백에 따라, 실제 오실로스코프처럼 채널 버튼을 눌러 켜야만 그 채널의 파형이
+// 화면에 그려지게 했습니다. 프로브 연결 여부·측정값 읽기(라벨/디코드/measure)는 이 상태와 무관하게
+// 그대로 동작하고, drawScope()에서 실제로 선을 그릴지만 이 상태로 걸러냅니다 — 기본값은 전부 OFF.
+const scopeChannelOn = {}; // id -> [ch1on, ch2on, ch3on, ch4on]
+function isScopeChannelOn(id, n){
+  const arr = scopeChannelOn[id];
+  return !!(arr && arr[n - 1]);
+}
+function setScopeChannelOnUI(id, n, on){
+  const btn = document.getElementById(`${id}_chonbtn${n}`);
+  if (!btn) return;
+  btn.classList.toggle('on', on);
+}
+// 예제 자동 배선 코드(오실로스코프를 미리 CH1/CH2에 물려 두는 실습들)에서도 재사용하도록
+// 토글과 "지정한 값으로 세팅"을 분리해 뒀습니다.
+function setScopeChannelOn(id, n, on){
+  if (!scopeChannelOn[id]) scopeChannelOn[id] = [false, false, false, false];
+  scopeChannelOn[id][n - 1] = on;
+  setScopeChannelOnUI(id, n, on);
+  drawScope(id);
+}
+function toggleScopeChannelOn(id, n){
+  setScopeChannelOn(id, n, !isScopeChannelOn(id, n));
+}
 function setScopeHoldUI(id, state){
   const btn = document.getElementById(`${id}_holdbtn`);
   if (!btn) return;
@@ -14331,6 +14376,9 @@ function drawScope(id){
 
   const SCOPE_CH_COLORS = ['#ffd23f', '#5ad0e6', '#ff5ac8', '#7cfc8a'];
   ['CH1', 'CH2', 'CH3', 'CH4'].forEach((ch, idx) => {
+    // [Ver0.9974] 이 채널 버튼이 꺼져 있으면(기본값) 프로브가 연결되어 있어도 파형 자체를
+    // 그리지 않습니다 — 라벨/디코드/측정 등 다른 정보는 이 아래 runTick 쪽에서 여전히 갱신됩니다.
+    if (!isScopeChannelOn(id, idx + 1)) return;
     const voltsDiv = voltsDivs[idx];
     const color = SCOPE_CH_COLORS[idx];
     const key = `${id}_${ch}`;
@@ -18422,6 +18470,10 @@ function wireApiVsRegBurstExample(board, key){
   taggedWire(key, d13Pin, document.querySelector(`#${scope} [data-pin$="_CH1"]`));
   taggedWire(key, d12Pin, document.querySelector(`#${scope} [data-pin$="_CH2"]`));
   taggedWire(key, gndPin, document.querySelector(`#${scope} [data-pin$="_GND"]`));
+  // [Ver0.9974] 채널 버튼 기본값이 OFF로 바뀌어서, 학생이 직접 배선하지 않고 바로 결과를 보는
+  // 이 예제의 취지가 유지되도록 미리 켜 둡니다.
+  setScopeChannelOn(scope, 1, true);
+  setScopeChannelOn(scope, 2, true);
   // 13번(API)은 펄스가 넓어(약 3.75µs) 5µs/div, 12번(레지스터)은 훨씬 좁아(약 0.25µs) 그 20배인
   // 12번 채널 기준으로는 화면이 너무 빡빡하므로, 우선 13번 파형이 한눈에 들어오는 5µs/div로
   // 맞춰 둡니다 — 12번을 볼 때는 학생이 직접 0.2~0.5µs로 낮추면 됩니다(예제 코드 주석 참고).
@@ -18684,6 +18736,10 @@ function runRlcPhaseExperiment(){
   createWire(document.querySelector(`#${sc} [data-pin$="_CH1B"]`), psuN);
   createWire(psuL, document.querySelector(`#${sc} [data-pin$="_CH2"]`));
   createWire(psuN, document.querySelector(`#${sc} [data-pin$="_GND"]`));
+  // [Ver0.9974] 채널 버튼 기본값이 OFF로 바뀌어서, 실험을 실행하자마자 전류·전압 파형이 바로
+  // 보이도록 CH1(전류)·CH2(전압)를 미리 켜 둡니다.
+  setScopeChannelOn(sc, 1, true);
+  setScopeChannelOn(sc, 2, true);
   const timeDivSel = document.getElementById(`${sc}_timediv`);
   if (timeDivSel) timeDivSel.value = '5';
   document.getElementById(`${psu}_switch`).click();
@@ -18740,6 +18796,10 @@ function runRlc3PhaseExperiment(){
   createWire(document.querySelector(`#${sc} [data-pin$="_CH1B"]`), psuN);
   createWire(rBranchHot, document.querySelector(`#${sc} [data-pin$="_CH2"]`));
   createWire(psuN, document.querySelector(`#${sc} [data-pin$="_GND"]`));
+  // [Ver0.9974] 채널 버튼 기본값이 OFF로 바뀌어서, 실험을 실행하자마자 R상 전류·전압 파형이
+  // 바로 보이도록 CH1(전류)·CH2(전압)를 미리 켜 둡니다.
+  setScopeChannelOn(sc, 1, true);
+  setScopeChannelOn(sc, 2, true);
   const timeDivSel = document.getElementById(`${sc}_timediv`);
   if (timeDivSel) timeDivSel.value = '5';
   document.getElementById(`${psu}_switch`).click();
@@ -19262,6 +19322,11 @@ function serializeProject(){
     fields: serializeComponentFields(el),
     switches: serializeComponentSwitches(el),
     rotation: el.dataset.rotation || '0',
+    // [Ver0.9974] 오실로스코프 채널 ON/OFF는 <input>/<select>도 아니고("전원 스위치"류처럼
+    // 시뮬레이션 정지 시 자동으로 꺼지면 안 되는 화면 표시 상태라) id를 "_switch"/"_toggle"로
+    // 끝내지도 않아서, serializeComponentFields/Switches 어느 쪽에도 안 잡힙니다 — 스코프일 때만
+    // scopeChannelOn을 별도로 함께 저장합니다.
+    scopeChannelOn: el.classList.contains('comp-scope') ? (scopeChannelOn[el.id] || [false, false, false, false]) : undefined,
   }));
 
   const wireList = wires.map(w => {
@@ -19386,6 +19451,10 @@ function restoreProjectState(data){
       restoreComponentFields(el, c.fields);
       restoreComponentSwitches(el, c.switches);
       if (c.rotation) setComponentRotation(el, parseInt(c.rotation, 10) || 0);
+      // [Ver0.9974] 저장 당시 켜져 있던 오실로스코프 채널을 그대로 복원합니다(없으면 전부 OFF).
+      if (el.classList.contains('comp-scope') && Array.isArray(c.scopeChannelOn)){
+        c.scopeChannelOn.forEach((on, i) => { if (on) setScopeChannelOn(newId, i + 1, true); });
+      }
     }
     compIdByIndex.push(newId);
   });
