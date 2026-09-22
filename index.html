@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9980</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9981</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1910,7 +1910,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9980</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9981</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -3119,7 +3119,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9980", en: "K's Simulator Ver0.9980" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9981", en: "K's Simulator Ver0.9981" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3960,7 +3960,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9980", en: "K's Arduino Simulator Ver0.9980" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9981", en: "K's Arduino Simulator Ver0.9981" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -6769,6 +6769,9 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9981', ko: [
+      '🛡 아주 드물게 보드를 추가/삭제하는 등의 조작과 겹쳐 물리 시뮬레이션 루프 안에서 예외가 한 번 발생하면, 그 뒤로는 "시뮬레이션 실행 중"이라고 표시되면서도 화면의 모든 LED/출력이 완전히 멈추고 코드를 다시 컴파일해도 살아나지 않는 문제를 고쳤습니다 — 원인은 매 틱(25ms)마다 보드/부품 전체를 갱신하는 핵심 함수가 예외에 전혀 보호되어 있지 않아, 어디서든 한 번만 예외가 나면 그 즉시 애니메이션 루프 자체가 영구히 멈춰버리는 구조였기 때문입니다. 이제 한 틱에서 문제가 생겨도 그 틱만 건너뛰고(화면 갱신 한 프레임만 놓침) 다음 틱부터는 계속 정상적으로 돌아갑니다',
+  ]},
   { ver: 'Ver0.9980', ko: [
       '⚡ 인터럽트(attachInterrupt/detachInterrupt/digitalPinToInterrupt)를 지원합니다 — 실제 우노(R3)는 2·3번 핀만(메가는 2/3/18~21번), R4·ESP32 계열은 모든 핀에서 RISING/FALLING/CHANGE 모드로 인터럽트를 걸 수 있고, noInterrupts()/interrupts()(cli()/sei() 별칭 포함)로 껐다 켤 수도 있습니다. ISR은 매 물리 틱(25ms)마다 핀 상태를 검사해 실행되며, delay()로 메인 loop()가 멈춰 있는 동안에도 독립적으로 실행됩니다(실제 MCU처럼 명령어 도중 끼어드는 것까지는 아니지만, "인터럽트로 버튼을 감지해 카운터를 올린다" 같은 수업용 예제에는 충분합니다) — volatile 변수 선언도 함께 지원합니다',
   ]},
@@ -13726,7 +13729,21 @@ function simulationMasterLoop(currentTime) {
   if (elapsed > 200) elapsed = 200;
 
   while (elapsed >= PHYSICS_STEP_MS) {
-    runTick();
+    // [버그 수정] runTick()은 보드/부품 수십 종류를 한 틱에 전부 갱신하는 매우 큰 함수라,
+    // 그 안 어딘가(특히 보드를 막 추가했다가 지우는 등 드물게만 일어나는 조합)에서 처리되지
+    // 않은 예외가 한 번이라도 튀어나오면 이 while문이 통째로 멈추고, 그 아래 있는
+    // requestAnimationFrame(simulationMasterLoop) 호출까지 도달하지 못해 애니메이션 루프 자체가
+    // 영원히 멈춰버립니다. 그러면 시뮬레이션이 "실행 중"인 것처럼 보여도 화면의 어떤 LED/출력도
+    // 다시는 갱신되지 않고, 코드를 다시 컴파일해도 (물리 루프 자체가 죽었으므로) 전혀 살아나지
+    // 않는 것처럼 보입니다 — 사용자가 보고한 "보드를 추가했다 지운 뒤로 LED가 멈추고 재컴파일도
+    // 안 먹힌다" 증상과 정확히 일치하는 실패 양상입니다. 한 틱에서 난 오류가 이후 모든 틱까지
+    // 영구히 멈추게 하지 않도록, 이 틱만 건너뛰고(화면 갱신 한 프레임만 놓침) 다음 틱부터는
+    // 계속 정상적으로 돌아가게 방어적으로 감쌌습니다.
+    try {
+      runTick();
+    } catch (err) {
+      console.error('[runTick 오류] 이번 틱을 건너뜁니다:', err);
+    }
     elapsed -= PHYSICS_STEP_MS;
     lastPhysicsTime += PHYSICS_STEP_MS;
   }
