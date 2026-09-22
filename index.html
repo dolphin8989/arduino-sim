@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9981</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9985</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1910,7 +1910,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9981</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9985</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -3119,7 +3119,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9981", en: "K's Simulator Ver0.9981" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9985", en: "K's Simulator Ver0.9985" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3960,7 +3960,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9981", en: "K's Arduino Simulator Ver0.9981" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9985", en: "K's Arduino Simulator Ver0.9985" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -4481,6 +4481,13 @@ function transpileCppToJs(cppCode) {
     js = js.replace(new RegExp(`\\bPORT${letter}\\b`, 'g'), `__regs.PORT${letter}`);
     js = js.replace(new RegExp(`\\bPIN${letter}\\b`, 'g'), `__regs.PIN${letter}`);
   });
+  // [기능 추가] ADC(ADMUX/ADCSRA/ADCSRB/ADCL/ADCH/ADC/DIDR0)·UART(UDR0/UCSR0A/UCSR0B/UCSR0C/
+  // UBRR0H/UBRR0L) 레지스터 직접 제어 — DDRx/PORTx/PINx와 완전히 같은 방식으로, __regs의
+  // 프로퍼티 참조로 치환합니다(실제 값은 makeRegs()가 board가 R3/Mega(진짜 AVR)일 때만
+  // 만들어 두고, R4/ESP32에 이 이름을 써도 조용히 아무 효과가 없습니다).
+  ['ADMUX', 'ADCSRA', 'ADCSRB', 'ADCL', 'ADCH', 'ADC', 'DIDR0', 'UDR0', 'UCSR0A', 'UCSR0B', 'UCSR0C', 'UBRR0H', 'UBRR0L'].forEach(name => {
+    js = js.replace(new RegExp(`\\b${name}\\b`, 'g'), `__regs.${name}`);
+  });
   // R4(RA4M1) 포트 레지스터 직접 접근: "R_PORT1->PODR" 같은 구조체 포인터 멤버 접근 문법을
   // (R_PORTn은 실제로는 CMSIS 포인터지만) __regs의 평평한 프로퍼티 참조로 치환합니다 — R3의
   // DDRx/PORTx/PINx와 같은 방식으로, makeRegs()가 보드가 R4일 때만 이 프로퍼티들을 실제로
@@ -4763,6 +4770,272 @@ function pushEdge(board, pinName, v){
   if (arr.length > 4000) arr.splice(0, arr.length - 3000);
 }
 
+/* ============================================================================
+ * 🔤 [Ver0.9985] 인라인 어셈블리(asm volatile("...")) — 기본형만 지원
+ *
+ * 이 시뮬레이터는 실제 AVR 명령어를 한 사이클씩 실행하는 하드웨어 에뮬레이터가 아니라 C++을
+ * 자바스크립트로 바꿔 흉내 내는 방식이라, 진짜 어셈블리를 실행하려면 그 안에 "작은 AVR
+ * 코어"(범용 레지스터 32개 r0~r31, 상태 플래그 SREG, 분기/호출용 프로그램 카운터)를 따로
+ * 하나 더 만들어야 합니다. 여기서는 GCC 확장 인라인 어셈블리(출력/입력 변수를 : 로 지정하는
+ * 문법)는 지원하지 않고, 학생·개발자가 가장 흔히 쓰는 "기본형" — 레지스터/즉시값/I/O 레지스터
+ * 이름만 쓰는 순수 명령어 나열 — 만 지원합니다. asm volatile(...) 문 하나를 미리 통째로
+ * 파싱해서 "레이블(점프 목적지)별로 번호가 매겨진 case들이 들어있는 switch/while 루프" 형태의
+ * 자바스크립트 함수로 컴파일해 두고, 원래 코드의 그 자리는 그 함수를 호출하는 문장 하나로
+ * 바꿔치기합니다 — 그래서 setup()/loop() 안에서 일반 C++ 문장과 완전히 자연스럽게 섞어 쓸 수
+ * 있습니다. rjmp로 무한 루프에 빠지는 실수(또는 고의)로 학생의 브라우저 탭이 영원히 멈춰버리는
+ * 사고를 막기 위해, 한 번 호출에 20만 스텝이 넘으면 명확한 오류로 멈춥니다.
+ * ============================================================================ */
+
+// I/O 레지스터 직접 접근(IN/OUT/SBI/CBI/SBIS/SBIC)에 쓸 수 있는 이름 목록 — makeRegs()가 실제로
+// 만들어 두는 프로퍼티와 정확히 같아야 합니다(DDRx/PORTx/PINx 9개 포트 + ADC/UART).
+const AVR_ASM_IO_REGS = new Set();
+['A', 'B', 'C', 'D', 'E', 'G', 'H', 'J', 'L'].forEach(letter => {
+  AVR_ASM_IO_REGS.add('DDR' + letter); AVR_ASM_IO_REGS.add('PORT' + letter); AVR_ASM_IO_REGS.add('PIN' + letter);
+});
+['ADMUX', 'ADCSRA', 'ADCSRB', 'ADCL', 'ADCH', 'ADC', 'DIDR0', 'UDR0', 'UCSR0A', 'UCSR0B', 'UCSR0C', 'UBRR0H', 'UBRR0L'].forEach(n => AVR_ASM_IO_REGS.add(n));
+
+// 8비트 ALU 연산 — 실제 ATmega328p 데이터시트의 SREG 플래그 규칙을 따릅니다(C=자리올림,
+// Z=결과0, N=최상위비트, V=부호있는 오버플로, S=N^V). 어떤 명령어가 어떤 플래그를 실제로
+// 건드리는지는(예: AND/OR/EOR는 C를 안 건드림, INC/DEC는 C·V 일부만 다르게 처리) 이 함수를
+// 호출하는 쪽(compileAsmProgram)에서 필요한 필드만 골라 __sreg에 반영하는 방식으로 처리합니다.
+function __avrAlu(op, a, b, carryIn){
+  a = a & 0xFF; b = (b == null ? 0 : b) & 0xFF;
+  const cin = carryIn ? 1 : 0;
+  let result = 0, C = 0, V = 0;
+  switch (op){
+    case 'add': { const sum = a + b + cin; result = sum & 0xFF; C = sum > 0xFF ? 1 : 0; V = (((a ^ result) & (b ^ result) & 0x80) !== 0) ? 1 : 0; break; }
+    case 'sub': { const diff = a - b - cin; result = diff & 0xFF; C = diff < 0 ? 1 : 0; V = (((a ^ b) & (a ^ result) & 0x80) !== 0) ? 1 : 0; break; }
+    case 'and': result = a & b; break;
+    case 'or': result = a | b; break;
+    case 'eor': result = a ^ b; break;
+    case 'inc': result = (a + 1) & 0xFF; V = (a === 0x7F) ? 1 : 0; break;
+    case 'dec': result = (a - 1) & 0xFF; V = (a === 0x80) ? 1 : 0; break;
+    case 'com': result = (0xFF - a) & 0xFF; break;
+    case 'neg': result = (0x100 - a) & 0xFF; C = result === 0 ? 0 : 1; V = (result === 0x80) ? 1 : 0; break;
+    case 'lsl': result = (a << 1) & 0xFF; C = (a & 0x80) ? 1 : 0; V = ((result & 0x80) ? 1 : 0) ^ C; break;
+    case 'lsr': result = (a >> 1) & 0xFF; C = (a & 0x01) ? 1 : 0; V = 0 ^ C; break;
+    case 'rol': result = ((a << 1) | cin) & 0xFF; C = (a & 0x80) ? 1 : 0; V = ((result & 0x80) ? 1 : 0) ^ C; break;
+    case 'ror': result = ((a >> 1) | (cin << 7)) & 0xFF; C = (a & 0x01) ? 1 : 0; V = ((result & 0x80) ? 1 : 0) ^ C; break;
+    default: result = a;
+  }
+  const Z = (result === 0) ? 1 : 0;
+  const N = (result & 0x80) ? 1 : 0;
+  return { result, C, Z, N, V, S: N ^ V };
+}
+
+// C 문자열 리터럴의 이스케이프(\n, \t, \", \\)를 실제 문자로 되돌립니다 — asm volatile(...) 안의
+// 어셈블리 텍스트는 "명령어1 \n\t 명령어2 \n\t ..." 형태로 한 줄짜리 C 문자열에 이스케이프
+// 시퀀스로 줄바꿈을 넣는 관용구가 매우 흔합니다.
+function __unescapeAsmString(s){
+  return s.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+}
+
+// 소스 코드에서 asm/__asm__/__asm(...) 문을 전부 찾아, 괄호 안의 문자열 리터럴(여러 개가 이어져
+// 있으면 전부 이어붙임)과 "GCC 확장 인라인 어셈블리(: 로 입출력 변수를 지정하는 문법)인지"를
+// 함께 돌려줍니다. 문자열 리터럴 안의 괄호/콜론은 문자열을 통째로 건너뛰어 오탐하지 않습니다.
+function extractAsmStatements(rawCode){
+  const results = [];
+  const re = /\b(?:asm|__asm__|__asm)\s*(?:volatile\s*)?\(/g;
+  let m;
+  while ((m = re.exec(rawCode))){
+    const start = m.index;
+    let i = m.index + m[0].length;
+    let depth = 1;
+    let sawColon = false;
+    const contentParts = [];
+    while (i < rawCode.length && depth > 0){
+      const ch = rawCode[i];
+      if (ch === '"'){
+        let j = i + 1, buf = '';
+        while (j < rawCode.length && rawCode[j] !== '"'){
+          if (rawCode[j] === '\\' && j + 1 < rawCode.length){ buf += rawCode[j] + rawCode[j + 1]; j += 2; }
+          else { buf += rawCode[j]; j++; }
+        }
+        contentParts.push(buf);
+        i = j + 1;
+        continue;
+      }
+      if (ch === '(') { depth++; i++; continue; }
+      if (ch === ')') { depth--; i++; continue; }
+      if (ch === ':' && depth === 1) sawColon = true;
+      i++;
+    }
+    let semi = rawCode.indexOf(';', i);
+    if (semi === -1) semi = i;
+    results.push({ start, end: semi + 1, rawContent: contentParts.join(''), isExtended: sawColon });
+  }
+  return results;
+}
+
+// 어셈블리 텍스트(줄바꿈 복원 완료)를 "레이블 -> 명령어 인덱스" 맵과 명령어 목록으로 나눕니다.
+// ';'는 어셈블리 주석이라 그 뒤는 버리고, "레이블:" 접두사는 같은 줄에 명령어가 있든 없든
+// 모두 처리하며, 레이블은 항상 "바로 다음에 실행될 명령어"의 인덱스를 가리키게 합니다.
+function parseAsmProgram(text){
+  const labelIndex = {};
+  const instrLines = [];
+  text.split('\n').forEach((raw, lineNo0) => {
+    let line = raw.replace(/;.*/, '').trim();
+    if (!line) return;
+    const labelMatch = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/);
+    if (labelMatch){
+      labelIndex[labelMatch[1]] = instrLines.length;
+      line = labelMatch[2].trim();
+      if (!line) return;
+    }
+    const m = line.match(/^([A-Za-z]+)\s*(.*)$/);
+    if (!m) return;
+    const args = m[2].trim() ? m[2].trim().split(',').map(a => a.trim()).filter(Boolean) : [];
+    instrLines.push({ mnemonic: m[1].toUpperCase(), args, lineText: raw.trim(), lineNo: lineNo0 + 1 });
+  });
+  return { instrLines, labelIndex };
+}
+
+// 파싱된 명령어 목록을 "switch(__pc) 안에 명령어별 case가 있고, 그 case들을 while(true)로 계속
+// 도는" 자바스크립트 함수 하나로 컴파일합니다 — 분기(rjmp/브랜치)·건너뛰기(SBIS 등)는 그냥
+// __pc를 원하는 case 번호로 옮기는 것만으로 자연스럽게 구현됩니다(자바스크립트엔 goto가 없지만
+// switch+루프 조합으로 흉내낼 수 있는, 트랜스파일러에서 흔히 쓰는 방법입니다). 지원하지 않는
+// 명령어·레지스터·레이블을 만나면 그 즉시 "몇 번째 줄의 무엇이 문제인지"를 담은 한국어 오류를
+// 던집니다(교육용이라 "조용히 틀리게 동작"하는 것보다 "왜 안 되는지 알려주고 멈추는" 쪽이 훨씬
+// 낫습니다).
+function compileAsmProgram(text, fnName){
+  const { instrLines, labelIndex } = parseAsmProgram(text);
+  const regReg = /^[Rr](\d{1,2})$/;
+  const parseReg = (tok, lineNo, mnemonic) => {
+    const mm = regReg.exec((tok || '').trim());
+    if (!mm) throw new Error(`어셈블리 ${lineNo}번째 줄(${mnemonic}): 레지스터 이름이 아닙니다 — "${tok}" (예: r16)`);
+    const n = parseInt(mm[1], 10);
+    if (n > 31) throw new Error(`어셈블리 ${lineNo}번째 줄(${mnemonic}): 레지스터 번호는 r0~r31까지만 가능합니다 — "${tok}"`);
+    return n;
+  };
+  const parseImm = (tok, lineNo, mnemonic) => {
+    const t = (tok || '').trim();
+    if (/^0x[0-9a-fA-F]+$/.test(t)) return parseInt(t, 16);
+    if (/^0b[01]+$/.test(t)) return parseInt(t.slice(2), 2);
+    if (/^-?\d+$/.test(t)) return parseInt(t, 10);
+    throw new Error(`어셈블리 ${lineNo}번째 줄(${mnemonic}): 숫자(즉시값)가 아닙니다 — "${tok}" (예: 0xFF, 10)`);
+  };
+  const parseIoReg = (tok, lineNo, mnemonic) => {
+    const t = (tok || '').trim();
+    if (AVR_ASM_IO_REGS.has(t)) return t;
+    throw new Error(`어셈블리 ${lineNo}번째 줄(${mnemonic}): 지원하는 레지스터 이름이 아닙니다 — "${tok}" (DDRB/PORTB/PINB, ADMUX/ADCSRA/UDR0 등 실제 레지스터 "이름"을 쓰세요 — 숫자 I/O 주소는 지원하지 않습니다)`);
+  };
+  const parseBit = (tok, lineNo, mnemonic) => {
+    const n = parseImm(tok, lineNo, mnemonic);
+    if (n < 0 || n > 7) throw new Error(`어셈블리 ${lineNo}번째 줄(${mnemonic}): 비트 번호는 0~7까지만 가능합니다 — "${tok}"`);
+    return n;
+  };
+  const resolveLabel = (tok, lineNo, mnemonic) => {
+    const t = (tok || '').trim();
+    if (!(t in labelIndex)) throw new Error(`어셈블리 ${lineNo}번째 줄(${mnemonic}): "${tok}" 레이블을 찾을 수 없습니다`);
+    return labelIndex[t];
+  };
+  const alu = (op, dExpr, valExpr, carryExpr, opts) => {
+    let s = `{ const __a = __avrAlu('${op}', ${dExpr}, ${valExpr}, ${carryExpr}); `;
+    if (opts.result) s += `${dExpr} = __a.result; `;
+    if (opts.C) s += `__sreg.C = __a.C; `;
+    s += `__sreg.Z = __a.Z; __sreg.N = __a.N; `;
+    s += opts.V === false ? `__sreg.V = 0; ` : `__sreg.V = __a.V; `;
+    s += `__sreg.S = __a.S; }`;
+    return s;
+  };
+  const FLOW_CONTROL = new Set(['SBIS', 'SBIC', 'SBRS', 'SBRC', 'RJMP', 'RCALL', 'RET', 'BREQ', 'BRNE', 'BRCS', 'BRLO', 'BRCC', 'BRSH', 'BRMI', 'BRPL', 'BRVS', 'BRVC', 'BRLT', 'BRGE']);
+  const cases = instrLines.map((instr, idx) => {
+    const { mnemonic, args, lineNo } = instr;
+    const d0 = () => `__gpr[${parseReg(args[0], lineNo, mnemonic)}]`;
+    const r1 = () => `__gpr[${parseReg(args[1], lineNo, mnemonic)}]`;
+    let body;
+    switch (mnemonic){
+      case 'NOP': case 'CLI': case 'SEI': body = ''; break;
+      case 'LDI': body = `${d0()} = ${parseImm(args[1], lineNo, mnemonic)} & 0xFF;`; break;
+      case 'MOV': body = `${d0()} = ${r1()};`; break;
+      case 'CLR': body = `${d0()} = 0; __sreg.Z = 1; __sreg.N = 0; __sreg.V = 0; __sreg.S = 0;`; break;
+      case 'SER': body = `${d0()} = 0xFF;`; break;
+      case 'ADD': body = alu('add', d0(), r1(), '0', { result: true, C: true }); break;
+      case 'ADC': body = alu('add', d0(), r1(), '__sreg.C', { result: true, C: true }); break;
+      case 'SUB': body = alu('sub', d0(), r1(), '0', { result: true, C: true }); break;
+      case 'SUBI': body = alu('sub', d0(), parseImm(args[1], lineNo, mnemonic), '0', { result: true, C: true }); break;
+      case 'CP': body = alu('sub', d0(), r1(), '0', { result: false, C: true }); break;
+      case 'CPI': body = alu('sub', d0(), parseImm(args[1], lineNo, mnemonic), '0', { result: false, C: true }); break;
+      case 'INC': body = alu('inc', d0(), '0', '0', { result: true, C: false }); break;
+      case 'DEC': body = alu('dec', d0(), '0', '0', { result: true, C: false }); break;
+      case 'AND': body = alu('and', d0(), r1(), '0', { result: true, C: false, V: false }); break;
+      case 'ANDI': body = alu('and', d0(), parseImm(args[1], lineNo, mnemonic), '0', { result: true, C: false, V: false }); break;
+      case 'OR': body = alu('or', d0(), r1(), '0', { result: true, C: false, V: false }); break;
+      case 'ORI': body = alu('or', d0(), parseImm(args[1], lineNo, mnemonic), '0', { result: true, C: false, V: false }); break;
+      case 'EOR': body = alu('eor', d0(), r1(), '0', { result: true, C: false, V: false }); break;
+      case 'COM': body = alu('com', d0(), '0', '0', { result: true, C: false, V: false }) + ' __sreg.C = 1;'; break;
+      case 'NEG': body = alu('neg', d0(), '0', '0', { result: true, C: true }); break;
+      case 'LSL': body = alu('lsl', d0(), '0', '0', { result: true, C: true }); break;
+      case 'LSR': body = alu('lsr', d0(), '0', '0', { result: true, C: true }); break;
+      case 'ROL': body = alu('rol', d0(), '0', '__sreg.C', { result: true, C: true }); break;
+      case 'ROR': body = alu('ror', d0(), '0', '__sreg.C', { result: true, C: true }); break;
+      case 'IN': body = `${d0()} = __regs.${parseIoReg(args[1], lineNo, mnemonic)} & 0xFF;`; break;
+      case 'OUT': body = `__regs.${parseIoReg(args[0], lineNo, mnemonic)} = ${`__gpr[${parseReg(args[1], lineNo, mnemonic)}]`} & 0xFF;`; break;
+      case 'SBI': { const io = parseIoReg(args[0], lineNo, mnemonic), b = parseBit(args[1], lineNo, mnemonic); body = `__regs.${io} = (__regs.${io} | (1 << ${b})) & 0xFF;`; break; }
+      case 'CBI': { const io = parseIoReg(args[0], lineNo, mnemonic), b = parseBit(args[1], lineNo, mnemonic); body = `__regs.${io} = (__regs.${io} & ~(1 << ${b})) & 0xFF;`; break; }
+      case 'PUSH': body = `__asmStack.push(${d0()});`; break;
+      case 'POP': body = `if (!__asmStack.length) throw new Error('POP: 스택이 비어 있습니다(PUSH 없이 POP했습니다)'); ${d0()} = __asmStack.pop();`; break;
+      case 'SBIS': { const io = parseIoReg(args[0], lineNo, mnemonic), b = parseBit(args[1], lineNo, mnemonic); body = `__pc = ((__regs.${io} >> ${b}) & 1) ? ${idx + 2} : ${idx + 1}; break;`; break; }
+      case 'SBIC': { const io = parseIoReg(args[0], lineNo, mnemonic), b = parseBit(args[1], lineNo, mnemonic); body = `__pc = (((__regs.${io} >> ${b}) & 1) === 0) ? ${idx + 2} : ${idx + 1}; break;`; break; }
+      case 'SBRS': { const b = parseBit(args[1], lineNo, mnemonic); body = `__pc = ((${d0()} >> ${b}) & 1) ? ${idx + 2} : ${idx + 1}; break;`; break; }
+      case 'SBRC': { const b = parseBit(args[1], lineNo, mnemonic); body = `__pc = (((${d0()} >> ${b}) & 1) === 0) ? ${idx + 2} : ${idx + 1}; break;`; break; }
+      case 'RJMP': body = `__pc = ${resolveLabel(args[0], lineNo, mnemonic)}; break;`; break;
+      case 'RCALL': body = `__callStack.push(${idx + 1}); __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; break;`; break;
+      case 'RET': body = `if (!__callStack.length) return; __pc = __callStack.pop(); break;`; break;
+      case 'BREQ': body = `if (__sreg.Z) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRNE': body = `if (!__sreg.Z) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRCS': case 'BRLO': body = `if (__sreg.C) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRCC': case 'BRSH': body = `if (!__sreg.C) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRMI': body = `if (__sreg.N) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRPL': body = `if (!__sreg.N) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRVS': body = `if (__sreg.V) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRVC': body = `if (!__sreg.V) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRLT': body = `if (__sreg.N !== __sreg.V) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      case 'BRGE': body = `if (__sreg.N === __sreg.V) { __pc = ${resolveLabel(args[0], lineNo, mnemonic)}; } else { __pc = ${idx + 1}; } break;`; break;
+      default:
+        throw new Error(`지원하지 않는 어셈블리 명령어입니다: "${mnemonic}" (${lineNo}번째 줄: ${instr.lineText}) — 지원 명령어: NOP/LDI/MOV/CLR/SER/ADD/ADC/SUB/SUBI/CP/CPI/INC/DEC/AND/ANDI/OR/ORI/EOR/COM/NEG/LSL/LSR/ROL/ROR/IN/OUT/SBI/CBI/SBIS/SBIC/SBRS/SBRC/PUSH/POP/RJMP/RCALL/RET/BREQ/BRNE/BRCS/BRCC/BRMI/BRPL/BRVS/BRVC/BRLT/BRGE/CLI/SEI`);
+    }
+    if (!FLOW_CONTROL.has(mnemonic)) body += ` __pc = ${idx + 1}; break;`;
+    return `      case ${idx}: ${body}`;
+  });
+
+  return `
+    function ${fnName}(){
+      const __asmStack = [];
+      const __callStack = [];
+      let __pc = 0;
+      let __steps = 0;
+      while (true) {
+        if (++__steps > 200000) throw new Error('어셈블리 코드(${fnName})가 무한 루프에 빠진 것 같습니다(20만 스텝 초과) — rjmp/분기 조건을 확인해 주세요.');
+        switch (__pc) {
+${cases.join('\n')}
+          default: return;
+        }
+      }
+    }
+  `;
+}
+
+// 소스 코드 안의 모든 asm 문을 찾아 컴파일하고, 원래 자리를 "그 함수를 호출하는 문장"으로
+// 바꿔치기한 새 소스와, 그 함수들의 정의(globalVars 쪽에 덧붙일 것)를 함께 돌려줍니다.
+let __asmBlockCounter = 0;
+function extractAndCompileAsmBlocks(rawCode, board){
+  const blocks = extractAsmStatements(rawCode);
+  if (!blocks.length) return { code: rawCode, defs: [] };
+  let code = rawCode;
+  const defs = [];
+  blocks.slice().sort((a, b) => b.start - a.start).forEach(blk => {
+    if (blk.isExtended){
+      throw new Error('확장 인라인 어셈블리(입력/출력 변수를 지정하는 ": ..." 구문)는 지원하지 않습니다 — 레지스터/즉시값만 쓰는 기본 형태(예: asm volatile("ldi r16, 0xFF" "\\n\\t" "out PORTB, r16"); )로 바꿔서 다시 시도해 주세요.');
+    }
+    const text = __unescapeAsmString(blk.rawContent);
+    const fnName = `__asmBlock_${board}_${__asmBlockCounter++}`;
+    defs.push(compileAsmProgram(text, fnName));
+    code = code.slice(0, blk.start) + `${fnName}();` + code.slice(blk.end);
+  });
+  return { code, defs };
+}
+
 function makeRegs(board){
   // Mega는 실제로 훨씬 많은 포트(A/B/C/D/E/G/H/J/L)를 쓰고, 그 매핑이 Uno/R3와 전혀 다르므로
   // (예: Mega의 D13은 PB7, Uno는 PB5) 보드가 Mega 계열일 때만 별도의 포트 목록/맵을 씁니다.
@@ -4779,8 +5052,28 @@ function makeRegs(board){
       get: () => { bump(REG_ACCESS_CYCLES); return raw['DDR' + letter]; },
       set: (v) => { bump(REG_ACCESS_CYCLES); raw['DDR' + letter] = v; }
     });
+    // [버그 수정] PINx(입력 데이터 레지스터)는 실제 AVR에서 "그 순간 각 핀에 실제로 걸려있는
+    // 전압"을 읽는 읽기 전용 레지스터인데, 예전에는 그냥 raw 저장값(누가 쓰지 않는 한 항상 0)을
+    // 그대로 돌려줘서 실제 회로 상태와 완전히 무관했습니다 — 예를 들어 버튼을 D8(PB0)에 연결해
+    // `if (!(PINB & (1<<PB0)))`처럼 레지스터로 직접 버튼을 읽는 코드는 버튼을 눌러도/떼도 값이
+    // 절대 바뀌지 않아 "레지스터가 안 먹힌다"는 문제로 나타났습니다. digitalRead()/R4의 PIDR와
+    // 같은 방식(boardPinReading으로 그 순간의 실제 전선/부품 상태를 읽음, 아무것도 안 물려 있으면
+    // digitalRead()와 동일하게 HIGH로 취급)으로 고쳐 실제 회로와 항상 일치하게 했습니다.
     Object.defineProperty(regs, 'PIN' + letter, {
-      get: () => { bump(REG_ACCESS_CYCLES); return raw['PIN' + letter]; },
+      get: () => {
+        bump(REG_ACCESS_CYCLES);
+        const map = portMap[letter];
+        let v = 0;
+        Object.entries(map).forEach(([bit, pinName]) => {
+          const r = boardPinReading(boardDomId[board], pinName);
+          const hi = r ? r.v >= 0.5 : true;
+          if (hi) v |= (1 << bit);
+        });
+        return v;
+      },
+      // 실제 하드웨어에서도 PINx에 값을 쓰는 것은 이례적인 용법(해당 비트의 PORTx를 토글시키는
+      // 하드웨어 트릭)이라 이 시뮬레이터에서는 별도 동작 없이 조용히 무시합니다(raw 저장은
+      // 남겨둬 read-back 자체가 망가지진 않게 함).
       set: (v) => { bump(REG_ACCESS_CYCLES); raw['PIN' + letter] = v; }
     });
     Object.defineProperty(regs, 'PORT' + letter, {
@@ -4791,15 +5084,142 @@ function makeRegs(board){
         const map = portMap[letter];
         Object.entries(map).forEach(([bit, pinName]) => {
           const newV = (v >> bit) & 1;
-          // 이 D0~D13 이름의 레지스터 직접제어 경로는 R3/Mega(진짜 AVR)와 R4(같은 핀 이름 규약을 쓰는
-          // 5V 로직 보드)에만 걸리고 ESP32는 GPIOxx 이름을 쓰므로 이 맵에 안 걸립니다 — 그래서
-          // volts를 5V로 고정해도 항상 맞습니다.
-          mcuVM[board].pinState[pinName] = { type: 'digital', v: newV, volts: newV ? 5 : 0 };
-          pushEdge(board, pinName, newV);
+          // [버그 수정] DDRx가 그 비트를 INPUT(0)으로 두고 있는데도 PORTx에 값을 쓰면(내부 풀업
+          // 켜기 용도로 흔히 쓰이는 "DDRx bit=0 + PORTx bit=1" 조합), 예전에는 이걸 구분하지 않고
+          // 무조건 그 핀을 실제 디지털 출력처럼 세게 구동(5V/0V)한 것으로 처리했습니다. 그러면
+          // 버튼처럼 같은 net에 실제로 GND를 연결하는 부품과 전기적으로 충돌하거나, 풀업이 아니라
+          // 하드 드라이브로 취급돼 실제 하드웨어와 다르게 동작했습니다. 일반 API 경로
+          // (pinMode/digitalWrite)도 INPUT으로 설정된 핀은 pinState를 건드리지 않고 미배선 상태를
+          // 그대로 HIGH로 취급하는 것과 동일하게, DDRx가 OUTPUT(1)인 비트만 실제로 구동합니다.
+          const ddrBit = (raw['DDR' + letter] >> bit) & 1;
+          if (ddrBit){
+            // 이 D0~D13 이름의 레지스터 직접제어 경로는 R3/Mega(진짜 AVR)와 R4(같은 핀 이름 규약을
+            // 쓰는 5V 로직 보드)에만 걸리고 ESP32는 GPIOxx 이름을 쓰므로 이 맵에 안 걸립니다 —
+            // 그래서 volts를 5V로 고정해도 항상 맞습니다.
+            mcuVM[board].pinState[pinName] = { type: 'digital', v: newV, volts: newV ? 5 : 0 };
+            pushEdge(board, pinName, newV);
+          }
         });
       }
     });
   });
+
+  // [기능 추가] ADC(ADMUX/ADCSRA/ADCSRB/ADCL/ADCH/ADC/DIDR0) · UART(UDR0/UCSR0A/UCSR0B/UCSR0C/
+  // UBRR0H/UBRR0L) 레지스터 직접 제어 — 실제 AVR 칩(R3/Mega)에만 있는 주변장치라, DDRx/PORTx와
+  // 마찬가지로 이 보드가 진짜 AVR일 때만 만듭니다(R4는 완전히 다른 레지스터 이름을 쓰는 별도
+  // 칩(RA4M1)이고, ESP32는 애초에 AVR이 아니므로 둘 다 이 이름을 코드에 써도 조용히 무시됩니다).
+  // "학생이 레지스터로 직접 ADC/UART를 수업 중인데 안 먹힌다"는 요청으로 추가되었습니다.
+  const supportsAvrPeripherals = isMega || board.startsWith('r3');
+  if (supportsAvrPeripherals){
+    // ---- ADC ----
+    // 실제 하드웨어는 ADCSRA에 ADEN(활성화)+ADSC(변환 시작) 비트를 같이 쓰면 그 뒤 13 ADC 클럭
+    // 정도가 지나야 변환이 끝나 ADSC 비트가 저절로 0으로 떨어지는데, 이 시뮬레이터는 그런 세밀한
+    // 사이클 타이밍을 흉내 내지 않으므로(다른 API들도 전부 "즉시 완료"로 처리) 변환을
+    // write() 한 번 안에서 곧바로 끝내고 ADSC를 바로 0으로 되돌려 둡니다. 그렇지 않으면 학생이
+    // 흔히 쓰는 "while (ADCSRA & (1<<ADSC));" 같은 대기 루프가 ADSC가 영원히 안 떨어져 무한
+    // 루프에 빠지고, 이 시뮬레이터의 실행 구조(await 없는 동기 루프)상 탭 자체가 멈춰버립니다.
+    raw.ADMUX = 0; raw.ADCSRA = 0; raw.ADCSRB = 0; raw.ADCH = 0; raw.ADCL = 0; raw.DIDR0 = 0;
+    Object.defineProperty(regs, 'ADMUX', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.ADMUX; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw.ADMUX = v; }
+    });
+    Object.defineProperty(regs, 'ADCSRA', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.ADCSRA; },
+      set: (v) => {
+        bump(REG_ACCESS_CYCLES);
+        let newVal = v;
+        // ADIF(4번 비트)는 실제 AVR처럼 "1을 쓰면 그 비트가 지워지는" 특수 비트라, 쓴 값을 그대로
+        // 저장하면 안 됩니다 — 이번에 1을 썼으면 지우고, 안 건드렸으면 기존 플래그를 유지합니다.
+        if (newVal & 0x10) newVal &= ~0x10; else newVal |= (raw.ADCSRA & 0x10);
+        const adenSet = (newVal & 0x80) !== 0, adscRequested = (newVal & 0x40) !== 0;
+        if (adenSet && adscRequested){
+          // ADMUX 하위 4비트로 고른 채널(A0~A15 중 하나)을 그 순간 실제로 읽어(boardPinReading,
+          // analogRead()와 동일한 근거) 10비트(0~1023) 값으로 변환합니다.
+          const channel = raw.ADMUX & 0x0F;
+          const pinName = 'A' + channel;
+          const reading = boardPinReading(boardDomId[board], pinName);
+          const result = reading ? Math.max(0, Math.min(1023, Math.floor(reading.v * 1023))) : 0;
+          const adlar = (raw.ADMUX & 0x20) !== 0; // ADLAR(왼쪽 정렬) — 8비트 정밀도만 필요할 때 씀
+          if (adlar){ raw.ADCH = (result >> 2) & 0xFF; raw.ADCL = (result << 6) & 0xFF; }
+          else { raw.ADCH = (result >> 8) & 0x03; raw.ADCL = result & 0xFF; }
+          newVal = (newVal & ~0x40) | 0x10; // ADSC는 즉시 완료(0)로, ADIF(변환 완료 플래그)는 세움(1)
+        }
+        raw.ADCSRA = newVal;
+      }
+    });
+    Object.defineProperty(regs, 'ADCSRB', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.ADCSRB; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw.ADCSRB = v; }
+    });
+    Object.defineProperty(regs, 'ADCL', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.ADCL; },
+      set: () => { bump(REG_ACCESS_CYCLES); } // 실제 하드웨어에서도 읽기 전용 — 쓰기는 조용히 무시
+    });
+    Object.defineProperty(regs, 'ADCH', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.ADCH; },
+      set: () => { bump(REG_ACCESS_CYCLES); }
+    });
+    // ADC — avr/io.h가 정의하는 ADCL/ADCH 합본 16비트 별칭("int v = ADC;" 한 줄로 바로 읽는
+    // 관용구). ADLAR와 무관하게 항상 0~1023 결과값 그대로를 돌려줍니다(정렬은 ADCL/ADCH를 직접
+    // 읽을 때만 의미가 있음).
+    Object.defineProperty(regs, 'ADC', {
+      get: () => { bump(REG_ACCESS_CYCLES); const adlar = (raw.ADMUX & 0x20) !== 0; return adlar ? ((raw.ADCH << 2) | (raw.ADCL >> 6)) : ((raw.ADCH << 8) | raw.ADCL); },
+      set: () => { bump(REG_ACCESS_CYCLES); }
+    });
+    Object.defineProperty(regs, 'DIDR0', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.DIDR0; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw.DIDR0 = v; }
+    });
+
+    // ---- UART(USART0) ----
+    // Serial 객체(sandboxPrefix)와 완전히 같은 실제 데이터 통로(serialRxBuffer/__serialTransmit)를
+    // 그대로 씁니다 — API(Serial.print 등)와 레지스터(UDR0 등)를 섞어 써도 항상 일관되게
+    // 동작해야 하기 때문입니다(위 DDRx/PORTx가 API와 일관성을 맞추는 것과 같은 이유).
+    raw.UCSR0A = 0x20; raw.UCSR0B = 0; raw.UCSR0C = 0x06; raw.UBRR0H = 0; raw.UBRR0L = 0;
+    Object.defineProperty(regs, 'UDR0', {
+      get: () => {
+        bump(REG_ACCESS_CYCLES);
+        const buf = serialRxBuffer[board] || '';
+        if (!buf.length) return 0;
+        serialRxBuffer[board] = buf.slice(1);
+        return buf.charCodeAt(0) & 0xFF;
+      },
+      set: (v) => {
+        bump(REG_ACCESS_CYCLES);
+        __serialTransmit(board, String.fromCharCode(Math.round(v) & 0xFF));
+      }
+    });
+    Object.defineProperty(regs, 'UCSR0A', {
+      // RXC0(수신 완료)·UDRE0(송신 버퍼 비어있음)는 그 순간 실제 상태를 매번 다시 계산해
+      // 돌려줍니다 — 이 시뮬레이터는 송수신을 즉시 처리하므로 UDRE0는 항상 1(항상 바로 보낼 수
+      // 있음)이라, "while (!(UCSR0A & (1<<UDRE0)));" 같은 대기 루프가 무한 루프에 빠지지 않습니다.
+      get: () => {
+        bump(REG_ACCESS_CYCLES);
+        let v = raw.UCSR0A & ~0xE0;
+        if ((serialRxBuffer[board] || '').length > 0) v |= 0x80; // RXC0
+        v |= 0x40; // TXC0 — 송신도 항상 즉시 끝난 것으로 취급
+        v |= 0x20; // UDRE0 — 송신 버퍼는 항상 비어있음(바로 다음 바이트를 넣을 수 있음)
+        return v;
+      },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw.UCSR0A = v; }
+    });
+    Object.defineProperty(regs, 'UCSR0B', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.UCSR0B; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw.UCSR0B = v; }
+    });
+    Object.defineProperty(regs, 'UCSR0C', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.UCSR0C; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw.UCSR0C = v; }
+    });
+    Object.defineProperty(regs, 'UBRR0H', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.UBRR0H; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw.UBRR0H = v; }
+    });
+    Object.defineProperty(regs, 'UBRR0L', {
+      get: () => { bump(REG_ACCESS_CYCLES); return raw.UBRR0L; },
+      set: (v) => { bump(REG_ACCESS_CYCLES); raw.UBRR0L = v; }
+    });
+  }
 
   // R4(RA4M1) 포트 레지스터 — 보드가 R4 계열일 때만 만들어 둡니다(R3/ESP32에서는 아무 프로퍼티도
   // 없으므로 R4 전용 register 코드를 다른 보드에 올려도 조용히 무시될 뿐, 오류는 나지 않습니다).
@@ -5084,12 +5504,30 @@ function deployToMCU(board, rawCode) {
   updateCycleStats(board);
 
   try {
+    // [기능 추가] 인라인 어셈블리(asm volatile(...)) 지원. 이 시뮬레이터는 실제 AVR CPU 명령어를
+    // 한 줄씩 실행하는 하드웨어 에뮬레이터가 아니라, C++ 코드를 자바스크립트로 바꿔서
+    // (transpileCppToJs) 그 동작만 흉내 내는 방식이라, asm 블록을 진짜 AVR 명령어로 실행할 수는
+    // 없습니다. 대신 asm 블록 안의 명령어 텍스트를 미리 찾아(extractAndCompileAsmBlocks) 자주
+    // 쓰이는 AVR 명령어 부분집합을 흉내 내는 자바스크립트 함수로 "컴파일"하고, 원래 asm 문 자리를
+    // 그 함수를 호출하는 코드로 바꿔치기합니다(compileAsmProgram). 지원하지 않는 명령어나 확장
+    // 인라인 어셈블리(입출력 변수 바인딩 구문)를 쓰면 정확히 무엇이 문제인지 한국어로 알려줍니다.
+    // [중요] 이 치환은 반드시 디버거 체크포인트 삽입보다 먼저 해야 합니다 — 체크포인트 삽입은
+    // 중괄호({}) 깊이만 추적하고 괄호(()) 깊이는 보지 않으므로, 여러 줄에 걸친
+    // "asm volatile(...)" 문 안의 각 줄도 setup()/loop() 최상위 문장으로 착각해 그 사이사이에
+    // await __dbgCheckpoint(...) 호출을 끼워넣어 버립니다(그 호출 안의 보드 이름 문자열까지
+    // 어셈블리 텍스트로 잘못 끌려 들어가 명령어가 깨지는 원인이 됨). asm(...) 문을 먼저 함수
+    // 호출 한 줄로 치환해 버리면 더 이상 여러 줄에 걸친 문장이 남지 않으므로 이 문제가 없습니다.
+    const asmResult = extractAndCompileAsmBlocks(rawCode, board);
+    const codeAfterAsm = asmResult.code;
+    const asmDefs = asmResult.defs;
+
     // 디버거 체크포인트 삽입은 실패해도(예상 못한 코드 구조 등) 절대 실행 자체를 막으면 안
-    // 되므로, 실패 시 원본 rawCode로 조용히 되돌아갑니다(= 지금까지와 100% 동일한 동작).
-    let codeForTranspile = rawCode;
-    try { codeForTranspile = injectDebugCheckpoints(rawCode, board); }
-    catch (e) { codeForTranspile = rawCode; }
+    // 되므로, 실패 시 원본(asm 치환까지만 끝난) 코드로 조용히 되돌아갑니다.
+    let codeForTranspile = codeAfterAsm;
+    try { codeForTranspile = injectDebugCheckpoints(codeAfterAsm, board); }
+    catch (e) { codeForTranspile = codeAfterAsm; }
     dbgStateFor(board).execGen = myGen;
+
     const transpiled = transpileCppToJs(codeForTranspile);
 
     // [버그 수정] 예전에는 "다음에 바로 void가 나와야 setup() 끝"이라는 느슨한 정규식으로
@@ -5122,6 +5560,7 @@ function deployToMCU(board, rawCode) {
       globalVars = globalVars.slice(0, fn.start) + globalVars.slice(fn.end);
     });
     globalVars = globalVars.replace(/#include[^\n]*/g, '');
+    if (asmDefs.length) globalVars += '\n' + asmDefs.join('\n');
 
     const sandboxPrefix = `
       // [기능 추가] Serial.print(값, HEX/DEC/OCT/BIN) 서식 인자 지원 — CAN ID를 16진수로 찍는
@@ -5222,6 +5661,14 @@ function deployToMCU(board, rawCode) {
       const PH0=0,PH1=1,PH2=2,PH3=3,PH4=4,PH5=5,PH6=6,PH7=7;
       const PJ0=0,PJ1=1,PJ2=2,PJ3=3,PJ4=4,PJ5=5,PJ6=6,PJ7=7;
       const PL0=0,PL1=1,PL2=2,PL3=3,PL4=4,PL5=5,PL6=6,PL7=7;
+      // [기능 추가] ADC(ADMUX/ADCSRA)·UART(UCSR0A/B/C) 레지스터 직접 제어 코드에서 쓰는 비트
+      // 이름 상수 — 실제 avr/io.h(iom328p.h 등)와 이름·값이 동일합니다(R3/Mega가 아닌 보드에서는
+      // makeRegs()가 대응하는 레지스터 자체를 안 만들어 두므로 이 상수만 있어도 실제 효과는 없음).
+      const REFS1=7, REFS0=6, ADLAR=5, MUX3=3, MUX2=2, MUX1=1, MUX0=0;
+      const ADEN=7, ADSC=6, ADATE=5, ADIF=4, ADIE=3, ADPS2=2, ADPS1=1, ADPS0=0;
+      const RXCIE0=7, TXCIE0=6, UDRIE0=5, RXEN0=4, TXEN0=3, UCSZ02=2, RXB80=1, TXB80=0;
+      const RXC0=7, TXC0=6, UDRE0=5, FE0=4, DOR0=3, UPE0=2, U2X0=1, MPCM0=0;
+      const UMSEL01=7, UMSEL00=6, UPM01=5, UPM00=4, USBS0=3, UCSZ01=2, UCSZ00=1, UCPOL0=0;
       // API 호출(pinMode/digitalWrite/analogWrite/digitalRead/analogRead)은 실제 AVR에서도
       // 핀 번호->포트/비트마스크 조회, 인터럽트 disable/enable, read-modify-write를 거치는
       // 만큼 매번 ${API_CALL_CYCLES}사이클의 비용이 드는 것으로 계산합니다. (아래 makeRegs의
@@ -6426,11 +6873,16 @@ function deployToMCU(board, rawCode) {
       return { setup: __user_setup, loop: __user_loop };
     `;
 
-    const runner = new AsyncFunction('mcuVM', 'logSerial', 'boardPinReading', '__regs', 'boardDomId', 'serialRxBuffer', 'btRxBuffer', '__serialTransmit', 'i2cRxBuffer', '__i2cTransfer', '__i2cRequestFrom', 'canRxQueue', '__canTransmit', 'canfdRxQueue', '__canfdTransmit', 'rs485RxQueue', '__rs485BusTransmit', 'softSerialRegistry', '__softSerialWrite', '__modbusReadRegs', '__modbusWriteRegs', '__pmSensorReadByPin', '__pmSensorReadI2c', '__dbgCheckpoint', 'freertosTasks', fullExecution);
+    const runner = new AsyncFunction('mcuVM', 'logSerial', 'boardPinReading', '__regs', 'boardDomId', 'serialRxBuffer', 'btRxBuffer', '__serialTransmit', 'i2cRxBuffer', '__i2cTransfer', '__i2cRequestFrom', 'canRxQueue', '__canTransmit', 'canfdRxQueue', '__canfdTransmit', 'rs485RxQueue', '__rs485BusTransmit', 'softSerialRegistry', '__softSerialWrite', '__modbusReadRegs', '__modbusWriteRegs', '__pmSensorReadByPin', '__pmSensorReadI2c', '__dbgCheckpoint', 'freertosTasks', '__gpr', '__sreg', '__avrAlu', fullExecution);
     mcu.bootTimeMs = performance.now();
     freertosTasks[board] = []; // [Ver0.9951] 재컴파일/재시작 때마다 이전 태스크 목록을 비웁니다
 
-    runner(mcuVM, logSerial, boardPinReading, makeRegs(board), boardDomId, serialRxBuffer, btRxBuffer, __serialTransmit, i2cRxBuffer, __i2cTransfer, __i2cRequestFrom, canRxQueue, __canTransmit, canfdRxQueue, __canfdTransmit, rs485RxQueue, __rs485BusTransmit, softSerialRegistry, __softSerialWrite, __modbusReadRegs, __modbusWriteRegs, __pmSensorReadByPin, __pmSensorReadI2c, __dbgCheckpoint, freertosTasks).then(instance => {
+    // [기능 추가] 인라인 어셈블리 지원: 범용 레지스터 32개(r0~r31)와 상태 레지스터(SREG) 플래그를
+    // 보드별로 새로 만듭니다(재배포/재컴파일할 때마다 초기화 — 실제 리셋과 동일한 동작).
+    const __gpr = new Array(32).fill(0);
+    const __sreg = { C: 0, Z: 0, N: 0, V: 0, S: 0 };
+
+    runner(mcuVM, logSerial, boardPinReading, makeRegs(board), boardDomId, serialRxBuffer, btRxBuffer, __serialTransmit, i2cRxBuffer, __i2cTransfer, __i2cRequestFrom, canRxQueue, __canTransmit, canfdRxQueue, __canfdTransmit, rs485RxQueue, __rs485BusTransmit, softSerialRegistry, __softSerialWrite, __modbusReadRegs, __modbusWriteRegs, __pmSensorReadByPin, __pmSensorReadI2c, __dbgCheckpoint, freertosTasks, __gpr, __sreg, __avrAlu).then(instance => {
       if (mcu.gen !== myGen) return; // 그 사이 재컴파일/재배포되었으면 이 결과는 버립니다.
       mcu.loopFn = instance.loop;
       mcu.isCompiled = true;
@@ -6769,6 +7221,21 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9985', ko: [
+      '🔤 인라인 어셈블리(asm volatile("..."))를 실제로 실행할 수 있게 됐습니다 — 이 시뮬레이터는 실제 AVR 명령어를 한 사이클씩 도는 하드웨어 에뮬레이터가 아니라 C++을 자바스크립트로 바꿔 흉내 내는 방식이라 진짜 CPU 코어까지 새로 만들 수는 없지만, 학생·개발자가 실습에서 가장 흔히 쓰는 명령어 부분집합(NOP/LDI/MOV/CLR/SER, ADD/ADC/SUB/SUBI/CP/CPI/INC/DEC, AND/ANDI/OR/ORI/EOR/COM/NEG, LSL/LSR/ROL/ROR, IN/OUT/SBI/CBI/SBIS/SBIC/SBRS/SBRC, PUSH/POP, RJMP/RCALL/RET, BREQ/BRNE/BRCS/BRCC/BRMI/BRPL/BRVS/BRVC/BRLT/BRGE, CLI/SEI)를 지원하는 작은 컴파일러를 새로 만들었습니다. r0~r31 범용 레지스터와 SREG(C/Z/N/V/S) 플래그를 실제 ATmega328p 데이터시트 규칙 그대로 계산하고, IN/OUT/SBI/CBI 등으로 DDRx/PORTx/PINx는 물론 ADMUX/ADCSRA/UDR0 같은 ADC·UART 레지스터까지 "레지스터 이름"으로 직접 건드릴 수 있어 asm 코드와 일반 C++ 코드, 레지스터 직접 제어를 한 스케치 안에서 자연스럽게 섞어 쓸 수 있습니다. rjmp 등으로 무한 루프에 빠지는 실수(또는 고의)로 브라우저 탭이 영원히 멈춰버리는 사고를 막기 위해 한 번 호출에 20만 스텝이 넘으면 "무한 루프에 빠진 것 같다"는 명확한 오류로 멈춥니다. 다만 입출력 변수를 C 변수와 직접 연결하는 GCC 확장 인라인 어셈블리(콜론으로 피연산자를 지정하는 구문)와 숫자로 된 I/O 주소(예: out 0x05, r16)는 지원하지 않으며, 이 경우 무엇을 고쳐야 하는지 정확히 안내합니다',
+  ]},
+  { ver: 'Ver0.9984', ko: [
+      '🧮 레지스터 직접 제어에 ADC(ADMUX/ADCSRA/ADCSRB/ADCL/ADCH/ADC/DIDR0)와 UART(UDR0/UCSR0A/UCSR0B/UCSR0C/UBRR0H/UBRR0L)를 추가했습니다 — R3/Mega에서 "ADMUX = (1<<REFS0)|채널; ADCSRA = (1<<ADEN)|(1<<ADSC)|...; while(ADCSRA & (1<<ADSC)); 값 = ADC;" 같은 실제 교재의 레지스터 직접 제어 코드가 그대로 동작합니다(analogRead()와 동일한 실제 배선 값을 그 순간 바로 변환해 반환하므로, 변환 대기 루프가 무한 루프에 빠지지 않습니다). UART도 Serial 객체와 완전히 같은 통신 경로를 공유해 UDR0로 직접 주고받은 바이트가 다른 보드의 Serial.read()/available()과, 반대로 Serial.write()로 보낸 바이트가 UDR0/UCSR0A(RXC0)로 정상적으로 오갑니다',
+  ]},
+  { ver: 'Ver0.9983', ko: [
+      '🔧 레지스터(DDRB/PORTB/PINB 등)로 직접 만든 코드에서, 입력으로 설정한 핀을 PINx 레지스터로 읽으면 실제 회로 상태와 무관하게 항상 같은 값만 나오던 문제를 고쳤습니다 — R4의 PIDR(입력 레지스터)처럼 실제 배선 상태를 그때그때 계산하도록 고쳤습니다',
+      '🔌 (더 근본적인 수정) 토글 스위치·푸시버튼·릴리·벽스위치 등 "접점을 닫아서 회로를 잇는" 부품으로 디지털 핀을 제어하는 회로가, digitalRead()든 레지스터(PINx) 직접 읽기든 상관없이 스위치를 눌러도/켜도 상태가 전혀 바뀌지 않던 문제를 고쳤습니다 — 디지털 신호가 흐르는 경로를 판단하는 핵심 함수(netOf)가 전선으로 직접 이은 연결만 인식하고, 스위치·릴레이 등이 "닫혀서 0Ω으로 통하는" 연결은 전혀 몰랐던 것이 원인이었습니다(옛날부터 있던 버튼(btn) 부품만 예외적으로 별도 코드가 있어 정상 동작했음). 배선 예제에서 흔히 쓰는 버튼/스위치로 LED·릴레이 등을 제어하는 회로 대부분에 영향이 있던 근본적인 버그로, 이제 모든 종류의 스위치/릴레이/접점 부품이 정상적으로 디지털 신호를 전달합니다',
+      '🤖 "AI 회로 어시스턴트"가 LED 색상 외에도 지정하지 못하던 값들을 고쳤습니다 — 커패시터/전해 커패시터/인덕터의 용량값, 파워케이블의 저항값(전에는 아예 빠짐), 전원 공급 장치(DC)/충전식 배터리/CC-CV 충전기/DC-DC 벅 컨버터의 출력 전압을 사용자가 요청한 대로("10µF 커패시터", "12V 배터리" 등) 실제로 반영합니다',
+      '📖 인라인 어셈블리(asm volatile(...))가 들어간 코드를 업로드하면 "Unexpected identifier" 같은 알 수 없는 자바스크립트 오류만 뜨고 원인을 알 수 없던 문제를 고쳤습니다 — 이 시뮬레이터는 실제 AVR 명령어를 실행하는 게 아니라 코드를 자바스크립트로 바꿔 흉내 내는 방식이라 어셈블리 자체를 지원할 수 없는데, 이제 업로드 전에 미리 감지해 "이 시뮬레이터는 인라인 어셈블리를 지원하지 않으며, 레지스터 직접 제어(DDRx/PORTx/PINx)는 정상 지원된다"는 안내를 시리얼 모니터에 정확히 띄워줍니다',
+  ]},
+  { ver: 'Ver0.9982', ko: [
+      '🎨 "AI 회로 어시스턴트"에게 LED 색상을 다양하게 요청해도(예: "빨간 LED와 초록 LED를 달아줘") 항상 빨간색으로만 만들어지던 문제를 고쳤습니다 — AI에게 회로 설계를 요청할 때 넘기는 설계 규격에 애초에 "색상" 항목 자체가 빠져 있어(저항값 필드만 있었음) AI가 색을 알려줄 방법이 없었던 것이 원인이었습니다. 이제 led/2컬러 LED/형광등/파일럿램프처럼 색을 고를 수 있는 부품에 한해 AI가 요청받은 색(빨강/초록/파랑/노랑/흰색)을 실제로 지정합니다(그 부품이 지원하지 않는 색을 요청하면 기본색으로 처리됩니다)',
+  ]},
   { ver: 'Ver0.9981', ko: [
       '🛡 아주 드물게 보드를 추가/삭제하는 등의 조작과 겹쳐 물리 시뮬레이션 루프 안에서 예외가 한 번 발생하면, 그 뒤로는 "시뮬레이션 실행 중"이라고 표시되면서도 화면의 모든 LED/출력이 완전히 멈추고 코드를 다시 컴파일해도 살아나지 않는 문제를 고쳤습니다 — 원인은 매 틱(25ms)마다 보드/부품 전체를 갱신하는 핵심 함수가 예외에 전혀 보호되어 있지 않아, 어디서든 한 번만 예외가 나면 그 즉시 애니메이션 루프 자체가 영구히 멈춰버리는 구조였기 때문입니다. 이제 한 틱에서 문제가 생겨도 그 틱만 건너뛰고(화면 갱신 한 프레임만 놓침) 다음 틱부터는 계속 정상적으로 돌아갑니다',
   ]},
@@ -12131,9 +12598,24 @@ function boardOfComponent(compEl){
   return null;
 }
 
+// [버그 수정] 릴레이/토글스위치/푸시버튼/MCCB/타이머/전자접촉기처럼 "닫힌 접점"을 0Ω 가상
+// 엣지로 표현하는 부품들이, 지금까지는 저항망(resistiveReading 등 아날로그 전압 계산, 아래
+// resistiveEdgesWithoutMeters 참고)에만 반영되고 이 net 그래프에는 전혀 반영되지 않았습니다.
+// 이 net 그래프는 digitalRead()/DDRx-PORTx-PINx 레지스터/externalSourceOnNet 등 "디지털
+// 신호가 어디까지 전선으로 이어져 있는가"를 판정하는 모든 곳의 기반이라, 예를 들어 "푸시버튼을
+// 디지털 핀에 물려 누르면 LOW가 되게" 만든 아주 흔한 회로에서조차 버튼을 눌러도(전자적으로는
+// 분명히 접점이 붙었는데도) digitalRead()가 그 변화를 절대 감지하지 못하는 문제가 있었습니다
+// (토글 스위치·릴레이 접점 등 같은 방식으로 만들어진 다른 모든 부품도 동일하게 영향을 받았습니다).
+// 저항이 정확히 0Ω인 접점 엣지만 전선과 똑같이 이 net에 포함시켜 고쳤습니다 — LED/전구/
+// 파일럿램프/전류계처럼 실제 저항·전압강하가 있는 소자(ohms > 0)는 지금처럼 이 net 밖에 남아
+// 있으므로, "저항 있는 부품 건너편은 별도 net"이라는 기존 규칙(예: 배터리 병렬 단락 감지,
+// 다이오드 경계 판정 등)도 그대로 유지됩니다.
 function netOf(startEl){
   const visited = new Set();
   const stack = [startEl];
+  const zeroOhmEdges = (typeof resistiveEdgesWithoutMeters === 'function')
+    ? resistiveEdgesWithoutMeters().filter(e => e.ohms === 0)
+    : [];
   while (stack.length){
     const el = stack.pop();
     if (!el || visited.has(el)) continue;
@@ -12146,6 +12628,10 @@ function netOf(startEl){
     wires.forEach(w => {
       if (w.from === el && !visited.has(w.to)) stack.push(w.to);
       if (w.to === el && !visited.has(w.from)) stack.push(w.from);
+    });
+    zeroOhmEdges.forEach(e => {
+      if (e.legA === el && !visited.has(e.legB)) stack.push(e.legB);
+      if (e.legB === el && !visited.has(e.legA)) stack.push(e.legA);
     });
   }
   return visited;
@@ -20621,7 +21107,7 @@ function aiSystemPromptForBuild(){
 [JSON 형식]
 {
   "board": "r3" 또는 null(아두이노 MCU가 필요 없는 순수 전기회로면 null),
-  "components": [ { "type": "led", "value": null }, ... ],
+  "components": [ { "type": "led", "value": null, "color": null, "voltage": null }, ... ],
   "wires": [ { "fromComp": "board", "fromPin": "D13", "toComp": 0, "toPin": "A", "color": "#e6584a" }, ... ],
   "code": "완성된 아두이노 C++ 스케치 전체 (board가 null이면 이 필드는 생략)"
 }
@@ -20629,7 +21115,12 @@ function aiSystemPromptForBuild(){
 규칙:
 - components 배열의 인덱스(0부터 시작)를 wires의 fromComp/toComp에서 그대로 참조한다. 보드를 가리킬 때는 반드시 문자열 "board"를 쓴다.
 - 반드시 아래 목록에 있는 type과 핀 이름만 쓴다. 목록에 없는 부품·핀은 절대 지어내지 않는다.
-- resistor는 저항값(옴, 숫자)을 value 필드에 넣을 수 있다. 그 외 부품은 value를 null로 둔다.
+- resistor/powercable은 저항값(옴, 숫자, 예: 1kΩ→1000)을 value 필드에 넣을 수 있다.
+- capacitor/capacitor-e는 정전용량(패럿 단위의 숫자, 예: 1µF→0.000001, 100nF→0.0000001)을 value 필드에 넣을 수 있다.
+- inductor는 인덕턴스(헨리 단위의 숫자, 예: 10mH→0.01)를 value 필드에 넣을 수 있다.
+- 위에 해당하지 않는 부품은 value를 null로 둔다.
+- led/twocolorled/ledtube220/pilotlamp처럼 색상을 고를 수 있는 부품에 사용자가 특정 색(빨강/초록/파랑/노랑/흰색 등)을 요청했다면, color 필드에 "red"/"green"/"blue"/"yellow"/"white" 중 하나를 그대로 넣어라(부품마다 지원하는 색 종류가 달라 목록에 없는 색을 넣으면 그 부품의 기본색으로 무시된다 — 예: twocolorled는 red/green만 지원). 색상 요청이 없거나 색을 고를 수 없는 부품(rgbled 등 R/G/B 핀으로만 색을 만드는 부품)이면 color를 null로 둔다.
+- psu(DC 전원 공급 장치)/battery(충전식 배터리)/cccv(CC/CV 충전기)/buck(DC-DC 벅 컨버터)에 사용자가 특정 전압(예: "5V", "12V 배터리")을 요청했다면, voltage 필드에 그 전압(볼트, 숫자)을 넣어라. AC 220V/380V 전원이 필요하면 voltage를 쓰지 말고 ac220(단상 220V)/ac3phase(3상 380V/220V) 부품을 그대로 써라(전압이 고정이라 설정할 필요가 없다). 전압 요청이 없거나 해당하지 않는 부품이면 voltage를 null로 둔다.
 - 좌표(x, y)는 시뮬레이터가 자동으로 겹치지 않게 배치하므로 절대 넣지 않는다.
 - LED를 보드에 직접 연결할 때도 실제 회로처럼 resistor 부품을 하나 거쳐서 배선하라(전류 제한 저항).
 - code는 wires에서 실제로 사용한 보드 핀 번호와 정확히 같은 상수를 써야 한다.
@@ -20735,6 +21226,116 @@ function aiResolvePinElement(boardEl, compElsByIndex, ref, pinName){
   return null;
 }
 
+// [버그 수정] resistor의 value 필드처럼 커패시터/인덕터도 값을 지정할 수 있어야 하는데,
+// 예전에는(LED 색상과 같은 이유로) resistor만 처리했습니다. 커패시터/인덕터는 입력칸이
+// "숫자 + 단위 select" 두 개로 나뉘어 있어(예: cap-value=100, cap-unit=1e-9 → 100nF), AI가
+// 보내는 실제 값(패럿/헨리 단위, 예: 1e-6)을 그 숫자 입력칸에 그대로 넣으면 단위가 안 맞아
+// 10^n배 어긋납니다. 그래서 실제 값(SI 단위)을 받아 가장 보기 좋은(1~999 사이) 단위를
+// 자동으로 골라주는 헬퍼를 둡니다.
+function aiPickUnitOption(selectEl, rawSI){
+  // 큰 단위부터(예: 커패시터는 µF→nF→pF 순) 훑다가 "이 단위로 표시하면 1 이상"이 되는 첫
+  // 단위를 씁니다 — 부동소수점 오차(예: 1e-6/1e-9가 정확히 1000이 아니라 999.999...999로
+  // 계산되는 경우) 때문에 원래 단위(µF)보다 작은 단위(nF)가 잘못 뽑히는 걸 막기 위해, 위에서부터
+  // 순서대로 보고 조건을 만족하는 "가장 큰" 단위에서 즉시 멈춥니다(작은 단위가 오차로 먼저
+  // 조건을 만족하더라도 아예 검사하지 않으므로 영향이 없습니다).
+  const options = Array.from(selectEl.options)
+    .map(o => ({ el: o, mult: parseFloat(o.value) }))
+    .filter(o => isFinite(o.mult) && o.mult > 0)
+    .sort((a, b) => b.mult - a.mult);
+  if (!options.length) return null;
+  const EPS = 1e-6;
+  const best = options.find(o => (rawSI / o.mult) >= 1 - EPS);
+  return best || options[options.length - 1]; // 모든 단위보다 작으면 가장 작은 단위를 씁니다.
+}
+// resistor/powercable(옴)·capacitor/capacitor-e(패럿)·inductor(헨리)에 item.value(AI가 보낸
+// 실제 물리값, 옴은 그대로·패럿/헨리는 SI 단위)를 적용합니다. 그 외 타입은 아무 일도 하지 않고
+// 조용히 무시합니다(해당 없는 부품에 value가 잘못 와도 안전).
+function applyAiComponentValue(item, el){
+  if (item.value == null || isNaN(parseFloat(item.value))) return;
+  const raw = parseFloat(item.value);
+  if (item.type === 'resistor' || item.type === 'powercable'){
+    const vInput = el.querySelector('.res-value');
+    if (vInput){
+      vInput.value = raw; // 저항은 select 기본값이 Ω(배수 1)이므로 그대로 대입하면 됩니다.
+      if (typeof updateResistor === 'function') updateResistor(el.id);
+    }
+  } else if (item.type === 'capacitor' || item.type === 'capacitor-e'){
+    const isE = item.type === 'capacitor-e';
+    const vInput = el.querySelector(isE ? '.cape-value' : '.cap-value');
+    const unitSel = el.querySelector(isE ? '.cape-unit' : '.cap-unit');
+    if (vInput && unitSel){
+      const best = aiPickUnitOption(unitSel, raw);
+      if (best){
+        unitSel.value = best.el.value;
+        vInput.value = +(raw / best.mult).toPrecision(4);
+        if (typeof updateCapacitor === 'function') updateCapacitor(el.id);
+      }
+    }
+  } else if (item.type === 'inductor'){
+    const vInput = el.querySelector('.ind-value');
+    const unitSel = el.querySelector('.ind-unit');
+    if (vInput && unitSel){
+      const best = aiPickUnitOption(unitSel, raw);
+      if (best){
+        unitSel.value = best.el.value;
+        vInput.value = +(raw / best.mult).toPrecision(4);
+        if (typeof updateInductor === 'function') updateInductor(el.id);
+      }
+    }
+  }
+}
+// [버그 수정] LED 색상과 똑같은 이유로, psu(DC)/battery/cccv/buck에 사용자가 요청한 전압도
+// 그동안 AI가 지정할 방법이 없어 항상 부품 기본값(psu 5V, battery 3.7V, cccv/buck 5V)으로만
+// 만들어졌습니다. item.voltage가 있으면 부품별 실제 UI 컨트롤(select 또는 range+숫자)을 찾아
+// 값을 맞추고, 그 컨트롤이 평소 change/input 이벤트로 하던 후속 처리(표시 갱신 등)를 그대로
+// 타도록 change 이벤트를 실제로 발생시킵니다(LED 색상 select와 같은 패턴).
+function applyAiComponentVoltage(item, el){
+  if (item.voltage == null || isNaN(parseFloat(item.voltage))) return;
+  const target = parseFloat(item.voltage);
+  if (item.type === 'psu'){
+    const sel = el.querySelector('.psu-dc-volt');
+    if (sel){
+      const match = Array.from(sel.options).find(o => o.value !== 'custom' && Math.abs(parseFloat(o.value) - target) < 1e-9);
+      if (match){
+        sel.value = match.value;
+      } else {
+        // 목록에 없는 전압(예: 7.4V)이면 "직접 입력"을 골라 그 숫자 그대로 넣습니다.
+        sel.value = 'custom';
+        const custom = el.querySelector('.psu-dc-custom');
+        if (custom) custom.value = target;
+      }
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  } else if (item.type === 'battery'){
+    // 배터리 정격 전압은 select 목록(1.5/3.7/9/12/19.6V)에 있는 값만 고를 수 있으므로,
+    // 요청한 전압과 가장 가까운 옵션을 고릅니다.
+    const sel = el.querySelector('.battery-rated-volt');
+    if (sel){
+      let best = null, bestDiff = Infinity;
+      Array.from(sel.options).forEach(o => {
+        const v = parseFloat(o.value);
+        if (!isFinite(v)) return;
+        const diff = Math.abs(v - target);
+        if (diff < bestDiff){ bestDiff = diff; best = o; }
+      });
+      if (best){
+        sel.value = best.value;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+  } else if (item.type === 'cccv' || item.type === 'buck'){
+    const slider = el.querySelector(item.type === 'cccv' ? '.cccv-volt' : '.buck-volt');
+    const num = el.querySelector(item.type === 'cccv' ? '.cccv-volt-num' : '.buck-volt-num');
+    if (slider){
+      const min = parseFloat(slider.min), max = parseFloat(slider.max);
+      const clamped = Math.max(min, Math.min(max, target));
+      slider.value = clamped;
+      if (num) num.value = clamped;
+      if (typeof updateRegulatorDisplay === 'function') updateRegulatorDisplay(el);
+    }
+  }
+}
+
 // AI가 돌려준 회로 설계안(JSON)을 실제로 캔버스에 그립니다 — 보드 생성, 부품 생성, 배선,
 // 코드 주입까지 한 번에 처리하고, 실행 전체를 되돌릴 수 있도록(Ctrl+Z) undo 스냅샷을 한 번만
 // 남깁니다.
@@ -20784,11 +21385,19 @@ async function executeCircuitBuild(plan){
       el.style.top = Math.round(aiLayoutY) + 'px';
       aiLayoutX += w + AI_LAYOUT_GAP;
       aiLayoutRowH = Math.max(aiLayoutRowH, h);
-      if (item.type === 'resistor' && item.value != null && !isNaN(parseFloat(item.value))){
-        const vInput = el.querySelector('.res-value');
-        if (vInput){
-          vInput.value = parseFloat(item.value);
-          if (typeof updateResistor === 'function') updateResistor(el.id);
+      applyAiComponentValue(item, el);
+      applyAiComponentVoltage(item, el);
+      // [버그 수정] AI가 "빨간 LED", "초록 LED"처럼 색상을 요청해도, 예전에는 그 정보를 받을
+      // 필드 자체가 프롬프트/스키마에 없어서(resistor의 value 필드만 있었음) 항상 부품 기본값인
+      // 빨강으로만 만들어졌습니다. 이제 item.color가 있으면 실제 색상 select(led-color-select)의
+      // 값을 맞춰줍니다 — laser/iremit/부저처럼 색이 고정된(hidden input) 부품은
+      // "select.led-color-select"로 한정해 건드리지 않고, 그 부품이 지원하지 않는 색을 AI가
+      // 잘못 보내온 경우(예: twocolorled에 blue)도 옵션 목록에 없으면 무시해 기본색을 유지합니다.
+      if (item.color){
+        const colorSel = el.querySelector('select.led-color-select');
+        if (colorSel && Array.from(colorSel.options).some(o => o.value === item.color)){
+          colorSel.value = item.color;
+          colorSel.dispatchEvent(new Event('change', { bubbles: true }));
         }
       }
       compEls.push(el);
