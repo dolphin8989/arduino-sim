@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9967</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9973</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -638,6 +638,24 @@
   .comp-pmsensor .pm-title{font-size:.62rem; font-family:'IBM Plex Mono',monospace; color:#e8b454; font-weight:600; margin-bottom:4px;}
   .comp-pmsensor .pm-sub{font-size:.56rem; color:var(--text-faint); font-family:'IBM Plex Mono',monospace; margin:2px 0 4px;}
 
+  /* ---------- [Ver0.9969] 냉각팬 / 송풍팬 — DC 모터와 전기적으로는 거의 같지만(정격 전압에
+     비례해 회전), PM(미세먼지) 센서와 함께 "공기청정기" 같은 실습 회로를 만들 수 있도록 별도
+     부품으로 뒀습니다. VCC-GND 두 다리만 있는 가장 단순한(팬 자체엔 속도 제어 핀이 없는) 2선식
+     팬이라, 실제로 속도를 코드로 제어하려면 트랜지스터·릴레이를 VCC 앞에 넣어 그 트랜지스터의
+     베이스/게이트를 MCU 핀으로 켜고 끄면 됩니다(이미 있는 트랜지스터/릴레이 부품을 그대로 재사용). */
+  .comp-fan{width:74px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .comp-fan .fan-frame{width:56px; height:56px; border-radius:9px; background:linear-gradient(160deg,#262c36,#14181e);
+    border:2px solid #3a4250; position:relative; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 14px rgba(0,0,0,.4);}
+  .comp-fan .fan-frame::before, .comp-fan .fan-frame::after{content:''; position:absolute; width:5px; height:5px;
+    border-radius:50%; background:#0a0d12; border:1px solid #444c56;}
+  .comp-fan .fan-frame::before{top:3px; left:3px; box-shadow:44px 0 #0a0d12, 0 44px #0a0d12, 44px 44px #0a0d12;}
+  .comp-fan .fan-blade{width:42px; height:42px; border-radius:50%;
+    background:conic-gradient(#5aa9e6 0deg 80deg,#243444 80deg 180deg,#5aa9e6 180deg 260deg,#243444 260deg 360deg);
+    border:1px solid #1a222c;}
+  .comp-fan select.fan-rated-v{width:100%; background:#0e1116; color:var(--text); border:1px solid var(--border-strong);
+    border-radius:4px; font-size:.62rem; padding:2px; cursor:pointer;}
+
   /* ---------- 회로도 전용 장식 부품 (라즈베리파이/HDMI/USB사운드/스피커/커스텀) ----------
      실제로 컴파일/시뮬레이션되지 않고, 회로도(배선도)에 "여기에 이 장치가 있다"는 것을
      표시하기 위한 순수 장식용 부품입니다. 핀은 배선(전선 긋기) 대상으로는 정상 동작하지만,
@@ -666,6 +684,14 @@
   .comp-diagramdeco .deco-title{font-size:.62rem; font-family:'IBM Plex Mono',monospace; color:#9fb4ff; font-weight:600; margin-bottom:4px;}
   .comp-diagramdeco .deco-icon{font-size:1.4rem; margin-bottom:4px;}
   .comp-diagramdeco .comp-pin-row{flex-wrap:wrap; gap:6px 8px; justify-content:center;}
+  /* [Ver0.9971] 카메라 모듈 — RPi CAM 포트에 연결되면(CSI 리본 케이블 흉내) 렌즈에 은은한
+     초록 테두리가 들어옵니다(HDMI 모니터가 연결됐을 때 빛나는 것과 같은 패턴). */
+  .comp-diagramdeco.comp-camera{width:110px;}
+  .comp-camera .cam-lens{width:38px; height:38px; margin:2px auto 4px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#3a4048,#0c0e11 72%); border:3px solid #5a6472;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(0,0,0,.4);}
+  .comp-camera .cam-lens-inner{width:14px; height:14px; border-radius:50%; background:radial-gradient(circle at 40% 35%,#8fc4ff,#1a2733 70%);}
+  .comp-camera.cam-connected .cam-lens{border-color:#3ddc84; filter:drop-shadow(0 0 4px #3ddc84);}
 
   .comp-custom{padding:10px; background:linear-gradient(160deg,#2a2438,#171420); border:1px solid #6a5c9e; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35); min-width:130px;}
   .comp-custom .custom-title{font-size:.64rem; font-family:'IBM Plex Mono',monospace; color:#c9b8ff; font-weight:600; margin-bottom:4px; word-break:break-word;}
@@ -681,6 +707,22 @@
   .us-angle-row{display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:.62rem; color:var(--text-faint); font-family:'IBM Plex Mono',monospace;}
   .us-angle-row input[type=range]{flex:1; accent-color:var(--teal); cursor:pointer;}
   .us-angle-row span{width:32px; text-align:right; color:var(--teal-strong);}
+
+  /* ---------- [Ver0.9972] 1차원 회전 라이다 센서 — 초음파 센서와 같은 "1차원 거리값" 개념을
+     그대로 쓰되, 외부 서보 없이 센서 자체가 모터로 계속 360도 회전하며 스캔합니다. ---------- */
+  .comp-lidar{width:150px; padding:10px; background:#20262e; border:1px solid #3a4048; border-radius:9px; text-align:center;}
+  .comp-lidar .comp-pin-row{flex-wrap:wrap; gap:6px 8px;}
+  .lidar-body{position:relative; width:64px; height:64px; margin:0 auto 6px; border-radius:50%;
+    background:radial-gradient(circle at 38% 32%,#3a4450,#1a1f24 72%); border:2px solid #4a5560; overflow:hidden;}
+  .lidar-sweep{position:absolute; inset:0; border-radius:50%; transform-origin:50% 50%;
+    background:conic-gradient(from 0deg, rgba(61,220,132,.65) 0deg, rgba(61,220,132,0) 38deg, rgba(61,220,132,0) 360deg);}
+  .lidar-dot{position:absolute; top:50%; left:50%; width:9px; height:9px; margin:-4.5px; border-radius:50%;
+    background:#3ddc84; box-shadow:0 0 6px 2px rgba(61,220,132,.75); z-index:1;}
+  .lidar-angle-row{display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:.62rem; color:var(--text-faint); font-family:'IBM Plex Mono',monospace;}
+  .lidar-angle-row label{flex-shrink:0; white-space:nowrap;}
+  .lidar-angle-row input[type=range]{flex:1; min-width:0; accent-color:var(--teal); cursor:pointer;}
+  .lidar-angle-row span{width:34px; flex-shrink:0; text-align:right; color:var(--teal-strong);}
+  .lidar-cur-angle{font-size:.6rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:3px;}
 
   /* ---------- 3축 자이로/가속도 센서 (I2C) ---------- */
   .comp-gyro, .comp-accel{width:152px; padding:9px; background:linear-gradient(160deg,#222b26,#141b17); border:1px solid var(--border-strong); border-radius:9px; text-align:center;}
@@ -1648,6 +1690,47 @@
   .ros-battery-fill{height:100%; background:linear-gradient(90deg,#3ddc84,#1c8a52); transition:width .3s;}
   .ros-tf-list{font-size:.58rem; color:#7c8695; font-family:'IBM Plex Mono',monospace; line-height:1.6;}
 
+  /* --- 탭5: 📺 유튜브 임베드 [Ver0.9970] --- */
+  #viewYoutube{flex-direction:column;}
+  .yt-addr-bar{display:flex; align-items:center; gap:6px; padding:7px 10px; background:#20242b;
+    border-bottom:1px solid #2b313a; flex:0 0 auto;}
+  .yt-addr-bar input{flex:1; background:#12161c; border:1px solid #2b313a; border-radius:5px; padding:5px 8px;
+    font-size:.68rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+  .yt-addr-bar button{font-size:.72rem; padding:4px 10px; background:#1b212a; border:1px solid #2b313a;
+    color:var(--text-dim); border-radius:5px; cursor:pointer;}
+  .yt-addr-bar button:hover{background:#232b36;}
+  #ytPlayerWrap{position:relative; flex:1; min-height:0; background:#000; display:flex; align-items:center; justify-content:center;}
+  #ytPlayer{width:100%; height:100%; border:none;}
+  .yt-empty-hint{color:#565f6b; font-size:.68rem; text-align:center; padding:20px; font-family:'IBM Plex Mono',monospace;}
+
+  /* --- 탭6: 💻 가상 리눅스 Bash 터미널 [Ver0.9970] --- */
+  #viewLinux{flex-direction:column; background:#0b0e11; padding:10px 12px; gap:6px; font-family:'IBM Plex Mono',monospace;}
+  #linuxTermBody{flex:1; min-height:0; overflow-y:auto; font-size:.72rem; color:#8fdc9a; white-space:pre-wrap; line-height:1.55;}
+  #linuxTermBody .lt-cmd{color:#dfe4ea;}
+  #linuxTermBody .lt-cmd::before{content:'$ '; color:#5eb2ff;}
+  #linuxTermBody .lt-err{color:#ff8a8a;}
+  #linuxTermBody .lt-dim{color:#7c8695;}
+  .linux-term-inputrow{display:flex; align-items:center; gap:6px; flex:0 0 auto; background:#000; border:1px solid #232830; border-radius:5px; padding:5px 8px;}
+  .linux-prompt{color:#5eb2ff; font-size:.72rem; white-space:nowrap;}
+  #linuxTermInput{flex:1; background:transparent; border:none; outline:none; color:#dfe4ea; font-size:.72rem; font-family:'IBM Plex Mono',monospace;}
+
+  /* --- 탭7: 📷 카메라 모듈 (웹캠 / 가상 풍경) [Ver0.9971] --- */
+  #viewCamera{flex-direction:column;}
+  .cam-toolbar{display:flex; align-items:center; gap:10px; padding:7px 10px; background:#20242b;
+    border-bottom:1px solid #2b313a; flex:0 0 auto;}
+  .cam-toolbar .btn{font-size:.7rem; padding:5px 11px;}
+  .cam-toolbar .btn.cam-active{background:var(--teal); color:#0b0e11; border-color:var(--teal);}
+  .cam-toolbar .btn:disabled{opacity:.4; cursor:not-allowed;}
+  .cam-status-text{font-size:.66rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+  #camViewWrap{position:relative; flex:1; min-height:0; background:#000; overflow:hidden;}
+  #camWebcamVideo{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  #camPlaceholderCanvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  /* [Ver0.9971 버그 수정] 두 엘리먼트 모두 위에서 명시적으로 display를 지정해 두었는데, 이
+     ID 셀렉터가 브라우저 기본 스타일시트의 [hidden]{display:none} 규칙보다 상세도가 높아서
+     hidden 속성을 켜도 그대로 보여버리는 문제가 있었습니다(웹캠 화면 뒤로 풍경 캔버스가
+     겹쳐 비치는 형태로 드러남). hidden일 때는 반드시 display:none이 이기도록 별도로 명시합니다. */
+  #camWebcamVideo[hidden], #camPlaceholderCanvas[hidden]{display:none;}
+
   /* ============ 🤖 하단 Gemini AI 회로 어시스턴트 (Ver0.9962) ============ */
   /* [Ver0.9963 수정] 처음엔 position:fixed로 캔버스 위에 떠 있게 했었는데, 그러면 실제 문서
      흐름(body는 header/workspace/footer를 세로로 쌓는 flex 컨테이너)에서 빠져나와 캔버스
@@ -1674,6 +1757,22 @@
   }
   .ai-key-chip{ font-size:.7rem; padding:5px 9px; color:var(--teal); border-color:var(--border-strong); }
   .ai-key-chip:hover{ color:var(--teal-strong,var(--teal)); }
+  /* [Ver0.9969] API Key 발급 방법 팝오버 — 클릭하면 열리고 바깥을 클릭하면 닫힙니다. */
+  .ai-key-help-wrap{ position:relative; }
+  .ai-key-help-btn{ font-size:.68rem; padding:5px 10px; white-space:nowrap; }
+  /* [Ver0.9969 수정] AI 바 자체가 화면 맨 아래에 있는 레이아웃 요소라, 아래로 펼치면(top:100%)
+     대부분의 창 높이에서 화면 밖으로 잘려 보이지 않는 문제가 있었습니다(스크린샷으로 확인) — 위로
+     펼치도록(bottom:100%) 고쳤습니다. */
+  .ai-key-help-pop{
+    position:absolute; bottom:calc(100% + 6px); right:0; z-index:60; width:250px;
+    background:#181d24; border:1px solid #2b313a; border-radius:8px; padding:12px 14px;
+    box-shadow:0 -10px 28px rgba(0,0,0,.5); font-size:.68rem; color:var(--text-dim); line-height:1.55;
+  }
+  .ai-key-help-pop b{ display:block; margin-bottom:6px; font-size:.74rem; color:var(--text); }
+  .ai-key-help-pop ol{ margin:0 0 8px; padding-left:16px; }
+  .ai-key-help-pop li{ margin-bottom:2px; }
+  .ai-key-help-pop a{ display:inline-block; color:#5eb2ff; word-break:break-all; font-family:'IBM Plex Mono',monospace; font-size:.66rem; }
+  .ai-key-help-pop a:hover{ text-decoration:underline; }
   .ai-bar-body{ display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; }
   .ai-prompt-input{
     flex:1; min-width:240px; background:#0b0e12; color:var(--text); border:1px solid var(--border);
@@ -1695,7 +1794,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9967</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9973</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -1961,9 +2060,13 @@
       </div>
       <div class="palette-group" data-group="motor">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.motor">모터 &amp; 드라이버</span><span class="pg-count">12</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.motor">모터 &amp; 드라이버</span><span class="pg-count">13</span>
         </div>
         <div class="palette-group-body">
+          <div class="palette-item" onclick="spawnComponent('fan')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:5px;background:#2a3038;border:1px solid #444c56;display:flex;align-items:center;justify-content:center;"><div style="width:12px;height:12px;border-radius:50%;background:conic-gradient(#5aa9e6 0deg 90deg,#243444 90deg 180deg,#5aa9e6 180deg 270deg,#243444 270deg 360deg);"></div></div></div>
+            <span data-i18n="palette.fan">냉각팬 / 송풍팬<br>(5V/12V/24V)</span>
+          </div>
           <div class="palette-item" onclick="spawnComponent('servo')">
             <div class="swatch"><div style="width:20px;height:20px;border-radius:3px;background:linear-gradient(160deg,#2a6fc4,#0d2f5c);position:relative;"><div style="position:absolute;top:2px;left:9px;width:2px;height:10px;background:#e8d38a;"></div></div></div>
             <span data-i18n="palette.servo">DC 서보모터<br>(전압 선택)</span>
@@ -2016,12 +2119,16 @@
       </div>
       <div class="palette-group" data-group="sensor">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.sensor">센서</span><span class="pg-count">7</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.sensor">센서</span><span class="pg-count">8</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('ultrasonic')">
             <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:#2a3038;display:flex;align-items:center;justify-content:center;gap:2px;"><div style="width:7px;height:7px;border-radius:50%;background:#9aa0a6;"></div><div style="width:7px;height:7px;border-radius:50%;background:#9aa0a6;"></div></div></div>
             <span data-i18n="palette.ultrasonic">초음파 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('lidar')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#3a4450,#1a1f24 72%);border:1.5px solid #4a5560;position:relative;"><div style="position:absolute;top:2px;left:9px;width:2px;height:8px;background:#3ddc84;box-shadow:0 0 3px 1px rgba(61,220,132,.8);"></div></div></div>
+            <span data-i18n="palette.lidar">라이다 센서<br>(1차원 회전형)</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('sensor-ldr')">
             <div class="swatch"><div style="width:16px;height:16px;border-radius:50%;background:#e8d38a;box-shadow:inset 0 0 0 3px #7a6a3a;"></div></div>
@@ -2185,9 +2292,13 @@
       </div>
       <div class="palette-group collapsed" data-group="diagramdeco">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.diagramdeco">🖇️ 회로도 전용 부품</span><span class="pg-count">7</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.diagramdeco">🖇️ 회로도 전용 부품</span><span class="pg-count">8</span>
         </div>
         <div class="palette-group-body">
+          <div class="palette-item" onclick="spawnComponent('camera')">
+            <div class="swatch"><div style="width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3a4048,#0c0e11 72%);border:2px solid #5a6472;"></div></div>
+            <span data-i18n="palette.camera">카메라 모듈<br>(회로도 전용)</span>
+          </div>
           <div class="palette-item" onclick="spawnComponent('rpi3')">
             <div class="swatch"><div style="width:24px;height:18px;border-radius:2px;background:linear-gradient(160deg,#1f5a30,#0c2414);border:1px solid #2f7a3f;"></div></div>
             <span data-i18n="palette.rpi3">Raspberry Pi 3<br>(회로도 전용)</span>
@@ -2470,7 +2581,7 @@ void loop() {
        더블클릭하면 열리는 싱글턴 팝업입니다(모니터가 여러 개 있어도 이 팝업 하나를 공유하고,
        openMonitorPopup(compId)가 매번 대상만 바꿔 씁니다). 기존 .board-popup 프레임(드래그/
        리사이즈/최대화)을 그대로 재사용합니다. -->
-  <div class="board-popup" id="popupMonitor" hidden style="left:46%; top:50px; width:660px; height:600px;">
+  <div class="board-popup" id="popupMonitor" hidden style="left:40%; top:50px; width:760px; height:600px;">
     <div class="popup-head" data-drag-handle>
       <b id="monitorPopupTitle">🖥️ HDMI 모니터</b>
       <button class="btn ghost popup-max-btn" id="maxBtnMonitor" onclick="toggleMonitorPopupMaximize()" data-i18n-title="popup.maximizeTitle" title="최대화 (창을 화면 가득 채우기)">⛶</button>
@@ -2481,6 +2592,9 @@ void loop() {
       <button class="editor-tab" id="tabBtnTkinter" onclick="switchMonitorTab('tkinter')" data-i18n="monitor.tabTkinter">🐍 Tkinter GUI</button>
       <button class="editor-tab" id="tabBtnWeb" onclick="switchMonitorTab('web')" data-i18n="monitor.tabWeb">🌐 Web / Flask</button>
       <button class="editor-tab" id="tabBtnRos" onclick="switchMonitorTab('ros')" data-i18n="monitor.tabRos">🤖 ROS</button>
+      <button class="editor-tab" id="tabBtnYoutube" onclick="switchMonitorTab('youtube')" data-i18n="monitor.tabYoutube">📺 유튜브</button>
+      <button class="editor-tab" id="tabBtnLinux" onclick="switchMonitorTab('linux')" data-i18n="monitor.tabLinux">💻 터미널</button>
+      <button class="editor-tab" id="tabBtnCamera" onclick="switchMonitorTab('camera')" data-i18n="monitor.tabCamera">📷 카메라</button>
     </div>
     <div id="monitorScreen" class="no-signal">
       <div class="no-signal-overlay">
@@ -2565,6 +2679,49 @@ void loop() {
           </div>
         </div>
       </div>
+      <!-- [Ver0.9970] 📺 유튜브 임베드 탭 — 실제 youtube.com/embed/ iframe입니다(모크 아님).
+           영상 ID/링크를 입력하면 그 iframe의 src만 바꿔 끼웁니다. 이 시뮬레이터는 완전히
+           오프라인으로도 쓸 수 있어야 하므로, 이 탭만은 인터넷 연결이 있어야 실제로 영상이
+           보입니다(연결이 없으면 iframe이 그냥 비어 보일 뿐 — 다른 탭에는 영향 없음). -->
+      <div class="monitor-tab-view" id="viewYoutube">
+        <div class="yt-addr-bar">
+          <div class="web-dot" style="background:#ff3d3d;"></div>
+          <input type="text" id="ytUrlInput" placeholder="유튜브 링크 또는 영상 ID 붙여넣기 (예: https://youtu.be/dQw4w9WgXcQ)" data-i18n-ph="monitor.ytInputPh">
+          <button onclick="loadYoutubeVideo()" data-i18n="monitor.ytLoadBtn">▶ 재생</button>
+        </div>
+        <div id="ytPlayerWrap">
+          <div class="yt-empty-hint" id="ytEmptyHint" data-i18n="monitor.ytEmptyHint">위에 유튜브 링크를 붙여넣고 재생을 누르세요 (인터넷 연결 필요)</div>
+          <iframe id="ytPlayer" hidden allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+      <!-- [Ver0.9970] 💻 가상 리눅스 Bash 터미널 — 실제 리눅스나 Pyodide 같은 외부 실행 엔진을
+           전혀 쓰지 않는, 문자열 패턴매칭 기반의 가벼운 모크 터미널입니다(ROS 탭처럼 "동작하는
+           흉내"에 가깝지만, 실제 OS 프로세스나 파일시스템은 전혀 없습니다). 메모리 안의 가짜
+           디렉터리 트리(LINUX_FAKE_FS)를 ls/cd/pwd/cat/echo로 돌아다닐 수 있고, gpio readall은
+           노코드 HMI 탭의 rpiPinState를 그대로 읽어와 "그 탭에서 만든 위젯이 곧 GPIO"라는
+           연결고리를 보여줍니다. -->
+      <div class="monitor-tab-view" id="viewLinux">
+        <div id="linuxTermBody"></div>
+        <div class="linux-term-inputrow">
+          <span class="linux-prompt" id="linuxPromptLabel">pi@raspberrypi:~$</span>
+          <input type="text" id="linuxTermInput" spellcheck="false" autocomplete="off">
+        </div>
+      </div>
+      <!-- [Ver0.9971] 📷 카메라 탭 — 라즈베리파이 CSI 카메라 모듈(comp-camera)이 CAM 핀으로
+           연결되어 있을 때만 활성화됩니다. "웹캠 연결"을 누르면 실제 브라우저 웹캠
+           (getUserMedia)을 붙여서 보여주고, 연결하지 않았거나 실패하면 오프라인에서도 항상
+           보이는 자체 제작 캔버스 산 풍경 애니메이션을 대신 보여줍니다(외부 이미지/영상을
+           네트워크로 받아오지 않음 — 이 시뮬레이터의 오프라인 우선 원칙 유지). -->
+      <div class="monitor-tab-view" id="viewCamera">
+        <div class="cam-toolbar">
+          <button class="btn" id="camWebcamBtn" onclick="camToggleWebcam()" data-i18n="monitor.camWebcamBtn">🎥 웹캠 연결</button>
+          <span class="cam-status-text" id="camStatusText" data-i18n="monitor.camPlaceholderStatus">가상 풍경 (웹캠 미연결)</span>
+        </div>
+        <div id="camViewWrap">
+          <video id="camWebcamVideo" autoplay playsinline muted hidden></video>
+          <canvas id="camPlaceholderCanvas" width="640" height="400"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2594,6 +2751,20 @@ void loop() {
     <div class="ai-controls">
       <input type="password" id="geminiApiKey" class="ai-key-input" placeholder="Gemini API Key (무료, Google AI Studio 발급)" title="Google AI Studio(aistudio.google.com)에서 무료로 발급받은 API Key를 입력하고 Enter를 누르면 이 브라우저에 저장되고 입력칸이 접힙니다. 이 컴퓨터에서 구글 서버로만 직접 전송됩니다(이 시뮬레이터 개발자를 포함해 다른 곳으로는 전송되지 않습니다).">
       <button type="button" class="btn ghost ai-key-chip" id="aiKeySavedChip" onclick="showAiKeyInput()" style="display:none;" title="저장된 Key를 바꾸려면 클릭하세요">🔑 Key 저장됨 (변경)</button>
+      <!-- [Ver0.9969] API Key 발급 방법 안내 — 클릭하면 열리고, 팝오버 밖 아무 곳이나 클릭하면
+           닫힙니다(toggleAiKeyHelp/전역 document 클릭 리스너, 전선 색상 편집창과 같은 패턴). -->
+      <div class="ai-key-help-wrap">
+        <button type="button" class="btn ghost ai-key-help-btn" id="aiKeyHelpBtn" onclick="toggleAiKeyHelp(event)" data-i18n="ai.keyHelpBtn">❓ 키 발급 방법</button>
+        <div class="ai-key-help-pop" id="aiKeyHelpPop" hidden>
+          <b data-i18n="ai.keyHelpTitle">무료 Gemini API Key 받는 법</b>
+          <ol>
+            <li data-i18n="ai.keyHelpStep1">아래 링크를 열고 구글 계정으로 로그인</li>
+            <li data-i18n="ai.keyHelpStep2">"Create API key" (API 키 만들기) 클릭</li>
+            <li data-i18n="ai.keyHelpStep3">생성된 키를 복사해 왼쪽 입력칸에 붙여넣고 Enter</li>
+          </ol>
+          <a href="https://aistudio.google.com/app/api-keys" target="_blank" rel="noopener noreferrer">aistudio.google.com/app/api-keys ↗</a>
+        </div>
+      </div>
       <button class="btn ghost" id="btnAiToggle" onclick="toggleAiBar()" data-i18n="ai.collapse">▼ 접기</button>
     </div>
   </div>
@@ -2666,7 +2837,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9967", en: "K's Simulator Ver0.9967" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9973", en: "K's Simulator Ver0.9973" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3029,6 +3200,10 @@ const STRINGS = {
   "comp.ultrasonic.label": { ko: "초음파 센서", en: "Ultrasonic Sensor" },
   "comp.ultrasonic.angleLabel": { ko: "장애물 각도", en: "Obstacle angle" },
   "comp.ultrasonic.aimTitle": { ko: "AIM ← 서보 SIG (선택, 회전판 서보의 각도를 이 센서의 조준 방향으로 사용 · 안 물리면 정면 0°로 고정)", en: "AIM ← servo SIG (optional — uses that servo's angle as this sensor's aim direction; unwired = fixed forward 0°)" },
+  "comp.lidar.label": { ko: "라이다 센서", en: "LiDAR Sensor" },
+  "comp.lidar.curAngle": { ko: "현재 각도: ", en: "Current angle: " },
+  "comp.lidar.objAngleLabel": { ko: "장애물 각도", en: "Obstacle angle" },
+  "comp.lidar.angTitle": { ko: "ANG → 보드 아날로그 핀 (analogRead, 0~1023 = 0~360°, 지금 회전 각도를 그대로 실어보냄)", en: "ANG → a board analog pin (analogRead, 0-1023 = 0-360°, carries the sensor's current rotation angle)" },
   "comp.gyro.title": { ko: "3축 자이로 센서 (I2C, °/s)", en: "3-Axis Gyroscope (I2C, °/s)" },
   "comp.gyro.label": { ko: "3축 자이로 센서", en: "3-Axis Gyroscope" },
   "comp.accel.title": { ko: "3축 가속도 센서 (I2C, g)", en: "3-Axis Accelerometer (I2C, g)" },
@@ -3109,6 +3284,9 @@ const STRINGS = {
   "comp.rpi.deco": { ko: "(회로도 전용 · 시뮬레이션 안 됨)", en: "(diagram only · not simulated)" },
   "comp.hdmimonitor.title": { ko: "HDMI 모니터", en: "HDMI Monitor" },
   "comp.rpi.hdmiTitle": { ko: "HDMI OUT (더블클릭한 HDMI 모니터 부품의 팝업에서 화면 확인)", en: "HDMI OUT (double-click a connected HDMI Monitor part to view its screen)" },
+  "comp.rpi.camTitle": { ko: "CAM (CSI 카메라 포트) → 카메라 모듈의 CAM 핀과 연결", en: "CAM (CSI camera port) → wire to a Camera Module's CAM pin" },
+  "comp.camera.title": { ko: "카메라 모듈", en: "Camera Module" },
+  "comp.camera.camTitle": { ko: "CAM → 라즈베리파이의 CAM 포트 (CSI 리본 케이블)", en: "CAM → the Raspberry Pi's CAM port (CSI ribbon cable)" },
   "monitor.tabNocode": { ko: "🎛 노코드 HMI", en: "🎛 No-code HMI" },
   "monitor.tabTkinter": { ko: "🐍 Tkinter GUI", en: "🐍 Tkinter GUI" },
   "monitor.tabWeb": { ko: "🌐 Web / Flask", en: "🌐 Web / Flask" },
@@ -3134,6 +3312,20 @@ const STRINGS = {
   "monitor.rosBatteryHead": { ko: "🔋 배터리", en: "🔋 Battery" },
   "monitor.rosPoseHead": { ko: "📍 Pose (odom)", en: "📍 Pose (odom)" },
   "monitor.rosTfHead": { ko: "🌳 TF Tree", en: "🌳 TF Tree" },
+  "monitor.tabYoutube": { ko: "📺 유튜브", en: "📺 YouTube" },
+  "monitor.tabLinux": { ko: "💻 터미널", en: "💻 Terminal" },
+  "monitor.ytInputPh": { ko: "유튜브 링크 또는 영상 ID 붙여넣기 (예: https://youtu.be/dQw4w9WgXcQ)", en: "Paste a YouTube link or video ID (e.g. https://youtu.be/dQw4w9WgXcQ)" },
+  "monitor.ytLoadBtn": { ko: "▶ 재생", en: "▶ Play" },
+  "monitor.ytEmptyHint": { ko: "위에 유튜브 링크를 붙여넣고 재생을 누르세요 (인터넷 연결 필요)", en: "Paste a YouTube link above and press Play (needs an internet connection)" },
+  "monitor.ytBadLink": { ko: "⚠️ 유튜브 링크에서 영상 ID를 찾지 못했습니다 — 링크를 다시 확인해 주세요", en: "⚠️ Couldn't find a video ID in that link — please check it and try again" },
+  "monitor.tabCamera": { ko: "📷 카메라", en: "📷 Camera" },
+  "monitor.camWebcamBtn": { ko: "🎥 웹캠 연결", en: "🎥 Connect Webcam" },
+  "monitor.camDisconnectBtn": { ko: "🛑 연결 해제", en: "🛑 Disconnect" },
+  "monitor.camPlaceholderStatus": { ko: "가상 풍경 (웹캠 미연결)", en: "Virtual scenery (webcam not connected)" },
+  "monitor.camNotConnected": { ko: "카메라 모듈이 라즈베리파이의 CAM 포트에 연결되지 않았습니다", en: "The camera module isn't wired to the Raspberry Pi's CAM port" },
+  "monitor.camWebcamStatus": { ko: "🎥 실제 웹캠 화면", en: "🎥 Live webcam feed" },
+  "monitor.camUnsupported": { ko: "⚠️ 이 브라우저/환경에서는 웹캠 기능을 쓸 수 없습니다 (가상 풍경으로 표시합니다)", en: "⚠️ Webcam isn't available in this browser/context (showing virtual scenery instead)" },
+  "monitor.camFailedToast": { ko: "⚠️ 웹캠을 열지 못했습니다 (권한이 거부되었거나 장치가 없습니다) — 가상 풍경으로 표시합니다", en: "⚠️ Couldn't open the webcam (permission denied or no device) — showing virtual scenery instead" },
   "comp.usbsound.title": { ko: "USB 사운드 모듈", en: "USB Sound Module" },
   "comp.speaker.title": { ko: "스피커", en: "Speaker" },
   "comp.custom.defaultName": { ko: "커스텀 부품", en: "Custom Part" },
@@ -3237,6 +3429,7 @@ const STRINGS = {
   "palette.rpi4": { ko: "Raspberry Pi 4<br>(회로도 전용)", en: "Raspberry Pi 4<br>(diagram only)" },
   "palette.rpi5": { ko: "Raspberry Pi 5<br>(회로도 전용)", en: "Raspberry Pi 5<br>(diagram only)" },
   "palette.hdmimonitor": { ko: "HDMI 모니터<br>(회로도 전용)", en: "HDMI Monitor<br>(diagram only)" },
+  "palette.camera": { ko: "카메라 모듈<br>(회로도 전용)", en: "Camera Module<br>(diagram only)" },
   "palette.usbsound": { ko: "USB 사운드 모듈<br>(회로도 전용)", en: "USB Sound Module<br>(diagram only)" },
   "palette.speaker": { ko: "스피커<br>(회로도 전용)", en: "Speaker<br>(diagram only)" },
   "palette.custom": { ko: "커스텀 부품<br>(이름·핀 직접 지정)", en: "Custom Part<br>(name/pins your own)" },
@@ -3280,12 +3473,16 @@ const STRINGS = {
   "palette.humid": { ko: "습도 센서", en: "Humidity Sensor" },
   "palette.title": { ko: "부품 상자", en: "Component Box" },
   "palette.ultrasonic": { ko: "초음파 센서", en: "Ultrasonic Sensor" },
+  "palette.lidar": { ko: "라이다 센서<br>(1차원 회전형)", en: "LiDAR Sensor<br>(1D rotating)" },
   "palette.gyro": { ko: "3축 자이로 센서<br>(I2C)", en: "3-Axis Gyroscope<br>(I2C)" },
   "palette.accel": { ko: "3축 가속도 센서<br>(I2C)", en: "3-Axis Accelerometer<br>(I2C)" },
   "palette.pmsensor": { ko: "미세먼지 센서<br>(PM2.5/PM10)", en: "Dust Sensor<br>(PM2.5/PM10)" },
   "comp.pmsensor.title": { ko: "미세먼지 센서", en: "Dust Sensor" },
   "comp.pmsensor.txTitle": { ko: "TX → 보드 디지털 핀 (SoftwareSerial RX로, PMS.h/SdsDustSensor.h)", en: "TX → board digital pin (as SoftwareSerial RX, for PMS.h/SdsDustSensor.h)" },
   "comp.pmsensor.aoutTitle": { ko: "AOUT → 보드 아날로그 핀 (GP2Y1010AU0F류 analogRead 직접 사용)", en: "AOUT → board analog pin (raw analogRead, GP2Y1010AU0F-style)" },
+  "palette.fan": { ko: "냉각팬 / 송풍팬<br>(5V/12V/24V)", en: "Cooling / Blower Fan<br>(5V/12V/24V)" },
+  "comp.fan.label": { ko: "냉각팬", en: "Fan" },
+  "comp.fan.ratedTitle": { ko: "정격 전압 (VCC 핀에 이 전압에 가까울수록 빨리 돕니다)", en: "Rated voltage (spins faster the closer VCC gets to this voltage)" },
   "palette.wifiap": { ko: "무선 AP<br>(신호 발생)", en: "Wireless AP<br>(signal gen)" },
   "popup.apiCycles0": { ko: "API 호출(pinMode/digitalWrite 등): <b>0</b> cycles (<b>0.00µs</b>)", en: "API calls (pinMode/digitalWrite, etc.): <b>0</b> cycles (<b>0.00µs</b>)" },
   "popup.apiCyclesPrefix": { ko: "API 호출(pinMode/digitalWrite 등)", en: "API calls (pinMode/digitalWrite, etc.)" },
@@ -3385,7 +3582,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9967", en: "K's Arduino Simulator Ver0.9967" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9973", en: "K's Arduino Simulator Ver0.9973" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -3475,6 +3672,11 @@ const STRINGS = {
   "ai.brand": { ko: "Gemini AI 회로 어시스턴트", en: "Gemini AI Circuit Assistant" },
   "ai.hint": { ko: "자연어로 회로를 만들거나, 이미 배선한 회로에 맞는 코드를 자동으로 짭니다", en: "Build a circuit from a sentence, or auto-write code that matches what you've already wired" },
   "ai.collapse": { ko: "▼ 접기", en: "▼ Collapse" },
+  "ai.keyHelpBtn": { ko: "❓ 키 발급 방법", en: "❓ Get a key" },
+  "ai.keyHelpTitle": { ko: "무료 Gemini API Key 받는 법", en: "How to get a free Gemini API Key" },
+  "ai.keyHelpStep1": { ko: "아래 링크를 열고 구글 계정으로 로그인", en: "Open the link below and sign in with your Google account" },
+  "ai.keyHelpStep2": { ko: "\"Create API key\" (API 키 만들기) 클릭", en: "Click \"Create API key\"" },
+  "ai.keyHelpStep3": { ko: "생성된 키를 복사해 왼쪽 입력칸에 붙여넣고 Enter", en: "Copy the generated key, paste it into the input on the left, and press Enter" },
   "ai.expand": { ko: "▲ 펼치기", en: "▲ Expand" },
 };
 let currentLang = 'ko';
@@ -5991,14 +6193,37 @@ function makeDraggable(el){
       document.addEventListener('mouseup', onUp);
       return;
     }
+    // [버그 수정, Ver0.9968] 원래는 이 mousedown 하나로 곧바로 activeDrag를 세팅해(문턱값 없이)
+    // 드래그를 시작했습니다. 그런데 더블클릭하려고 같은 자리를 두 번 클릭하는 사이 손이 1px
+    // 안팎만 흔들려도 부품이 실제로 미세하게 이동해 버려, 브라우저의 네이티브 dblclick 판정이
+    // 깨지는 문제가 있었습니다(예: HDMI 모니터를 더블클릭해 팝업을 열려고 했는데 안 열림 —
+    // 재현 확인). 바로 위 "중앙 조작 요소" 분기에 이미 있던 문턱값 방식(THRESHOLD 넘게 끌어야
+    // 진짜 드래그 시작)을 여기에도 똑같이 적용했습니다. 선택(굵은 테두리 표시)은 기존처럼 클릭
+    // 즉시 일어나므로 "한 번 클릭 = 선택"이라는 동작은 그대로 유지되고, 일정 거리 이상 끌 때만
+    // 실제로 위치가 움직입니다.
     selectComponent(el);
-    activeDrag = el;
-    dragSnapshotTaken = false;
-    const rect = el.getBoundingClientRect();
-    // 캔버스가 확대/축소되어 있어도(canvasZoom) 컴포넌트가 커서를 따라 1:1로 움직이도록,
-    // 화면 좌표 오프셋을 캔버스의 "원래(비확대) 좌표계" 기준으로 환산해 저장합니다.
-    dragOffset.x = (e.clientX - rect.left) / canvasZoom;
-    dragOffset.y = (e.clientY - rect.top) / canvasZoom;
+    const startX = e.clientX, startY = e.clientY;
+    const rect0 = el.getBoundingClientRect();
+    const offX = (startX - rect0.left) / canvasZoom, offY = (startY - rect0.top) / canvasZoom;
+    const THRESHOLD = 5;
+    let dragStarted = false;
+    const onMove = (ev) => {
+      if (dragStarted) return;
+      if (Math.hypot(ev.clientX - startX, ev.clientY - startY) < THRESHOLD) return;
+      dragStarted = true;
+      activeDrag = el;
+      dragSnapshotTaken = false;
+      // 캔버스가 확대/축소되어 있어도(canvasZoom) 컴포넌트가 커서를 따라 1:1로 움직이도록,
+      // 화면 좌표 오프셋을 캔버스의 "원래(비확대) 좌표계" 기준으로 환산해 저장합니다.
+      dragOffset.x = offX;
+      dragOffset.y = offY;
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
     e.stopPropagation();
   });
   if (el.classList.contains('board')){
@@ -6087,6 +6312,32 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9973', ko: [
+      '🔧 "회로도 그리기" 팝업에서 저항·커패시터·LED 같은 부품을 R키로 세로(90°/270°)로 돌렸을 때 부품명과 값 글자가 서로 겹쳐 보이던 문제를 고쳤습니다 — 세로로 돌아간 상태에서는 글자를 가로 방향이 아니라 세로 방향으로 나란히 배치해, 어느 각도로 돌려도 겹치지 않고 읽히게 했습니다',
+      '📏 "회로도 그리기" 부품 기호와 칸 간격이 너무 크다는 의견에 따라, 부품 상자 크기·여백·간격을 전체적으로 절반 정도로 줄였습니다 — 저항 지그재그, 커패시터·인덕터·LED·전지·모터 기호와 글자 크기까지 함께 축소해 더 많은 부품을 한 화면에 편하게 배치할 수 있습니다',
+  ]},
+  { ver: 'Ver0.9972', ko: [
+      '🛰 "센서" 팔레트에 1차원 회전형 라이다 센서를 추가했습니다 — 초음파 센서와 똑같이 장애물까지의 거리를 재지만, 외부 서보 없이 센서 자신이 내장 모터로 계속 360도 회전하며 스캔합니다(2초에 한 바퀴, 레이더 화면처럼 초록 빔이 도는 애니메이션으로 표시)',
+      '📡 VCC/GND/TRIG/ECHO 핀은 초음파 센서(HC-SR04)와 완전히 같은 방식으로 동작해 기존 pulseIn 기반 코드를 그대로 쓸 수 있고, 새로 추가된 ANG 핀(analogRead, 0~1023 = 0~360°)으로 "지금 몇 도를 보고 있는지"까지 함께 읽으면 거리+각도를 모아 간단한 360도 스캔(맵)을 만드는 실습도 가능합니다',
+      '🎯 "장애물 거리"·"장애물 각도" 슬라이더로 원하는 곳에 가상의 장애물을 두면, 회전하는 빔이 그 각도를 지나는 순간에만 가까운 거리값이, 나머지 구간에서는 최대 거리(1200cm)가 읽힙니다 — 실제 레이저처럼 초음파보다 훨씬 좁은 빔(±2°)을 씁니다',
+  ]},
+  { ver: 'Ver0.9971', ko: [
+      '📷 HDMI 모니터 팝업에 7번째 탭 "카메라"를 추가했습니다 — 라즈베리파이의 새 CAM 포트와 카메라 모듈(회로도 전용 부품, HDMI 모니터처럼 CAM-CAM 핀 한 줄만 이으면 연결됩니다)을 전선으로 이으면 이 탭이 활성화됩니다',
+      '🎥 "웹캠 연결" 버튼을 누르면 브라우저 권한을 요청해 실제 PC/노트북 웹캠 화면을 보여줍니다(getUserMedia) — 권한을 거부하거나 웹캠이 없거나 file://처럼 이 기능을 못 쓰는 환경이면 자동으로 안내와 함께 아래 2번 모드로 돌아갑니다. 브라우저/OS의 웹캠 권한 설정에 따라 첫 사용 시 허용 여부를 직접 확인해 주세요',
+      '🏔 웹캠을 연결하지 않았을 때는 외부 이미지/영상을 전혀 내려받지 않는, 자체 제작한 캔버스 산 풍경 애니메이션이 기본으로 보입니다 — 이 시뮬레이터의 "인터넷 없이도 항상 동작" 원칙을 그대로 지킵니다(예외는 여전히 유튜브 탭 하나뿐입니다). 모니터 팝업을 닫거나 다른 탭으로 넘어가면 웹캠 스트림과 애니메이션이 자동으로 멈춰 백그라운드에서 계속 돌지 않습니다',
+  ]},
+  { ver: 'Ver0.9970', ko: [
+      '📺 HDMI 모니터 팝업에 5번째 탭 "유튜브"를 추가했습니다 — 유튜브 링크(또는 영상 ID)를 붙여넣고 재생을 누르면 실제 youtube.com 임베드 플레이어가 뜹니다(모크가 아닌 진짜 iframe입니다). 이 시뮬레이터는 기본적으로 완전히 오프라인으로 쓸 수 있게 만들었는데, 이 탭만은 예외적으로 실제 영상을 불러오는 것이라 인터넷 연결이 있어야 합니다',
+      '💻 6번째 탭 "터미널"도 추가했습니다 — 진짜 리눅스나 외부 실행 엔진 없이, ls/cd/cat/pwd/echo/mkdir/touch/rm/history 같은 기본 명령과 whoami·uname·date·ifconfig 같은 정보성 명령을 흉내 내는 가벼운 모크 Bash 콘솔입니다. 특히 "gpio readall"을 입력하면 노코드 HMI 탭에서 만든 위젯들의 가상 GPIO 상태를 그대로 읽어와 보여줘서, 두 탭이 서로 연결되어 있다는 걸 보여줍니다. python3을 입력하면 아주 가벼운 흉내 REPL로 들어가는데(print(...)와 간단한 사칙연산만 흉내), 그 외 입력에는 실제 파이썬이 아니라는 걸 매번 솔직하게 표시합니다',
+      '🛠 팝업 폭을 660px→760px로 넓혀 탭 6개가 한 줄에 여유있게 들어가도록 했고, API Key 발급 방법 팝오버가 화면 아래로 잘려 보이던 문제(위로 펼치도록 수정)도 함께 손봤습니다',
+  ]},
+  { ver: 'Ver0.9969', ko: [
+      '🌀 "모터 & 드라이버" 팔레트에 냉각팬/송풍팬 부품을 추가했습니다(정격 5V/12V/24V 선택) — VCC/GND 두 다리로만 전원을 넣으면 정격 전압에 가까울수록 빨리 돕니다. 이미 있는 미세먼지(PM) 센서와 함께 배선하면(PM 센서 AOUT/SDA·SCL로 오염도를 읽고, 그 값이 기준치를 넘으면 코드에서 트랜지스터나 릴레이로 팬 전원을 켜는 식) 간단한 "공기청정기" 실습 회로를 만들 수 있습니다',
+      '❓ 하단 Gemini AI 바의 API Key 입력칸 옆에 "키 발급 방법" 버튼을 추가했습니다 — 누르면 발급 절차 3단계와 Google AI Studio API Key 페이지 링크가 담긴 작은 안내창이 뜨고, 다른 곳을 클릭하면 자동으로 닫힙니다',
+  ]},
+  { ver: 'Ver0.9968', ko: [
+      '🖱 HDMI 모니터 부품을 더블클릭해도 팝업이 안 열리는 버그를 고쳤습니다 — 원인은 부품을 끄는(드래그) 로직이 문턱값 없이 마우스를 누르자마자 곧바로 위치 이동을 시작해서, 더블클릭하려고 같은 자리를 두 번 클릭하는 사이 손이 1px만 흔들려도 부품이 실제로 미세하게 이동해 버려 브라우저의 더블클릭 판정 자체가 깨지는 것이었습니다(직접 재현해 확인). 다른 조작 요소(입력칸·리셋 버튼 등)에는 이미 있던 "일정 거리 이상 끌어야 진짜 드래그로 인정" 방식을 부품 본체 드래그에도 동일하게 적용했습니다 — 한 번 클릭했을 때 굵은 테두리로 선택되는 동작은 그대로이고, 실제로 위치가 바뀌는 것만 문턱값을 넘겨야 시작됩니다',
+  ]},
   { ver: 'Ver0.9967', ko: [
       '🤖 HDMI 모니터 팝업에 4번째 탭 "ROS"를 추가했습니다 — 상단에서 launch 파일(teleop_demo.launch 또는 sensor_demo.launch)을 고르고 "▶ roslaunch"를 누르면 그 안에 정의된 노드들이 한 번에 떠서, 오른쪽에 노드↔토픽 연결 관계를 화살표로 보여주는 그래프가 그려집니다(발행은 초록 실선, 구독은 주황 점선, 메시지가 지나갈 때마다 잠깐 반짝입니다)',
       '📡 이번엔 겉보기만 그럴듯한 게 아니라 실제로 동작하는 발행-구독(pub/sub) 로직입니다 — rosPublish()가 그 토픽을 구독 중인 노드에 실제로 등록된 JS 콜백을 진짜로 호출합니다. 예를 들어 teleop_demo에서 /cmd_vel을 발행하면 robot_state_node가 실제로 그 콜백에서 오도메트리를 적분해 /odom을 다시 발행하고, 그 값이 오른쪽 Pose 미니맵에 실시간으로 그려집니다(배터리도 함께 서서히 감소)',
@@ -6800,6 +7051,8 @@ function deleteComponent(el){
   // [Ver0.9966, 2부] 지운 부품이 라즈베리파이나 HDMI 모니터였을 수 있으니 전체 모니터 연결
   // 상태를 다시 훑고, 지금 팝업이 보고 있던 모니터 자체가 지워졌다면 팝업도 닫습니다.
   if (typeof updateMonitorHdmiStatus === 'function') updateMonitorHdmiStatus();
+  // [Ver0.9971] 지운 부품이 카메라 모듈이었을 수도 있으니 같이 갱신합니다.
+  if (typeof updateCameraConnStatus === 'function') updateCameraConnStatus();
   const monPopup = document.getElementById('popupMonitor');
   if (monPopup && !monPopup.hidden && monPopup.dataset.targetComp === el.id) closeMonitorPopup();
 }
@@ -6836,6 +7089,11 @@ function clearCanvasAll(){
   // 그렇지 않으면 새 프로젝트를 시작하거나 다른 프로젝트를 불러온 뒤에도 이전 세션의
   // setInterval이 백그라운드에서 계속 돌아 메시지를 발행하는 누수가 생깁니다.
   if (typeof rosStopLaunch === 'function') rosStopLaunch();
+  // [Ver0.9971] 카메라 탭에서 웹캠이 켜져 있었거나 풍경 애니메이션이 돌고 있었다면 여기서도
+  // 반드시 정리합니다 — 캔버스를 비우면 카메라 부품 자체가 사라지므로 계속 켜둘 이유가 없고,
+  // 정리하지 않으면 ROS의 setInterval 누수와 같은 종류의 문제가 생깁니다.
+  if (typeof camStopWebcam === 'function') camStopWebcam();
+  if (typeof camStopPlaceholderAnim === 'function') camStopPlaceholderAnim();
 }
 
 // 툴바의 "새 프로젝트 시작" 버튼 — 확인창을 띄운 뒤 캔버스(부품·보드·전선)를 전부 지우고,
@@ -7244,6 +7502,31 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_AIM" data-i18n-title="comp.ultrasonic.aimTitle" title="AIM ← 서보 SIG (선택, 회전판 서보의 각도를 이 센서의 조준 방향으로 사용 · 안 물리면 정면 0°로 고정)"></div><span class="pin-cap cap-sig">AIM</span></div>
       </div>`;
+  } else if (type === 'lidar'){
+    // [Ver0.9972] 1차원 회전 라이다 센서 — 초음파 센서(comp-ultrasonic)와 똑같이 "장애물까지의
+    // 거리(1차원 값)"를 재지만, 조준 방향을 정해줄 외부 서보(AIM 핀) 없이 센서 자체가 내장
+    // 모터로 계속 360도 회전하며 스캔합니다(runTick에서 각도를 계속 누적). TRIG/ECHO 핀은
+    // 초음파 센서와 똑같은 방식으로 동작해 기존 pulseIn 기반 코드를 그대로 재사용할 수 있고,
+    // 추가로 ANG 핀(0~1023 아날로그)이 "지금 몇 도를 보고 있는지"를 실어보내 회전각+거리를
+    // 함께 읽어 간단한 맵을 그리는 실습도 가능합니다.
+    div.classList.add('comp-lidar');
+    div.dataset.angle = '0';
+    div.innerHTML = `
+      <div class="lidar-body">
+        <div class="lidar-sweep" id="${id}_sweep"></div>
+        <div class="lidar-dot"></div>
+      </div>
+      <div class="lidar-cur-angle"><span data-i18n="comp.lidar.curAngle">현재 각도: </span><span id="${id}_angleval">0°</span></div>
+      <div class="comp-label"><span data-i18n="comp.lidar.label">라이다 센서</span><span id="${id}_val">200cm</span></div>
+      <input type="range" min="2" max="1200" value="200" id="${id}_slider" style="width:100%;accent-color:var(--teal);margin:4px 0;">
+      <div class="lidar-angle-row"><label data-i18n="comp.lidar.objAngleLabel">장애물 각도</label><input type="range" min="0" max="359" value="90" id="${id}_objangle"><span id="${id}_objangleval">90°</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_TRIG" title="TRIG"></div><span class="pin-cap cap-sig">TRIG</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ECHO" title="ECHO"></div><span class="pin-cap cap-sig">ECHO</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ANG" data-i18n-title="comp.lidar.angTitle" title="ANG → 보드 아날로그 핀 (analogRead, 0~1023 = 0~360°, 지금 회전 각도를 그대로 실어보냄)"></div><span class="pin-cap cap-sig">ANG</span></div>
+      </div>`;
   } else if (type === 'gyro'){
     div.classList.add('comp-gyro');
     div.innerHTML = `
@@ -7292,6 +7575,24 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SDA" data-i18n-title="comp.i2csensor.sdaTitle" title="SDA → 보드 I2C 데이터 핀 (R3/R4: A4 · ESP32: GPIO21)"></div><span class="pin-cap cap-sig">SDA</span></div>
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_W" data-i18n-title="comp.pmsensor.aoutTitle" title="AOUT → 보드 아날로그 핀 (GP2Y1010AU0F류 analogRead 직접 사용)"></div><span class="pin-cap cap-sig">AOUT</span></div>
       </div>`;
+  } else if (type === 'fan'){
+    // [Ver0.9969] 냉각팬/송풍팬 — VCC-GND 2선식. 정격 전압을 고르고, VCC 핀에 실제로 그 전압에
+    // 가까운 전원이 걸리면(resistiveReading으로 저항/전선을 거쳐서라도) 걸린 전압에 비례해
+    // 돕니다. 속도를 코드로 끄고 켜려면 이 VCC 앞에 트랜지스터나 릴레이를 넣어 그 스위칭 소자를
+    // MCU 핀으로 제어하면 됩니다(팬 자신은 별도의 제어 핀이 없는 가장 흔한 2선식 팬 모델).
+    div.classList.add('comp-fan');
+    div.innerHTML = `
+      <div class="fan-frame"><div class="fan-blade" id="${id}_fan"></div></div>
+      <div class="comp-label"><span data-i18n="comp.fan.label">냉각팬</span><span id="${id}_speed" data-i18n="motor.stopped">정지</span></div>
+      <select class="fan-rated-v" data-i18n-title="comp.fan.ratedTitle" title="정격 전압 (VCC 핀에 이 전압에 가까울수록 빨리 돕니다)">
+        <option value="5" selected>5V</option>
+        <option value="12">12V</option>
+        <option value="24">24V</option>
+      </select>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+      </div>`;
   } else if (type === 'rpi3' || type === 'rpi4' || type === 'rpi5'){
     // [회로도 전용 장식 부품] 컴파일/시뮬레이션 대상이 아니라, 회로도에 "여기에 라즈베리파이가
     // 있다"는 것을 표시하고 실제 물리 핀 번호·GPIO 이름으로 배선할 수 있도록 만든 부품입니다.
@@ -7313,6 +7614,7 @@ function spawnComponent(type, dropX, dropY){
       <div class="rpi-title">🖥️ ${modelLabel}<span class="rpi-sub" data-i18n="comp.rpi.deco">(회로도 전용 · 시뮬레이션 안 됨)</span></div>
       <div class="rpi-ports">
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_HDMI" data-i18n-title="comp.rpi.hdmiTitle" title="HDMI OUT (더블클릭한 HDMI 모니터 부품의 팝업에서 화면 확인)"></div><span class="pin-cap cap-sig">HDMI</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_CAM" data-i18n-title="comp.rpi.camTitle" title="CAM (CSI 카메라 포트) → 카메라 모듈의 CAM 핀과 연결"></div><span class="pin-cap cap-sig">CAM</span></div>
       </div>
       <div class="rpi-header">${rowsHtml}</div>`;
   } else if (type === 'hdmimonitor'){
@@ -7323,6 +7625,18 @@ function spawnComponent(type, dropX, dropY){
       <div class="comp-pin-row">
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_HDMI" title="HDMI IN"></div><span class="pin-cap cap-sig">HDMI</span></div>
         <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_PWR" title="전원"></div><span class="pin-cap cap-vcc">PWR</span></div>
+      </div>`;
+  } else if (type === 'camera'){
+    // [Ver0.9971] 카메라 모듈(회로도 전용 장식 부품) — 실제 라즈베리파이 카메라처럼 리본 케이블
+    // 한 줄(CSI)만으로 연결되므로, HDMI 모니터와 같은 방식으로 CAM-CAM 핀 하나만 전선으로 잇습니다.
+    // 이 핀이 실제로 RPi의 CAM 포트에 연결되어 있으면, HDMI 모니터 팝업의 "카메라" 탭에서 화면을
+    // 볼 수 있습니다(모니터 자체와는 별개 — 카메라는 RPi에, 모니터는 RPi의 HDMI에 각각 연결).
+    div.classList.add('comp-diagramdeco', 'comp-camera');
+    div.innerHTML = `
+      <div class="deco-title" data-i18n="comp.camera.title">카메라 모듈</div>
+      <div class="cam-lens"><div class="cam-lens-inner"></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_CAM" data-i18n-title="comp.camera.camTitle" title="CAM → 라즈베리파이의 CAM 포트 (CSI 리본 케이블)"></div><span class="pin-cap cap-sig">CAM</span></div>
       </div>`;
   } else if (type === 'usbsound'){
     div.classList.add('comp-diagramdeco', 'comp-usbsound');
@@ -8651,6 +8965,18 @@ function spawnComponent(type, dropX, dropY){
     const angleSlider = document.getElementById(`${id}_angle`);
     const angleVal = document.getElementById(`${id}_angleval`);
     angleSlider.addEventListener('input', () => { angleVal.textContent = angleSlider.value + '°'; });
+  } else if (type === 'lidar'){
+    // 거리 슬라이더는 "장애물이 있는 지점까지의 거리"만 바꾸고, 시뮬레이션이 돌고 있을 때는
+    // runTick이 매 틱 회전각과 함께 실제 표시값(${id}_val)을 다시 계산합니다(초음파 센서와
+    // 달리 계속 회전 중이라 슬라이더 값 = 화면 표시값이 아닐 수 있음 — 빔이 장애물 각도를
+    // 지날 때만 그 값에 가까운 값을 보여줍니다). 시뮬레이션이 꺼져 있을 때는 슬라이더를
+    // 만지면 미리보기로 그 값을 그대로 보여줍니다.
+    const slider = document.getElementById(`${id}_slider`);
+    const val = document.getElementById(`${id}_val`);
+    slider.addEventListener('input', () => { if (!isSimulating) val.textContent = slider.value + 'cm'; });
+    const objAngleSlider = document.getElementById(`${id}_objangle`);
+    const objAngleVal = document.getElementById(`${id}_objangleval`);
+    objAngleSlider.addEventListener('input', () => { objAngleVal.textContent = objAngleSlider.value + '°'; });
   } else if (type === 'gyro'){
     ['x','y','z'].forEach(ax => {
       const s = document.getElementById(`${id}_g${ax}`);
@@ -8963,6 +9289,25 @@ function ultrasonicReading(sensorEl){
   const inCone = Math.abs(objAngle - aim) <= ULTRASONIC_BEAM_HALF_DEG;
   const effectiveDist = inCone ? dist : 400;
   return { type:'echo', v: Math.min(1, effectiveDist / 400) };
+}
+
+// [Ver0.9972] 1차원 회전 라이다 센서 — ultrasonicReading()과 완전히 같은 "조준 방향이 장애물
+// 각도의 빔 폭 안에 들어와야만 실제 거리가 보인다"는 개념이지만, 조준 방향(aim)을 외부
+// 서보가 아니라 이 부품 자신이 runTick에서 계속 채워 넣는 div.dataset.angle(0~359°, 내장
+// 모터로 회전)에서 가져옵니다. 실제 레이저처럼 초음파보다 훨씬 좁은 빔(±2°)을 씁니다.
+const LIDAR_RANGE_CM = 1200; // 저가형 2D 라이다(RPLidar A1 등)의 대략적인 최대 측정 거리(12m)를 본뜸
+const LIDAR_BEAM_HALF_DEG = 2;
+function lidarReading(sensorEl){
+  const sliders = sensorEl.querySelectorAll('input[type=range]');
+  const dist = sliders[0] ? parseFloat(sliders[0].value) : 200;
+  const objAngle = sliders[1] ? parseFloat(sliders[1].value) : 90;
+  const aim = parseFloat(sensorEl.dataset.angle) || 0;
+  // 0°/360°를 넘나드는 원형 각도 차이(예: 359°와 1°는 실제로 2°밖에 차이 나지 않음)를 구합니다.
+  let diff = Math.abs(objAngle - aim) % 360;
+  if (diff > 180) diff = 360 - diff;
+  const inBeam = diff <= LIDAR_BEAM_HALF_DEG;
+  const effectiveDist = inBeam ? dist : LIDAR_RANGE_CM;
+  return { type:'echo', v: Math.min(1, effectiveDist / LIDAR_RANGE_CM) };
 }
 function driveMotor(motorId, speed, dir){
   const el = document.getElementById(motorId);
@@ -10494,6 +10839,8 @@ function createWire(pinA, pinB){
   updateLegend();
   // [Ver0.9966, 2부] 새 전선이 라즈베리파이-HDMI 모니터 결선을 완성/변경했을 수 있으므로 갱신.
   if (typeof updateMonitorHdmiStatus === 'function') updateMonitorHdmiStatus();
+  // [Ver0.9971] 새 전선이 라즈베리파이-카메라 모듈 결선을 완성/변경했을 수 있으므로 갱신.
+  if (typeof updateCameraConnStatus === 'function') updateCameraConnStatus();
   return wireObj;
 }
 
@@ -10843,6 +11190,8 @@ function deleteWire(wireObj){
   updateLegend();
   // [Ver0.9966, 2부] 전선을 지워 라즈베리파이-HDMI 모니터 결선이 끊어졌을 수 있으므로 갱신.
   if (typeof updateMonitorHdmiStatus === 'function') updateMonitorHdmiStatus();
+  // [Ver0.9971] 전선을 지워 라즈베리파이-카메라 모듈 결선이 끊어졌을 수 있으므로 갱신.
+  if (typeof updateCameraConnStatus === 'function') updateCameraConnStatus();
 }
 
 function setWireColor(wireObj, color){
@@ -10913,6 +11262,7 @@ const COMP_HELP_BLURB = {
   wifiap:     { ko: 'VCC/GND로 전원을 넣고 보드와 TX/RX(시리얼) 또는 SDA/SCL로 연결하면, AT 명령/네트워크 데이터를 주고받는 무선 AP로 동작합니다.', en: 'Power via VCC/GND, connect TX/RX (serial) or SDA/SCL to the board — it acts as a Wi-Fi AP relaying AT commands/data.' },
   rs485servo: { ko: 'VCC/GND는 서보 전원, SIG는 RS-485 버스 데이터선입니다 — 여러 대를 VCC-VCC, SIG-SIG, GND-GND로 데이지체인처럼 나란히 이어 붙일 수 있습니다.', en: 'VCC/GND powers the servo, SIG carries RS-485 bus data — chain several units VCC-VCC, SIG-SIG, GND-GND in a daisy chain.' },
   ultrasonic: { ko: 'VCC/GND로 전원을 넣고, TRIG에 짧은 펄스를 보내면 ECHO에서 그 왕복 시간만큼 HIGH가 유지됩니다 — 그 시간으로 거리를 계산합니다.', en: 'Power via VCC/GND; a short pulse on TRIG makes ECHO stay HIGH for the round-trip time, which encodes distance.' },
+  lidar:      { ko: '초음파 센서와 똑같이 TRIG/ECHO(pulseIn)로 거리를 읽지만, 외부 서보 없이 센서 스스로 계속 360도 회전합니다 — ANG 핀(analogRead)으로 지금 몇 도를 보고 있는지도 함께 읽으면, 거리+각도를 loop()에서 계속 모아 간단한 360도 스캔(맵)을 만들 수 있습니다.', en: 'Reads distance via TRIG/ECHO (pulseIn) exactly like the ultrasonic sensor, but spins a full 360° on its own — no external servo needed. Also read ANG (analogRead) for the current angle, and collect distance+angle pairs in loop() to build a simple 360° scan.' },
   gyro:       { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 연결하면 X/Y/Z 세 축의 각속도(°/s) 값을 읽어올 수 있습니다.', en: 'Power via VCC/GND, connect SDA/SCL (I2C) to the board to read X/Y/Z angular velocity.' },
   accel:      { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 연결하면 X/Y/Z 세 축의 가속도(g) 값을 읽어올 수 있습니다.', en: 'Power via VCC/GND, connect SDA/SCL (I2C) to the board to read X/Y/Z acceleration.' },
   canmodule:  { ko: 'VCC/GND로 전원을 넣고 CANH/CANL 두 선을 다른 CAN 모듈과 그대로 나란히 이으면 버스로 통신합니다(극성 없음).', en: 'Power via VCC/GND; wire CANH/CANL straight across to other CAN nodes — the bus has no polarity.' },
@@ -11110,6 +11460,14 @@ function externalSourceOnNet(pinEl){
     if (pid.endsWith('_ECHO')){
       const sensor = el.closest('.comp-ultrasonic');
       if (sensor) return ultrasonicReading(sensor);
+      const lidar = el.closest('.comp-lidar');
+      if (lidar) return lidarReading(lidar);
+    }
+    // [Ver0.9972] 라이다의 ANG 핀 — 지금 회전 각도(0~360°)를 0~1의 아날로그 값으로 실어보내
+    // analogRead()가 0~1023 사이 값(각도에 비례)으로 읽을 수 있게 합니다.
+    if (pid.endsWith('_ANG')){
+      const lidar = el.closest('.comp-lidar');
+      if (lidar) return { type:'analog', v: (parseFloat(lidar.dataset.angle) || 0) / 360 };
     }
     // 5V ↔ 3.3V 레벨 시프터: HV1/HV2 채널 핀은 반대편 LV1/LV2 핀의 net(실제 회로 전체)에서
     // 읽히는 디지털 논리값을 그대로 가져와, 이 시프터의 HV/LV 기준전압 핀 전압으로 다시
@@ -12999,7 +13357,7 @@ function toggleSimulation(){
       const label = document.getElementById(`${sv.id}_angle`);
       if (label) label.textContent = '90°';
     });
-    document.querySelectorAll('.comp-dcmotor, .comp-dcmotor-enc, .comp-bldcmotor, .comp-motor3ph, .comp-acmotor').forEach(m => driveMotor(m.id, 0, 1));
+    document.querySelectorAll('.comp-dcmotor, .comp-dcmotor-enc, .comp-bldcmotor, .comp-motor3ph, .comp-acmotor, .comp-fan').forEach(m => driveMotor(m.id, 0, 1));
     document.querySelectorAll('.comp-stepper').forEach(st => driveStepper(st.id, parseFloat(st.dataset.angle || '0'), false, parseFloat(st.dataset.stepCount || '0')));
     document.querySelectorAll('.comp-relay, .comp-relay220').forEach(relay => updateRelayVisual(relay.id, false));
     document.querySelectorAll('.comp-multimeter').forEach(mm => updateMultimeter(mm.id));
@@ -13502,6 +13860,40 @@ function runTick(){
         const motorEl = el.closest('.comp-bldcmotor');
         if (motorEl) driveMotor(motorEl.id, speed, dir);
       });
+    }
+  });
+
+  // 5-1b. [Ver0.9969] 냉각팬/송풍팬: VCC-GND 두 다리뿐인 가장 단순한 2선식 부하 — 전용 드라이버
+  // 없이, VCC 핀에 저항/전선을 거쳐서라도 도달하는 전압을 resistiveReading()으로 직접 읽어 정격
+  // 전압 대비 비율만큼 속도를 냅니다(다른 2선식 220V 부하와 같은 "직접 읽기" 방식 — acmotor처럼
+  // 별도 컨트롤러 부품이 없어도 항상 동작). 코드로 켜고 끄려면 이 VCC 앞에 트랜지스터/릴레이를
+  // 넣어 그 스위칭 소자를 MCU 핀으로 제어하면 됩니다.
+  document.querySelectorAll('.comp-fan').forEach(fan => {
+    const vPin = fan.querySelector('[data-pin$="_V"]');
+    const ratedSel = fan.querySelector('.fan-rated-v');
+    const rated = ratedSel ? parseFloat(ratedSel.value) : 5;
+    const vReading = (isSimulating && vPin) ? resistiveReading(vPin) : null;
+    const suppliedV = vReading ? readingToVolts(vReading) : 0;
+    const speed = rated > 0 ? Math.max(0, Math.min(1, suppliedV / rated)) : 0;
+    driveMotor(fan.id, speed, 1);
+  });
+
+  // 5-1c. [Ver0.9972] 1차원 회전 라이다 센서: 전원 유무와 무관하게(교육용 단순화 — 실제로는
+  // VCC가 있어야 돌지만, 배선 실습의 초점이 "TRIG/ECHO/ANG를 어떻게 읽는가"이므로 초음파
+  // 센서처럼 배선 여부와 무관하게 항상 값을 냅니다) 시뮬레이션이 도는 동안 계속 360도로
+  // 회전합니다(2초에 한 바퀴, 40Hz 틱 기준 틱당 4.5°). 화면의 스윕 표시와 각도 라벨, 그리고
+  // "지금 스캔 중인 거리" 표시(${id}_val)를 매 틱 갱신합니다.
+  document.querySelectorAll('.comp-lidar').forEach(lidar => {
+    if (isSimulating){
+      let angle = (parseFloat(lidar.dataset.angle) || 0) + 4.5;
+      if (angle >= 360) angle -= 360;
+      lidar.dataset.angle = String(angle);
+      const sweep = document.getElementById(`${lidar.id}_sweep`);
+      if (sweep) sweep.style.transform = `rotate(${angle}deg)`;
+      const angleVal = document.getElementById(`${lidar.id}_angleval`);
+      if (angleVal) angleVal.textContent = `${Math.round(angle)}°`;
+      const val = document.getElementById(`${lidar.id}_val`);
+      if (val) val.textContent = `${Math.round(lidarReading(lidar).v * LIDAR_RANGE_CM)}cm`;
     }
   });
 
@@ -14098,6 +14490,60 @@ function updateMonitorHdmiStatus(monitorId){
   });
 }
 
+// [Ver0.9971] 📷 카메라 모듈 배선 감지 — rpiConnectedToMonitor()와 완전히 같은 패턴입니다.
+// comp-rpi의 새 CAM 핀이 comp-camera 부품의 CAM 핀과 같은 net에 물려 있는지 netOf()로
+// 판별합니다(실제 CSI 카메라 포트처럼 "포트 이름이 같은 핀끼리 잇는다"는 느낌).
+function rpiConnectedToCamera(cameraEl){
+  const camPin = cameraEl && cameraEl.querySelector('[data-pin$="_CAM"]');
+  if (!camPin) return null;
+  const net = netOf(camPin);
+  for (const el of net){
+    if (el === camPin || !el.dataset) continue;
+    const pid = el.dataset.pin || '';
+    if (pid.endsWith('_CAM') && el.closest('.comp-rpi')) return el.closest('.comp-rpi');
+  }
+  return null;
+}
+
+// 캔버스 위 카메라 모듈 부품(들)의 연결 상태를 갱신합니다 — updateMonitorHdmiStatus()와 같은
+// 패턴이며, 모니터 팝업이 현재 이 카메라와 연결된 라즈베리파이의 모니터를 보여주고 있다면
+// 카메라 탭 UI(연결 안내/웹캠 버튼 활성화 여부)도 함께 갱신합니다.
+function updateCameraConnStatus(cameraId){
+  const cameras = cameraId
+    ? [document.getElementById(cameraId)].filter(Boolean)
+    : Array.from(document.querySelectorAll('.comp-camera'));
+  cameras.forEach(camEl => {
+    const connected = !!rpiConnectedToCamera(camEl);
+    camEl.dataset.camConnected = connected ? '1' : '0';
+    camEl.classList.toggle('cam-connected', connected);
+  });
+  camRefreshTabUi();
+}
+
+// 지금 모니터 팝업에 열려 있는 대상(popup.dataset.targetComp)의 모니터에, CAM 핀으로 연결된
+// 카메라 모듈이 있는지 확인해 카메라 탭의 안내 문구/웹캠 버튼 활성화 상태를 맞춥니다. 모니터가
+// HDMI로도 연결되어 있어야 같은 라즈베리파이라는 것을 알 수 있으므로 rpiConnectedToMonitor를
+// 먼저 거칩니다.
+function camRefreshTabUi(){
+  const popup = document.getElementById('popupMonitor');
+  const btn = document.getElementById('camWebcamBtn');
+  const statusText = document.getElementById('camStatusText');
+  if (!popup || !btn) return;
+  const monitorEl = popup.dataset.targetComp ? document.getElementById(popup.dataset.targetComp) : null;
+  const rpiEl = monitorEl ? rpiConnectedToMonitor(monitorEl) : null;
+  let camEl = null;
+  if (rpiEl){
+    document.querySelectorAll('.comp-camera').forEach(c => { if (rpiConnectedToCamera(c) === rpiEl) camEl = c; });
+  }
+  const camReady = !!camEl;
+  btn.disabled = !camReady;
+  if (!camReady && camWebcamStream){ camStopWebcam(); }
+  if (statusText && !camWebcamStream){
+    statusText.textContent = camReady ? tr('monitor.camPlaceholderStatus') : tr('monitor.camNotConnected');
+    statusText.dataset.i18n = camReady ? 'monitor.camPlaceholderStatus' : 'monitor.camNotConnected';
+  }
+}
+
 // 팝업 하나를 여러 모니터 부품이 공유하므로, 열 때마다 대상 부품 id를 새로 지정하고 그
 // 부품에 지금 라즈베리파이가 연결되어 있는지 즉시 검사해 화면(no-signal 오버레이)을 맞춥니다.
 function openMonitorPopup(compId){
@@ -14111,10 +14557,16 @@ function openMonitorPopup(compId){
   popup.style.zIndex = ++popupZTop;
   updateMonitorHdmiStatus(compId);
   drawTkinterMockUi();
+  camRefreshTabUi();
 }
 function closeMonitorPopup(){
   const popup = document.getElementById('popupMonitor');
   if (popup) popup.hidden = true;
+  // [Ver0.9971] 팝업을 닫을 때 웹캠이 켜져 있었다면 반드시 스트림을 끊고(카메라 표시등이
+  // 계속 켜져 있지 않도록) 풍경 애니메이션 루프도 멈춥니다 — 안 그러면 백그라운드에서 계속
+  // 돌면서 배터리/CPU를 낭비합니다.
+  camStopWebcam();
+  camStopPlaceholderAnim();
 }
 // toggleBoardPopupMaximize()와 똑같은 로직이지만, popupMonitor/maxBtnMonitor는 board 키
 // 규칙(popup${KEY.toUpperCase()})을 따르는 동적 보드 팝업이 아니라 고정 ID의 정적 싱글턴
@@ -14147,7 +14599,7 @@ function toggleMonitorPopupMaximize(){
 
 // 3개 모드 탭 전환 — .editor-tabs/.editor-tab(코드/블록 에디터 탭과 같은 스타일)을 재사용합니다.
 function switchMonitorTab(tabName){
-  const NAMES = ['nocode', 'tkinter', 'web', 'ros'];
+  const NAMES = ['nocode', 'tkinter', 'web', 'ros', 'youtube', 'linux', 'camera'];
   NAMES.forEach(name => {
     const cap = name.charAt(0).toUpperCase() + name.slice(1);
     document.getElementById(`tabBtn${cap}`)?.classList.toggle('active', name === tabName);
@@ -14157,6 +14609,16 @@ function switchMonitorTab(tabName){
   // [Ver0.9967, 3부] ROS 탭은 숨겨져 있던 동안(display:none) SVG의 실제 렌더 너비를 알 수
   // 없으므로, 탭이 보이게 된 직후 다시 그려야 그래프가 팝업 폭에 맞게 정확히 배치됩니다.
   if (tabName === 'ros') drawRosGraph();
+  // [Ver0.9970] 터미널 탭으로 전환하면 바로 타이핑할 수 있도록 입력창에 포커스를 줍니다.
+  if (tabName === 'linux') document.getElementById('linuxTermInput')?.focus();
+  // [Ver0.9971] 카메라 탭으로 들어오면 연결 상태를 다시 확인하고 풍경 애니메이션을 켜며,
+  // 다른 탭으로 나가면 웹캠/애니메이션을 멈춰 백그라운드에서 계속 돌지 않게 합니다.
+  if (tabName === 'camera'){
+    camRefreshTabUi();
+    if (!camWebcamStream) camStartPlaceholderAnim();
+  } else {
+    camStopPlaceholderAnim();
+  }
 }
 
 // comp-hdmimonitor 부품을 더블클릭하면 바로 팝업을 엽니다(comp-custom의 기존 더블클릭 편집
@@ -14331,6 +14793,387 @@ function reloadWebIframe(){
   requestAnimationFrame(() => { iframe.srcdoc = WEB_IFRAME_DEFAULT_SRCDOC; });
 }
 reloadWebIframe(); // 페이지 로드 시 기본 데모 화면을 한 번 채워 둡니다.
+
+/* ---------- 탭5: 📺 유튜브 임베드 [Ver0.9970] — 실제 iframe(youtube.com/embed/)입니다. 이
+   시뮬레이터는 오프라인으로도 완전히 동작해야 하므로, 이 탭만은 예외적으로 인터넷 연결이 있어야
+   실제로 영상이 보입니다. 링크에서 영상 ID만 정규식으로 뽑아내 embed URL을 새로 만듭니다(전체
+   URL을 그대로 넣으면 youtu.be/워치 페이지 링크가 iframe 안에서 열리지 않는 경우가 있어서). ---------- */
+function youtubeExtractId(input){
+  const s = (input || '').trim();
+  if (!s) return null;
+  // 이미 11자리 영상 ID만 붙여넣은 경우(공백 없이 영숫자/-/_ 로만 구성)
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+  const patterns = [
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const re of patterns){ const m = s.match(re); if (m) return m[1]; }
+  return null;
+}
+function loadYoutubeVideo(){
+  const input = document.getElementById('ytUrlInput');
+  const hint = document.getElementById('ytEmptyHint');
+  const iframe = document.getElementById('ytPlayer');
+  if (!input || !iframe) return;
+  const id = youtubeExtractId(input.value);
+  if (!id){
+    if (hint){ hint.textContent = tr('monitor.ytBadLink'); hint.hidden = false; }
+    iframe.hidden = true;
+    iframe.src = '';
+    return;
+  }
+  iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+  iframe.hidden = false;
+  if (hint) hint.hidden = true;
+}
+document.getElementById('ytUrlInput')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') loadYoutubeVideo();
+});
+
+/* ============================================================================
+ * 💻 [Ver0.9970] 가상 리눅스 Bash 터미널 — HDMI 모니터 팝업의 6번째 탭
+ *
+ * [설계 메모] 실제 리눅스도, Pyodide 같은 외부 실행 엔진도 전혀 쓰지 않는 가벼운 모크입니다.
+ * 사용자가 입력한 문자열을 몇 가지 알려진 명령 패턴과 비교해 그럴듯한 결과를 흉내 내는 방식으로,
+ * 진짜 프로세스·셸·파일시스템은 존재하지 않습니다(메모리 안의 가짜 트리 LINUX_FAKE_FS만 있음).
+ * gpio readall만은 노코드 HMI 탭의 rpiPinState를 실제로 읽어와, "그 탭에서 만든 위젯이 곧
+ * GPIO"라는 이 시뮬레이터 전체의 연결고리를 터미널에서도 보여줍니다.
+ * ============================================================================ */
+const LINUX_FAKE_FS = {
+  '/': { type: 'dir', children: ['home', 'etc', 'boot'] },
+  '/home': { type: 'dir', children: ['pi'] },
+  '/home/pi': { type: 'dir', children: ['Desktop', 'sketch.py', 'readme.txt'] },
+  '/home/pi/Desktop': { type: 'dir', children: [] },
+  '/home/pi/sketch.py': { type: 'file', content: 'import RPi.GPIO as GPIO\nimport time\n\nGPIO.setmode(GPIO.BCM)\nGPIO.setup(17, GPIO.OUT)\n\nwhile True:\n    GPIO.output(17, True)\n    time.sleep(1)\n    GPIO.output(17, False)\n    time.sleep(1)\n' },
+  '/home/pi/readme.txt': { type: 'file', content: '이 터미널은 K군의 시뮬레이터가 만든 가벼운 가상 콘솔입니다.\n실제 리눅스가 아니라 몇 가지 명령만 흉내 냅니다 — help 를 입력해 보세요.' },
+  '/etc': { type: 'dir', children: ['os-release'] },
+  '/etc/os-release': { type: 'file', content: 'PRETTY_NAME="Raspberry Pi OS (mock, K\'s Simulator)"\nID=raspbian\n' },
+  '/boot': { type: 'dir', children: ['config.txt'] },
+  '/boot/config.txt': { type: 'file', content: '# 이 시뮬레이터에서는 실제로 읽히지 않는 예시 파일입니다\ngpu_mem=128\n' },
+};
+const linuxTermState = { cwd: '/home/pi', history: [], histIdx: -1, bootedAt: Date.now() };
+
+function linuxNormalizePath(path){
+  const parts = path.split('/').filter(p => p.length && p !== '.');
+  const out = [];
+  for (const p of parts){ if (p === '..') out.pop(); else out.push(p); }
+  return '/' + out.join('/');
+}
+function linuxResolvePath(arg){
+  if (!arg || arg === '~') return '/home/pi';
+  if (arg.startsWith('~/')) return linuxNormalizePath('/home/pi/' + arg.slice(2));
+  if (arg.startsWith('/')) return linuxNormalizePath(arg);
+  return linuxNormalizePath(linuxTermState.cwd + '/' + arg);
+}
+function linuxTermPrint(text, cls){
+  const body = document.getElementById('linuxTermBody');
+  if (!body) return;
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = text;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
+}
+function linuxTermPrintCmd(cmdText){
+  const body = document.getElementById('linuxTermBody');
+  if (!body) return;
+  const line = document.createElement('div');
+  line.className = 'lt-cmd';
+  line.textContent = `${linuxTermState.cwd === '/home/pi' ? '~' : linuxTermState.cwd} ${cmdText}`;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
+}
+function linuxUpdatePromptLabel(){
+  const label = document.getElementById('linuxPromptLabel');
+  const short = linuxTermState.cwd === '/home/pi' ? '~' : linuxTermState.cwd;
+  if (label) label.textContent = `pi@raspberrypi:${short}$`;
+}
+function linuxBootBanner(){
+  const body = document.getElementById('linuxTermBody');
+  if (body) body.innerHTML = '';
+  linuxTermPrint('Raspberry Pi OS (mock) — K군의 시뮬레이터 가상 터미널', 'lt-dim');
+  linuxTermPrint('진짜 리눅스가 아니라, 몇 가지 명령만 흉내 내는 가벼운 모크입니다. help 를 입력해 보세요.', 'lt-dim');
+  linuxTermPrint('');
+}
+// 명령어 하나를 처리해 결과를 터미널에 출력합니다. 실제 셸처럼 파이프/리다이렉션 등은 지원하지
+// 않는, 딱 필요한 만큼만 흉내 낸 가벼운 파서입니다.
+function linuxExecCommand(raw){
+  const cmdText = raw.trim();
+  linuxTermPrintCmd(cmdText || '');
+  if (!cmdText) return;
+  linuxTermState.history.push(cmdText);
+  linuxTermState.histIdx = linuxTermState.history.length;
+  const [cmd, ...args] = cmdText.split(/\s+/);
+  const argsJoined = args.join(' ');
+
+  if (cmd === 'help'){
+    ['help — 이 도움말', 'ls [경로] — 목록 보기', 'cd <경로> — 이동', 'pwd — 현재 위치', 'cat <파일> — 파일 내용',
+     'echo <문자열> — 그대로 출력', 'whoami / hostname / uname -a / date — 시스템 정보(흉내)',
+     'gpio readall — 노코드 HMI 탭의 가상 GPIO 상태 보기', 'mkdir/touch/rm — 가짜 파일 만들기/지우기',
+     'clear — 화면 지우기', 'history — 이전 명령 목록', 'python3 — (모크) 파이썬 흉내 REPL', 'reboot — 재부팅 흉내']
+      .forEach(l => linuxTermPrint(l, 'lt-dim'));
+  } else if (cmd === 'pwd'){
+    linuxTermPrint(linuxTermState.cwd);
+  } else if (cmd === 'whoami'){
+    linuxTermPrint('pi');
+  } else if (cmd === 'hostname'){
+    linuxTermPrint(args[0] === '-I' ? '192.168.0.42' : 'raspberrypi');
+  } else if (cmd === 'uname'){
+    linuxTermPrint(args[0] === '-a'
+      ? 'Linux raspberrypi 6.6.31-v8+ #1 SMP PREEMPT (mock) aarch64 GNU/Linux'
+      : 'Linux');
+  } else if (cmd === 'date'){
+    linuxTermPrint(new Date().toString());
+  } else if (cmd === 'clear'){
+    document.getElementById('linuxTermBody').innerHTML = '';
+  } else if (cmd === 'history'){
+    linuxTermState.history.forEach((h, i) => linuxTermPrint(`${i + 1}  ${h}`, 'lt-dim'));
+  } else if (cmd === 'echo'){
+    linuxTermPrint(argsJoined);
+  } else if (cmd === 'ls'){
+    const target = args.filter(a => !a.startsWith('-'))[0];
+    const path = linuxResolvePath(target || linuxTermState.cwd);
+    const entry = LINUX_FAKE_FS[path];
+    if (!entry){ linuxTermPrint(`ls: 존재하지 않는 경로: ${target || path}`, 'lt-err'); }
+    else if (entry.type !== 'dir'){ linuxTermPrint(path.split('/').pop()); }
+    else if (!entry.children.length){ linuxTermPrint('', 'lt-dim'); }
+    else { linuxTermPrint(entry.children.join('  ')); }
+  } else if (cmd === 'cd'){
+    const path = linuxResolvePath(args[0] || '~');
+    const entry = LINUX_FAKE_FS[path];
+    if (!entry || entry.type !== 'dir'){ linuxTermPrint(`bash: cd: ${args[0] || ''}: 그런 디렉터리가 없습니다`, 'lt-err'); }
+    else { linuxTermState.cwd = path; linuxUpdatePromptLabel(); }
+  } else if (cmd === 'cat'){
+    if (!args[0]){ linuxTermPrint('cat: 파일 이름이 필요합니다', 'lt-err'); return; }
+    const path = linuxResolvePath(args[0]);
+    const entry = LINUX_FAKE_FS[path];
+    if (!entry){ linuxTermPrint(`cat: ${args[0]}: 그런 파일이 없습니다`, 'lt-err'); }
+    else if (entry.type === 'dir'){ linuxTermPrint(`cat: ${args[0]}: 디렉터리입니다`, 'lt-err'); }
+    else { entry.content.split('\n').forEach(l => linuxTermPrint(l)); }
+  } else if (cmd === 'mkdir'){
+    if (!args[0]){ linuxTermPrint('mkdir: 디렉터리 이름이 필요합니다', 'lt-err'); return; }
+    const path = linuxResolvePath(args[0]);
+    const parent = path.slice(0, path.lastIndexOf('/')) || '/';
+    if (!LINUX_FAKE_FS[parent] || LINUX_FAKE_FS[parent].type !== 'dir'){ linuxTermPrint(`mkdir: ${args[0]}: 상위 경로가 없습니다`, 'lt-err'); return; }
+    LINUX_FAKE_FS[path] = { type: 'dir', children: [] };
+    const name = path.split('/').pop();
+    if (!LINUX_FAKE_FS[parent].children.includes(name)) LINUX_FAKE_FS[parent].children.push(name);
+  } else if (cmd === 'touch'){
+    if (!args[0]){ linuxTermPrint('touch: 파일 이름이 필요합니다', 'lt-err'); return; }
+    const path = linuxResolvePath(args[0]);
+    const parent = path.slice(0, path.lastIndexOf('/')) || '/';
+    if (!LINUX_FAKE_FS[parent] || LINUX_FAKE_FS[parent].type !== 'dir'){ linuxTermPrint(`touch: ${args[0]}: 상위 경로가 없습니다`, 'lt-err'); return; }
+    if (!LINUX_FAKE_FS[path]) LINUX_FAKE_FS[path] = { type: 'file', content: '' };
+    const name = path.split('/').pop();
+    if (!LINUX_FAKE_FS[parent].children.includes(name)) LINUX_FAKE_FS[parent].children.push(name);
+  } else if (cmd === 'rm'){
+    if (!args[0]){ linuxTermPrint('rm: 대상이 필요합니다', 'lt-err'); return; }
+    const path = linuxResolvePath(args[0]);
+    if (!LINUX_FAKE_FS[path]){ linuxTermPrint(`rm: ${args[0]}: 그런 파일이나 디렉터리가 없습니다`, 'lt-err'); return; }
+    const parent = path.slice(0, path.lastIndexOf('/')) || '/';
+    delete LINUX_FAKE_FS[path];
+    if (LINUX_FAKE_FS[parent]) LINUX_FAKE_FS[parent].children = LINUX_FAKE_FS[parent].children.filter(c => c !== path.split('/').pop());
+  } else if (cmd === 'ifconfig' || cmd === 'ip'){
+    linuxTermPrint('eth0: inet 192.168.0.42  netmask 255.255.255.0', 'lt-dim');
+    linuxTermPrint('wlan0: inet 192.168.0.43  netmask 255.255.255.0', 'lt-dim');
+  } else if (cmd === 'gpio' && args[0] === 'readall'){
+    // 노코드 HMI 탭에서 만든 위젯 = 이 명령이 읽는 실제 GPIO 상태입니다(rpiPinState 공유).
+    const ids = Object.keys(rpiPinState);
+    if (!ids.length){ linuxTermPrint('(노코드 HMI 탭에 위젯이 하나도 없습니다 — 먼저 그 탭에서 버튼/토글 등을 추가해 보세요)', 'lt-dim'); return; }
+    ids.forEach(wid => {
+      const widgetEl = document.getElementById(wid);
+      const gpio = widgetEl ? widgetEl.dataset.gpio : '?';
+      const kind = widgetEl ? widgetEl.dataset.kind : '';
+      const val = rpiPinState[wid];
+      linuxTermPrint(kind === 'gauge' ? `ADC${gpio} : ${val}%` : `GPIO${gpio} : ${val ? 'HIGH (1)' : 'LOW (0)'}`);
+    });
+  } else if (cmd === 'reboot' || (cmd === 'sudo' && args[0] === 'reboot')){
+    linuxTermPrint('시스템을 재시작합니다...', 'lt-dim');
+    setTimeout(() => { linuxBootBanner(); }, 500);
+  } else if (cmd === 'python3' || cmd === 'python'){
+    linuxTermPrint('Python 3.11.2 (mock) — 실제 파이썬을 실행하지 않는 흉내 REPL입니다.', 'lt-dim');
+    linuxTermPrint('exit()를 입력하면 셸로 돌아갑니다.', 'lt-dim');
+    linuxTermState.inPython = true;
+    linuxUpdatePromptLabel_python();
+  } else if (cmd === 'sudo'){
+    linuxTermPrint(`sudo: ${argsJoined || '명령'}: (mock) 실제 권한 상승 없이 그대로 실행합니다`, 'lt-dim');
+    if (args.length) linuxExecCommand(argsJoined);
+  } else {
+    linuxTermPrint(`bash: ${cmd}: command not found`, 'lt-err');
+  }
+}
+function linuxUpdatePromptLabel_python(){
+  const label = document.getElementById('linuxPromptLabel');
+  if (label) label.textContent = '>>>';
+}
+// python3(모크) 서브모드 전용 — print(...)와 간단한 사칙연산만 흉내 냅니다. 그 외 입력은
+// "실제로 실행하지 않는다"는 사실을 매번 솔직하게 알려줍니다.
+function linuxExecPythonMock(raw){
+  const line = raw.trim();
+  linuxTermPrintCmd(line);
+  if (!line) return;
+  if (line === 'exit()' || line === 'quit()'){
+    linuxTermState.inPython = false;
+    linuxUpdatePromptLabel();
+    return;
+  }
+  const printMatch = line.match(/^print\((.*)\)$/);
+  if (printMatch){
+    let inner = printMatch[1].trim();
+    if ((inner.startsWith('"') && inner.endsWith('"')) || (inner.startsWith("'") && inner.endsWith("'"))) inner = inner.slice(1, -1);
+    linuxTermPrint(inner);
+    return;
+  }
+  if (/^[0-9.\s+\-*/()]+$/.test(line) && line.length < 40){
+    try { linuxTermPrint(String(Function(`"use strict"; return (${line});`)())); return; } catch (e) { /* fall through */ }
+  }
+  linuxTermPrint('(이 모크 REPL은 print(...)와 간단한 사칙연산만 흉내 냅니다 — 실제 파이썬 인터프리터가 아닙니다)', 'lt-dim');
+}
+document.getElementById('linuxTermInput')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter'){
+    const input = e.target;
+    const val = input.value;
+    input.value = '';
+    if (linuxTermState.inPython) linuxExecPythonMock(val);
+    else linuxExecCommand(val);
+  } else if (e.key === 'ArrowUp'){
+    e.preventDefault();
+    if (!linuxTermState.history.length) return;
+    linuxTermState.histIdx = Math.max(0, linuxTermState.histIdx - 1);
+    e.target.value = linuxTermState.history[linuxTermState.histIdx] || '';
+  } else if (e.key === 'ArrowDown'){
+    e.preventDefault();
+    if (!linuxTermState.history.length) return;
+    linuxTermState.histIdx = Math.min(linuxTermState.history.length, linuxTermState.histIdx + 1);
+    e.target.value = linuxTermState.history[linuxTermState.histIdx] || '';
+  }
+});
+linuxBootBanner(); // 페이지 로드 시 부팅 배너를 한 번 채워 둡니다.
+
+/* ============================================================================
+ * 📷 [Ver0.9971] 카메라 모듈 — HDMI 모니터 팝업의 7번째 탭
+ *
+ * [설계 메모] 두 가지 화면 모드가 있습니다.
+ *  1) 실제 웹캠(navigator.mediaDevices.getUserMedia) — 사용자가 "웹캠 연결"을 누르면
+ *     브라우저 권한을 요청하고, 허용되면 진짜 카메라 화면을 <video>에 스트리밍합니다.
+ *     권한 거부/장치 없음/API 미지원/file:// 같은 non-secure-context 등 실패 상황은 모두
+ *     잡아서 안내 문구를 보여주고 자동으로 2번 모드로 돌아갑니다.
+ *  2) 자체 제작 캔버스 2D 산 풍경 애니메이션 — 외부 이미지/영상을 네트워크로 받아오지 않는
+ *     완전한 오프라인 기본값입니다(이 시뮬레이터의 "인터넷 없이도 항상 동작" 원칙 유지 — 유일한
+ *     예외는 명시적으로 안내된 유튜브 탭뿐입니다). 하늘 그라디언트 + 해 + 2겹 산 실루엣을
+ *     느린 애니메이션(해가 천천히 위아래로, 산 안개가 좌우로)으로 그립니다.
+ * ============================================================================ */
+let camWebcamStream = null;
+let camPlaceholderAnimId = null;
+
+// "웹캠 연결" / "연결 해제" 버튼 — 지금 상태의 반대로 토글합니다.
+function camToggleWebcam(){
+  if (camWebcamStream) { camStopWebcam(); camStartPlaceholderAnim(); }
+  else camStartWebcam();
+}
+
+async function camStartWebcam(){
+  const statusText = document.getElementById('camStatusText');
+  const btn = document.getElementById('camWebcamBtn');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    if (statusText) statusText.textContent = tr('monitor.camUnsupported');
+    showToast(tr('monitor.camUnsupported'));
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    camWebcamStream = stream;
+    const video = document.getElementById('camWebcamVideo');
+    const canvas = document.getElementById('camPlaceholderCanvas');
+    if (video){ video.srcObject = stream; video.hidden = false; }
+    if (canvas) canvas.hidden = true;
+    camStopPlaceholderAnim();
+    if (btn){ btn.textContent = tr('monitor.camDisconnectBtn'); btn.dataset.i18n = 'monitor.camDisconnectBtn'; btn.classList.add('cam-active'); }
+    if (statusText){ statusText.textContent = tr('monitor.camWebcamStatus'); statusText.dataset.i18n = 'monitor.camWebcamStatus'; }
+  } catch (err){
+    // 권한 거부, 장치 없음, file://처럼 보안 컨텍스트가 아닌 경우 등 — 어떤 이유든 실패하면
+    // 조용히 풍경 애니메이션으로 되돌아갑니다(사용자가 웹캠 없이도 계속 쓸 수 있도록).
+    showToast(tr('monitor.camFailedToast'));
+    camStartPlaceholderAnim();
+  }
+}
+
+// 웹캠 스트림의 모든 트랙을 멈추고 원래 상태(캔버스 풍경)로 되돌립니다. 모니터 팝업을 닫거나
+// 카메라 탭을 벗어나거나 캔버스를 통째로 비울 때도 호출되므로, 이미 꺼져 있어도 안전하게
+// 아무 일도 하지 않아야 합니다.
+function camStopWebcam(){
+  if (!camWebcamStream) return;
+  camWebcamStream.getTracks().forEach(t => t.stop());
+  camWebcamStream = null;
+  const video = document.getElementById('camWebcamVideo');
+  const canvas = document.getElementById('camPlaceholderCanvas');
+  if (video){ video.pause(); video.srcObject = null; video.hidden = true; }
+  if (canvas) canvas.hidden = false;
+  const btn = document.getElementById('camWebcamBtn');
+  if (btn){ btn.textContent = tr('monitor.camWebcamBtn'); btn.dataset.i18n = 'monitor.camWebcamBtn'; btn.classList.remove('cam-active'); }
+  const statusText = document.getElementById('camStatusText');
+  if (statusText){ statusText.textContent = tr('monitor.camPlaceholderStatus'); statusText.dataset.i18n = 'monitor.camPlaceholderStatus'; }
+}
+
+// 오프라인에서도 항상 보이는 자체 제작 산 풍경 애니메이션 — 하늘 그라디언트, 해, 2겹 산
+// 실루엣을 requestAnimationFrame으로 아주 느리게 움직입니다(전력/CPU 부담이 거의 없는 수준).
+function camDrawPlaceholderFrame(t){
+  const canvas = document.getElementById('camPlaceholderCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const sec = t / 1000;
+  // 하늘 그라디언트
+  const sky = ctx.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, '#2a5d8a');
+  sky.addColorStop(0.55, '#7fb3d5');
+  sky.addColorStop(1, '#cfe8f0');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, h);
+  // 해 (아주 느리게 위아래로)
+  const sunY = h * 0.28 + Math.sin(sec * 0.15) * 10;
+  const sunX = w * 0.72;
+  const sunGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 70);
+  sunGlow.addColorStop(0, 'rgba(255,244,200,0.9)');
+  sunGlow.addColorStop(1, 'rgba(255,244,200,0)');
+  ctx.fillStyle = sunGlow;
+  ctx.beginPath(); ctx.arc(sunX, sunY, 70, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff4c8';
+  ctx.beginPath(); ctx.arc(sunX, sunY, 26, 0, Math.PI * 2); ctx.fill();
+  // 뒷산 (연한 색, 좌우로 아주 느리게)
+  const backShift = Math.sin(sec * 0.08) * 14;
+  ctx.fillStyle = '#8fa9b8';
+  ctx.beginPath();
+  ctx.moveTo(0, h);
+  ctx.lineTo(0, h * 0.62);
+  for (let x = 0; x <= w; x += w / 8){
+    ctx.lineTo(x + backShift, h * 0.62 - Math.sin((x / w) * Math.PI * 2 + sec * 0.1) * 30 - 20);
+  }
+  ctx.lineTo(w, h * 0.62);
+  ctx.lineTo(w, h); ctx.closePath(); ctx.fill();
+  // 앞산 (진한 색)
+  const frontShift = Math.sin(sec * 0.12 + 1) * 10;
+  ctx.fillStyle = '#3f6152';
+  ctx.beginPath();
+  ctx.moveTo(0, h);
+  ctx.lineTo(0, h * 0.78);
+  for (let x = 0; x <= w; x += w / 6){
+    ctx.lineTo(x + frontShift, h * 0.78 - Math.sin((x / w) * Math.PI * 2.4 + sec * 0.15 + 2) * 40 - 10);
+  }
+  ctx.lineTo(w, h * 0.78);
+  ctx.lineTo(w, h); ctx.closePath(); ctx.fill();
+  camPlaceholderAnimId = requestAnimationFrame(camDrawPlaceholderFrame);
+}
+function camStartPlaceholderAnim(){
+  if (camPlaceholderAnimId) return; // 이미 돌고 있으면 중복 시작 방지
+  camPlaceholderAnimId = requestAnimationFrame(camDrawPlaceholderFrame);
+}
+function camStopPlaceholderAnim(){
+  if (camPlaceholderAnimId){ cancelAnimationFrame(camPlaceholderAnimId); camPlaceholderAnimId = null; }
+}
 
 /* ============================================================================
  * 🤖 [Ver0.9967, 3부] ROS(Robot Operating System) 모크 — HDMI 모니터 팝업의 4번째 탭
@@ -16463,8 +17306,8 @@ function BOM_LABELS_FN(){ return {
   led: 'LED', pot: tr('bom.pot'), btn: tr('bom.btn'), toggleswitch: tr('bom.toggleswitch'), scope: tr('bom.scope'),
   rgbled: tr('bom.rgbled'), psu: tr('comp.psu.title'), breadboard: tr('bom.breadboard'),
   btmodule: tr('bom.btmodule'), wifiap: tr('bom.wifiap'), dac: tr('comp.dac.title').replace(/<br>.*/,'').trim(),
-  ultrasonic: tr('bom.ultrasonic'), gyro: tr('bom.gyro'), accel: tr('bom.accel'), servo: tr('comp.servo.label'), rs485servo: tr('comp.rs485servo.label'), canmodule: tr('comp.canmodule.title'), canfdmodule: tr('comp.canfdmodule.title'), 'rs485module': tr('comp.rs485module.title'), pmsensor: tr('comp.pmsensor.title'), dcmotor: tr('comp.dcmotor.label'),
-  rpi3: 'Raspberry Pi 3', rpi4: 'Raspberry Pi 4', rpi5: 'Raspberry Pi 5', hdmimonitor: tr('comp.hdmimonitor.title'), usbsound: tr('comp.usbsound.title'), speaker: tr('comp.speaker.title'), custom: tr('comp.custom.defaultName'),
+  ultrasonic: tr('bom.ultrasonic'), lidar: tr('comp.lidar.label'), gyro: tr('bom.gyro'), accel: tr('bom.accel'), servo: tr('comp.servo.label'), rs485servo: tr('comp.rs485servo.label'), canmodule: tr('comp.canmodule.title'), canfdmodule: tr('comp.canfdmodule.title'), 'rs485module': tr('comp.rs485module.title'), pmsensor: tr('comp.pmsensor.title'), dcmotor: tr('comp.dcmotor.label'), fan: tr('comp.fan.label'),
+  rpi3: 'Raspberry Pi 3', rpi4: 'Raspberry Pi 4', rpi5: 'Raspberry Pi 5', hdmimonitor: tr('comp.hdmimonitor.title'), camera: tr('comp.camera.title'), usbsound: tr('comp.usbsound.title'), speaker: tr('comp.speaker.title'), custom: tr('comp.custom.defaultName'),
   motordriver: tr('bom.motordriver'), 'sensor-ldr': tr('sensor.ldr'), 'sensor-temp': tr('sensor.temp'), 'sensor-humid': tr('sensor.humid'),
   lcd: tr('bom.lcd'), oled: tr('bom.oled'),
   resistor: tr('bom.resistor'), powercable: tr('bom.powercable'), motor3ph: tr('comp.motor3ph.label'),
@@ -16553,7 +17396,7 @@ function schematicKindOf(ownerEl){
   // 바뀌는 범용 PSU/AC220/3상/변압기는 아직 상자(box)로 남겨둡니다(잘못된 2핀 기호를 붙이면
   // 오히려 더 헷갈리기 때문). 건전지/과일전지/발전기는 항상 V/G 2핀만 있어 안전합니다.
   if (ownerEl.classList.contains('comp-coincell') || ownerEl.classList.contains('comp-fruitbatt') || ownerEl.classList.contains('comp-generator') || ownerEl.classList.contains('comp-battery')) return 'battery';
-  if (ownerEl.classList.contains('comp-dcmotor')) return 'motor';
+  if (ownerEl.classList.contains('comp-dcmotor') || ownerEl.classList.contains('comp-fan')) return 'motor';
   return 'box';
 }
 function schematicLabelOf(ownerEl){
@@ -16646,7 +17489,11 @@ function buildSchematicModel(){
   const wired = schematicWiredPinSet();
   const nodes = [];
   const pinIndexOf = new Map(); // pinEl -> {n, p}
-  const PIN_STUB = 14;
+  // [Ver0.9973] "부품 사이즈가 너무 큼" 피드백에 따라 기호/칸/여백을 대략 절반으로 줄였습니다.
+  // 팝업 쪽 nodeSymbolLocalSVG()도 이 축소에 맞춰 내부 도형 좌표와 글자 크기를 같은 비율로
+  // 함께 줄였습니다(두 함수는 서로 다른 JS 실행 환경이라 상수를 공유할 수 없어, 값만 나란히
+  // 맞춰 두었습니다 — 이 배율을 다시 조정할 때는 반드시 두 곳을 함께 고쳐야 합니다).
+  const PIN_STUB = 7;
 
   const rawItems = [];
   document.querySelectorAll('.placed-component').forEach(el => {
@@ -16675,27 +17522,28 @@ function buildSchematicModel(){
   // [간격 확대] 부품이 한 줄로 나란히 놓이면 그 사이를 잇는 배선들이 서로 바짝 붙어 거의
   // 겹쳐 보이는 문제가 있었습니다 — 칸 사이 여백(GAP_X/GAP_Y)을 넉넉히 늘려서 전선이 지나갈
   // 공간을 확보합니다(그래도 겹치는 자리는 위의 타넘기 렌더링이 보완해 줍니다).
-  const MARGIN = 70, GAP_X = 108, GAP_Y = 96, MAX_ROW_W = 1480;
+  const MARGIN = 35, GAP_X = 54, GAP_Y = 48, MAX_ROW_W = 1480;
   let curX = MARGIN, curY = MARGIN, rowH = 0;
 
   rawItems.forEach((it, nodeIdx) => {
     let w, h;
     if (it.kind === 'box'){
-      w = Math.max(130, it.usePins.length * 34 + 26);
-      h = 66;
+      w = Math.max(65, it.usePins.length * 17 + 13);
+      h = 33;
     } else {
-      w = 110; h = 50;
+      w = 55; h = 25;
     }
     // 라벨/값 문자열이 기호 폭(w)보다 넓을 때(한글 라벨은 특히 길어지기 쉽습니다 — 예:
     // "스텝모터 드라이버 (A4988)") 그 글자가 옆 부품이나 캔버스 바깥으로 잘려 나가지 않도록,
     // 이 노드가 실제로 차지할 "칸" 너비(effW)를 라벨/값 폭까지 감싸도록 넉넉하게 잡습니다.
     // 전선/핀은 원래 기호 폭(w) 기준 그대로 두고, 기호 자체는 이 칸 안에서 가운데로 배치합니다.
+    // (폰트 크기 8/7은 nodeSymbolLocalSVG()가 실제로 그리는 축소된 라벨/값 글자 크기와 맞춘 값)
     const label = schematicLabelOf(it.el);
     const value = schematicValueOf(it.el);
-    const labelW = schematicTextWidth(label, 12);
-    const valueW = value ? schematicTextWidth(value, 10) : 0;
-    const effW = Math.max(w, labelW, valueW) + 16;
-    const extraBelow = (it.kind === 'box' ? PIN_STUB + 18 : 20);
+    const labelW = schematicTextWidth(label, 8);
+    const valueW = value ? schematicTextWidth(value, 7) : 0;
+    const effW = Math.max(w, labelW, valueW) + 10;
+    const extraBelow = (it.kind === 'box' ? PIN_STUB + 9 : 10);
     const cellH = h + extraBelow;
     if (curX > MARGIN && curX + effW > MARGIN + MAX_ROW_W){
       curX = MARGIN;
@@ -16769,7 +17617,7 @@ function buildSchematicModel(){
   });
 
   const maxRight = Math.max(...nodes.map(n => n.cellRight));
-  const maxBottom = Math.max(...nodes.map(n => n.y + n.h + (n.kind === 'box' ? PIN_STUB + 16 : 20)));
+  const maxBottom = Math.max(...nodes.map(n => n.y + n.h + (n.kind === 'box' ? PIN_STUB + 8 : 10)));
   const model = { nodes, wires: wireList, width: Math.ceil(Math.max(600, maxRight + MARGIN)), height: Math.ceil(Math.max(400, maxBottom + MARGIN)) };
   return applySavedSchematicLayout(model);
 }
@@ -16803,70 +17651,80 @@ function schematicPopupScriptSource(){
     "  var w = node.w, h = node.h, label = node.label, value = node.value, rot = node.rot||0;",
     "  var cx = w/2, cy = h/2, STROKE = '#e8ecf1', body = '';",
     "  if (node.kind === 'resistor'){",
-    "    var zx = 18, zw = w-36, steps = 6, zigH = 9;",
+    "    var zx = 9, zw = w-18, steps = 6, zigH = 4.5;",
     "    var pts = '0,'+cy+' '+zx+','+cy;",
     "    for (var i=0;i<steps;i++){ var px = zx + zw*((i+1)/steps); var py = cy + (i%2===0? -zigH: zigH); pts += ' '+px+','+py; }",
     "    pts += ' '+w+','+cy;",
     "    body = '<polyline points=\"'+pts+'\" fill=\"none\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>';",
     "  } else if (node.kind === 'inductor'){",
-    "    var zx2 = 14, zw2 = w-28, loops = 4, r = zw2/(loops*2);",
+    "    var zx2 = 7, zw2 = w-14, loops = 4, r = zw2/(loops*2);",
     "    var path = 'M 0,'+cy+' L '+zx2+','+cy+' ';",
     "    for (var j=0;j<loops;j++){ var sx = zx2 + j*r*2; path += 'A '+r+','+r+' 0 1 1 '+(sx+r*2)+','+cy+' '; }",
     "    path += 'L '+w+','+cy;",
     "    body = '<path d=\"'+path+'\" fill=\"none\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>';",
     "  } else if (node.kind === 'capacitor' || node.kind === 'capacitorE'){",
-    "    var p1 = cx-5, p2 = cx+5;",
+    "    var p1 = cx-2.5, p2 = cx+2.5;",
     "    body = '<line x1=\"0\" y1=\"'+cy+'\" x2=\"'+p1+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
     "      + '<line x1=\"'+p2+'\" y1=\"'+cy+'\" x2=\"'+w+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
-    "      + '<line x1=\"'+p1+'\" y1=\"'+(cy-14)+'\" x2=\"'+p1+'\" y2=\"'+(cy+14)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>';",
+    "      + '<line x1=\"'+p1+'\" y1=\"'+(cy-7)+'\" x2=\"'+p1+'\" y2=\"'+(cy+7)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>';",
     "    if (node.kind === 'capacitorE'){",
-    "      body += '<path d=\"M '+(p2-3)+','+(cy-14)+' Q '+(p2+6)+','+cy+' '+(p2-3)+','+(cy+14)+'\" fill=\"none\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>'",
-    "        + txt(p1-9, cy-15, 12, '#ffd23f', 'middle', '+', rot);",
+    "      body += '<path d=\"M '+(p2-1.5)+','+(cy-7)+' Q '+(p2+3)+','+cy+' '+(p2-1.5)+','+(cy+7)+'\" fill=\"none\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>'",
+    "        + txt(p1-6, cy-11, 8, '#ffd23f', 'middle', '+', rot);",
     "    } else {",
-    "      body += '<line x1=\"'+p2+'\" y1=\"'+(cy-14)+'\" x2=\"'+p2+'\" y2=\"'+(cy+14)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>';",
+    "      body += '<line x1=\"'+p2+'\" y1=\"'+(cy-7)+'\" x2=\"'+p2+'\" y2=\"'+(cy+7)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>';",
     "    }",
     "  } else if (node.kind === 'led' || node.kind === 'diode'){",
-    "    var tri = (cx-8)+','+(cy-10)+' '+(cx-8)+','+(cy+10)+' '+(cx+8)+','+cy;",
-    "    body = '<line x1=\"0\" y1=\"'+cy+'\" x2=\"'+(cx-8)+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
+    "    var tri = (cx-4)+','+(cy-5)+' '+(cx-4)+','+(cy+5)+' '+(cx+4)+','+cy;",
+    "    body = '<line x1=\"0\" y1=\"'+cy+'\" x2=\"'+(cx-4)+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
     "      + '<polygon points=\"'+tri+'\" fill=\"none\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
-    "      + '<line x1=\"'+(cx+8)+'\" y1=\"'+(cy-10)+'\" x2=\"'+(cx+8)+'\" y2=\"'+(cy+10)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>'",
-    "      + '<line x1=\"'+(cx+8)+'\" y1=\"'+cy+'\" x2=\"'+w+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>';",
+    "      + '<line x1=\"'+(cx+4)+'\" y1=\"'+(cy-5)+'\" x2=\"'+(cx+4)+'\" y2=\"'+(cy+5)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>'",
+    "      + '<line x1=\"'+(cx+4)+'\" y1=\"'+cy+'\" x2=\"'+w+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>';",
     "    if (node.kind === 'led'){",
-    "      body += '<line x1=\"'+(cx-3)+'\" y1=\"'+(cy-16)+'\" x2=\"'+(cx+5)+'\" y2=\"'+(cy-25)+'\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
-    "        + '<path d=\"M '+(cx+1)+','+(cy-25)+' L '+(cx+5)+','+(cy-25)+' L '+(cx+5)+','+(cy-21)+'\" fill=\"none\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
-    "        + '<line x1=\"'+(cx+5)+'\" y1=\"'+(cy-9)+'\" x2=\"'+(cx+13)+'\" y2=\"'+(cy-18)+'\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>'",
-    "        + '<path d=\"M '+(cx+9)+','+(cy-18)+' L '+(cx+13)+','+(cy-18)+' L '+(cx+13)+','+(cy-14)+'\" fill=\"none\" stroke=\"#ffd23f\" stroke-width=\"1.3\"/>';",
+    "      body += '<line x1=\"'+(cx-1.5)+'\" y1=\"'+(cy-8)+'\" x2=\"'+(cx+2.5)+'\" y2=\"'+(cy-12.5)+'\" stroke=\"#ffd23f\" stroke-width=\"1.2\"/>'",
+    "        + '<path d=\"M '+(cx+0.5)+','+(cy-12.5)+' L '+(cx+2.5)+','+(cy-12.5)+' L '+(cx+2.5)+','+(cy-10.5)+'\" fill=\"none\" stroke=\"#ffd23f\" stroke-width=\"1.2\"/>'",
+    "        + '<line x1=\"'+(cx+2.5)+'\" y1=\"'+(cy-4.5)+'\" x2=\"'+(cx+6.5)+'\" y2=\"'+(cy-9)+'\" stroke=\"#ffd23f\" stroke-width=\"1.2\"/>'",
+    "        + '<path d=\"M '+(cx+4.5)+','+(cy-9)+' L '+(cx+6.5)+','+(cy-9)+' L '+(cx+6.5)+','+(cy-7)+'\" fill=\"none\" stroke=\"#ffd23f\" stroke-width=\"1.2\"/>';",
     "    }",
     "  } else if (node.kind === 'battery'){",
     "    // [Ver0.9960] 표준 건전지/전원 기호 — 긴 얇은 극판(+)과 짧고 두꺼운 극판(−) 한 쌍.",
-    "    var bp1 = cx-6, bp2 = cx+6;",
+    "    var bp1 = cx-3, bp2 = cx+3;",
     "    body = '<line x1=\"0\" y1=\"'+cy+'\" x2=\"'+bp1+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
     "      + '<line x1=\"'+bp2+'\" y1=\"'+cy+'\" x2=\"'+w+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
-    "      + '<line x1=\"'+bp1+'\" y1=\"'+(cy-14)+'\" x2=\"'+bp1+'\" y2=\"'+(cy+14)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>'",
-    "      + '<line x1=\"'+bp2+'\" y1=\"'+(cy-7)+'\" x2=\"'+bp2+'\" y2=\"'+(cy+7)+'\" stroke=\"'+STROKE+'\" stroke-width=\"5\"/>';",
+    "      + '<line x1=\"'+bp1+'\" y1=\"'+(cy-7)+'\" x2=\"'+bp1+'\" y2=\"'+(cy+7)+'\" stroke=\"'+STROKE+'\" stroke-width=\"2.5\"/>'",
+    "      + '<line x1=\"'+bp2+'\" y1=\"'+(cy-3.5)+'\" x2=\"'+bp2+'\" y2=\"'+(cy+3.5)+'\" stroke=\"'+STROKE+'\" stroke-width=\"4\"/>';",
     "  } else if (node.kind === 'motor'){",
     "    // [Ver0.9960] 표준 모터 기호 — 원 안에 M.",
-    "    var mr = Math.min(w, h*1.6)/2 - 4;",
+    "    var mr = Math.min(w, h*1.6)/2 - 2;",
     "    body = '<line x1=\"0\" y1=\"'+cy+'\" x2=\"'+(cx-mr)+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
     "      + '<line x1=\"'+(cx+mr)+'\" y1=\"'+cy+'\" x2=\"'+w+'\" y2=\"'+cy+'\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
     "      + '<circle cx=\"'+cx+'\" cy=\"'+cy+'\" r=\"'+mr+'\" fill=\"none\" stroke=\"'+STROKE+'\" stroke-width=\"2\"/>'",
-    "      + txt(cx, cy+5, 15, STROKE, 'middle', 'M', rot);",
+    "      + txt(cx, cy+3.5, 10, STROKE, 'middle', 'M', rot);",
     "  } else {",
-    "    body = '<rect x=\"0\" y=\"0\" width=\"'+w+'\" height=\"'+h+'\" rx=\"6\" fill=\"#1b2129\" stroke=\"#4a5a6a\" stroke-width=\"1.6\"/>';",
+    "    body = '<rect x=\"0\" y=\"0\" width=\"'+w+'\" height=\"'+h+'\" rx=\"3\" fill=\"#1b2129\" stroke=\"#4a5a6a\" stroke-width=\"1.3\"/>';",
     "    node.pins.forEach(function(p){",
-    "      body += '<line x1=\"'+p.lx+'\" y1=\"'+h+'\" x2=\"'+p.lx+'\" y2=\"'+p.ly+'\" stroke=\"#8b93a1\" stroke-width=\"1.4\"/>'",
-    "        + '<circle cx=\"'+p.lx+'\" cy=\"'+p.ly+'\" r=\"2.6\" fill=\"#5ad0e6\"/>'",
-    "        + txt(p.lx, p.ly+11, 9, '#9fb0c0', 'middle', svgEscP(p.name), rot);",
+    "      body += '<line x1=\"'+p.lx+'\" y1=\"'+h+'\" x2=\"'+p.lx+'\" y2=\"'+p.ly+'\" stroke=\"#8b93a1\" stroke-width=\"1.2\"/>'",
+    "        + '<circle cx=\"'+p.lx+'\" cy=\"'+p.ly+'\" r=\"1.6\" fill=\"#5ad0e6\"/>'",
+    "        + txt(p.lx, p.ly+7, 6, '#9fb0c0', 'middle', svgEscP(p.name), rot);",
     "    });",
     "  }",
     "  if (node.kind !== 'box'){",
-    "    body += '<circle cx=\"0\" cy=\"'+cy+'\" r=\"3\" fill=\"#5ad0e6\"/><circle cx=\"'+w+'\" cy=\"'+cy+'\" r=\"3\" fill=\"#5ad0e6\"/>';",
+    "    body += '<circle cx=\"0\" cy=\"'+cy+'\" r=\"1.8\" fill=\"#5ad0e6\"/><circle cx=\"'+w+'\" cy=\"'+cy+'\" r=\"1.8\" fill=\"#5ad0e6\"/>';",
     "    var pn0 = node.pins[0], pn1 = node.pins[1];",
-    "    if (pn0) body += txt(pn0.lx, cy+17, 9, '#9fb0c0', 'middle', svgEscP(pn0.name), rot);",
-    "    if (pn1) body += txt(pn1.lx, cy+17, 9, '#9fb0c0', 'middle', svgEscP(pn1.name), rot);",
+    "    if (pn0) body += txt(pn0.lx, cy+9, 6, '#9fb0c0', 'middle', svgEscP(pn0.name), rot);",
+    "    if (pn1) body += txt(pn1.lx, cy+9, 6, '#9fb0c0', 'middle', svgEscP(pn1.name), rot);",
     "  }",
-    "  body += txt(cx, -8, 12, '#e8ecf1', 'middle', svgEscP(label), rot);",
-    "  if (value) body += txt(cx, -22, 10, '#5ad0e6', 'middle', svgEscP(value), rot);",
+    // [Ver0.9973] 부품을 90°/270°(세로)로 돌리면, 글자 자체는 txt()의 반대회전 보정으로 계속",
+    // 수평을 유지하지만 라벨(label)과 값(value)의 "위치"는 그대로 노드를 따라 돌아갑니다.",
+    // 원래처럼 두 글자를 같은 로컬 X(가로)에서 Y(세로)로만 14px 띄워 두면(라벨 -8, 값 -22),",
+    // 0°/180°일 때는 위아래로 안전하게 떨어지지만 90°/270°일 때는 그 Y차이가 화면상 X차이로",
+    // 바뀌어 버려 글자 폭(14px보다 훨씬 넓음)을 감당 못 하고 두 글자가 겹쳐 보였습니다(사용자",
+    // 리포트). 90°/270°일 때는 반대로 로컬 X 차이를 둬서(라벨/값 모두 같은 Y=cy) 화면상",
+    // Y차이로 뒤바뀌게 만들어, 회전 각도와 무관하게 항상 위아래로 안전하게 떨어지도록 합니다.",
+    "  var vertRot = (Math.round((((rot%360)+360)%360)/90) % 2) === 1;",
+    "  var labelX = vertRot ? -5 : cx, labelY = vertRot ? cy : -5;",
+    "  var valueX = vertRot ? -17 : cx, valueY = vertRot ? cy : -17;",
+    "  body += txt(labelX, labelY, 8, '#e8ecf1', 'middle', svgEscP(label), rot);",
+    "  if (value) body += txt(valueX, valueY, 7, '#5ad0e6', 'middle', svgEscP(value), rot);",
     "  return body;",
     "}",
     "function wirePathPoints(w, wi){",
@@ -18547,6 +19405,8 @@ function restoreProjectState(data){
   updateLegend();
   // [Ver0.9966, 2부] 불러온 프로젝트에 이미 라즈베리파이-HDMI 모니터 결선이 있을 수 있으므로 갱신.
   if (typeof updateMonitorHdmiStatus === 'function') updateMonitorHdmiStatus();
+  // [Ver0.9971] 불러온 프로젝트에 이미 라즈베리파이-카메라 모듈 결선이 있을 수 있으므로 갱신.
+  if (typeof updateCameraConnStatus === 'function') updateCameraConnStatus();
 }
 
 function handleProjectFileSelected(inputEl){
@@ -18618,7 +19478,7 @@ function collapseNonBoardPaletteGroupsByDefault(){
  * (buildAiComponentCatalog) — 코드가 바뀌면 카탈로그도 자동으로 같이 바뀌므로, AI가 존재하지
  * 않는 핀 이름을 지어내 배선이 조용히 실패하는 사고를 원천적으로 막습니다.
  * ============================================================================ */
-const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','bulb220','canfdmodule','canmodule','capacitor','capacitor-e','cccv','clampmeter','coincell','contactor','dac','dcmotor','dcmotor-enc','diode','electromagnet','eocr','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','lcd','led','ledtube220','levelshifter','mccb','motor3ph','motordriver','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-humid','sensor-ldr','sensor-temp','servo','speaker','stepper','terminalblock','timer','toggleswitch','transformer','transistor','ultrasonic','usbsound','wallswitch','wifiap'];
+const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','bulb220','camera','canfdmodule','canmodule','capacitor','capacitor-e','cccv','clampmeter','coincell','contactor','dac','dcmotor','dcmotor-enc','diode','electromagnet','eocr','fan','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','lcd','led','ledtube220','levelshifter','lidar','mccb','motor3ph','motordriver','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-humid','sensor-ldr','sensor-temp','servo','speaker','stepper','terminalblock','timer','toggleswitch','transformer','transistor','ultrasonic','usbsound','wallswitch','wifiap'];
 // ('custom'은 사용자가 직접 그리는 빈 부품이라 AI가 고를 이유가 없어 목록에서 뺐습니다.)
 const AI_BOARD_TYPES = ['r3', 'r4', 'mega', 'esp32b', 'esp32d', 'esp32t'];
 
@@ -18981,6 +19841,19 @@ function showAiKeyInput(){
   if (chip) chip.style.display = 'none';
   if (keyInput){ keyInput.style.display = ''; keyInput.focus(); keyInput.select(); }
 }
+// [Ver0.9969] API Key 발급 방법 팝오버 — 버튼을 클릭하면 열리고/닫히고, 팝오버 바깥 아무
+// 곳이나 클릭하면(전선 색상 편집창과 같은 패턴) 자동으로 닫힙니다.
+function toggleAiKeyHelp(e){
+  if (e) e.stopPropagation();
+  const pop = document.getElementById('aiKeyHelpPop');
+  if (pop) pop.hidden = !pop.hidden;
+}
+document.addEventListener('click', (e) => {
+  const pop = document.getElementById('aiKeyHelpPop');
+  if (!pop || pop.hidden) return;
+  if (e.target.closest('#aiKeyHelpPop, #aiKeyHelpBtn')) return;
+  pop.hidden = true;
+});
 function saveAiKeyFromInput(){
   const keyInput = document.getElementById('geminiApiKey');
   if (!keyInput) return;
