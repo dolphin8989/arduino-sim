@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9987</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9988</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -55,16 +55,16 @@
   }
   .brand-text{display:flex; flex-direction:column; line-height:1.15;}
   .brand-text b{font-size:.92rem; font-weight:600; letter-spacing:.2px;}
-  .brand-text span{font-size:.68rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace;}
+  .brand-text span{font-size:.68rem; color:#fff; font-family:'IBM Plex Mono',monospace;}
   .toolbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap; row-gap:6px;}
 
   /* Footer (legal / disclaimer bar) */
   .app-footer{
     flex:0 0 auto; background:var(--bg-panel); border-top:1px solid var(--border);
-    padding:5px 18px; font-size:.66rem; line-height:1.5; color:var(--text-faint);
+    padding:5px 18px; font-size:.66rem; line-height:1.5; color:#fff;
     display:flex; align-items:center; justify-content:center; text-align:center; flex-wrap:wrap; gap:4px 10px; z-index:20;
   }
-  .app-footer a{color:var(--text-dim); text-decoration:none;}
+  .app-footer a{color:#fff; text-decoration:none;}
   .app-footer a:hover{color:var(--teal-strong); text-decoration:underline;}
   .app-footer .footer-sep{color:var(--border-strong);}
   .lang-select{
@@ -78,7 +78,7 @@
   }
   .project-name-input:focus{border-color:var(--teal); outline:none;}
   .bg-color-label{
-    display:flex; align-items:center; gap:3px; font-size:.78rem; color:var(--text-dim); cursor:pointer;
+    display:flex; align-items:center; gap:3px; font-size:.78rem; color:#fff; cursor:pointer;
     background:var(--bg-panel-2); border:1px solid var(--border-strong); border-radius:6px; padding:4px 7px;
   }
   .bg-color-label input[type=color]{width:22px; height:20px; border:none; border-radius:3px; padding:0; cursor:pointer; background:transparent;}
@@ -91,7 +91,7 @@
   .btn.primary{background:var(--teal); border-color:var(--teal); color:#04262a; font-weight:600;}
   .btn.primary:hover{background:var(--teal-strong); border-color:var(--teal-strong);}
   .btn.stop{background:var(--danger); border-color:var(--danger); color:#2a0605; font-weight:600;}
-  .btn.ghost{background:transparent; border-color:transparent; color:var(--text-dim);}
+  .btn.ghost{background:transparent; border-color:transparent; color:#fff;}
   .btn.ghost:hover{color:var(--text); background:var(--bg-panel-2);}
   .btn.ghost.active{background:var(--teal); color:#03191b; border-color:var(--teal);}
   .ds-menu-wrap{position:relative;}
@@ -106,7 +106,7 @@
   .ds-menu[hidden]{ display:none; }
   .ds-menu a{display:block; padding:8px 10px; border-radius:5px; color:var(--text); text-decoration:none; font-size:.78rem;}
   .ds-menu a:hover{background:var(--bg-panel); color:var(--teal);}
-  .ds-menu-sep{margin:6px 4px 2px; padding-top:6px; border-top:1px solid var(--border); font-size:.7rem; color:var(--text-dim); text-align:center;}
+  .ds-menu-sep{margin:6px 4px 2px; padding-top:6px; border-top:1px solid var(--border); font-size:.7rem; color:#fff; text-align:center;}
   .code-export-group{display:flex; align-items:center; gap:4px;}
   .code-export-group span{font-size:.66rem; color:var(--text-faint); margin-right:2px;}
   .code-export-group .export-btn{font-size:.66rem; padding:4px 8px;}
@@ -119,21 +119,21 @@
     width:216px; flex:0 0 auto; background:var(--bg-panel); border-right:1px solid var(--border);
     display:flex; flex-direction:column; z-index:8;
   }
-  .palette-title{padding:14px 16px 8px; font-size:.68rem; font-weight:600; color:var(--text-faint);
+  .palette-title{padding:14px 16px 8px; font-size:.68rem; font-weight:600; color:#fff;
     text-transform:uppercase; letter-spacing:1px;}
   .palette-items{flex:1; overflow-y:auto; padding:6px 12px 16px; display:flex; flex-direction:column; gap:4px;}
   /* ---------- 부품 팔레트 그룹화(접이식 카테고리 + 이름표) ---------- */
   .palette-group{display:flex; flex-direction:column;}
   .palette-group-header{
     display:flex; align-items:center; gap:6px; padding:8px 2px 4px; cursor:pointer; user-select:none;
-    font-size:.66rem; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:.6px;
+    font-size:.66rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.6px;
     border-top:1px solid var(--border);
   }
   .palette-group:first-child .palette-group-header{border-top:none; padding-top:2px;}
   .palette-group-header:hover{color:var(--teal);}
   .palette-group-header .pg-caret{display:inline-block; width:10px; text-align:center; font-size:.6rem; color:var(--teal); transition:transform .15s;}
   .palette-group.collapsed .pg-caret{transform:rotate(-90deg);}
-  .palette-group-header .pg-count{margin-left:auto; font-weight:400; font-size:.6rem; opacity:.7;}
+  .palette-group-header .pg-count{margin-left:auto; font-weight:400; font-size:.6rem; color:#fff; opacity:.9;}
   .palette-group-body{display:flex; flex-direction:column; gap:8px; padding-top:6px;}
   /* '🔬 전기 실험실'만 예전 방식 그대로 즉시 표시/숨김(display:none)입니다(요청: "전기 실습 등은
      따로 빼주고"). 나머지 그룹은 버튼을 누르면 아래로 스르륵 슬라이드되며 펼쳐지고 한 번 더
@@ -153,9 +153,9 @@
   .palette-item:hover{border-color:var(--teal); transform:translateY(-1px);}
   .palette-item:active{cursor:grabbing;}
   .palette-item .swatch{width:30px; height:30px; display:flex; align-items:center; justify-content:center;}
-  .palette-item span{font-size:.72rem; color:var(--text-dim); line-height:1.3;}
-  .palette-hint{padding:10px 16px 16px; font-size:.68rem; color:var(--text-faint); line-height:1.5;}
-  .palette-hint b{color:var(--text-dim);}
+  .palette-item span{font-size:.72rem; color:#fff; line-height:1.3;}
+  .palette-hint{padding:10px 16px 16px; font-size:.68rem; color:#fff; line-height:1.5;}
+  .palette-hint b{color:#fff;}
   .release-notes-group .palette-group-header{cursor:pointer;}
   /* ---------- 릴리즈 노트 팝업 ---------- */
   .rn-overlay{position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:2000; display:flex; align-items:center; justify-content:center;}
@@ -187,7 +187,7 @@
   /* 캔버스 우하단에 항상 떠 있는 HUD라 스크롤로 보드가 그 밑에 오면 클릭/드래그를 가로채던
      문제가 있었습니다 — 컨테이너 자체는 pointer-events:none으로 클릭을 통과시키고, 실제
      눌러야 하는 버튼에만 auto로 되돌려 그 부분만 클릭되게 합니다. */
-  .zoom-badge{position:absolute; right:14px; bottom:14px; z-index:20; display:flex; align-items:center; gap:4px; background:rgba(18,20,25,.88); border:1px solid var(--border-strong); border-radius:8px; padding:5px 7px; font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--text-dim); box-shadow:0 4px 10px rgba(0,0,0,.35); pointer-events:none;}
+  .zoom-badge{position:absolute; right:14px; bottom:14px; z-index:20; display:flex; align-items:center; gap:4px; background:rgba(18,20,25,.88); border:1px solid var(--border-strong); border-radius:8px; padding:5px 7px; font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:#fff; box-shadow:0 4px 10px rgba(0,0,0,.35); pointer-events:none;}
   .zoom-badge button{width:22px; height:22px; border-radius:5px; border:1px solid var(--border-strong); background:#20242c; color:var(--text); cursor:pointer; font-size:.8rem; line-height:1; pointer-events:auto;}
   .zoom-badge button:hover{background:#2a2f38;}
   .zoom-badge span{min-width:38px; text-align:center;}
@@ -389,11 +389,25 @@
     z-index:6; backdrop-filter:blur(6px); overflow:hidden; display:flex; flex-direction:column;
     pointer-events:none;
   }
-  .legend h4{padding:10px 12px 6px; font-size:.68rem; text-transform:uppercase; letter-spacing:.6px; color:var(--text-faint); font-weight:600;}
+  /* [기능 추가] "핀 연결 맵이 작업 공간을 가린다"는 요청에 따라, 목록(.legend-list)이 길어지면
+     작업 공간을 덮는 문제를 막기 위해 헤더의 토글 버튼으로 목록만 접을 수 있게 했습니다(하단
+     AI 바의 접기/펼치기와 같은 방식) — 접어도 헤더(제목+버튼)는 항상 남아있어 다시 펼 수 있고,
+     헤더만 있을 때는 차지하는 공간이 훨씬 작아집니다. */
+  .legend-head{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 8px 9px 12px; pointer-events:auto;}
+  .legend h4{font-size:.68rem; text-transform:uppercase; letter-spacing:.6px; color:#fff; font-weight:600;}
+  .legend-toggle-btn{
+    flex:0 0 auto; width:20px; height:20px; border-radius:5px; border:1px solid var(--border-strong);
+    background:var(--bg-panel-2); color:#fff; cursor:pointer; font-size:.62rem; line-height:1; padding:0;
+    display:flex; align-items:center; justify-content:center; transition:transform .15s, background .12s;
+  }
+  .legend-toggle-btn:hover{background:#242c37; border-color:var(--teal);}
+  .legend.collapsed{max-height:none;}
+  .legend.collapsed .legend-list, .legend.collapsed .legend-empty{display:none;}
+  .legend.collapsed .legend-toggle-btn{transform:rotate(-90deg);}
   .legend-list{list-style:none; padding:0 12px 12px; overflow-y:auto; display:flex; flex-direction:column; gap:5px; pointer-events:auto;}
-  .legend-list li{font-size:.74rem; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; display:flex; align-items:center; gap:7px;}
+  .legend-list li{font-size:.74rem; color:#fff; font-family:'IBM Plex Mono',monospace; display:flex; align-items:center; gap:7px;}
   .legend-dot{width:8px; height:8px; border-radius:50%; flex:0 0 auto;}
-  .legend-empty{padding:0 12px 12px; font-size:.72rem; color:var(--text-faint);}
+  .legend-empty{padding:0 12px 12px; font-size:.72rem; color:#fff;}
 
   /* Arduino Board */
   .board{
@@ -1876,7 +1890,7 @@
   .ai-bar-header{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
   .ai-brand{ display:flex; align-items:center; gap:8px; font-size:.8rem; }
   .ai-spark-icon{ font-size:1rem; }
-  .ai-hint{ font-size:.66rem; color:var(--text-dim); }
+  .ai-hint{ font-size:.66rem; color:#fff; }
   .ai-controls{ display:flex; align-items:center; gap:8px; }
   .ai-key-input{
     background:#0e1116; color:var(--text); border:1px solid var(--border-strong); border-radius:5px;
@@ -1893,7 +1907,7 @@
   .ai-key-help-pop{
     position:absolute; bottom:calc(100% + 6px); right:0; z-index:60; width:250px;
     background:#181d24; border:1px solid #2b313a; border-radius:8px; padding:12px 14px;
-    box-shadow:0 -10px 28px rgba(0,0,0,.5); font-size:.68rem; color:var(--text-dim); line-height:1.55;
+    box-shadow:0 -10px 28px rgba(0,0,0,.5); font-size:.68rem; color:#fff; line-height:1.55;
   }
   .ai-key-help-pop b{ display:block; margin-bottom:6px; font-size:.74rem; color:var(--text); }
   .ai-key-help-pop ol{ margin:0 0 8px; padding-left:16px; }
@@ -1908,7 +1922,7 @@
   .ai-prompt-input:focus{ border-color:var(--teal); }
   .ai-button-group{ display:flex; gap:6px; }
   .ai-submit-btn, .ai-code-btn{ height:46px; padding:0 14px; white-space:nowrap; font-size:.74rem; }
-  .ai-status-line{ font-size:.68rem; color:var(--text-dim); min-height:14px; }
+  .ai-status-line{ font-size:.68rem; color:#fff; min-height:14px; }
   .ai-status-line.error{ color:#e6584a; }
 </style>
 </head>
@@ -1921,7 +1935,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9987</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9988</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -2666,8 +2680,11 @@
     <button onclick="resetCanvasZoom()" data-i18n-title="zoom.resetTitle" title="100%로 초기화">⟲</button>
   </div>
 
-  <div class="legend">
-    <h4 data-i18n="legend.title">연결 현황</h4>
+  <div class="legend" id="legendPanel">
+    <div class="legend-head">
+      <h4 data-i18n="legend.title">연결 현황</h4>
+      <button class="legend-toggle-btn" id="btnLegendToggle" onclick="toggleLegendPanel()" data-i18n-title="legend.collapseTitle" title="연결 현황 패널 숨기기">▾</button>
+    </div>
     <ul class="legend-list" id="legendList"></ul>
     <div class="legend-empty" id="legendEmpty" hidden data-i18n="legend.empty">연결된 전선이 없습니다.</div>
   </div>
@@ -3145,7 +3162,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9987", en: "K's Simulator Ver0.9987" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9988", en: "K's Simulator Ver0.9988" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3680,6 +3697,8 @@ const STRINGS = {
   "hint.wirePoint": { ko: "전선을 더블클릭하면 그 자리에 점이 생겨 원하는 위치로 끌어서 구부릴 수 있고, 점을 다시 더블클릭하면 없앨 수 있습니다. 옆 점과 수평·수직으로 가까워지면 자동으로 딱 맞춰지고(Shift를 누르면 자유롭게), 이렇게 직각으로도 자유롭게도 배선을 정리할 수 있습니다.", en: "Double-click a wire to add a point you can drag anywhere to bend it; double-click a point again to remove it. Dragging a point near horizontal/vertical alignment with its neighbor snaps it into place (hold Shift to place it freely) -- so you can route wires with clean right angles or fully freehand." },
   "legend.empty": { ko: "연결된 전선이 없습니다.", en: "No wires connected." },
   "legend.title": { ko: "연결 현황", en: "Connections" },
+  "legend.collapseTitle": { ko: "연결 현황 패널 숨기기", en: "Hide connection panel" },
+  "legend.expandTitle": { ko: "연결 현황 패널 보이기", en: "Show connection panel" },
   "err.braceMismatch": { ko: "중괄호 '{', '}' 짝이 맞지 않습니다.", en: "Mismatched braces '{' '}'." },
   "err.openBrace": { ko: "여는 괄호", en: "open braces:" },
   "err.closeBrace": { ko: "닫는 괄호", en: "close braces:" },
@@ -4000,7 +4019,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9987", en: "K's Arduino Simulator Ver0.9987" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9988", en: "K's Arduino Simulator Ver0.9988" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -7261,6 +7280,10 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9988', ko: [
+      '🔆 헤더(상단)·부품 상자(왼쪽)·하단 AI 바·저작권 표시줄 등 화면 가장자리 UI 글자들이 어두운 회색이라 가독성이 떨어지던 문제를 고쳐, 전부 흰색으로 바꿨습니다(캔버스 좌하단 "연결 현황" 패널·우하단 확대율 배지도 포함)',
+      '🗺 캔버스 좌하단 "연결 현황"(핀 연결 목록) 패널이 배선이 많아지면 길어져 작업 공간을 가리던 문제 — 패널 제목 옆에 접기/펼치기 버튼(▾/▸)을 추가해, 누르면 목록만 접혀서 제목줄만 남고(다시 누르면 펼쳐짐) 작업 공간을 가리지 않게 했습니다',
+  ]},
   { ver: 'Ver0.9987', ko: [
       '📐 CC/CV 충전기·DC-DC 벅 컨버터를 캔버스에 놓고 시뮬레이션을 시작하면(특히 아직 배선하지 않은 상태) "⚠ 입력 전원 없음" 경고 문구가 나타나면서 부품 높이가 늘어나, 이미 브레드보드 구멍에 맞춰 꽂아둔 부품 다리 위치가 아래로 밀려 어긋나 보이던 문제를 고쳤습니다. OLED 모듈도 시뮬레이션을 한 번이라도 돌리면(보드에 연결되어 있지 않아도) 화면 칸이 내용에 맞춰 커지면서 같은 방식으로 핀이 밀렸는데 이것도 함께 고쳤습니다. 미세먼지(PM) 센서도 센서값이 커져 표시 텍스트가 두 줄로 줄바꿈될 때 핀이 살짝 밀리던 것을 함께 손봤습니다 — 세 경우 모두 "내용에 따라 커지는 상자"가 min-height/display:none 방식이라 실제로 필요한 최대 높이를 미리 확보해두지 못했던 것이 원인으로, 항상 필요한 만큼의 높이를 고정으로 미리 잡아두는 방식으로 바꿨습니다(LED 전류/퍼센트 표시에 쓰였던 것과 같은 방식)',
       '🔧 DC 모터+엔코더 부품에 VCC+/VCC-(모터 구동 단자 TA/TB)와 별도로 엔코더 전용 전원(ENCV/ENCG)까지 갖춘 4선식 버전을 추가했습니다("DC 모터(엔코더 4선/AB상)") — 기존 DC모터+엔코더(엔코더 GND 한 핀만 있던 것)와 달리 A상/B상 두 채널을 모두 내보내(서로 90° 위상차) 회전 방향까지 코드에서 판별할 수 있습니다',
@@ -21372,6 +21395,23 @@ function toggleAiBar(){
   bar.classList.toggle('collapsed');
   const collapsed = bar.classList.contains('collapsed');
   if (btn) btn.textContent = tr(collapsed ? 'ai.expand' : 'ai.collapse');
+}
+
+// [기능 추가] 캔버스 좌하단 "연결 현황"(핀 연결 목록) 패널이 배선이 많아지면 길어져 작업
+// 공간을 가리는 문제 — 헤더의 토글 버튼으로 목록만 접고 펼 수 있게 합니다(헤더 자체는 항상
+// 남아있어 다시 펼 수 있는 버튼을 찾을 수 있습니다).
+function toggleLegendPanel(){
+  const panel = document.getElementById('legendPanel');
+  const btn = document.getElementById('btnLegendToggle');
+  if (!panel) return;
+  panel.classList.toggle('collapsed');
+  const collapsed = panel.classList.contains('collapsed');
+  if (btn){
+    btn.textContent = collapsed ? '▸' : '▾';
+    const key = collapsed ? 'legend.expandTitle' : 'legend.collapseTitle';
+    btn.title = tr(key);
+    btn.dataset.i18nTitle = key;
+  }
 }
 
 // AI가 돌려준 fromComp/toComp("board" 또는 components 배열 인덱스)와 핀 이름으로 실제 DOM 핀
