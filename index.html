@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9986</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9987</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -721,7 +721,10 @@
   .comp-pmsensor{width:160px; padding:10px; background:linear-gradient(160deg,#3a2e1c,#241c10); border:1px solid #8f6a2a; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
   .comp-pmsensor .comp-pin-row{flex-wrap:wrap; gap:6px 8px;}
   .comp-pmsensor .pm-title{font-size:.62rem; font-family:'IBM Plex Mono',monospace; color:#e8b454; font-weight:600; margin-bottom:4px;}
-  .comp-pmsensor .pm-sub{font-size:.56rem; color:var(--text-faint); font-family:'IBM Plex Mono',monospace; margin:2px 0 4px;}
+  /* 값이 커지면(예: PM10 3자리) 줄바꿈이 일어나 핀 위치가 밀리므로, 1줄이든 2줄이든 항상 같은
+     높이를 갖도록 고정 height + overflow:hidden으로 잡습니다(위 .reg-warn/.oled-screen과 동일한
+     기법). */
+  .comp-pmsensor .pm-sub{font-size:.56rem; color:var(--text-faint); font-family:'IBM Plex Mono',monospace; margin:2px 0 4px; line-height:1.25; height:22px; overflow:hidden;}
 
   /* ---------- [Ver0.9969] 냉각팬 / 송풍팬 — DC 모터와 전기적으로는 거의 같지만(정격 전압에
      비례해 회전), PM(미세먼지) 센서와 함께 "공기청정기" 같은 실습 회로를 만들 수 있도록 별도
@@ -1090,8 +1093,12 @@
     background:#04120a; border:1px solid #1c3a24; border-radius:4px; color:#5ad0e6; font-family:'IBM Plex Mono',monospace;
     font-size:.64rem; padding:3px 4px; margin-bottom:7px; text-align:center; text-shadow:0 0 4px rgba(90,208,230,.5);
   }
-  .reg-warn{font-size:.6rem; color:#ffb454; margin-bottom:6px; display:none;}
-  .reg-warn.show{display:block;}
+  /* min-height/display:none 대신 "내용과 무관하게 늘 같은 높이"를 갖도록 visibility 토글 +
+     고정 height(최대 2줄 분량)로 처리합니다 — 그렇지 않으면 경고가 나타나는 순간(시뮬레이션 시작
+     시 흔한 "아직 배선 안 됨" 상태) comp-pin-row가 아래로 밀려 이미 꽂아둔 브레드보드 구멍과
+     부품 다리 위치가 어긋나 보입니다(위 .led-val/.led-cur 주석과 동일한 문제). */
+  .reg-warn{font-size:.6rem; color:#ffb454; margin-bottom:6px; line-height:1.2; height:2.4em; overflow:hidden; visibility:hidden;}
+  .reg-warn.show{visibility:visible;}
   .comp-cccv .comp-pin-row, .comp-buck .comp-pin-row{flex-wrap:wrap; gap:5px 7px; justify-content:center;}
 
   .comp-transistor{width:126px; padding:10px; background:linear-gradient(160deg,#2a3648,#161c26); border:1px solid #3a4a5f; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
@@ -1407,7 +1414,11 @@
   .oled-screen{
     background:#000; border:2px solid #333; border-radius:3px; padding:5px 7px;
     font-family:'IBM Plex Mono',monospace; font-size:.62rem; line-height:1.5; color:#eaf6ff;
-    text-align:left; white-space:pre; min-height:56px; box-shadow:inset 0 0 8px rgba(255,255,255,.05);
+    text-align:left; white-space:pre; overflow:hidden;
+    /* 보드 연결 여부와 무관하게 runTick()이 항상 4줄(빈 줄 포함) 텍스트를 채우므로, min-height가
+       아니라 4줄 분량을 정확히 담는 고정 height로 잡아야 시뮬레이션 시작 시 화면이 커지면서
+       핀 위치가 브레드보드 구멍과 어긋나는 문제가 생기지 않습니다. */
+    height:74px; box-shadow:inset 0 0 8px rgba(255,255,255,.05);
   }
   .comp-oled .comp-pin-row{margin-top:8px;}
 
@@ -1910,7 +1921,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9986</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9987</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -2176,7 +2187,7 @@
       </div>
       <div class="palette-group" data-group="motor">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.motor">모터 &amp; 드라이버</span><span class="pg-count">13</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.motor">모터 &amp; 드라이버</span><span class="pg-count">16</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('fan')">
@@ -2199,9 +2210,21 @@
             <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:repeating-conic-gradient(#e8d38a 0deg 15deg,#2a2a2a 15deg 30deg);"></div></div>
             <span data-i18n="palette.dcmotorenc">DC 모터<br>(엔코더 포함)</span>
           </div>
+          <div class="palette-item" onclick="spawnComponent('dcmotor-enc2')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:repeating-conic-gradient(#e8d38a 0deg 15deg,#2a2a2a 15deg 30deg);"></div></div>
+            <span data-i18n="palette.dcmotorenc2">DC 모터<br>(엔코더 4선/AB상)</span>
+          </div>
           <div class="palette-item" onclick="spawnComponent('motordriver')">
             <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#1e2a1e,#12180f);border:1px solid #3a4a35;"></div></div>
             <span data-i18n="palette.motordriver">모터 드라이버<br>(L298N)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('motordriver2')">
+            <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#1e2a1e,#12180f);border:1px solid #3a4a35;"></div></div>
+            <span data-i18n="palette.motordriver2">모터 드라이버<br>(2채널, L298N)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('motordriverenc')">
+            <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#1e2a1e,#12180f);border:1px solid #3a4a35;"></div></div>
+            <span data-i18n="palette.motordriverenc">모터 드라이버<br>(엔코더 입력)</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('motor3ph')">
             <div class="swatch"><div style="width:22px;height:22px;border-radius:50%;background:conic-gradient(#ff5c5c 0deg 120deg,#ffd23f 120deg 240deg,#5aa9e6 240deg 360deg);"></div></div>
@@ -3084,6 +3107,7 @@ const STRINGS = {
   "bom.btn": { ko: "푸시 버튼", en: "Push Button" },
   "bom.toggleswitch": { ko: "토글 스위치", en: "Toggle Switch" },
   "bom.dcmotorenc": { ko: "DC 모터 (엔코더 포함)", en: "DC Motor (with encoder)" },
+  "bom.dcmotorenc2": { ko: "DC 모터 (엔코더 4선/AB상)", en: "DC Motor (4-wire AB-phase encoder)" },
   "bom.empty": { ko: "캔버스에 부품이 없습니다.", en: "No components on the canvas." },
   "bom.acmotor": { ko: "단상 AC 모터(220V)", en: "Single-Phase AC Motor (220V)" },
   "bom.acmotorctrl": { ko: "AC 모터 컨트롤러", en: "AC Motor Controller" },
@@ -3094,6 +3118,8 @@ const STRINGS = {
   "bom.levelshifter": { ko: "레벨 시프터 (5V↔3.3V)", en: "Logic Level Shifter (5V↔3.3V)" },
   "bom.lcd": { ko: "캐릭터 LCD (16x2)", en: "Character LCD (16x2)" },
   "bom.motordriver": { ko: "모터 드라이버 (L298N)", en: "Motor Driver (L298N)" },
+  "bom.motordriver2": { ko: "모터 드라이버 (2채널, L298N)", en: "Motor Driver (2-channel, L298N)" },
+  "bom.motordriverenc": { ko: "모터 드라이버 (엔코더 입력)", en: "Motor Driver (with encoder input)" },
   "bom.oled": { ko: "OLED 모듈 (I2C)", en: "OLED Module (I2C)" },
   "bom.pot": { ko: "가변저항 (Potentiometer)", en: "Potentiometer" },
   "bom.powercable": { ko: "파워케이블 (저항 있음)", en: "Power Cable (with resistance)" },
@@ -3119,7 +3145,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9986", en: "K's Simulator Ver0.9986" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9987", en: "K's Simulator Ver0.9987" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3167,9 +3193,12 @@ const STRINGS = {
   "comp.dcmotor.taTitle": { ko: "단자 1 → 모터 드라이버 OUT1 (극성 무관)", en: "Terminal 1 → motor driver OUT1 (polarity doesn't matter)" },
   "comp.dcmotor.tbTitle": { ko: "단자 2 → 모터 드라이버 OUT2 (극성 무관)", en: "Terminal 2 → motor driver OUT2 (polarity doesn't matter)" },
   "comp.dcmotorenc.label": { ko: "DC 모터+엔코더", en: "DC Motor + Encoder" },
+  "comp.dcmotorenc2.label": { ko: "DC 모터+엔코더(4선)", en: "DC Motor + Encoder (4-wire)" },
   "comp.dirTitle": { ko: "방향 제어 (디지털)", en: "Direction control (digital)" },
   "comp.encaTitle": { ko: "엔코더 A상 펄스 출력 → 보드 디지털 핀", en: "Encoder A-phase pulse output → board digital pin" },
+  "comp.encbTitle": { ko: "엔코더 B상 펄스 출력 → 보드 디지털 핀 (A상과 90° 위상차, 회전 방향 판별용)", en: "Encoder B-phase pulse output → board digital pin (90° out of phase with A, for direction sensing)" },
   "comp.encgTitle": { ko: "엔코더 GND", en: "Encoder GND" },
+  "comp.encvTitle": { ko: "엔코더 전원 VCC", en: "Encoder power VCC" },
   "comp.lcd.title": { ko: "캐릭터 LCD 16x2 (HD44780, 4-bit)", en: "Character LCD 16x2 (HD44780, 4-bit)" },
   "comp.led.colorSelect": { ko: "LED 색상 선택", en: "LED color" },
   // [기능 추가 Ver0.9979] 새 부품 이름표
@@ -3196,6 +3225,14 @@ const STRINGS = {
   "comp.md.out2Title": { ko: "모터 출력 2 → DC 모터 단자 2", en: "Motor output 2 → DC motor terminal 2" },
   "comp.md.title": { ko: "모터 드라이버", en: "Motor Driver" },
   "comp.md.vccTitle": { ko: "모터 전원 VCC", en: "Motor power VCC" },
+  "comp.md2.title": { ko: "2채널 모터 드라이버", en: "2-Channel Motor Driver" },
+  "comp.md2.in2Title": { ko: "방향 제어 (디지털) — B채널", en: "Direction control (digital) — channel B" },
+  "comp.md2.enbTitle": { ko: "속도 제어 (PWM) — B채널", en: "Speed control (PWM) — channel B" },
+  "comp.md2.out3Title": { ko: "모터 출력 3 → DC 모터 단자 1 (B채널)", en: "Motor output 3 → DC motor terminal 1 (channel B)" },
+  "comp.md2.out4Title": { ko: "모터 출력 4 → DC 모터 단자 2 (B채널)", en: "Motor output 4 → DC motor terminal 2 (channel B)" },
+  "comp.mdenc.title": { ko: "엔코더 입력 모터 드라이버", en: "Motor Driver with Encoder Input" },
+  "comp.mdenc.encaTitle": { ko: "엔코더 A상 입력(패스스루) → 보드로 그대로 전달", en: "Encoder A-phase input (pass-through) → forwarded to the board" },
+  "comp.mdenc.encbTitle": { ko: "엔코더 B상 입력(패스스루) → 보드로 그대로 전달", en: "Encoder B-phase input (pass-through) → forwarded to the board" },
   "comp.mm.acv": { ko: "AC V (교류 전압)", en: "AC V (alternating voltage)" },
   "comp.mm.dca": { ko: "DC A (전류, mA 추정치)", en: "DC A (current, estimated mA)" },
   "comp.mm.dcv": { ko: "DC V (직류 전압)", en: "DC V (direct voltage)" },
@@ -3755,12 +3792,15 @@ const STRINGS = {
   "palette.dac": { ko: "DAC 신호 발생기", en: "DAC Signal Generator" },
   "palette.dcmotor": { ko: "DC 모터", en: "DC Motor" },
   "palette.dcmotorenc": { ko: "DC 모터<br>(엔코더 포함)", en: "DC Motor<br>(with encoder)" },
+  "palette.dcmotorenc2": { ko: "DC 모터<br>(엔코더 4선/AB상)", en: "DC Motor<br>(4-wire AB-phase encoder)" },
   "palette.lcd": { ko: "캐릭터 LCD<br>(16x2)", en: "Character LCD<br>(16x2)" },
   "palette.ldr": { ko: "조도 센서 (LDR)", en: "Light Sensor (LDR)" },
   "palette.clampmeter": { ko: "AC 클램프미터<br>(후크미터)", en: "AC Clamp Meter<br>(Hook Meter)" },
   "palette.led": { ko: "LED", en: "LED" },
   "palette.motor3ph": { ko: "3상 유도전동기", en: "3-Phase Induction Motor" },
   "palette.motordriver": { ko: "모터 드라이버<br>(L298N)", en: "Motor Driver<br>(L298N)" },
+  "palette.motordriver2": { ko: "모터 드라이버<br>(2채널, L298N)", en: "Motor Driver<br>(2-channel, L298N)" },
+  "palette.motordriverenc": { ko: "모터 드라이버<br>(엔코더 입력)", en: "Motor Driver<br>(with encoder input)" },
   "palette.multimeter": { ko: "디지털 멀티미터", en: "Digital Multimeter" },
   "palette.oled": { ko: "OLED 모듈<br>(I2C)", en: "OLED Module<br>(I2C)" },
   "palette.pot": { ko: "가변저항 (Pot)", en: "Potentiometer (Pot)" },
@@ -3960,7 +4000,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9986", en: "K's Arduino Simulator Ver0.9986" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9987", en: "K's Arduino Simulator Ver0.9987" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -7221,6 +7261,12 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9987', ko: [
+      '📐 CC/CV 충전기·DC-DC 벅 컨버터를 캔버스에 놓고 시뮬레이션을 시작하면(특히 아직 배선하지 않은 상태) "⚠ 입력 전원 없음" 경고 문구가 나타나면서 부품 높이가 늘어나, 이미 브레드보드 구멍에 맞춰 꽂아둔 부품 다리 위치가 아래로 밀려 어긋나 보이던 문제를 고쳤습니다. OLED 모듈도 시뮬레이션을 한 번이라도 돌리면(보드에 연결되어 있지 않아도) 화면 칸이 내용에 맞춰 커지면서 같은 방식으로 핀이 밀렸는데 이것도 함께 고쳤습니다. 미세먼지(PM) 센서도 센서값이 커져 표시 텍스트가 두 줄로 줄바꿈될 때 핀이 살짝 밀리던 것을 함께 손봤습니다 — 세 경우 모두 "내용에 따라 커지는 상자"가 min-height/display:none 방식이라 실제로 필요한 최대 높이를 미리 확보해두지 못했던 것이 원인으로, 항상 필요한 만큼의 높이를 고정으로 미리 잡아두는 방식으로 바꿨습니다(LED 전류/퍼센트 표시에 쓰였던 것과 같은 방식)',
+      '🔧 DC 모터+엔코더 부품에 VCC+/VCC-(모터 구동 단자 TA/TB)와 별도로 엔코더 전용 전원(ENCV/ENCG)까지 갖춘 4선식 버전을 추가했습니다("DC 모터(엔코더 4선/AB상)") — 기존 DC모터+엔코더(엔코더 GND 한 핀만 있던 것)와 달리 A상/B상 두 채널을 모두 내보내(서로 90° 위상차) 회전 방향까지 코드에서 판별할 수 있습니다',
+      '🔧 모터 드라이버에 2채널짜리를 추가했습니다("모터 드라이버(2채널, L298N)") — VCC/GND는 공유하고 채널 A(IN1/ENA/OUT1/OUT2)와 채널 B(IN2/ENB/OUT3/OUT4)가 서로 완전히 독립적으로 동작해, 모터 드라이버 하나로 DC 모터 두 대를 각자 따로 제어할 수 있습니다',
+      '🔧 엔코더 입력이 바로 되는 모터 드라이버를 추가했습니다("모터 드라이버(엔코더 입력)") — 기본 모터 구동(VCC/GND/IN1/ENA/OUT1/OUT2)은 기존 모터 드라이버와 같고, ENCV/ENCG/ENCA/ENCB 네 핀이 추가로 있어 엔코더 DC 모터의 엔코더 신호를 드라이버를 거쳐 보드로 편하게 모아 배선할 수 있습니다',
+  ]},
   { ver: 'Ver0.9986', ko: [
       '🔌 범용 커스텀 부품(팔레트의 "커스텀 부품(이름·핀 직접 지정)")의 이름·핀을 편집하고 저장하면, 그 순간부터 그 부품의 핀을 클릭해도 배선이 전혀 연결되지 않던 문제를 고쳤습니다 — 편집 저장 시 핀 DOM 요소를 통째로 새로 그리면서, 다른 모든 부품(PSU 모드 변경·오실로스코프 채널 변경·단자 개수 변경 등)이 똑같은 상황에서 하는 "새로 그린 핀에 클릭 배선 이벤트를 다시 연결하기" 처리가 커스텀 부품 편집 저장 경로에만 빠져 있던 것이 원인이었습니다. 커스텀 부품은 배치하자마자 항상 이 편집창이 자동으로 뜨므로 사실상 모든 커스텀 부품이 배선 불가능한 상태였습니다(불러온 프로젝트를 다시 열 때도 같은 문제가 있어 함께 고쳤습니다). 이름에 한글을 입력하는 것 자체는 오류 없이 정상 저장되는 것을 확인했습니다',
   ]},
@@ -9260,6 +9306,63 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT1" data-i18n-title="comp.md.out1Title" title="모터 출력 1 → DC 모터 단자 1"></div><span class="pin-cap" style="color:var(--text-faint)">OUT1</span></div>
         <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT2" data-i18n-title="comp.md.out2Title" title="모터 출력 2 → DC 모터 단자 2"></div><span class="pin-cap" style="color:var(--text-faint)">OUT2</span></div>
       </div>`;
+  } else if (type === 'motordriver2'){
+    // L298N류 2채널 모터 드라이버 — VCC/GND는 공유하고, 채널 A(IN1/ENA/OUT1/OUT2)와 채널 B
+    // (IN2/ENB/OUT3/OUT4)는 서로 완전히 독립적으로 모터 두 대를 각각 구동합니다. comp-motordriver
+    // 클래스를 함께 붙여서 채널 A는 기존 단일채널 구동 로직(runTick)을 그대로 재사용하고,
+    // 채널 B만 comp-motordriver2 전용 구동 블록을 새로 둡니다.
+    div.classList.add('comp-motordriver', 'comp-motordriver2');
+    div.innerHTML = `
+      <div class="md-title">L298N (2CH)<br><span data-i18n="comp.md2.title">2채널 모터 드라이버</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.md.vccTitle" title="모터 전원 VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN1" data-i18n-title="comp.dirTitle" title="방향 제어 (디지털) — A채널"></div><span class="pin-cap cap-sig">IN1</span></div>
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENA" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM) — A채널"></div><span class="pin-cap cap-pwm">ENA</span></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT1" data-i18n-title="comp.md.out1Title" title="모터 출력 1 → DC 모터 단자 1 (A채널)"></div><span class="pin-cap" style="color:var(--text-faint)">OUT1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT2" data-i18n-title="comp.md.out2Title" title="모터 출력 2 → DC 모터 단자 2 (A채널)"></div><span class="pin-cap" style="color:var(--text-faint)">OUT2</span></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN2" data-i18n-title="comp.md2.in2Title" title="방향 제어 (디지털) — B채널"></div><span class="pin-cap cap-sig">IN2</span></div>
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENB" data-i18n-title="comp.md2.enbTitle" title="속도 제어 (PWM) — B채널"></div><span class="pin-cap cap-pwm">ENB</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT3" data-i18n-title="comp.md2.out3Title" title="모터 출력 3 → DC 모터 단자 1 (B채널)"></div><span class="pin-cap" style="color:var(--text-faint)">OUT3</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT4" data-i18n-title="comp.md2.out4Title" title="모터 출력 4 → DC 모터 단자 2 (B채널)"></div><span class="pin-cap" style="color:var(--text-faint)">OUT4</span></div>
+      </div>`;
+  } else if (type === 'motordriverenc'){
+    // 엔코더 입력이 바로 되는(패스스루) 모터 드라이버 — VCC/GND/IN1/ENA/OUT1/OUT2는 기존
+    // motordriver와 완전히 동일하게 모터를 구동하고, ENCV/ENCG/ENCA/ENCB 네 핀은 드라이버 자체는
+    // 아무 것도 하지 않는 순수 패스스루 단자입니다. 엔코더 DC 모터(dcmotor-enc/dcmotor-enc2)의
+    // 엔코더 핀을 여기로 모아 보드로 그대로 이어주는 배선 편의용 커넥터로, 실제 신호는 배선으로
+    // 연결된 모터 쪽에서 그대로 옵니다 — netOf()가 배선으로 이어진 전체 net을 보고
+    // externalSourceOnNet이 그 net 안에서 진짜 모터의 ENCA/ENCB 핀을 찾아내므로, 이 드라이버
+    // 자신의 ENCA/ENCB 핀에는 별도 처리 코드가 필요 없습니다.
+    div.classList.add('comp-motordriver', 'comp-motordriverenc');
+    div.innerHTML = `
+      <div class="md-title">L298N+ENC<br><span data-i18n="comp.mdenc.title">엔코더 입력 모터 드라이버</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.md.vccTitle" title="모터 전원 VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN1" data-i18n-title="comp.dirTitle" title="방향 제어 (디지털)"></div><span class="pin-cap cap-sig">IN1</span></div>
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENA" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM)"></div><span class="pin-cap cap-pwm">ENA</span></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT1" data-i18n-title="comp.md.out1Title" title="모터 출력 1 → DC 모터 단자 1"></div><span class="pin-cap" style="color:var(--text-faint)">OUT1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT2" data-i18n-title="comp.md.out2Title" title="모터 출력 2 → DC 모터 단자 2"></div><span class="pin-cap" style="color:var(--text-faint)">OUT2</span></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_ENCV" data-i18n-title="comp.encvTitle" title="엔코더 전원 VCC (패스스루)"></div><span class="pin-cap cap-vcc">ENCV</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_ENCG" data-i18n-title="comp.encgTitle" title="엔코더 GND (패스스루)"></div><span class="pin-cap cap-gnd">ENCG</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ENCA" data-i18n-title="comp.mdenc.encaTitle" title="엔코더 A상 입력(패스스루) → 보드로 그대로 전달"></div><span class="pin-cap cap-sig">ENCA</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ENCB" data-i18n-title="comp.mdenc.encbTitle" title="엔코더 B상 입력(패스스루) → 보드로 그대로 전달"></div><span class="pin-cap cap-sig">ENCB</span></div>
+      </div>`;
   } else if (type === 'lcd'){
     div.classList.add('comp-lcd');
     div.innerHTML = `
@@ -9717,6 +9820,27 @@ function spawnComponent(type, dropX, dropY){
       <div class="comp-pin-row">
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ENCA" data-i18n-title="comp.encaTitle" title="엔코더 A상 펄스 출력 → 보드 디지털 핀"></div><span class="pin-cap cap-sig">ENCA</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_ENCG" data-i18n-title="comp.encgTitle" title="엔코더 GND"></div><span class="pin-cap cap-gnd">ENCG</span></div>
+      </div>`;
+  } else if (type === 'dcmotor-enc2'){
+    // DC 모터 + 4선식 쿼드러처(A/B 2상) 엔코더 — 기존 dcmotor-enc(엔코더 GND 한 핀만 있고 엔코더
+    // 전용 전원은 따로 없음)와 달리 엔코더 전용 전원(ENCV/ENCG)이 별도로 있고, 회전 방향까지
+    // 알 수 있는 A/B 2상 신호를 냅니다(B상은 A상보다 1/4주기 위상차 — encoderPulseReading의
+    // phase 인자로 구현, 방향에 따라 앞서거나 뒤처짐). comp-dcmotor-enc 클래스를 그대로 함께
+    // 붙여서 기존 모양·구동 로직(driveMotor 셀렉터)·매 틱 배지 갱신·ENCA 판독 로직을
+    // 그대로 재사용합니다.
+    div.classList.add('comp-dcmotor-enc', 'comp-dcmotor-enc2');
+    div.innerHTML = `
+      <div class="motor-body"><div class="motor-fan" id="${id}_fan"></div><div class="enc-disk"></div></div>
+      <div class="comp-label"><span data-i18n="comp.dcmotorenc2.label">DC 모터+엔코더(4선)</span><span id="${id}_speed" data-i18n="motor.stopped">정지</span></div>
+      <div class="enc-badge" id="${id}_pulsehz">0 Hz</div>
+      <div class="comp-pin-row"><div class="pin-col"><div class="pin-mini" data-pin="${id}_TA" data-i18n-title="comp.termA" title="모터 단자 A"></div><span class="pin-cap">TA</span></div><div class="pin-col"><div class="pin-mini" data-pin="${id}_TB" data-i18n-title="comp.termB" title="모터 단자 B"></div><span class="pin-cap">TB</span></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_ENCV" data-i18n-title="comp.encvTitle" title="엔코더 전원 VCC"></div><span class="pin-cap cap-vcc">ENCV</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_ENCG" data-i18n-title="comp.encgTitle" title="엔코더 GND"></div><span class="pin-cap cap-gnd">ENCG</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ENCA" data-i18n-title="comp.encaTitle" title="엔코더 A상 펄스 출력 → 보드 디지털 핀"></div><span class="pin-cap cap-sig">ENCA</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ENCB" data-i18n-title="comp.encbTitle" title="엔코더 B상 펄스 출력 → 보드 디지털 핀 (A상과 90° 위상차, 회전 방향 판별용)"></div><span class="pin-cap cap-sig">ENCB</span></div>
       </div>`;
   } else if (type === 'stepper'){
     div.classList.add('comp-stepper');
@@ -10556,9 +10680,15 @@ function setRS485ServoAngle(compId, angle){
 // 엔코더 DC 모터: 현재 회전 속도(dataset.speed, driveMotor가 기록)에 비례하는 펄스를 만들고,
 // 배지(Hz) 표시도 함께 갱신합니다. 배선 여부와 무관하게 매 틱 갱신되어야 하므로 runTick에서도
 // 직접 호출하고, 보드/스코프가 이 핀을 읽을 때(externalSourceOnNet)도 같은 함수를 재사용합니다.
-function encoderPulseReading(motorEl){
+// phase='B'를 넘기면(dcmotor-enc2의 4선식 쿼드러처 B상) 같은 주파수의 펄스를 A상보다 1/4주기
+// (90°) 어긋나게 냅니다 — 실제 쿼드러처 인코더처럼 회전 방향(dataset.dir)에 따라 B상이 A상보다
+// 앞서거나 뒤처지므로, 학생 코드가 A/B 위상 순서를 보고 방향을 판별할 수 있습니다. 배지(Hz)
+// 표시는 A상 호출에서만 갱신합니다(두 번 겹쳐 쓰지 않도록).
+function encoderPulseReading(motorEl, phase){
+  phase = phase || 'A';
   const speed = parseFloat(motorEl.dataset.speed || '0');
-  const pulseLabel = document.getElementById(`${motorEl.id}_pulsehz`);
+  const dir = parseFloat(motorEl.dataset.dir || '1') < 0 ? -1 : 1;
+  const pulseLabel = phase === 'A' ? document.getElementById(`${motorEl.id}_pulsehz`) : null;
   if (!isSimulating || speed <= 0.03){
     if (pulseLabel) pulseLabel.textContent = '0 Hz';
     return { type: 'digital', v: 0 };
@@ -10566,7 +10696,8 @@ function encoderPulseReading(motorEl){
   const freq = 5 + speed * 95; // 엔코더 슬릿 수에 비례하는 펄스 주파수(예시로 5~100Hz)
   if (pulseLabel) pulseLabel.textContent = `${Math.round(freq)} Hz`;
   const period = 1000 / freq;
-  const v = Math.floor(Date.now() / (period / 2)) % 2;
+  const phaseShiftMs = (phase === 'B') ? dir * (period / 4) : 0;
+  const v = Math.floor((Date.now() + phaseShiftMs) / (period / 2)) % 2;
   return { type: 'digital', v };
 }
 
@@ -12481,6 +12612,9 @@ const COMP_HELP_BLURB = {
   relay220:   { ko: '코일 자체가 220V로 직접 여자됩니다(별도 5V 제어 신호 없음) — L/N에 220V를 걸면 COM이 NC에서 NO로 전환되는 스위치로 동작합니다.', en: 'The coil itself is energized directly by 220V AC — no separate 5V control signal; COM switches from NC to NO.' },
   transistor: { ko: 'B(베이스)에 작은 신호/전류를 흘리면 C-E(컬렉터-이미터) 사이가 스위치처럼 닫힙니다 — 큰 부하는 C-E 쪽에, 제어 신호는 B에 저항과 함께 연결하세요.', en: 'A small signal into B (base) closes the C-E path like a switch — put the load on C-E and drive B (with a series resistor) from your control signal.' },
   motordriver:{ ko: 'VCC/GND는 모터 전원, IN1/IN2는 보드 디지털 핀(방향 제어), OUT1/OUT2는 모터로 나갑니다 — 로직 전원과 모터 전원이 분리되어 있는 경우가 많으니 핀 설명을 확인하세요.', en: 'VCC/GND powers the motor, IN1/IN2 (from board pins) set direction, OUT1/OUT2 go to the motor. Logic and motor power are often separate — check each pin.' },
+  motordriver2:{ ko: 'VCC/GND(공통 모터 전원) 아래로 A채널(IN1/ENA→OUT1/OUT2)과 B채널(IN2/ENB→OUT3/OUT4)이 완전히 독립적으로 동작합니다 — 모터 두 대를 각자 따로 제어할 수 있습니다.', en: 'Shares VCC/GND for motor power, but channel A (IN1/ENA→OUT1/OUT2) and channel B (IN2/ENB→OUT3/OUT4) drive two motors completely independently.' },
+  motordriverenc:{ ko: '기본 동작(VCC/GND/IN1/ENA→OUT1/OUT2)은 motordriver와 같고, ENCV/ENCG/ENCA/ENCB 네 핀은 엔코더 DC 모터의 신호를 그대로 보드로 이어주는 패스스루 단자입니다(드라이버 자체는 엔코더 신호를 가공하지 않음).', en: 'Drives the motor the same way as motordriver (VCC/GND/IN1/ENA→OUT1/OUT2). ENCV/ENCG/ENCA/ENCB are pass-through pins that simply forward an encoder motor\'s signals to the board.' },
+  'dcmotor-enc2':{ ko: 'TA/TB는 모터 구동 단자, ENCV/ENCG는 엔코더 전용 전원, ENCA/ENCB는 서로 90° 위상차가 나는 2상(쿼드러처) 펄스를 냅니다 — A/B 순서를 비교하면 회전 방향까지 알 수 있습니다.', en: 'TA/TB drive the motor; ENCV/ENCG power the encoder separately; ENCA/ENCB output two quadrature pulse channels 90° apart, so comparing their order reveals rotation direction.' },
   a4988:      { ko: 'STEP 핀에 펄스를 줄 때마다 한 스텝씩 움직이고 DIR로 방향을 정합니다 — VMOT/GND는 모터 전원, VDD/GND는 로직 전원으로 서로 다릅니다.', en: 'Each pulse on STEP advances one step; DIR sets direction. VMOT/GND (motor power) and VDD/GND (logic power) are separate rails.' },
   levelshifter:{ko: '한쪽(LV)은 보드의 낮은 전압(예: 3.3V), 반대쪽(HV)은 더 높은 전압(예: 5V) 로직에 연결해 신호를 안전하게 변환합니다 — 양쪽 GND는 반드시 공통으로 연결하세요.', en: 'One side (LV) connects to the lower-voltage logic (e.g. 3.3V), the other (HV) to the higher one (e.g. 5V). Always tie both GNDs together.' },
   dac:        { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 통신하면, OUT 핀에서 설정한 전압이 실제 아날로그 신호로 나옵니다.', en: 'Power via VCC/GND, talk to the board over SDA/SCL (I2C), and OUT outputs the analog voltage you set.' },
@@ -12784,7 +12918,14 @@ function externalSourceOnNet(pinEl){
     }
     if (pid.endsWith('_ENCA')){
       const motorEl = el.closest('.comp-dcmotor-enc');
-      if (motorEl) return encoderPulseReading(motorEl);
+      if (motorEl) return encoderPulseReading(motorEl, 'A');
+    }
+    // dcmotor-enc2(4선식 쿼드러처 인코더)의 B상 — motordriverenc의 ENCB 패스스루 단자가 같은
+    // net에 있어도 그건 comp-dcmotor-enc2가 아니므로 closest()가 null을 반환해 자연히
+    // 건너뛰고, net을 계속 훑어 실제 모터의 ENCB 핀을 찾아냅니다.
+    if (pid.endsWith('_ENCB')){
+      const motorEl = el.closest('.comp-dcmotor-enc2');
+      if (motorEl) return encoderPulseReading(motorEl, 'B');
     }
     // 2채널 가변 전원 공급기 — 채널마다 독립된 V+/GND 쌍(V1/G1, V2/G2)을 갖습니다. 그 채널의
     // 출력 스위치가 꺼져 있으면 신호원이 없는 것으로 처리합니다(보통 PSU가 꺼졌을 때와 동일).
@@ -15171,6 +15312,27 @@ function runTick(){
     const out1El = md.querySelector('[data-pin$="_OUT1"]');
     if (out1El){
       netOf(out1El).forEach(el => {
+        const pid = el.dataset.pin;
+        if (pid && /_T[AB]$/.test(pid)) driveMotor(pid.replace(/_T[AB]$/, ''), speed, dir);
+      });
+    }
+  });
+
+  // 5-0. 2채널 모터 드라이버(motordriver2)의 B채널: comp-motordriver 클래스를 함께 갖고 있어
+  //      A채널(IN1/ENA→OUT1/OUT2)은 바로 위 블록이 이미 구동했으므로, 여기서는 B채널
+  //      (IN2/ENB→OUT3/OUT4)만 같은 방식으로 추가로 구동합니다.
+  document.querySelectorAll('.comp-motordriver2').forEach(md => {
+    const legReading = (suffix) => {
+      const legEl = md.querySelector(`[data-pin$="_${suffix}"]`);
+      return legEl ? resistiveReading(legEl) : null;
+    };
+    const enbR = legReading('ENB');
+    const in2R = legReading('IN2');
+    const speed = enbR ? Math.max(0, Math.min(1, enbR.v)) : 0;
+    const dir = (in2R && in2R.v <= 0.5) ? -1 : 1;
+    const out3El = md.querySelector('[data-pin$="_OUT3"]');
+    if (out3El){
+      netOf(out3El).forEach(el => {
         const pid = el.dataset.pin;
         if (pid && /_T[AB]$/.test(pid)) driveMotor(pid.replace(/_T[AB]$/, ''), speed, dir);
       });
@@ -18884,12 +19046,12 @@ function BOM_LABELS_FN(){ return {
   btmodule: tr('bom.btmodule'), wifiap: tr('bom.wifiap'), dac: tr('comp.dac.title').replace(/<br>.*/,'').trim(),
   ultrasonic: tr('bom.ultrasonic'), lidar: tr('comp.lidar.label'), gyro: tr('bom.gyro'), accel: tr('bom.accel'), servo: tr('comp.servo.label'), rs485servo: tr('comp.rs485servo.label'), canmodule: tr('comp.canmodule.title'), canfdmodule: tr('comp.canfdmodule.title'), 'rs485module': tr('comp.rs485module.title'), pmsensor: tr('comp.pmsensor.title'), dcmotor: tr('comp.dcmotor.label'), fan: tr('comp.fan.label'),
   rpi3: 'Raspberry Pi 3', rpi4: 'Raspberry Pi 4', rpi5: 'Raspberry Pi 5', hdmimonitor: tr('comp.hdmimonitor.title'), camera: tr('comp.camera.title'), usbsound: tr('comp.usbsound.title'), speaker: tr('comp.speaker.title'), custom: tr('comp.custom.defaultName'),
-  motordriver: tr('bom.motordriver'), 'sensor-ldr': tr('sensor.ldr'), 'sensor-temp': tr('sensor.temp'), 'sensor-humid': tr('sensor.humid'),
+  motordriver: tr('bom.motordriver'), motordriver2: tr('bom.motordriver2'), motordriverenc: tr('bom.motordriverenc'), 'sensor-ldr': tr('sensor.ldr'), 'sensor-temp': tr('sensor.temp'), 'sensor-humid': tr('sensor.humid'),
   lcd: tr('bom.lcd'), oled: tr('bom.oled'),
   resistor: tr('bom.resistor'), powercable: tr('bom.powercable'), motor3ph: tr('comp.motor3ph.label'),
   acmotor: tr('bom.acmotor'), acmotorctrl: tr('bom.acmotorctrl'), levelshifter: tr('bom.levelshifter'),
   bulb220: tr('bom.bulb220'), ledtube220: tr('bom.ledtube220'),
-  bldcmotor: tr('comp.bldcmotor.label'), bldcdriver: tr('bom.bldcdriver'), 'dcmotor-enc': tr('bom.dcmotorenc'),
+  bldcmotor: tr('comp.bldcmotor.label'), bldcdriver: tr('bom.bldcdriver'), 'dcmotor-enc': tr('bom.dcmotorenc'), 'dcmotor-enc2': tr('bom.dcmotorenc2'),
   stepper: tr('bom.stepper'), a4988: tr('bom.a4988'),
   multimeter: tr('comp.mm.title'),
   capacitor: tr('comp.capacitor.label'), 'capacitor-e': tr('comp.capacitorE.label'), inductor: tr('comp.inductor.label'),
@@ -21075,7 +21237,7 @@ function collapseNonBoardPaletteGroupsByDefault(){
  * (buildAiComponentCatalog) — 코드가 바뀌면 카탈로그도 자동으로 같이 바뀌므로, AI가 존재하지
  * 않는 핀 이름을 지어내 배선이 조용히 실패하는 사고를 원천적으로 막습니다.
  * ============================================================================ */
-const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','buzzeractive','buzzerpassive','bulb220','camera','canfdmodule','canmodule','capacitor','capacitor-e','cccv','clampmeter','coincell','contactor','dac','dcmotor','dcmotor-enc','diode','dsensor-avoid','dsensor-ballswitch','dsensor-digitaltemp','dsensor-flame','dsensor-hallmag','dsensor-irrecv','dsensor-lightblock','dsensor-lightcup','dsensor-minireed','dsensor-reed','dsensor-shock','dsensor-tap','dsensor-tilt','dsensor-touch','dsensor-tracking','electromagnet','eocr','fan','flash7color','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','iremit','joystick','laser','lcd','led','ledtube220','levelshifter','lidar','mccb','motor3ph','motordriver','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-anahall','sensor-anatemp','sensor-heartbeat','sensor-humid','sensor-irdist2m','sensor-irdist3cm','sensor-irdist6m','sensor-irdist9m','sensor-ldr','sensor-linhall','sensor-rotary','sensor-soundbig','sensor-soundsm','sensor-temp','sensor-tempmod','sensor-water','servo','smdrgb','speaker','stepper','temphumid','terminalblock','timer','toggleswitch','transformer','transistor','twocolorled','ultrasonic','usbsound','wallswitch','wifiap'];
+const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','buzzeractive','buzzerpassive','bulb220','camera','canfdmodule','canmodule','capacitor','capacitor-e','cccv','clampmeter','coincell','contactor','dac','dcmotor','dcmotor-enc','dcmotor-enc2','diode','dsensor-avoid','dsensor-ballswitch','dsensor-digitaltemp','dsensor-flame','dsensor-hallmag','dsensor-irrecv','dsensor-lightblock','dsensor-lightcup','dsensor-minireed','dsensor-reed','dsensor-shock','dsensor-tap','dsensor-tilt','dsensor-touch','dsensor-tracking','electromagnet','eocr','fan','flash7color','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','iremit','joystick','laser','lcd','led','ledtube220','levelshifter','lidar','mccb','motor3ph','motordriver','motordriver2','motordriverenc','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-anahall','sensor-anatemp','sensor-heartbeat','sensor-humid','sensor-irdist2m','sensor-irdist3cm','sensor-irdist6m','sensor-irdist9m','sensor-ldr','sensor-linhall','sensor-rotary','sensor-soundbig','sensor-soundsm','sensor-temp','sensor-tempmod','sensor-water','servo','smdrgb','speaker','stepper','temphumid','terminalblock','timer','toggleswitch','transformer','transistor','twocolorled','ultrasonic','usbsound','wallswitch','wifiap'];
 // ('custom'은 사용자가 직접 그리는 빈 부품이라 AI가 고를 이유가 없어 목록에서 뺐습니다.)
 const AI_BOARD_TYPES = ['r3', 'r4', 'mega', 'esp32b', 'esp32d', 'esp32t'];
 
