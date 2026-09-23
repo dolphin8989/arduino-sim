@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9985</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9986</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1910,7 +1910,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9985</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9986</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -3119,7 +3119,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9985", en: "K's Simulator Ver0.9985" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9986", en: "K's Simulator Ver0.9986" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3960,7 +3960,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9985", en: "K's Arduino Simulator Ver0.9985" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9986", en: "K's Arduino Simulator Ver0.9986" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -7221,6 +7221,9 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9986', ko: [
+      '🔌 범용 커스텀 부품(팔레트의 "커스텀 부품(이름·핀 직접 지정)")의 이름·핀을 편집하고 저장하면, 그 순간부터 그 부품의 핀을 클릭해도 배선이 전혀 연결되지 않던 문제를 고쳤습니다 — 편집 저장 시 핀 DOM 요소를 통째로 새로 그리면서, 다른 모든 부품(PSU 모드 변경·오실로스코프 채널 변경·단자 개수 변경 등)이 똑같은 상황에서 하는 "새로 그린 핀에 클릭 배선 이벤트를 다시 연결하기" 처리가 커스텀 부품 편집 저장 경로에만 빠져 있던 것이 원인이었습니다. 커스텀 부품은 배치하자마자 항상 이 편집창이 자동으로 뜨므로 사실상 모든 커스텀 부품이 배선 불가능한 상태였습니다(불러온 프로젝트를 다시 열 때도 같은 문제가 있어 함께 고쳤습니다). 이름에 한글을 입력하는 것 자체는 오류 없이 정상 저장되는 것을 확인했습니다',
+  ]},
   { ver: 'Ver0.9985', ko: [
       '🔤 인라인 어셈블리(asm volatile("..."))를 실제로 실행할 수 있게 됐습니다 — 이 시뮬레이터는 실제 AVR 명령어를 한 사이클씩 도는 하드웨어 에뮬레이터가 아니라 C++을 자바스크립트로 바꿔 흉내 내는 방식이라 진짜 CPU 코어까지 새로 만들 수는 없지만, 학생·개발자가 실습에서 가장 흔히 쓰는 명령어 부분집합(NOP/LDI/MOV/CLR/SER, ADD/ADC/SUB/SUBI/CP/CPI/INC/DEC, AND/ANDI/OR/ORI/EOR/COM/NEG, LSL/LSR/ROL/ROR, IN/OUT/SBI/CBI/SBIS/SBIC/SBRS/SBRC, PUSH/POP, RJMP/RCALL/RET, BREQ/BRNE/BRCS/BRCC/BRMI/BRPL/BRVS/BRVC/BRLT/BRGE, CLI/SEI)를 지원하는 작은 컴파일러를 새로 만들었습니다. r0~r31 범용 레지스터와 SREG(C/Z/N/V/S) 플래그를 실제 ATmega328p 데이터시트 규칙 그대로 계산하고, IN/OUT/SBI/CBI 등으로 DDRx/PORTx/PINx는 물론 ADMUX/ADCSRA/UDR0 같은 ADC·UART 레지스터까지 "레지스터 이름"으로 직접 건드릴 수 있어 asm 코드와 일반 C++ 코드, 레지스터 직접 제어를 한 스케치 안에서 자연스럽게 섞어 쓸 수 있습니다. rjmp 등으로 무한 루프에 빠지는 실수(또는 고의)로 브라우저 탭이 영원히 멈춰버리는 사고를 막기 위해 한 번 호출에 20만 스텝이 넘으면 "무한 루프에 빠진 것 같다"는 명확한 오류로 멈춥니다. 다만 입출력 변수를 C 변수와 직접 연결하는 GCC 확장 인라인 어셈블리(콜론으로 피연산자를 지정하는 구문)와 숫자로 된 I/O 주소(예: out 0x05, r16)는 지원하지 않으며, 이 경우 무엇을 고쳐야 하는지 정확히 안내합니다',
   ]},
@@ -8175,6 +8178,16 @@ function applyCustomSpec(compEl, spec){
     wires.filter(w => removedPins.includes(w.from.dataset.pin) || removedPins.includes(w.to.dataset.pin)).forEach(w => deleteWire(w));
   }
   compEl.innerHTML = renderCustomPartMarkup(id, spec);
+  // [버그 수정] innerHTML을 다시 그리면 핀(.pin-mini) DOM 요소가 전부 새로 만들어지는데,
+  // 배선은 핀을 클릭할 때 반응하도록 bindPinEvents()가 각 핀 요소에 직접 onclick을 걸어두는
+  // 방식이라(이벤트 위임이 아님), 이 함수만 새 핀에 다시 걸어주지 않으면 그 핀들은 영원히
+  // 클릭해도 반응하지 않는(배선이 절대 연결되지 않는) 상태로 남습니다. 다른 부품들의 "핀
+  // 구성이 바뀔 때"(PSU 모드 변경, 오실로스코프 채널 모드 변경, 단자 개수 변경 등) 처리는
+  // 전부 innerHTML을 새로 그린 직후 bindPinEvents()를 다시 부르는데, 커스텀 부품 편집
+  // 저장(이 함수)만 빠져 있었던 것이 원인이었습니다 — 커스텀 부품은 배치 직후 항상 이 편집
+  // 창이 자동으로 뜨므로(위 spawnComponent 쪽 참고), 사실상 모든 커스텀 부품이 배선 불가
+  // 상태였습니다.
+  bindPinEvents();
   updateAllWires();
 }
 // 커스텀 부품 배치 직후, 또는 "✎ 편집" 버튼/더블클릭으로 이름·핀 개수·핀 이름을 입력하는
@@ -8245,6 +8258,9 @@ document.addEventListener('change', (e) => {
   if (compEl.querySelector('.custom-title')?.textContent === spec.name &&
       compEl.querySelectorAll('.comp-pin-row .pin-mini').length === spec.pins.length) return; // 이미 반영됨(자기 자신이 쏜 change 무시)
   compEl.innerHTML = renderCustomPartMarkup(compEl.id, spec);
+  // [버그 수정] applyCustomSpec()와 마찬가지로, 새로 그려진 핀 요소에 클릭 배선 이벤트를 다시
+  // 걸어주지 않으면 프로젝트를 불러온 뒤 이 커스텀 부품의 핀은 클릭해도 반응하지 않습니다.
+  bindPinEvents();
   updateAllWires();
 });
 // 커스텀 부품은 더블클릭으로도 바로 편집 모달을 엽니다(팔레트의 다른 값 입력형 부품들과
