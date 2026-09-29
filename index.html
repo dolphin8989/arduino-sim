@@ -46,7 +46,7 @@
     padding:6px 12px; border-radius:6px; cursor:pointer; font-size:.8rem; font-weight:600;
   }
   .lang-btn:hover{border-color:var(--teal);}
-  
+
   .hub-body{padding:32px; display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px;}
   .app-card{
     background:var(--bg-panel-2); border:1px solid var(--border); border-radius:10px;
@@ -63,7 +63,7 @@
   }
   .badge.free{background:rgba(61,220,132,.15); color:#3ddc84;}
   .badge.secure{background:rgba(242,165,61,.15); color:var(--amber);}
-  
+
   .vc-section{
     margin:0 32px 32px 32px; background:var(--bg-panel-2); border:1px solid var(--border);
     border-radius:10px; padding:20px 24px; display:flex; flex-direction:column; gap:10px;
@@ -122,7 +122,7 @@
     </div>
     <button class="lang-btn" onclick="toggleLanguage()" id="langToggleBtn">English</button>
   </div>
-  
+
   <div class="hub-body">
     <!-- 아두이노/ESP/전기 (자유 접속) -> Embedded.html -->
     <div class="app-card" onclick="openApp('Embedded.html', false)">
@@ -132,9 +132,9 @@
       <p id="cardArduinoDesc">다양한 마이크로컨트롤러 보드와 브레드보드, 센서 및 액추에이터 회로 실습 환경.</p>
     </div>
 
-    <!-- PLC (암호 보호) -> PLCS.html -->
-    <div class="app-card" onclick="openApp('PLCS.html', true)">
-      <span class="badge secure" id="badgeSecure1">암호 보호</span>
+    <!-- PLC (자유 접속) -> PLCS.html -->
+    <div class="app-card" onclick="openApp('PLCS.html', false)">
+      <span class="badge free" id="badgeFree2">자유 접속</span>
       <div class="icon">🏭</div>
       <h3 id="cardPlcTitle">PLC 시뮬레이터</h3>
       <p id="cardPlcDesc">4대 메이저 벤더 래더/ST/FBD/SFC 및 HMI, 가상 시운전 실습 환경.</p>
@@ -175,7 +175,7 @@
     <h3 id="modalTitle">보안 인증 필요</h3>
     <p id="modalDesc">이 시뮬레이터에 접근하려면 관리자 암호를 입력해야 합니다.</p>
     <input type="password" id="passInput" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter')verifyPassword()">
-    <span class="error-msg" id="errorMsg">암호가 틀렸습니다. (정답: 5072)</span>
+    <span class="error-msg" id="errorMsg">암호가 틀렸습니다. (정답: 7777)</span>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()" id="modalCancel">취소</button>
       <button class="btn-submit" onclick="verifyPassword()" id="modalConfirm">확인</button>
@@ -207,7 +207,7 @@
       footer: "Educational Virtual Commissioning Platform.",
       modalTitle: "보안 인증 필요",
       modalDesc: "이 시뮬레이터에 접근하려면 관리자 암호를 입력해야 합니다.",
-      errorMsg: "암호가 틀렸습니다. (힌트: 5072)",
+      errorMsg: "암호가 틀렸습니다. (힌트: 7777)",
       cancel: "취소",
       confirm: "확인"
     },
@@ -230,7 +230,7 @@
       footer: "Educational Virtual Commissioning Platform.",
       modalTitle: "Security Authentication",
       modalDesc: "Please enter the administrator password to access this simulator.",
-      errorMsg: "Incorrect password. (Hint: 5072)",
+      errorMsg: "Incorrect password. (Hint: 7777)",
       cancel: "Cancel",
       confirm: "Confirm"
     }
@@ -239,15 +239,15 @@
   function toggleLanguage() {
     currentLang = currentLang === 'ko' ? 'en' : 'ko';
     const t = i18n[currentLang];
-    
+
     document.getElementById('pageTitle').textContent = t.title;
     document.getElementById('txtTitle').textContent = t.title;
     document.getElementById('txtSub').textContent = t.sub;
     document.getElementById('langToggleBtn').textContent = t.langBtn;
-    
-    document.getElementById('badgeFree').textContent = t.badgeFree;
+
+    document.querySelectorAll('.badge.free').forEach(el => el.textContent = t.badgeFree);
     document.querySelectorAll('.badge.secure').forEach(el => el.textContent = t.badgeSecure);
-    
+
     document.getElementById('cardArduinoTitle').textContent = t.arduinoTitle;
     document.getElementById('cardArduinoDesc').textContent = t.arduinoDesc;
     document.getElementById('cardPlcTitle').textContent = t.plcTitle;
@@ -259,7 +259,7 @@
     document.getElementById('vcSectionDesc').textContent = t.vcDesc;
     document.getElementById('vcGuideBtn').textContent = t.vcGuide;
     document.getElementById('vcZipBtn').textContent = t.vcZip;
-    
+
     document.getElementById('txtFooter').textContent = "© Developer Kim Jong-wook. " + t.footer;
     document.getElementById('modalTitle').textContent = t.modalTitle;
     document.getElementById('modalDesc').textContent = t.modalDesc;
@@ -286,7 +286,7 @@
 
   function verifyPassword() {
     const pwd = document.getElementById('passInput').value;
-    if (pwd === '5072') {
+    if (pwd === '7777') {
       window.location.href = targetUrl;
     } else {
       const err = document.getElementById('errorMsg');
