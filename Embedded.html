@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9993</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9994</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -924,6 +924,18 @@
   .comp-motordriver{width:150px; padding:10px; background:linear-gradient(160deg,#1e2a1e,#12180f); border:1px solid #3a4a35; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
   .md-title{font-size:.62rem; color:#9fd48a; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; line-height:1.35;}
   .md-out-row{margin-top:10px; padding-top:8px; border-top:1px dashed #3a4a35;}
+
+  /* ---------- BTS7960/IBT-2 (43A 고전류 단일채널 H-브리지) ---------- */
+  .comp-motordriver-bts7960{width:166px; padding:10px; background:linear-gradient(160deg,#2a1414,#160a0a); border:1px solid #5a2a2a; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .comp-motordriver-bts7960 .md-title{color:#e88a8a;}
+
+  /* ---------- 7A 2채널 DC 모터 드라이버(160W, IN1~4/ENA/ENB, L298 로직 호환) ---------- */
+  .comp-motordriver-7a2ch{width:166px; padding:10px; background:linear-gradient(160deg,#2a1a14,#160e0a); border:1px solid #5a3a2a; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .comp-motordriver-7a2ch .md-title{color:#e8b48a;}
+
+  /* ---------- MPU-6050(GY-521) 자이로+가속도 통합 IMU ---------- */
+  .comp-imu-mpu6050{width:164px;}
+  .comp-imu-mpu6050 .sensor3-title{color:#e8d38a;}
 
   /* ---------- Resistor (Ω/kΩ/MΩ 선택) ---------- */
   .comp-resistor{width:98px; display:flex; flex-direction:column; align-items:center; gap:5px; padding:4px 0;}
@@ -1952,7 +1964,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9993</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9994</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -2218,7 +2230,7 @@
       </div>
       <div class="palette-group" data-group="motor">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.motor">모터 &amp; 드라이버</span><span class="pg-count">17</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.motor">모터 &amp; 드라이버</span><span class="pg-count">19</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('fan')">
@@ -2289,11 +2301,19 @@
             <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#2a1e33,#160f1c);border:1px solid #4a3560;"></div></div>
             <span data-i18n="palette.a4988">스텝모터 드라이버<br>(A4988)</span>
           </div>
+          <div class="palette-item" onclick="spawnComponent('motordriver-bts7960')">
+            <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#2a1414,#160a0a);border:1px solid #5a2a2a;"></div></div>
+            <span data-i18n="palette.mdbts">모터 드라이버<br>(BTS7960/IBT-2, 43A)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('motordriver-7a2ch')">
+            <div class="swatch"><div style="width:26px;height:18px;border-radius:2px;background:linear-gradient(160deg,#2a1a14,#160e0a);border:1px solid #5a3a2a;"></div></div>
+            <span data-i18n="palette.md7a">모터 드라이버<br>(7A 2채널, 160W)</span>
+          </div>
         </div>
       </div>
       <div class="palette-group" data-group="sensor">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.sensor">센서</span><span class="pg-count">48</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.sensor">센서</span><span class="pg-count">49</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('ultrasonic')">
@@ -2319,6 +2339,10 @@
           <div class="palette-item" onclick="spawnComponent('gyro')">
             <div class="swatch"><svg width="24" height="24" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="4.5" fill="none" stroke="#3ddc84" stroke-width="1.4"/><ellipse cx="12" cy="12" rx="4.5" ry="10" fill="none" stroke="#5aa9e6" stroke-width="1.4" transform="rotate(30 12 12)"/><circle cx="12" cy="12" r="1.6" fill="#e8d38a"/></svg></div>
             <span data-i18n="palette.gyro">3축 자이로 센서<br>(I2C)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('imu-mpu6050')">
+            <div class="swatch"><svg width="24" height="24" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="4.5" fill="none" stroke="#3ddc84" stroke-width="1.2"/><path d="M12 12 L18 6" stroke="#e8d38a" stroke-width="1.6"/><path d="M12 12 L12 4" stroke="#e6493d" stroke-width="1.6"/><circle cx="12" cy="12" r="1.6" fill="#e8d38a"/></svg></div>
+            <span data-i18n="palette.imumpu6050">6축 IMU<br>(MPU-6050/GY-521, I2C)</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('accel')">
             <div class="swatch"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2 L12 22 M2 12 L22 12" stroke="#444c56" stroke-width="1" /><path d="M12 12 L18 6" stroke="#3ddc84" stroke-width="1.6"/><path d="M12 12 L6 16" stroke="#5aa9e6" stroke-width="1.6"/><path d="M12 12 L12 4" stroke="#e6493d" stroke-width="1.6"/></svg></div>
@@ -3186,6 +3210,8 @@ const STRINGS = {
   "bom.motordriver": { ko: "모터 드라이버 (L298N)", en: "Motor Driver (L298N)" },
   "bom.motordriver2": { ko: "모터 드라이버 (2채널, L298N)", en: "Motor Driver (2-channel, L298N)" },
   "bom.motordriverenc": { ko: "모터 드라이버 (엔코더 입력)", en: "Motor Driver (with encoder input)" },
+  "bom.mdbts": { ko: "모터 드라이버 (BTS7960/IBT-2, 43A)", en: "Motor Driver (BTS7960/IBT-2, 43A)" },
+  "bom.md7a": { ko: "모터 드라이버 (7A 2채널, 160W)", en: "Motor Driver (7A Dual-Channel, 160W)" },
   "bom.oled": { ko: "OLED 모듈 (I2C)", en: "OLED Module (I2C)" },
   "bom.pot": { ko: "가변저항 (Potentiometer)", en: "Potentiometer" },
   "bom.powercable": { ko: "파워케이블 (저항 있음)", en: "Power Cable (with resistance)" },
@@ -3196,6 +3222,7 @@ const STRINGS = {
   "bom.ultrasonic": { ko: "초음파 센서 (HC-SR04)", en: "Ultrasonic Sensor (HC-SR04)" },
   "bom.gyro": { ko: "3축 자이로 센서 (I2C)", en: "3-Axis Gyroscope (I2C)" },
   "bom.accel": { ko: "3축 가속도 센서 (I2C)", en: "3-Axis Accelerometer (I2C)" },
+  "bom.imumpu6050": { ko: "6축 IMU (MPU-6050/GY-521, I2C)", en: "6-Axis IMU (MPU-6050/GY-521, I2C)" },
   "bom.unitCount": { ko: "개", en: "" },
   "bom.wifiap": { ko: "무선 AP (신호 발생)", en: "Wireless AP (signal gen)" },
   "bom.wireCount": { ko: "연결된 전선", en: "Wires connected" },
@@ -3211,7 +3238,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9993", en: "K's Simulator Ver0.9993" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9994", en: "K's Simulator Ver0.9994" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3305,6 +3332,33 @@ const STRINGS = {
   "comp.mdenc.title": { ko: "엔코더 입력 모터 드라이버", en: "Motor Driver with Encoder Input" },
   "comp.mdenc.encaTitle": { ko: "엔코더 A상 입력(패스스루) → 보드로 그대로 전달", en: "Encoder A-phase input (pass-through) → forwarded to the board" },
   "comp.mdenc.encbTitle": { ko: "엔코더 B상 입력(패스스루) → 보드로 그대로 전달", en: "Encoder B-phase input (pass-through) → forwarded to the board" },
+  "comp.mdbts.title": { ko: "IBT-2 / HW-039 (43A)", en: "IBT-2 / HW-039 (43A)" },
+  "comp.mdbts.vccTitle": { ko: "로직 전원 VCC (5V)", en: "Logic power VCC (5V)" },
+  "comp.mdbts.risTitle": { ko: "R_IS: 정회전 전류감지 출력(표시용, 미시뮬레이션)", en: "R_IS: forward current-sense output (display only, not simulated)" },
+  "comp.mdbts.renTitle": { ko: "R_EN: 정회전 활성화(HIGH일 때만 RPWM 동작)", en: "R_EN: forward enable (RPWM only works while this is HIGH)" },
+  "comp.mdbts.rpwmTitle": { ko: "RPWM: 정회전 속도(PWM)", en: "RPWM: forward speed (PWM)" },
+  "comp.mdbts.lisTitle": { ko: "L_IS: 역회전 전류감지 출력(표시용, 미시뮬레이션)", en: "L_IS: reverse current-sense output (display only, not simulated)" },
+  "comp.mdbts.lenTitle": { ko: "L_EN: 역회전 활성화(HIGH일 때만 LPWM 동작)", en: "L_EN: reverse enable (LPWM only works while this is HIGH)" },
+  "comp.mdbts.lpwmTitle": { ko: "LPWM: 역회전 속도(PWM)", en: "LPWM: reverse speed (PWM)" },
+  "comp.mdbts.bpTitle": { ko: "B+: 모터 전원 + (배터리/DC 전원)", en: "B+: motor power + (battery/DC supply)" },
+  "comp.mdbts.bnTitle": { ko: "B-: 모터 전원 GND", en: "B-: motor power GND" },
+  "comp.mdbts.mpTitle": { ko: "M+: 모터 출력 → DC 모터 단자 1", en: "M+: motor output → DC motor terminal 1" },
+  "comp.mdbts.mnTitle": { ko: "M-: 모터 출력 → DC 모터 단자 2", en: "M-: motor output → DC motor terminal 2" },
+  "comp.md7a.title": { ko: "듀얼 DC 모터 드라이버", en: "Dual DC Motor Driver" },
+  "comp.md7a.vTitle": { ko: "모터 전원 + (9~24V)", en: "Motor power + (9-24V)" },
+  "comp.md7a.gTitle": { ko: "PGND: 모터 전원 GND", en: "PGND: motor power GND" },
+  "comp.md7a.enaTitle": { ko: "ENA: A채널 속도(PWM)", en: "ENA: channel A speed (PWM)" },
+  "comp.md7a.in1Title": { ko: "IN1: A채널 방향 제어1", en: "IN1: channel A direction control 1" },
+  "comp.md7a.in2Title": { ko: "IN2: A채널 방향 제어2", en: "IN2: channel A direction control 2" },
+  "comp.md7a.enbTitle": { ko: "ENB: B채널 속도(PWM)", en: "ENB: channel B speed (PWM)" },
+  "comp.md7a.in3Title": { ko: "IN3: B채널 방향 제어1", en: "IN3: channel B direction control 1" },
+  "comp.md7a.in4Title": { ko: "IN4: B채널 방향 제어2", en: "IN4: channel B direction control 2" },
+  "comp.md7a.dirHint": { ko: "IN a=H+IN b=L 정회전 · 반대면 역회전 · 같으면 정지", en: "IN a=H+IN b=L forward · reversed = reverse · equal = stop" },
+  "comp.imu.title": { ko: "MPU-6050 (GY-521) 자이로+가속도", en: "MPU-6050 (GY-521) Gyro+Accel" },
+  "comp.imu.xdaTitle": { ko: "XDA: 보조 I2C 데이터(자력계 패스스루용, 표시만)", en: "XDA: auxiliary I2C data (magnetometer pass-through, display only)" },
+  "comp.imu.xclTitle": { ko: "XCL: 보조 I2C 클럭(표시만)", en: "XCL: auxiliary I2C clock (display only)" },
+  "comp.imu.ad0Title": { ko: "AD0: I2C 주소 선택(0x68/0x69, 표시만)", en: "AD0: I2C address select (0x68/0x69, display only)" },
+  "comp.imu.intTitle": { ko: "INT: 데이터레디 인터럽트 출력(표시만)", en: "INT: data-ready interrupt output (display only)" },
   "comp.mm.acv": { ko: "AC V (교류 전압)", en: "AC V (alternating voltage)" },
   "comp.mm.dca": { ko: "DC A (전류, mA 추정치)", en: "DC A (current, estimated mA)" },
   "comp.mm.dcv": { ko: "DC V (직류 전압)", en: "DC V (direct voltage)" },
@@ -3897,6 +3951,8 @@ const STRINGS = {
   "palette.motordriver": { ko: "모터 드라이버<br>(L298N)", en: "Motor Driver<br>(L298N)" },
   "palette.motordriver2": { ko: "모터 드라이버<br>(2채널, L298N)", en: "Motor Driver<br>(2-channel, L298N)" },
   "palette.motordriverenc": { ko: "모터 드라이버<br>(엔코더 입력)", en: "Motor Driver<br>(with encoder input)" },
+  "palette.mdbts": { ko: "모터 드라이버<br>(BTS7960/IBT-2, 43A)", en: "Motor Driver<br>(BTS7960/IBT-2, 43A)" },
+  "palette.md7a": { ko: "모터 드라이버<br>(7A 2채널, 160W)", en: "Motor Driver<br>(7A Dual-Channel, 160W)" },
   "palette.multimeter": { ko: "디지털 멀티미터", en: "Digital Multimeter" },
   "palette.oled": { ko: "OLED 모듈<br>(I2C)", en: "OLED Module<br>(I2C)" },
   "palette.pot": { ko: "가변저항 (Pot)", en: "Potentiometer (Pot)" },
@@ -3914,6 +3970,7 @@ const STRINGS = {
   "palette.lidar": { ko: "라이다 센서<br>(1차원 회전형)", en: "LiDAR Sensor<br>(1D rotating)" },
   "palette.gyro": { ko: "3축 자이로 센서<br>(I2C)", en: "3-Axis Gyroscope<br>(I2C)" },
   "palette.accel": { ko: "3축 가속도 센서<br>(I2C)", en: "3-Axis Accelerometer<br>(I2C)" },
+  "palette.imumpu6050": { ko: "6축 IMU<br>(MPU-6050/GY-521, I2C)", en: "6-Axis IMU<br>(MPU-6050/GY-521, I2C)" },
   "palette.pmsensor": { ko: "미세먼지 센서<br>(PM2.5/PM10)", en: "Dust Sensor<br>(PM2.5/PM10)" },
   // [기능 추가 Ver0.9979] 37in1류 센서 키트 대량 추가 — 팔레트 라벨
   "palette.water": { ko: "수위 감지 센서", en: "Water Level Sensor" },
@@ -4126,7 +4183,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9993", en: "K's Arduino Simulator Ver0.9993" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9994", en: "K's Arduino Simulator Ver0.9994" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -7391,6 +7448,9 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9994', ko: [
+      '🔌 [모터 드라이버 2종 + IMU 센서 추가] 사진으로 보내주신 실제 모듈 3개(HW-039/IBT_2, OUT1~4 스크류터미널의 듀얼 드라이버, MPU-6050/GY-521)의 핀맵을 그대로 찾아 부품 상자에 추가하고 실제로 동작하게 만들었습니다. ① "모터 드라이버(BTS7960/IBT-2, 43A)" — 실제 HW-039 보드 실크스크린 그대로 VCC/GND(로직 5V)·R_EN/RPWM(정회전)·L_EN/LPWM(역회전)·R_IS/L_IS(전류감지, 표시만)와 모터 전원용 B+/B-, 모터 출력용 M+/M-를 갖습니다. R_EN+RPWM이 함께 HIGH면 정회전, L_EN+LPWM이 함께 HIGH면 역회전, 둘 다 켜면 안전하게 정지합니다. ② "모터 드라이버(7A 2채널, 160W)" — 사진 속 보드와 같은 L298 로직 호환 듀얼 채널 드라이버로, 9-24V/PGND 전원 아래 A채널(ENA/IN1/IN2→OUT1/OUT2)과 B채널(ENB/IN3/IN4→OUT3/OUT4)을 독립 제어합니다. 기존 motordriver2와 달리 채널마다 방향 핀이 IN1+IN2 두 개라, 실제 L298처럼 IN a=H+IN b=L 정회전 / 반대면 역회전 / 둘이 같으면 정지(브레이크)로 동작합니다. ③ "6축 IMU(MPU-6050/GY-521)" — 기존에 따로 있던 "3축 자이로 센서"와 "3축 가속도 센서"를 한 부품 안에 합쳐, VCC/GND/SCL/SDA 배선 하나로 자이로(gX/gY/gZ)와 가속도(aX/aY/aZ) 값을 함께 읽을 수 있습니다(기존 자이로/가속도 블록·Gyroscope/Accelerometer 클래스가 코드 수정 없이 이 부품 하나로도 그대로 동작). 실제 보드에 있는 XDA/XCL(보조 I2C)·AD0(주소선택)·INT(인터럽트) 핀도 배선 참고용으로 함께 넣었습니다(값 시뮬레이션은 하지 않음)',
+  ]},
   { ver: 'Ver0.9993', ko: [
       '\uD83C\uDFA8 [\uBC30\uC120 \uAE30\uBCF8\uC0C9 \uC790\uB3D9 \uC9C0\uC815] \uC0C8\uB85C \uBC30\uC120\uC744 \uC5F0\uACB0\uD560 \uB54C \uC5B4\uB290 \uCABD \uB2E8\uC790\uAC00 VCC/\uC804\uC6D0\uC778\uC9C0, GND\uC778\uC9C0\uC5D0 \uB530\uB77C \uBC30\uC120 \uC0C9\uC774 \uC790\uB3D9\uC73C\uB85C \uC815\uD574\uC9D1\uB2C8\uB2E4 \u2014 VCC/\uC804\uC6D0(\uBCF4\uB4DC\uC758 5V/3V3/VIN/IOREF, \uBD80\uD488\uC758 VCC/+\u00B7\uC560\uB178\uB4DC \uB4F1)\uC5D0 \uB2FF\uC73C\uBA74 \uBE68\uAC15, GND(\uBCF4\uB4DC\uC758 GND, \uBD80\uD488\uC758 GND/-\u00B7\uCE90\uC18C\uB4DC \uB4F1)\uC5D0 \uB2FF\uC73C\uBA74 \uD68C\uC0C9\uC774 \uAE30\uBCF8\uC0C9\uC73C\uB85C \uBD99\uC2B5\uB2C8\uB2E4(\uADF8 \uC678 \uC77C\uBC18 \uC2E0\uD638\uC120\uC740 \uAE30\uC874\uACFC \uB3D9\uC77C\uD558\uAC8C \uCCAD\uB85D\uC0C9). \uBB3C\uB860 \uBC30\uC120\uC744 \uD074\uB9AD\uD574 \uB728\uB294 \uC0C9\uC0C1 \uD3B8\uC9D1\uAE30\uB85C \uC5B8\uC81C\uB4E0 \uC6D0\uD558\uB294 \uC0C9\uC73C\uB85C \uBC14\uAFC0 \uC218 \uC788\uACE0, \uC774\uB294 \uC5F0\uACB0 \uC2DC \uC790\uB3D9\uC73C\uB85C \uC815\uD574\uC9C0\uB294 \uAE30\uBCF8\uAC12\uB9CC \uBC14\uAFC0 \uAC83\uC785\uB2C8\uB2E4',
   ]},
@@ -9666,6 +9726,97 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ENCA" data-i18n-title="comp.mdenc.encaTitle" title="엔코더 A상 입력(패스스루) → 보드로 그대로 전달"></div><span class="pin-cap cap-sig">ENCA</span></div>
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ENCB" data-i18n-title="comp.mdenc.encbTitle" title="엔코더 B상 입력(패스스루) → 보드로 그대로 전달"></div><span class="pin-cap cap-sig">ENCB</span></div>
       </div>`;
+  } else if (type === 'motordriver-bts7960'){
+    // BTS7960(IBT-2/HW-039) 43A 고전류 단일채널 H-브리지 — 실제 보드 실크스크린 그대로
+    // VCC/GND(로직 5V)+R_IS/R_EN/RPWM(정회전)/L_IS/L_EN/LPWM(역회전) 8핀 헤더와, 모터
+    // 전원용 B+/B-, 모터 출력용 M+/M- 스크류터미널을 갖습니다. RPWM+R_EN이 여자되면 정회전,
+    // LPWM+L_EN이 여자되면 역회전하며, 두 쪽이 동시에 여자되면(비정상 배선) 안전하게 정지합니다.
+    // R_IS/L_IS(전류 감지 출력)는 실제 보드에서도 배선을 안 해도 동작하는 선택 핀이라, 이
+    // 시뮬레이터에서도 배선 참고용 표시만 하고 별도 값은 시뮬레이션하지 않습니다.
+    div.classList.add('comp-motordriver-bts7960');
+    div.innerHTML = `
+      <div class="md-title">BTS7960<br><span data-i18n="comp.mdbts.title">IBT-2 / HW-039 (43A)</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_VCC" data-i18n-title="comp.mdbts.vccTitle" title="로직 전원 VCC (5V)"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_GND" title="로직 GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_RIS" data-i18n-title="comp.mdbts.risTitle" title="R_IS: 정회전 전류감지 출력(표시용, 미시뮬레이션)"></div><span class="pin-cap cap-sig">R_IS</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_REN" data-i18n-title="comp.mdbts.renTitle" title="R_EN: 정회전 활성화(HIGH일 때만 RPWM 동작)"></div><span class="pin-cap cap-sig">R_EN</span></div>
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_RPWM" data-i18n-title="comp.mdbts.rpwmTitle" title="RPWM: 정회전 속도(PWM)"></div><span class="pin-cap cap-pwm">RPWM</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_LIS" data-i18n-title="comp.mdbts.lisTitle" title="L_IS: 역회전 전류감지 출력(표시용, 미시뮬레이션)"></div><span class="pin-cap cap-sig">L_IS</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_LEN" data-i18n-title="comp.mdbts.lenTitle" title="L_EN: 역회전 활성화(HIGH일 때만 LPWM 동작)"></div><span class="pin-cap cap-sig">L_EN</span></div>
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_LPWM" data-i18n-title="comp.mdbts.lpwmTitle" title="LPWM: 역회전 속도(PWM)"></div><span class="pin-cap cap-pwm">LPWM</span></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_BP" data-i18n-title="comp.mdbts.bpTitle" title="B+: 모터 전원 + (배터리/DC 전원)"></div><span class="pin-cap cap-vcc">B+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_BN" data-i18n-title="comp.mdbts.bnTitle" title="B-: 모터 전원 GND"></div><span class="pin-cap cap-gnd">B-</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_MP" data-i18n-title="comp.mdbts.mpTitle" title="M+: 모터 출력 → DC 모터 단자 1"></div><span class="pin-cap" style="color:var(--text-faint)">M+</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_MN" data-i18n-title="comp.mdbts.mnTitle" title="M-: 모터 출력 → DC 모터 단자 2"></div><span class="pin-cap" style="color:var(--text-faint)">M-</span></div>
+      </div>`;
+  } else if (type === 'motordriver-7a2ch'){
+    // 7A 2채널(160W) DC 모터 드라이버 — L298 로직 호환 보드(예: DFRobot DRI0041과 동일 핀맵).
+    // motordriver2와 달리 채널마다 방향 핀이 IN1/IN2(또는 IN3/IN4) 두 개라, 실제 L298처럼
+    // IN a=HIGH+IN b=LOW(정회전) / IN a=LOW+IN b=HIGH(역회전) / 둘이 같으면 정지(브레이크)
+    // 조합으로 방향을 정하고, ENA/ENB는 그 위에서 속도(PWM)만 곱해줍니다.
+    div.classList.add('comp-motordriver-7a2ch');
+    div.innerHTML = `
+      <div class="md-title">7A 2CH (160W)<br><span data-i18n="comp.md7a.title">듀얼 DC 모터 드라이버</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.md7a.vTitle" title="모터 전원 + (9~24V)"></div><span class="pin-cap cap-vcc">9-24V</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.md7a.gTitle" title="PGND: 모터 전원 GND"></div><span class="pin-cap cap-gnd">PGND</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT1" title="모터 출력1(A채널) → DC 모터 단자1"></div><span class="pin-cap" style="color:var(--text-faint)">OUT1</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT2" title="모터 출력2(A채널) → DC 모터 단자2"></div><span class="pin-cap" style="color:var(--text-faint)">OUT2</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT3" title="모터 출력3(B채널) → DC 모터 단자1"></div><span class="pin-cap" style="color:var(--text-faint)">OUT3</span></div>
+        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT4" title="모터 출력4(B채널) → DC 모터 단자2"></div><span class="pin-cap" style="color:var(--text-faint)">OUT4</span></div>
+      </div>
+      <div class="comp-pin-row md-out-row">
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENA" data-i18n-title="comp.md7a.enaTitle" title="ENA: A채널 속도(PWM)"></div><span class="pin-cap cap-pwm">ENA</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN1" data-i18n-title="comp.md7a.in1Title" title="IN1: A채널 방향 제어1"></div><span class="pin-cap cap-sig">IN1</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN2" data-i18n-title="comp.md7a.in2Title" title="IN2: A채널 방향 제어2"></div><span class="pin-cap cap-sig">IN2</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENB" data-i18n-title="comp.md7a.enbTitle" title="ENB: B채널 속도(PWM)"></div><span class="pin-cap cap-pwm">ENB</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN3" data-i18n-title="comp.md7a.in3Title" title="IN3: B채널 방향 제어1"></div><span class="pin-cap cap-sig">IN3</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN4" data-i18n-title="comp.md7a.in4Title" title="IN4: B채널 방향 제어2"></div><span class="pin-cap cap-sig">IN4</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col" style="opacity:.7"><span class="pin-cap" style="color:var(--text-faint); font-size:.56rem;" data-i18n="comp.md7a.dirHint">IN a=H+IN b=L 정회전 · 반대면 역회전 · 같으면 정지</span></div>
+      </div>`;
+  } else if (type === 'imu-mpu6050'){
+    // MPU-6050(GY-521) — 자이로(gx/gy/gz)와 가속도(ax/ay/az)를 한 보드에 통합한 실제 IMU와
+    // 동일하게, 이 부품 하나가 comp-gyro와 comp-accel 클래스를 동시에 갖습니다 — 그래서 기존
+    // "자이로 센서"/"가속도 센서" 블록·Gyroscope/Accelerometer 클래스가 별도 코드 수정 없이
+    // 이 부품 하나에도 그대로 동작합니다(SDA/SCL만 배선하면 동일하게 인식됨). XDA/XCL(보조
+    // I2C, 자력계 패스스루용)·AD0(주소선택)·INT(데이터레디 인터럽트)는 실제 보드에도 있는
+    // 핀이지만 이 시뮬레이터에서는 배선 참고용 표시만 하고 값은 시뮬레이션하지 않습니다.
+    div.classList.add('comp-gyro', 'comp-accel', 'comp-imu-mpu6050');
+    div.innerHTML = `
+      <div class="sensor3-title" data-i18n="comp.imu.title">MPU-6050 (GY-521) 자이로+가속도</div>
+      <div class="axis-row"><label>gX</label><input type="range" min="-250" max="250" value="0" id="${id}_gx"><span id="${id}_gxval">0°/s</span></div>
+      <div class="axis-row"><label>gY</label><input type="range" min="-250" max="250" value="0" id="${id}_gy"><span id="${id}_gyval">0°/s</span></div>
+      <div class="axis-row"><label>gZ</label><input type="range" min="-250" max="250" value="0" id="${id}_gz"><span id="${id}_gzval">0°/s</span></div>
+      <div class="axis-row"><label>aX</label><input type="range" min="-2" max="2" step="0.01" value="0" id="${id}_ax"><span id="${id}_axval">0.00g</span></div>
+      <div class="axis-row"><label>aY</label><input type="range" min="-2" max="2" step="0.01" value="0" id="${id}_ay"><span id="${id}_ayval">0.00g</span></div>
+      <div class="axis-row"><label>aZ</label><input type="range" min="-2" max="2" step="0.01" value="1" id="${id}_az"><span id="${id}_azval">1.00g</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_VCC" title="VCC (3V3/5V)"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_GND" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SCL" data-i18n-title="comp.i2csensor.sclTitle" title="SCL → 보드 I2C 클럭 핀 (R3/R4: A5 · ESP32: GPIO22)"></div><span class="pin-cap cap-sig">SCL</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_SDA" data-i18n-title="comp.i2csensor.sdaTitle" title="SDA → 보드 I2C 데이터 핀 (R3/R4: A4 · ESP32: GPIO21)"></div><span class="pin-cap cap-sig">SDA</span></div>
+      </div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_XDA" data-i18n-title="comp.imu.xdaTitle" title="XDA: 보조 I2C 데이터(자력계 패스스루용, 표시만)"></div><span class="pin-cap cap-sig">XDA</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_XCL" data-i18n-title="comp.imu.xclTitle" title="XCL: 보조 I2C 클럭(표시만)"></div><span class="pin-cap cap-sig">XCL</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_AD0" data-i18n-title="comp.imu.ad0Title" title="AD0: I2C 주소 선택(0x68/0x69, 표시만)"></div><span class="pin-cap cap-sig">AD0</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_INT" data-i18n-title="comp.imu.intTitle" title="INT: 데이터레디 인터럽트 출력(표시만)"></div><span class="pin-cap cap-sig">INT</span></div>
+      </div>`;
   } else if (type === 'lcd'){
     div.classList.add('comp-lcd');
     div.innerHTML = `
@@ -10608,6 +10759,19 @@ function spawnComponent(type, dropX, dropY){
       s.addEventListener('input', () => { v.textContent = `${s.value}°/s`; });
     });
   } else if (type === 'accel'){
+    ['x','y','z'].forEach(ax => {
+      const s = document.getElementById(`${id}_a${ax}`);
+      const v = document.getElementById(`${id}_a${ax}val`);
+      s.addEventListener('input', () => { v.textContent = `${parseFloat(s.value).toFixed(2)}g`; });
+    });
+  } else if (type === 'imu-mpu6050'){
+    // MPU-6050 = 자이로+가속도 슬라이더를 한 부품 안에서 함께 연결(각각 gyro/accel과 동일한
+    // 텍스트 표시 로직).
+    ['x','y','z'].forEach(ax => {
+      const s = document.getElementById(`${id}_g${ax}`);
+      const v = document.getElementById(`${id}_g${ax}val`);
+      s.addEventListener('input', () => { v.textContent = `${s.value}°/s`; });
+    });
     ['x','y','z'].forEach(ax => {
       const s = document.getElementById(`${id}_a${ax}`);
       const v = document.getElementById(`${id}_a${ax}val`);
@@ -13050,6 +13214,8 @@ const COMP_HELP_BLURB = {
   motordriver:{ ko: 'VCC/GND는 모터 전원, IN1/IN2는 보드 디지털 핀(방향 제어), OUT1/OUT2는 모터로 나갑니다 — 로직 전원과 모터 전원이 분리되어 있는 경우가 많으니 핀 설명을 확인하세요.', en: 'VCC/GND powers the motor, IN1/IN2 (from board pins) set direction, OUT1/OUT2 go to the motor. Logic and motor power are often separate — check each pin.' },
   motordriver2:{ ko: 'VCC/GND(공통 모터 전원) 아래로 A채널(IN1/ENA→OUT1/OUT2)과 B채널(IN2/ENB→OUT3/OUT4)이 완전히 독립적으로 동작합니다 — 모터 두 대를 각자 따로 제어할 수 있습니다.', en: 'Shares VCC/GND for motor power, but channel A (IN1/ENA→OUT1/OUT2) and channel B (IN2/ENB→OUT3/OUT4) drive two motors completely independently.' },
   motordriverenc:{ ko: '기본 동작(VCC/GND/IN1/ENA→OUT1/OUT2)은 motordriver와 같고, ENCV/ENCG/ENCA/ENCB 네 핀은 엔코더 DC 모터의 신호를 그대로 보드로 이어주는 패스스루 단자입니다(드라이버 자체는 엔코더 신호를 가공하지 않음).', en: 'Drives the motor the same way as motordriver (VCC/GND/IN1/ENA→OUT1/OUT2). ENCV/ENCG/ENCA/ENCB are pass-through pins that simply forward an encoder motor\'s signals to the board.' },
+  'motordriver-bts7960': { ko: '실제 IBT-2/HW-039(BTS7960) 보드 핀맵 그대로입니다. VCC/GND는 로직 전원(5V), R_EN+RPWM이 함께 HIGH면 정회전, L_EN+LPWM이 함께 HIGH면 역회전합니다(둘 다 켜면 안전하게 정지). 모터 전원은 B+/B-(배터리 등 별도 DC 전원)로 따로 넣고, M+/M-를 모터로 연결하세요. R_IS/L_IS(전류감지)는 배선만 가능하고 값은 시뮬레이션하지 않습니다.', en: 'Matches the real IBT-2/HW-039 (BTS7960) pinout. VCC/GND is 5V logic power; R_EN+RPWM both HIGH drives forward, L_EN+LPWM both HIGH drives reverse (both together = safe stop). Feed motor power separately via B+/B- (battery/DC supply) and wire the motor to M+/M-. R_IS/L_IS (current sense) can be wired but their values are not simulated.' },
+  'motordriver-7a2ch': { ko: '실제 "7A 2채널(160W) DC 모터 드라이버"(L298 로직 호환) 핀맵입니다. 9-24V/PGND로 모터 전원을 넣고, A채널은 ENA(속도)+IN1/IN2(방향), B채널은 ENB(속도)+IN3/IN4(방향)로 각각 독립 제어합니다 — IN a=HIGH+IN b=LOW면 정회전, 반대면 역회전, 둘이 같으면 정지(브레이크)입니다. motordriver2와 달리 채널마다 방향 핀이 2개(IN1+IN2)라는 점이 실제 보드와 같습니다.', en: 'Matches the real "7A Dual-Channel (160W) DC Motor Driver" (L298-logic-compatible) pinout. Power the motor via 9-24V/PGND; channel A is ENA(speed)+IN1/IN2(direction), channel B is ENB(speed)+IN3/IN4(direction), fully independent. IN a=HIGH+IN b=LOW drives forward, reversed drives reverse, equal = stop (brake). Unlike motordriver2, each channel has 2 direction pins (IN1+IN2) — matching the real board.' },
   'dcmotor-enc2':{ ko: 'TA/TB는 모터 구동 단자, ENCV/ENCG는 엔코더 전용 전원, ENCA/ENCB는 서로 90° 위상차가 나는 2상(쿼드러처) 펄스를 냅니다 — A/B 순서를 비교하면 회전 방향까지 알 수 있습니다.', en: 'TA/TB drive the motor; ENCV/ENCG power the encoder separately; ENCA/ENCB output two quadrature pulse channels 90° apart, so comparing their order reveals rotation direction.' },
   a4988:      { ko: 'STEP 핀에 펄스를 줄 때마다 한 스텝씩 움직이고 DIR로 방향을 정합니다 — VMOT/GND는 모터 전원, VDD/GND는 로직 전원으로 서로 다릅니다.', en: 'Each pulse on STEP advances one step; DIR sets direction. VMOT/GND (motor power) and VDD/GND (logic power) are separate rails.' },
   levelshifter:{ko: '한쪽(LV)은 보드의 낮은 전압(예: 3.3V), 반대쪽(HV)은 더 높은 전압(예: 5V) 로직에 연결해 신호를 안전하게 변환합니다 — 양쪽 GND는 반드시 공통으로 연결하세요.', en: 'One side (LV) connects to the lower-voltage logic (e.g. 3.3V), the other (HV) to the higher one (e.g. 5V). Always tie both GNDs together.' },
@@ -13061,6 +13227,7 @@ const COMP_HELP_BLURB = {
   lidar:      { ko: '초음파 센서와 똑같이 TRIG/ECHO(pulseIn)로 거리를 읽지만, 외부 서보 없이 센서 스스로 계속 360도 회전합니다 — ANG 핀(analogRead)으로 지금 몇 도를 보고 있는지도 함께 읽으면, 거리+각도를 loop()에서 계속 모아 간단한 360도 스캔(맵)을 만들 수 있습니다.', en: 'Reads distance via TRIG/ECHO (pulseIn) exactly like the ultrasonic sensor, but spins a full 360° on its own — no external servo needed. Also read ANG (analogRead) for the current angle, and collect distance+angle pairs in loop() to build a simple 360° scan.' },
   gyro:       { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 연결하면 X/Y/Z 세 축의 각속도(°/s) 값을 읽어올 수 있습니다.', en: 'Power via VCC/GND, connect SDA/SCL (I2C) to the board to read X/Y/Z angular velocity.' },
   accel:      { ko: 'VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 연결하면 X/Y/Z 세 축의 가속도(g) 값을 읽어올 수 있습니다.', en: 'Power via VCC/GND, connect SDA/SCL (I2C) to the board to read X/Y/Z acceleration.' },
+  'imu-mpu6050': { ko: '실제 MPU-6050(GY-521) 핀맵입니다. VCC/GND로 전원을 넣고 보드와 SDA/SCL(I2C)로 연결하면, 자이로(gX/gY/gZ, °/s)와 가속도(aX/aY/aZ, g) 값을 한 부품에서 함께 읽을 수 있습니다 — 기존 "자이로 센서"/"가속도 센서" 블록이나 Gyroscope/Accelerometer 클래스를 그대로 써도 이 부품 하나로 다 됩니다. XDA/XCL/AD0/INT는 배선 참고용 표시 핀으로, 값은 시뮬레이션하지 않습니다.', en: 'Matches the real MPU-6050 (GY-521) pinout. Power via VCC/GND, connect SDA/SCL (I2C) to the board, and read both gyroscope (gX/gY/gZ, °/s) and accelerometer (aX/aY/aZ, g) values from this single part — the existing "Gyroscope sensor"/"Accelerometer sensor" blocks and Gyroscope/Accelerometer classes work with it directly. XDA/XCL/AD0/INT are wiring-reference pins only; their values are not simulated.' },
   canmodule:  { ko: 'VCC/GND로 전원을 넣고 CANH/CANL 두 선을 다른 CAN 모듈과 그대로 나란히 이으면 버스로 통신합니다(극성 없음).', en: 'Power via VCC/GND; wire CANH/CANL straight across to other CAN nodes — the bus has no polarity.' },
   canfdmodule:{ ko: 'VCC/GND로 전원을 넣고 CANH/CANL 두 선을 다른 CAN FD 모듈과 그대로 나란히 이으면 버스로 통신합니다(극성 없음).', en: 'Power via VCC/GND; wire CANH/CANL straight across to other CAN FD nodes — the bus has no polarity.' },
   rs485module:{ ko: 'VCC/GND로 전원을 넣고 DE/RE를 보드 디지털 핀에 연결해야 인식됩니다 — A/B 두 선을 다른 RS-485 모듈과 나란히 이으면 그 버스로 SoftwareSerial/RS485.h/ModbusMaster/ModbusRTU 통신이 오갑니다.', en: 'Power via VCC/GND and wire DE/RE to a board digital pin to be recognized — wire A/B straight across to other RS-485 modules to carry SoftwareSerial/RS485.h/ModbusMaster/ModbusRTU traffic on that bus.' },
@@ -15866,6 +16033,67 @@ function runTick(){
     }
   });
 
+  // 5-0a. BTS7960(IBT-2/HW-039) 43A 고전류 드라이버 — RPWM/R_EN이 함께 여자되면 정회전,
+  // LPWM/L_EN이 함께 여자되면 역회전합니다. 두 방향이 동시에 여자되면(비정상 배선) 실제
+  // 하드웨어도 위험한 상태이므로 안전하게 정지(speed 0)로 처리합니다.
+  document.querySelectorAll('.comp-motordriver-bts7960').forEach(md => {
+    const legReading = (suffix) => {
+      const legEl = md.querySelector(`[data-pin$="_${suffix}"]`);
+      return legEl ? resistiveReading(legEl) : null;
+    };
+    const rpwmR = legReading('RPWM'), renR = legReading('REN');
+    const lpwmR = legReading('LPWM'), lenR = legReading('LEN');
+    const rActive = renR && renR.v > 0.5;
+    const lActive = lenR && lenR.v > 0.5;
+    const rSpeed = (rActive && rpwmR) ? Math.max(0, Math.min(1, rpwmR.v)) : 0;
+    const lSpeed = (lActive && lpwmR) ? Math.max(0, Math.min(1, lpwmR.v)) : 0;
+    let speed = 0, dir = 1;
+    if (rSpeed > 0.01 && lSpeed > 0.01){
+      speed = 0; // 정/역 동시 여자 -> 안전 정지
+    } else if (rSpeed > 0.01){
+      speed = rSpeed; dir = 1;
+    } else if (lSpeed > 0.01){
+      speed = lSpeed; dir = -1;
+    }
+    const mpEl = md.querySelector('[data-pin$="_MP"]');
+    if (mpEl){
+      netOf(mpEl).forEach(el => {
+        const pid = el.dataset.pin;
+        if (pid && /_T[AB]$/.test(pid)) driveMotor(pid.replace(/_T[AB]$/, ''), speed, dir);
+      });
+    }
+  });
+
+  // 5-0a2. 7A 2채널(160W) DC 모터 드라이버 — L298 로직 호환. 채널마다 방향 핀이 2개(IN1/IN2,
+  // IN3/IN4)라 실제 L298처럼 두 핀의 조합으로 방향을 정합니다: a=H,b=L → 정회전 / a=L,b=H →
+  // 역회전 / a,b가 같으면(둘 다 H 또는 둘 다 L) 정지(브레이크). ENA/ENB는 그 위에서 속도만
+  // 곱해줍니다. A채널(ENA/IN1/IN2→OUT1/OUT2)과 B채널(ENB/IN3/IN4→OUT3/OUT4)은 서로 독립적으로
+  // 모터 두 대를 각각 구동합니다.
+  document.querySelectorAll('.comp-motordriver-7a2ch').forEach(md => {
+    const legReading = (suffix) => {
+      const legEl = md.querySelector(`[data-pin$="_${suffix}"]`);
+      return legEl ? resistiveReading(legEl) : null;
+    };
+    const driveChannel = (enSuffix, inASuffix, inBSuffix, outSuffix) => {
+      const enR = legReading(enSuffix);
+      const inAR = legReading(inASuffix), inBR = legReading(inBSuffix);
+      const aHigh = inAR && inAR.v > 0.5, bHigh = inBR && inBR.v > 0.5;
+      let dir = 1, stopped = true;
+      if (aHigh && !bHigh){ dir = 1; stopped = false; }
+      else if (!aHigh && bHigh){ dir = -1; stopped = false; }
+      const speed = (!stopped && enR) ? Math.max(0, Math.min(1, enR.v)) : 0;
+      const outEl = md.querySelector(`[data-pin$="_${outSuffix}"]`);
+      if (outEl){
+        netOf(outEl).forEach(el => {
+          const pid = el.dataset.pin;
+          if (pid && /_T[AB]$/.test(pid)) driveMotor(pid.replace(/_T[AB]$/, ''), speed, dir);
+        });
+      }
+    };
+    driveChannel('ENA', 'IN1', 'IN2', 'OUT1');
+    driveChannel('ENB', 'IN3', 'IN4', 'OUT3');
+  });
+
   // 5-0b. 12V LED 랜턴 헤드 — 모터 드라이버가 바로 위 블록들에서 이미 이 부품의 TA/TB에
   // driveMotor()로 dataset.speed(0~1)/dataset.dir(±1)을 채워 넣었으니, 그 값을 밝기로
   // 반영합니다. 실제 LED(다이오드)라면 역방향 전류가 흐르지 않으므로, dir이 역방향(-1)이면
@@ -18129,8 +18357,8 @@ const ARDUINO_BLOCK_COMPONENT_GROUP = {
 // (arduino_i2c_begin/write/read)은 여전히 'i2c' 통짜 그룹을 그대로 씁니다(어떤 I2C 장치든 관련).
 const ARDUINO_COMPONENT_GROUPS = {
   servo: ['servo'], stepper: ['a4988', 'stepper'], ultrasonic: ['ultrasonic'],
-  gyro: ['gyro'], accel: ['accel'], oled: ['oled'],
-  i2c: ['gyro', 'accel', 'pmsensor', 'oled'], can: ['canmodule', 'canfdmodule'],
+  gyro: ['gyro', 'imu-mpu6050'], accel: ['accel', 'imu-mpu6050'], oled: ['oled'],
+  i2c: ['gyro', 'accel', 'imu-mpu6050', 'pmsensor', 'oled'], can: ['canmodule', 'canfdmodule'],
 };
 function detectPresentComponentGroups(){
   const present = new Set();
@@ -19596,7 +19824,7 @@ function BOM_LABELS_FN(){ return {
   btmodule: tr('bom.btmodule'), wifiap: tr('bom.wifiap'), dac: tr('comp.dac.title').replace(/<br>.*/,'').trim(),
   ultrasonic: tr('bom.ultrasonic'), lidar: tr('comp.lidar.label'), gyro: tr('bom.gyro'), accel: tr('bom.accel'), servo: tr('comp.servo.label'), rs485servo: tr('comp.rs485servo.label'), canmodule: tr('comp.canmodule.title'), canfdmodule: tr('comp.canfdmodule.title'), 'rs485module': tr('comp.rs485module.title'), pmsensor: tr('comp.pmsensor.title'), dcmotor: tr('comp.dcmotor.label'), fan: tr('comp.fan.label'),
   rpi3: 'Raspberry Pi 3', rpi4: 'Raspberry Pi 4', rpi5: 'Raspberry Pi 5', hdmimonitor: tr('comp.hdmimonitor.title'), camera: tr('comp.camera.title'), usbsound: tr('comp.usbsound.title'), speaker: tr('comp.speaker.title'), custom: tr('comp.custom.defaultName'),
-  motordriver: tr('bom.motordriver'), motordriver2: tr('bom.motordriver2'), motordriverenc: tr('bom.motordriverenc'), 'sensor-ldr': tr('sensor.ldr'), 'sensor-temp': tr('sensor.temp'), 'sensor-humid': tr('sensor.humid'),
+  motordriver: tr('bom.motordriver'), motordriver2: tr('bom.motordriver2'), motordriverenc: tr('bom.motordriverenc'), 'motordriver-bts7960': tr('bom.mdbts'), 'motordriver-7a2ch': tr('bom.md7a'), 'imu-mpu6050': tr('bom.imumpu6050'), 'sensor-ldr': tr('sensor.ldr'), 'sensor-temp': tr('sensor.temp'), 'sensor-humid': tr('sensor.humid'),
   lcd: tr('bom.lcd'), oled: tr('bom.oled'),
   resistor: tr('bom.resistor'), powercable: tr('bom.powercable'), motor3ph: tr('comp.motor3ph.label'),
   acmotor: tr('bom.acmotor'), acmotorctrl: tr('bom.acmotorctrl'), levelshifter: tr('bom.levelshifter'),
@@ -21789,7 +22017,7 @@ function collapseNonBoardPaletteGroupsByDefault(){
  * (buildAiComponentCatalog) — 코드가 바뀌면 카탈로그도 자동으로 같이 바뀌므로, AI가 존재하지
  * 않는 핀 이름을 지어내 배선이 조용히 실패하는 사고를 원천적으로 막습니다.
  * ============================================================================ */
-const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','battselswitch','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','buzzeractive','buzzerpassive','bulb220','camera','canfdmodule','canmodule','capacitor','capacitor-e','cccv','barcodesensor','clampmeter','coincell','colorsensor','contactor','dac','dcmotor','dcmotor-enc','dcmotor-enc2','diode','dsensor-avoid','dsensor-ballswitch','dsensor-digitaltemp','dsensor-flame','dsensor-hallmag','dsensor-irrecv','dsensor-lightblock','dsensor-lightcup','dsensor-minireed','dsensor-reed','dsensor-shock','dsensor-tap','dsensor-tilt','dsensor-touch','dsensor-tracking','electromagnet','eocr','fan','flash7color','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','iremit','joystick','laser','lcd','led','ledlantern','ledtube220','levelshifter','lcdi2c','lidar','mccb','motor3ph','motordriver','motordriver2','motordriverenc','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-anahall','sensor-anatemp','sensor-heartbeat','sensor-humid','sensor-irdist2m','sensor-irdist3cm','sensor-irdist6m','sensor-irdist9m','sensor-ldr','sensor-linhall','sensor-rotary','sensor-soundbig','sensor-soundsm','sensor-temp','sensor-tempmod','sensor-water','servo','smdrgb','speaker','stepper','temphumid','terminalblock','timer','toggleswitch','transformer','transistor','twocolorled','ultrasonic','usbsound','visionsensor','wallswitch','wifiap'];
+const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','battselswitch','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','buzzeractive','buzzerpassive','bulb220','camera','canfdmodule','canmodule','capacitor','capacitor-e','cccv','barcodesensor','clampmeter','coincell','colorsensor','contactor','dac','dcmotor','dcmotor-enc','dcmotor-enc2','diode','dsensor-avoid','dsensor-ballswitch','dsensor-digitaltemp','dsensor-flame','dsensor-hallmag','dsensor-irrecv','dsensor-lightblock','dsensor-lightcup','dsensor-minireed','dsensor-reed','dsensor-shock','dsensor-tap','dsensor-tilt','dsensor-touch','dsensor-tracking','electromagnet','eocr','fan','flash7color','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','imu-mpu6050','iremit','joystick','laser','lcd','led','ledlantern','ledtube220','levelshifter','lcdi2c','lidar','mccb','motor3ph','motordriver','motordriver-7a2ch','motordriver-bts7960','motordriver2','motordriverenc','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-anahall','sensor-anatemp','sensor-heartbeat','sensor-humid','sensor-irdist2m','sensor-irdist3cm','sensor-irdist6m','sensor-irdist9m','sensor-ldr','sensor-linhall','sensor-rotary','sensor-soundbig','sensor-soundsm','sensor-temp','sensor-tempmod','sensor-water','servo','smdrgb','speaker','stepper','temphumid','terminalblock','timer','toggleswitch','transformer','transistor','twocolorled','ultrasonic','usbsound','visionsensor','wallswitch','wifiap'];
 // ('custom'은 사용자가 직접 그리는 빈 부품이라 AI가 고를 이유가 없어 목록에서 뺐습니다.)
 const AI_BOARD_TYPES = ['r3', 'r4', 'mega', 'esp32b', 'esp32d', 'esp32t'];
 

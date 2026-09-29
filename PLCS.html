@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>K군의 PLC 시뮬레이터 Ver0.85</title>
+<title>K군의 PLC 시뮬레이터 Ver0.88</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -399,6 +399,8 @@
   .cyl-speed-label{font-size:.58rem; color:var(--text-dim); white-space:nowrap;}
   .cyl-speed-slider{width:56px; accent-color:var(--teal);}
   .cyl-speed-val{font-size:.58rem; color:var(--text-dim); min-width:26px; text-align:left;}
+  .ecyl-stroke-pulses{width:52px; font-size:.6rem; background:#0f1318; color:var(--text); border:1px solid var(--border); border-radius:4px; padding:1px 3px;}
+  .ecyl-pulse-val{font-size:.58rem; color:var(--text-dim); min-width:38px; text-align:left;}
   .motor-icon.motor-spin{animation:plc-spin 1s linear infinite;}
   @keyframes plc-spin{ to{ transform:rotate(360deg); } }
   .servo-pos{font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--teal-strong);}
@@ -762,7 +764,7 @@
   <div class="brand">
     <div class="brand-mark">P1</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.85</b>
+      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.88</b>
       <span data-i18n="brand.subtitle">Multi-Vendor PLC / HMI Virtual Commissioning</span>
     </div>
   </div>
@@ -945,11 +947,11 @@
    에이전트·실제 산업통신 프로토콜은 다음 버전으로 미룹니다(팔레트에는 자리를 잡아
    두고 "다음 버전에서 지원" 안내만 뜨게 해 확장 지점을 명확히 남겨둡니다).
    ============================================================ */
-const APP_VERSION = 'Ver0.85';
+const APP_VERSION = 'Ver0.88';
 
 /* ---------------- i18n ---------------- */
 const STRINGS = {
-  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.85", en: "K's PLC Simulator Ver0.85" },
+  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.88", en: "K's PLC Simulator Ver0.88" },
   "brand.subtitle": { ko: "Multi-Vendor PLC / HMI Virtual Commissioning", en: "Multi-Vendor PLC / HMI Virtual Commissioning" },
   "toolbar.newProject": { ko: "🆕 새 프로젝트", en: "🆕 New Project" },
   "toolbar.projectNameTitle": { ko: "프로젝트 이름", en: "Project name" },
@@ -1224,6 +1226,8 @@ const STRINGS = {
   "cyl.speedHint": { ko: "미터아웃 유량조절밸브 — 전진/후진 속도(0.1~3.0초)", en: "Meter-out flow control valve — extend/retract speed (0.1–3.0s)" },
   "cyl.lsRetTitle": { ko: "후진 리밋스위치(LSR) — 실린더 몸통 위의 마커를 마우스로 드래그하면 트립 위치(0~100%)를 옮길 수 있습니다", en: "Retract limit switch (LSR) — drag the marker on the cylinder body to move its trip position (0–100%)" },
   "cyl.lsExtTitle": { ko: "전진 리밋스위치(LSE) — 실린더 몸통 위의 마커를 마우스로 드래그하면 트립 위치(0~100%)를 옮길 수 있습니다", en: "Extend limit switch (LSE) — drag the marker on the cylinder body to move its trip position (0–100%)" },
+  "ecyl.strokePulse": { ko: "총펄스", en: "Total Pulses" },
+  "ecyl.strokePulseHint": { ko: "실린더가 완전 후진(0%)에서 완전 전진(100%)까지 이동하는 데 필요한 PULSE 수를 설정합니다 — 서보/스텝모터의 전자기어비를 흉내낸 값입니다", en: "Sets how many PULSE edges move the cylinder from fully retracted (0%) to fully extended (100%) — approximates a servo/stepper's electronic gear ratio" },
   "about.body": { ko: "이 시뮬레이터는 산업용 PLC·HMI·전기/공압 회로를 브라우저에서 실습할 수 있도록 만든 교육용 도구입니다. 부품을 드래그해서 배치하고 단자를 클릭해 배선한 뒤, PLC를 더블클릭해 래더 프로그램을 작성하고 RUN을 누르면 실제로 동작합니다. 지금은 전기/공압 회로 엔진, 4개 PLC사(LS ELECTRIC·Mitsubishi·Siemens·Omron) 래더 IDE(벤더별 주소 표기 포함) + 서브프로그램(CALL), 간단한 HMI 에디터, 통신 모듈을 통한 가상 산업통신(Modbus TCP/CAN, 실제 소켓 통신은 아닌 시뮬레이션) + 패킷 모니터, 자동화산업기사형 프리셋 3종을 담고 있습니다. 3D 로봇 OLP와 자연어 AI 에이전트는 이후 버전에서 추가될 예정입니다.", en: "This simulator is an educational tool for practicing industrial PLC/HMI/electrical-pneumatic circuits in the browser. Drag parts onto the canvas, wire them by clicking terminals, then double-click a PLC to write a ladder program and press RUN to see it run for real. It now covers the circuit engine, a ladder IDE for all 4 PLC vendors (LS ELECTRIC/Mitsubishi/Siemens/Omron, each with vendor-styled addressing) plus CALL subroutines, a simple HMI editor, simulated industrial communications via comm modules (Modbus TCP/CAN — a simulation, not real sockets) with a packet monitor, and 3 automation-exam-style presets. The 3D robot OLP and the natural-language AI agent are planned for later versions." },
 
   // ---- 공압/유압 확장(Ver0.2): 방향제어밸브/압력밸브/유량밸브/실린더 부하옵션 공용 문구 ----
@@ -1767,6 +1771,74 @@ function wireFullPoints(w, pa, pb){
 function wirePathDFromPoints(pts){
   return 'M ' + pts.map(p => `${p.x} ${p.y}`).join(' L ');
 }
+// [Ver0.87] 배선 교차 타넘기 — 아두이노 시뮬레이터와 동일하게, 뒤에 만든 전선이 먼저 있던
+// 전선과 화면상 교차하는 지점마다 작은 반원을 그려 "선 위를 타고 넘어가는" 모양을 냅니다(실제
+// 배선판에서 서로 닿지 않고 교차하는 전선을 표현하는 관례). 같은 핀에서 만나는 진짜 전기적
+// 연결(구간의 끝점, t=0/1)은 EPS만큼 안쪽만 "교차"로 인정해 제외하므로 실수로 연결점에
+// 타넘기 모양이 그려지지 않습니다.
+function segSegIntersectionPoint(p1, p2, p3, p4){
+  const EPS = 0.02;
+  const rX = p2.x-p1.x, rY = p2.y-p1.y;
+  const sX = p4.x-p3.x, sY = p4.y-p3.y;
+  const denom = rX*sY - rY*sX;
+  if (Math.abs(denom) < 1e-9) return null; // 평행/거의 평행한 선은 교차점이 불안정하므로 건너뜀
+  const qpX = p3.x-p1.x, qpY = p3.y-p1.y;
+  const t = (qpX*sY - qpY*sX) / denom;
+  const u = (qpX*rY - qpY*rX) / denom;
+  if (t <= EPS || t >= 1-EPS || u <= EPS || u >= 1-EPS) return null;
+  return { t, x: p1.x + rX*t, y: p1.y + rY*t };
+}
+// pts를 그대로 잇되, crossingsBySeg에 적힌 지점마다 짧은 반원(A 명령)을 끼워 넣습니다. 반원
+// 반지름은 그 지점 앞뒤로 남은 여유를 넘지 않도록 줄여서, 교차점이 촘촘해도 서로 겹치거나
+// 구간 밖으로 튀어나가지 않게 합니다.
+const WIRE_HOP_RADIUS = 6;
+function routedPtsToDWithHops(pts, crossingsBySeg){
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let si=0; si<pts.length-1; si++){
+    const segA = pts[si], segB = pts[si+1];
+    const hits = (crossingsBySeg.get(si) || []).slice().sort((a,b)=>a.t-b.t);
+    if (!hits.length){ d += ` L ${segB.x} ${segB.y}`; continue; }
+    const segLen = Math.hypot(segB.x-segA.x, segB.y-segA.y) || 1;
+    const ux = (segB.x-segA.x)/segLen, uy = (segB.y-segA.y)/segLen;
+    let cursorT = 0;
+    hits.forEach((hit, hi) => {
+      const nextT = hi===hits.length-1 ? 1 : hits[hi+1].t;
+      const availBefore = (hit.t-cursorT)*segLen;
+      const availAfter = (nextT-hit.t)*segLen;
+      const hopHalf = Math.min(WIRE_HOP_RADIUS, availBefore*0.45, availAfter*0.45);
+      if (hopHalf < 1.5){ cursorT = hit.t; return; } // 여유가 너무 없으면 직선으로 통과
+      const beforeT = hit.t - hopHalf/segLen, afterT = hit.t + hopHalf/segLen;
+      const bx = segA.x + ux*segLen*beforeT, by = segA.y + uy*segLen*beforeT;
+      const ax = segA.x + ux*segLen*afterT, ay = segA.y + uy*segLen*afterT;
+      d += ` L ${bx} ${by} A ${hopHalf} ${hopHalf} 0 0 1 ${ax} ${ay}`;
+      cursorT = afterT;
+    });
+    d += ` L ${segB.x} ${segB.y}`;
+  }
+  return d;
+}
+// 이 배선(pts, wires 배열에서 myIdx번째)이 자신보다 먼저 만들어진(= 인덱스가 더 작은) 다른
+// 배선들과 화면상 교차하는 자리마다 타넘기 모양을 넣은 경로 문자열을 돌려줍니다. earlierPtsList는
+// updateAllWires()가 이번 렌더링 패스에서 이미 계산해 둔 이전 배선들의 pts 배열입니다(매번
+// 다시 계산하지 않도록 재사용).
+function wirePathDWithHops(pts, myIdx, earlierPtsList){
+  if (myIdx <= 0) return wirePathDFromPoints(pts);
+  const crossingsBySeg = new Map();
+  for (let oi=0; oi<myIdx; oi++){
+    const oPts = earlierPtsList[oi];
+    if (!oPts) continue;
+    for (let si=0; si<pts.length-1; si++){
+      for (let sj=0; sj<oPts.length-1; sj++){
+        const hit = segSegIntersectionPoint(pts[si], pts[si+1], oPts[sj], oPts[sj+1]);
+        if (!hit) continue;
+        if (!crossingsBySeg.has(si)) crossingsBySeg.set(si, []);
+        crossingsBySeg.get(si).push(hit);
+      }
+    }
+  }
+  if (!crossingsBySeg.size) return wirePathDFromPoints(pts);
+  return routedPtsToDWithHops(pts, crossingsBySeg);
+}
 // 핀에서 살짝 떨어진 지점에 번호 배지를 달기 위해, 핀에서 "이 배선이 처음 뻗어나가는 방향"
 // 쪽으로 소량만 이동한 좌표를 계산합니다(다음 점과 핀이 거의 겹치는 직선 구간에서는 그
 // 다음 점을 향하는 방향을 씁니다).
@@ -1824,15 +1896,17 @@ function updateAllWires(){
   svg.innerHTML = ''; handleSvg.innerHTML = ''; labelSvg.innerHTML = '';
   // 이전 틱의 '배선됨' 점 표시를 모두 지우고, 이번 배선 목록 기준으로 다시 찍습니다.
   $all('.pin-mini.pin-wired').forEach(p => { p.classList.remove('pin-wired'); p.style.removeProperty('--wire-dot-color'); });
+  const earlierPtsList = []; // [Ver0.87] 교차 타넘기 판정용 — 이번 패스에서 계산한 각 배선의 pts를 wires와 같은 인덱스로 모아둠
   wires.forEach((w, i) => {
     if (!w.points) w.points = []; // 구버전 저장 파일(꺾임점 없이 저장된 배선) 호환
     const pa = pinCenter(w.from), pb = pinCenter(w.to);
     const pts = wireFullPoints(w, pa, pb);
+    earlierPtsList.push(pts);
     // [Ver0.84] 공압(air)/유압(oil) 배선은 실제 배관도처럼 빗금(사선) 무늬 호스로 그립니다.
     const role = pinRoleOf(w.from);
     const hoseUrl = role==='air' ? 'url(#hosePatternAir)' : (role==='oil' ? 'url(#hosePatternOil)' : null);
     const path = document.createElementNS(NS,'path');
-    path.setAttribute('d', wirePathDFromPoints(pts));
+    path.setAttribute('d', wirePathDWithHops(pts, i, earlierPtsList));
     path.setAttribute('class','wire-path'+(w===selectedWire?' wire-selected':'')+(hoseUrl?' wire-hose':''));
     path.style.stroke = hoseUrl || w.color;
     // 한 번 클릭 = 배선 선택, 더블클릭 = 그 위치에 꺾임점 추가(둘이 서로 걸리지 않도록 클릭을
@@ -2601,6 +2675,154 @@ function cylUpdateVisual(comp, nets, stateOf, netOfPin, double){
 }
 
 /* ======================================================================
+   [Ver0.86] 전동 실린더(모터 구동) — 공압/유압 실린더와 같은 몸통+로드 비주얼 및 내장
+   리밋스위치(LSR/LSE) 드래그 기능을 그대로 재사용하지만, 압축공기/오일 대신 전기 신호로 직접
+   구동됩니다. 3가지 제어 방식을 제공합니다.
+   ① ecyl-onoff: COM(-)/FWD(+)/REV(+) 3핀 On-Off 방식 — 릴레이 접점처럼 단순히 정회전/역회전
+      신호만 걸어주면 끝까지 이동, 실제 전동실린더 구동모듈의 가장 기본적인 배선 형태입니다.
+   ② ecyl-anlg: ①과 배선은 동일하지만 AO(아날로그 출력) 단자가 추가되어, 현재 모터가 돌고
+      있는지(속도 100%)/정지했는지(0%)를 아날로그 값으로 PLC AI0/AI1에 보낼 수 있습니다.
+   ③ ecyl-servo: 서보/스텝(servo-pulse)과 동일하게 PULSE/DIR 펄스-방향 입력으로 위치를
+      제어하되, 컴포넌트 위에서 "총펄스"(스트로크 1회 왕복에 필요한 펄스 수)를 직접 설정할 수
+      있어 PULSE 카운트만큼 로드가 실제로 이동하는 모습을 눈으로 확인할 수 있습니다.
+   ====================================================================== */
+function ecylOnoffRender(id, def, opts){
+  const o = opts || {};
+  return `
+  <div class="comp-box cyl-box">
+    <button class="comp-help-btn" onclick="showCompHelp(this,'${def.type}')">?</button>
+    <div class="cyl-body">
+      <div class="cyl-rod" id="${id}_rod" style="transition-duration:.5s;"></div>
+      <input type="range" class="cyl-ls-trip cyl-ls-trip-r" data-persist="lsrTrip" min="0" max="100" step="1" value="0" title="${tr('cyl.lsRetTitle')}" oninput="evaluateElectricalNets()">
+      <input type="range" class="cyl-ls-trip cyl-ls-trip-e" data-persist="lseTrip" min="0" max="100" step="1" value="100" title="${tr('cyl.lsExtTitle')}" oninput="evaluateElectricalNets()">
+    </div>
+    <div class="comp-pin-row">
+      ${pinHTML(id,'COM','dc24n','COM','COM',false)}
+      ${pinHTML(id,'FWD','dc24p','FWD','FWD',false)}
+      ${pinHTML(id,'REV','dc24p','REV','REV',false)}
+      ${o.hasAo ? pinHTML(id,'AO','sig','AO','AO',false) : ''}
+    </div>
+    ${cylLimitSwitchesHTML(id)}
+    <div class="comp-ctrl-row cyl-speed-row" title="${tr('cyl.speedHint')}">
+      <span class="cyl-speed-label" data-i18n="cyl.speed">⏱ 속도</span>
+      <input type="range" class="cyl-speed-slider" data-persist="speed" min="0.1" max="3.0" step="0.1" value="0.5" oninput="cylSetSpeed('${id}', this.value)">
+      <span class="cyl-speed-val" id="${id}_speedval">0.5s</span>
+    </div>
+    <div class="comp-label">${labelOf(def)}</div>
+  </div>`;
+}
+// FWD/REV 코일과 동일하게, COM(dc24n)과 FWD 또는 REV(dc24p)가 함께 걸려야 그 방향으로 여자된
+// 것으로 판정합니다(밸브 코일의 pinDC24P&&pinDC24N 판정과 동일한 관례).
+function ecylDigitalUpdateVisual(comp, nets, stateOf, netOfPin, hasAo){
+  const com = document.getElementById(comp.id+'_COM');
+  const fwd = document.getElementById(comp.id+'_FWD');
+  const rev = document.getElementById(comp.id+'_REV');
+  const comOn = pinDC24N(com, nets, stateOf, netOfPin);
+  const fwdOn = comOn && pinDC24P(fwd, nets, stateOf, netOfPin);
+  const revOn = comOn && pinDC24P(rev, nets, stateOf, netOfPin);
+  let extend;
+  if (fwdOn && !revOn) extend = true;
+  else if (revOn && !fwdOn) extend = false;
+  else extend = comp.dataset.lastExtend === '1'; // 둘 다/둘 다 아님이면 마지막 명령 방향 유지
+  comp.dataset.lastExtend = extend ? '1' : '0';
+  const slider = comp.querySelector('.cyl-speed-slider');
+  const effSpeed = slider ? (parseFloat(slider.value) || 0.5) : 0.5;
+  const prevPct = comp.dataset.posPct !== undefined ? parseFloat(comp.dataset.posPct) : 0;
+  const targetPct = extend ? 100 : 0;
+  const durationMs = Math.max(50, effSpeed * 1000);
+  const stepPct = (scanCycleMs / durationMs) * 100;
+  let newPct = prevPct;
+  if (prevPct < targetPct) newPct = Math.min(targetPct, prevPct + stepPct);
+  else if (prevPct > targetPct) newPct = Math.max(targetPct, prevPct - stepPct);
+  comp.dataset.posPct = String(newPct);
+  comp.dataset.pos = newPct >= 100 ? 'ext' : (newPct <= 0 ? 'ret' : 'mid');
+  const rod = document.getElementById(comp.id+'_rod');
+  if (rod){
+    rod.classList.toggle('ext', newPct >= 100);
+    rod.style.left = (4 + newPct/100*60) + 'px';
+    rod.style.transitionDuration = Math.max(0.03, scanCycleMs/1000*1.4) + 's';
+  }
+  cylSetLimitSwitches(comp.id, prevPct, newPct);
+  // [주의] 이 함수(updateVisual)는 한 스캔의 4단계(부하/표시 갱신)에서 실행되는데, PLC의
+  // AI0/AI1 읽기는 그보다 앞선 3단계에서 이미 끝난 뒤입니다. 그래서 여기서 바로
+  // stateOf(netOfPin(ao,nets)).analog에 값을 써도 이번 스캔에서는 전달되지 않고, netState 자체가
+  // 매 스캔 새로 만들어져 버려지므로 그냥 사라져 버립니다(never reaches AI). 그래서 이번에 계산한
+  // 값은 comp.dataset.aoValue에 저장만 해 두고, 실제로 net에 실어 보내는 것은 ecylAnlgContributeSource
+  // (2단계, PLC 스캔보다 먼저 실행)가 "직전 스캔에 계산해둔 값"을 사용해서 합니다 — 결과적으로
+  // AO 값이 실제 상태보다 한 스캔 늦게 PLC에 반영되는데, 이는 실제 아날로그 I/O 모듈의 지연과도
+  // 비슷한 자연스러운 동작입니다.
+  if (hasAo){
+    const moving = Math.abs(newPct - prevPct) > 0.0005;
+    comp.dataset.aoValue = moving ? '100' : '0';
+  }
+}
+// 2단계(contributeSource, PLC 스캔보다 먼저 실행)에서 직전 스캔에 계산해둔 AO 값을 net에
+// 실어 보냅니다 — ecylDigitalUpdateVisual의 주석 참고.
+function ecylAnlgContributeSource(comp, nets, stateOf, netOfPin){
+  const ao = document.getElementById(comp.id+'_AO');
+  if (!ao) return;
+  stateOf(netOfPin(ao, nets)).analog = parseFloat(comp.dataset.aoValue || '0');
+}
+function ecylServoRender(id, def){
+  return `
+  <div class="comp-box cyl-box">
+    <button class="comp-help-btn" onclick="showCompHelp(this,'${def.type}')">?</button>
+    <div class="cyl-body">
+      <div class="cyl-rod" id="${id}_rod" style="transition-duration:.05s;"></div>
+      <input type="range" class="cyl-ls-trip cyl-ls-trip-r" data-persist="lsrTrip" min="0" max="100" step="1" value="0" title="${tr('cyl.lsRetTitle')}" oninput="evaluateElectricalNets()">
+      <input type="range" class="cyl-ls-trip cyl-ls-trip-e" data-persist="lseTrip" min="0" max="100" step="1" value="100" title="${tr('cyl.lsExtTitle')}" oninput="evaluateElectricalNets()">
+    </div>
+    <div class="comp-pin-row">
+      ${pinHTML(id,'PULSE','sig','PULSE','PULSE',false)}
+      ${pinHTML(id,'DIR','sig','DIR','DIR',false)}
+    </div>
+    ${cylLimitSwitchesHTML(id)}
+    <div class="comp-ctrl-row cyl-speed-row" title="${tr('ecyl.strokePulseHint')}">
+      <span class="cyl-speed-label" data-i18n="ecyl.strokePulse">↔ ${tr('ecyl.strokePulse')}</span>
+      <input type="number" class="ecyl-stroke-pulses" data-persist="strokePulses" min="10" max="5000" step="10" value="200" onchange="ecylSetStrokePulses('${id}', this.value)">
+      <span class="ecyl-pulse-val" id="${id}_pulseval">0/200</span>
+    </div>
+    <div class="comp-label">${labelOf(def)}</div>
+  </div>`;
+}
+function ecylSetStrokePulses(id, val){
+  const v = Math.max(10, Math.min(5000, parseInt(val, 10) || 200));
+  const comp = document.getElementById(id);
+  if (!comp) return;
+  const count = parseInt(comp.dataset.pulseCount || '0', 10);
+  const pulseVal = document.getElementById(id+'_pulseval');
+  if (pulseVal) pulseVal.textContent = Math.min(count, v) + '/' + v;
+}
+// servo-pulse와 동일한 PULSE(Off→On 엣지)+DIR 판정을 쓰되, 회전각 대신 "총펄스" 설정값 대비
+// 누적 펄스 수의 비율로 실린더 posPct(0~100%)를 직접 계산합니다(속도 슬라이더로 시간을 재는
+// 방식이 아니라, 서보/스텝모터답게 펄스 수 자체가 곧 위치입니다).
+function ecylServoUpdateVisual(comp, nets, stateOf, netOfPin){
+  const pulse = document.getElementById(comp.id+'_PULSE');
+  const dir = document.getElementById(comp.id+'_DIR');
+  const pulseOn = pinDC24P(pulse, nets, stateOf, netOfPin);
+  const dirFwd = pinDC24P(dir, nets, stateOf, netOfPin);
+  const last = comp.dataset.lastPulse === '1';
+  const strokeInput = comp.querySelector('.ecyl-stroke-pulses');
+  const totalPulses = Math.max(1, parseInt(strokeInput && strokeInput.value, 10) || 200);
+  let count = comp.dataset.pulseCount !== undefined ? parseInt(comp.dataset.pulseCount, 10) : 0;
+  if (pulseOn && !last) count = Math.max(0, Math.min(totalPulses, count + (dirFwd ? 1 : -1)));
+  comp.dataset.lastPulse = pulseOn ? '1' : '0';
+  comp.dataset.pulseCount = String(count);
+  const prevPct = comp.dataset.posPct !== undefined ? parseFloat(comp.dataset.posPct) : 0;
+  const newPct = (count / totalPulses) * 100;
+  comp.dataset.posPct = String(newPct);
+  comp.dataset.pos = newPct >= 100 ? 'ext' : (newPct <= 0 ? 'ret' : 'mid');
+  const rod = document.getElementById(comp.id+'_rod');
+  if (rod){
+    rod.classList.toggle('ext', newPct >= 100);
+    rod.style.left = (4 + newPct/100*60) + 'px';
+  }
+  const pulseVal = document.getElementById(comp.id+'_pulseval');
+  if (pulseVal) pulseVal.textContent = count + '/' + totalPulses;
+  cylSetLimitSwitches(comp.id, prevPct, newPct);
+}
+
+/* ======================================================================
    공압/유압 확장 엔진 (Ver0.2) — 서비스 유니트/펌프 같은 "실제 소스"에서 시작해 밸브를 거쳐
    실린더까지 압력이 실제로 전달되는지 확인할 수 있도록, 기존 valve-single/valve-double(전자밸브가
    스스로 압력을 만들어내는 단순 모델, 기존 3개 PLC 예제와의 호환을 위해 그대로 둠)과는 별도로
@@ -2726,6 +2948,24 @@ function dvRender(id, def, opt){
     const pil1 = pinHTML(id,'X1','air','X1','X1',true);
     const pil2 = (opt.actuation==='pilotPilot') ? pinHTML(id,'X2','air','X2','X2',true) : '';
     actuatorHTML = `<div class="comp-pin-row">${pil1}${pil2}</div>`;
+  } else if (opt.actuation === 'solenoidSpring'){
+    // 편솔밸브(valve-single)와 동일하게 SOL+(dc24p)/SOL-(dc24n) 코일 한 쌍 — 둘 다 여자되어야
+    // 작동 위치로 전환되고, 스프링으로 자동 복귀합니다.
+    actuatorHTML = `<div class="comp-pin-row">
+      ${pinHTML(id,'COILP','dc24p','SOL+','SOL+',true)}
+      ${pinHTML(id,'COILN','dc24n','SOL-','SOL-',true)}
+    </div>`;
+  } else if (opt.actuation === 'solenoidSolenoid'){
+    // 양솔밸브(valve-double)와 동일하게 SOL1(+/-)/SOL2(+/-) 코일 두 쌍 — 스프링 없이 마지막으로
+    // 여자된 쪽 위치를 그대로 유지(래칭)합니다.
+    actuatorHTML = `<div class="comp-pin-row">
+      ${pinHTML(id,'COIL1P','dc24p','SOL1+','SOL1+',true)}
+      ${pinHTML(id,'COIL1N','dc24n','SOL1-','SOL1-',true)}
+    </div>
+    <div class="comp-pin-row">
+      ${pinHTML(id,'COIL2P','dc24p','SOL2+','SOL2+',true)}
+      ${pinHTML(id,'COIL2N','dc24n','SOL2-','SOL2-',true)}
+    </div>`;
   }
   return `
   <div class="comp-box comp-dv">
@@ -2775,6 +3015,25 @@ function dvUpdateActuationFromPilot(comp, nets, stateOf, netOfPin, opt){
     // 둘 다 눌림/둘 다 아님이면 이전 상태 유지(래치)
   }
 }
+// [Ver0.88] PLC 24V DC 코일로 구동되는 "진짜" 솔레노이드 밸브(P 포트로 실제 공급을 받아야만
+// 동작) — 파일럿 밸브가 X1/X2의 압력으로 actuated를 판정하듯, 이쪽은 SOL(+/-) 코일의 dc24p/
+// dc24n 여자 상태로 판정합니다. valve-single/valve-double의 코일 판정 로직(pinDC24P&&pinDC24N)
+// 과 동일한 관례를 씁니다.
+function dvUpdateActuationFromSolenoid(comp, nets, stateOf, netOfPin, opt){
+  if (opt.actuation === 'solenoidSpring'){
+    const cp = document.getElementById(comp.id+'_COILP'), cn = document.getElementById(comp.id+'_COILN');
+    const energized = pinDC24P(cp,nets,stateOf,netOfPin) && pinDC24N(cn,nets,stateOf,netOfPin);
+    comp.dataset.actuated = energized ? '1' : '0';
+  } else if (opt.actuation === 'solenoidSolenoid'){
+    const c1p = document.getElementById(comp.id+'_COIL1P'), c1n = document.getElementById(comp.id+'_COIL1N');
+    const c2p = document.getElementById(comp.id+'_COIL2P'), c2n = document.getElementById(comp.id+'_COIL2N');
+    const e1 = pinDC24P(c1p,nets,stateOf,netOfPin) && pinDC24N(c1n,nets,stateOf,netOfPin);
+    const e2 = pinDC24P(c2p,nets,stateOf,netOfPin) && pinDC24N(c2n,nets,stateOf,netOfPin);
+    if (e1 && !e2) comp.dataset.actuated = '0'; // SOL1 여자 -> A 위치(P->A)
+    else if (e2 && !e1) comp.dataset.actuated = '1'; // SOL2 여자 -> B 위치(P->B)
+    // 둘 다 여자/둘 다 아님이면 이전 상태 유지(래치, 실제 양솔밸브와 동일)
+  }
+}
 function dvContributeLoad(comp, nets, stateOf, netOfPin, opt){
   const pPin = document.getElementById(comp.id+'_P');
   const aPin = document.getElementById(comp.id+'_A');
@@ -2792,6 +3051,8 @@ function dvContributeLoad(comp, nets, stateOf, netOfPin, opt){
   }
   if (opt.actuation === 'pilot' || opt.actuation === 'pilotSpring' || opt.actuation === 'pilotPilot'){
     dvUpdateActuationFromPilot(comp, nets, stateOf, netOfPin, opt);
+  } else if (opt.actuation === 'solenoidSpring' || opt.actuation === 'solenoidSolenoid'){
+    dvUpdateActuationFromSolenoid(comp, nets, stateOf, netOfPin, opt);
   }
   const actuated = comp.dataset.actuated === '1';
   const normallyOpen = !!opt.normallyOpen;
@@ -4570,6 +4831,14 @@ const DV_OPTS = {
   'pn-52-pilot-pilot': { ways:5, role:'air', actuation:'pilotPilot',  normallyOpen:false },
   'pn-32-roller':      { ways:3, role:'air', actuation:'roller',     normallyOpen:false },
   'pn-32-rollerdir':   { ways:3, role:'air', actuation:'rollerDir',  normallyOpen:false },
+  // [Ver0.88] P(공급) 포트로 실제 압축공기를 받아야만 동작하는 "진짜" 솔레노이드 밸브 —
+  // valve-single/valve-double(④, 스스로 에어를 만들어내는 단순화 모델)과 달리, 이 두 부품은
+  // pn-service 같은 실제 공급원에서 공기를 받아 P→A(/B)로 전달하는 표준 공압 엔진(dvContributeLoad)
+  // 을 그대로 쓰면서, 작동 방식만 사람이 누르는 버튼/파일럿 대신 PLC가 걸어주는 24V DC 코일로
+  // 바꾼 것입니다 — 그래서 컴프레서가 꺼지면(또는 P가 배선이 안 되면) 코일이 여자돼도 A/B에
+  // 압력이 실리지 않습니다.
+  'pn-32-solenoid-spring':    { ways:3, role:'air', actuation:'solenoidSpring',    normallyOpen:false },
+  'pn-52-solenoid-solenoid':  { ways:5, role:'air', actuation:'solenoidSolenoid',  normallyOpen:false },
   'hyd-dv42':          { ways:4, role:'oil', actuation:'toggle', normallyOpen:false },
   'hyd-dv43':          { ways:4, role:'oil', threePos:true },
   'hyd-shutoff':       { ways:2, role:'oil', actuation:'toggle', normallyOpen:true },
@@ -4611,6 +4880,9 @@ const COMPONENT_DEFS = {
   'mc-contactor': { type:'mc-contactor', cat:'actuator', icon:'🧷', label:{ko:'전자접촉기 MC(+EOCR)', en:'Magnetic Contactor (+EOCR)'}, render:mcRender, contributeLoad:mcContributeLoad },
   'vfd': { type:'vfd', cat:'actuator', icon:'🎛️', label:{ko:'인버터(VFD)', en:'VFD Inverter'}, render:vfdRender, contributeLoad:vfdContributeLoad },
   'servo-pulse': { type:'servo-pulse', cat:'actuator', icon:'🎯', label:{ko:'서보/스텝(펄스-방향)', en:'Servo/Stepper (Pulse-Dir)'}, render:servoRender, updateVisual:servoUpdateVisual },
+  'ecyl-onoff': { type:'ecyl-onoff', cat:'actuator', icon:'🔌', label:{ko:'전동실린더(On-Off, 정역+리밋)', en:'Electric Cylinder (On-Off, Fwd/Rev+Limits)'}, render:(id,def)=>ecylOnoffRender(id,def,{hasAo:false}), updateVisual:(c,n,s,p)=>ecylDigitalUpdateVisual(c,n,s,p,false) },
+  'ecyl-anlg': { type:'ecyl-anlg', cat:'actuator', icon:'📈', label:{ko:'전동실린더(정역+속도 아날로그출력)', en:'Electric Cylinder (Fwd/Rev + Analog Speed Out)'}, render:(id,def)=>ecylOnoffRender(id,def,{hasAo:true}), updateVisual:(c,n,s,p)=>ecylDigitalUpdateVisual(c,n,s,p,true), contributeSource:ecylAnlgContributeSource },
+  'ecyl-servo': { type:'ecyl-servo', cat:'actuator', icon:'🎯', label:{ko:'전동실린더(서보, 펄스-방향)', en:'Electric Cylinder (Servo, Pulse-Dir)'}, render:ecylServoRender, updateVisual:ecylServoUpdateVisual },
   'tower-lamp': { type:'tower-lamp', cat:'actuator', icon:'🚦', label:{ko:'적층 타워램프', en:'Tower Lamp'}, render:towerLampRender, updateVisual:towerLampUpdateVisual },
   'ind-lamp': { type:'ind-lamp', cat:'actuator', icon:'💡', label:{ko:'표시램프', en:'Indicator Lamp'}, render:indLampRender, updateVisual:indLampUpdateVisual },
 
@@ -4644,6 +4916,8 @@ const COMPONENT_DEFS = {
   'pn-52-pilot-pilot': { type:'pn-52-pilot-pilot', cat:'pneu', icon:'🌬️', label:{ko:'5/2-WAY 공압작동 공압복귀형 밸브', en:'5/2-Way Double Pilot-Actuated Valve'}, render:(id,def)=>dvRender(id,def,DV_OPTS['pn-52-pilot-pilot']), contributeLoad:(c,n,s,p)=>dvContributeLoad(c,n,s,p,DV_OPTS['pn-52-pilot-pilot']), updateVisual:dvUpdateVisual },
   'pn-32-roller': { type:'pn-32-roller', cat:'pneu', icon:'🛞', label:{ko:'3/2-WAY 롤러레버작동 밸브', en:'3/2-Way Roller Lever Valve'}, render:(id,def)=>dvRender(id,def,DV_OPTS['pn-32-roller']), contributeLoad:(c,n,s,p)=>dvContributeLoad(c,n,s,p,DV_OPTS['pn-32-roller']), updateVisual:dvUpdateVisual },
   'pn-32-rollerdir': { type:'pn-32-rollerdir', cat:'pneu', icon:'🛞', label:{ko:'3/2-WAY 방향성 롤러레버작동 밸브', en:'3/2-Way Directional Roller Lever Valve'}, render:(id,def)=>dvRender(id,def,DV_OPTS['pn-32-rollerdir']), contributeLoad:(c,n,s,p)=>dvContributeLoad(c,n,s,p,DV_OPTS['pn-32-rollerdir']), updateVisual:dvUpdateVisual },
+  'pn-32-solenoid-spring': { type:'pn-32-solenoid-spring', cat:'pneu', icon:'🧲', label:{ko:'3/2-WAY 솔레노이드 스프링복귀형 밸브(PLC용, N/C)', en:'3/2-Way Solenoid Spring-Return Valve (PLC, N/C)'}, render:(id,def)=>dvRender(id,def,DV_OPTS['pn-32-solenoid-spring']), contributeLoad:(c,n,s,p)=>dvContributeLoad(c,n,s,p,DV_OPTS['pn-32-solenoid-spring']), updateVisual:dvUpdateVisual },
+  'pn-52-solenoid-solenoid': { type:'pn-52-solenoid-solenoid', cat:'pneu', icon:'🧲', label:{ko:'5/2-WAY 양솔레노이드 밸브(PLC용)', en:'5/2-Way Double-Solenoid Valve (PLC)'}, render:(id,def)=>dvRender(id,def,DV_OPTS['pn-52-solenoid-solenoid']), contributeLoad:(c,n,s,p)=>dvContributeLoad(c,n,s,p,DV_OPTS['pn-52-solenoid-solenoid']), updateVisual:dvUpdateVisual },
   'pn-and': { type:'pn-and', cat:'pneu', icon:'&', label:{ko:'AND 밸브', en:'AND Valve'}, render:(id,def)=>logicValveRender(id,def,'and'), contributeLoad:(c,n,s,p)=>logicValveContributeLoad(c,n,s,p,'and') },
   'pn-or': { type:'pn-or', cat:'pneu', icon:'≥1', label:{ko:'OR 밸브', en:'OR Valve'}, render:(id,def)=>logicValveRender(id,def,'or'), contributeLoad:(c,n,s,p)=>logicValveContributeLoad(c,n,s,p,'or') },
   'pn-tconn': { type:'pn-tconn', cat:'pneu', icon:'🔗', label:{ko:'T형 콘넥타(공압)', en:'T-Connector (Pneumatic)'}, render:(id,def)=>junctionRender(id,def,3,'air',false) },
@@ -4679,12 +4953,12 @@ const PALETTE_CATEGORIES = [
   { key:'plc', titleKo:'① PLC 본체(벤더별)', titleEn:'① PLC CPUs (by vendor)', types:['plc-ls','plc-mit','plc-siemens','plc-omron'] },
   { key:'power', titleKo:'② 전원장치', titleEn:'② Power Supplies', types:['psu24v','reg5v','logic5v','ac220term','ac380term'] },
   { key:'sensor', titleKo:'③ 산업용 24V 센서/조작스위치', titleEn:'③ 24V Sensors/Operator Switches', types:['sen-ind','sen-cap','sen-photo-diff','sen-photo-thru','limit-sw','auto-sw','sen-pressure','sen-laser','sen-lidar','sen-color','sen-barcode','sen-vision','pb-start','pb-stop','pb-estop','pb-maintain'] },
-  { key:'actuator', titleKo:'④ 공압/구동 액추에이터', titleEn:'④ Pneumatic/Drive Actuators', types:['cyl-single','cyl-double','valve-single','valve-double','motor3ph','mc-contactor','vfd','servo-pulse','tower-lamp','ind-lamp'] },
+  { key:'actuator', titleKo:'④ 공압/구동 액추에이터', titleEn:'④ Pneumatic/Drive Actuators', types:['cyl-single','cyl-double','ecyl-onoff','ecyl-anlg','ecyl-servo','valve-single','valve-double','motor3ph','mc-contactor','vfd','servo-pulse','tower-lamp','ind-lamp'] },
   { key:'comm', titleKo:'⑤ 통신', titleEn:'⑤ Communications', types:['comm-ethernet','comm-serial','vc-gateway','net-bridge'] },
   { key:'hmi', titleKo:'⑥ HMI', titleEn:'⑥ HMI', types:['hmi-panel'] },
   { key:'robot', titleKo:'⑦ 3D 로봇(OLP)', titleEn:'⑦ 3D Robot (OLP)', types:['robot-arm'] },
   { key:'conveyor', titleKo:'⑧ 컨베이어(제품 이송)', titleEn:'⑧ Conveyor (Product Transport)', types:['conveyor-sensor'] },
-  { key:'pneu', titleKo:'⑨ 공압 부품(표준형)', titleEn:'⑨ Pneumatic Parts (Standard)', types:['pn-service','pn-distrib','cyl-single','pn-cyl-cushion','cyl-double','pn-seq-valve','pn-reduce-valve','pn-flow-oneway','pn-quick-exhaust','pn-gauge','pn-timer','pn-32-push-nc','pn-32-push-no','pn-52-toggle','pn-32-toggle-nc','pn-32-pilot-spring','pn-52-pilot-spring','pn-52-pilot-pilot','pn-32-roller','pn-32-rollerdir','pn-and','pn-or','pn-tconn'] },
+  { key:'pneu', titleKo:'⑨ 공압 부품(표준형)', titleEn:'⑨ Pneumatic Parts (Standard)', types:['pn-service','pn-distrib','cyl-single','pn-cyl-cushion','cyl-double','pn-seq-valve','pn-reduce-valve','pn-flow-oneway','pn-quick-exhaust','pn-gauge','pn-timer','pn-32-push-nc','pn-32-push-no','pn-52-toggle','pn-32-toggle-nc','pn-32-pilot-spring','pn-52-pilot-spring','pn-52-pilot-pilot','pn-32-roller','pn-32-rollerdir','pn-32-solenoid-spring','pn-52-solenoid-solenoid','pn-and','pn-or','pn-tconn'] },
   { key:'hyd', titleKo:'⑩ 유압 부품', titleEn:'⑩ Hydraulic Parts', types:['hyd-tray','hyd-pump','hyd-breaker','hyd-sightglass','hyd-cyl-clear','hyd-cyl','hyd-load','hyd-motor','hyd-dv42','hyd-dv43','hyd-relief','hyd-counterbal','hyd-reduce3way','hyd-shutoff','hyd-flow-bidir','hyd-flow-oneway','hyd-flow-prescomp','hyd-check','hyd-check-pilot','hyd-gauge','hyd-gauge-distrib','hyd-tconn','hyd-accum','hyd-pressure-remover'] },
 ];
 
@@ -4857,11 +5131,14 @@ const COMP_HELP_BLURB = {
   'pb-maintain': {ko:'유지형(매인테인드/올터네이트, "푸시-푸시") 조작 푸시버튼입니다. 한 번 누르면 COM-NO 접점이 닫힌 채로 유지되고, 다시 한 번 눌러야 열립니다(모드 선택 스위치나 자동/수동 전환처럼 계속 켜둬야 하는 신호에 적합). E-STOP과 달리 안전용이 아니라 일반 조작반의 선택 스위치 용도이며, 리밋스위치와 동작 방식은 같지만 사람이 조작하는 버튼이라는 점이 다릅니다.', en:'A maintained (alternate-action, "push-push") operator pushbutton. One click closes the COM-NO contact and it stays closed; a second click opens it again — suited to signals that need to stay on, like a mode-select or auto/manual switch. Unlike E-STOP, this is not a safety device, just an ordinary panel selector; it behaves like the limit switch mechanically, but it\'s an operator-actuated button rather than a mechanical sensor.'},
   'cyl-single': {ko:'단동 실린더(스프링 복귀). 편솔밸브의 A포트에 연결하면 여자 시 전진, 소자 시 스프링으로 복귀합니다. 하단 속도 슬라이더(0.1~3.0초)로 미터아웃 유량조절밸브를 흉내내어 전진/후진 애니메이션 속도를 조절할 수 있습니다(교육용 시각화이며 실제 유량 계산은 아닙니다).', en:'Single-acting cylinder (spring return). Extends when its valve energizes, retracts on de-energize. The speed slider below (0.1–3.0s) approximates a meter-out flow control valve by adjusting the extend/retract animation speed (a visual teaching aid, not a real flow calculation).'},
   'cyl-double': {ko:'복동 실린더. 양솔밸브의 A/B 포트를 각각 연결하면 전진/후진을 제어할 수 있습니다. 하단 속도 슬라이더(0.1~3.0초)로 미터아웃 유량조절밸브를 흉내내어 전진/후진 애니메이션 속도를 조절할 수 있습니다(교육용 시각화이며 실제 유량 계산은 아닙니다).', en:'Double-acting cylinder. Wire the double valve\'s A/B ports to control extend/retract. The speed slider below (0.1–3.0s) approximates a meter-out flow control valve by adjusting the extend/retract animation speed (a visual teaching aid, not a real flow calculation).'},
-  'valve-single': {ko:'편솔밸브(2/2way, 스프링 복귀). 코일이 여자되면 A포트로 압축공기를 보냅니다.', en:'Single solenoid valve (spring return). Energizing the coil sends air to port A.'},
-  'valve-double': {ko:'양솔밸브. SOL1 여자 시 A포트, SOL2 여자 시 B포트로 압축공기를 보냅니다.', en:'Double solenoid valve. SOL1 pressurizes port A, SOL2 pressurizes port B.'},
+  'valve-single': {ko:'편솔밸브(2/2way, 스프링 복귀). 코일이 여자되면 A포트로 압축공기를 보냅니다. ⚠️ P(공급) 포트가 따로 없이 A포트에서 자동으로 에어를 생성하는 단순화 모델입니다 — 서비스 유니트(컴프레서)를 연결하지 않아도, 심지어 컴프레서가 꺼져 있어도 코일만 여자되면 항상 작동합니다. 컴프레서가 꺼지면 실제로 멈추는 회로가 필요하면 ⑨ 공압 부품의 "3/2-WAY 솔레노이드 스프링복귀형 밸브(PLC용)"를 쓰세요 — 그 부품은 P 포트로 실제 공급을 받아야만 동작합니다.', en:'Single solenoid valve (2/2-way, spring return). Energizing the coil sends air to port A. ⚠️ This is a simplified part with no separate P (supply) port — it automatically generates its own air at A, so it works whenever the coil is energized, even with no service unit (compressor) wired in or with the compressor off. If you need a circuit that actually stops when the compressor is off, use the "3/2-Way Solenoid Spring-Return Valve (PLC)" in ⑨ Pneumatic Parts instead — that one only works when it genuinely receives supply air at its P port.'},
+  'valve-double': {ko:'양솔밸브. SOL1 여자 시 A포트, SOL2 여자 시 B포트로 압축공기를 보냅니다. ⚠️ 이 부품도 P(공급) 포트 없이 A/B 양쪽 다 자동으로 에어를 생성하는 단순화 모델입니다(컴프레서 연결·전원 여부와 무관하게 동작). 컴프레서 공급에 실제로 의존하는 회로가 필요하면 ⑨ 공압 부품의 "5/2-WAY 양솔레노이드 밸브(PLC용)"를 쓰세요.', en:'Double solenoid valve. SOL1 pressurizes port A, SOL2 pressurizes port B. ⚠️ This is also a simplified part with no P (supply) port — it automatically generates air at both A and B regardless of any compressor connection or power state. If you need a circuit that genuinely depends on compressor supply, use the "5/2-Way Double-Solenoid Valve (PLC)" in ⑨ Pneumatic Parts instead.'},
   'mc-contactor': {ko:'전자접촉기(MC)+EOCR. 코일(A1/A2)이 여자되면 다음 스캔부터 R/S/T 주접점이 닫힙니다. EOCR 트립 버튼으로 과부하 차단을 흉내낼 수 있습니다.', en:'Magnetic contactor + EOCR. Energizing the coil closes the R/S/T main contacts (one tick later). The EOCR trip button simulates an overload trip.'},
   'vfd': {ko:'인버터(VFD)입니다. 입력 전원이 살아있고 RUN 입력이 24V이면 3상 출력을 만들어 모터를 구동합니다(속도제어는 단순화됨).', en:'VFD inverter. Produces a 3-phase output to drive a motor when input power is live and RUN is 24V (speed control simplified).'},
   'servo-pulse': {ko:'펄스-방향(Pulse/Dir) 입력을 받는 서보/스텝모터입니다. PULSE가 Off→On 될 때마다 위치가 1씩 증감합니다.', en:'Servo/stepper driven by pulse+direction. Position changes by 1 on every PULSE off→on edge.'},
+  'ecyl-onoff': {ko:'전동 실린더(모터 구동, On-Off 방식)입니다. COM(-)과 FWD(+)에 24V를 걸면 정회전(전진), COM(-)과 REV(+)에 걸면 역회전(후진)합니다(밸브 코일처럼 두 단자가 함께 여자되어야 동작). 몸통 위의 리밋스위치(LSR/LSE) 마커를 드래그해 원하는 위치에서 신호를 받을 수 있고, 속도 슬라이더로 이동 시간을 조절합니다 — 공압/유압 실린더와 별도로 배선만 전기 신호로 하는 가장 단순한 전동 액추에이터입니다.', en:'A motor-driven electric cylinder (On-Off type). Energize COM(-)+FWD(+) to extend, COM(-)+REV(+) to retract (like a valve coil, both terminals must be energized together). Drag the LSR/LSE limit-switch markers on the body to trigger at any position, and use the speed slider to set travel time — the simplest electric actuator, wired purely with digital signals instead of air/oil.'},
+  'ecyl-anlg': {ko:'전동 실린더(정역+아날로그 출력)입니다. 배선은 On-Off형과 동일(COM/FWD/REV)하지만, AO 단자가 추가되어 모터가 돌고 있을 때 100%, 정지해 있을 때 0%인 아날로그 신호를 내보냅니다 — PLC의 AI0/AI1에 배선하면 CMP 명령으로 "지금 이 실린더가 움직이고 있는지"를 아날로그 값으로 판단하는 실습을 할 수 있습니다.', en:'A motor-driven electric cylinder with an analog output. Wiring is the same as the On-Off type (COM/FWD/REV), but it adds an AO terminal that outputs 100% while the motor is running and 0% when stopped — wire it to the PLC\'s AI0/AI1 to practice reading "is this cylinder currently moving?" as an analog value with a CMP instruction.'},
+  'ecyl-servo': {ko:'전동 실린더(서보/스텝, 펄스-방향)입니다. PULSE가 Off→On 될 때마다 DIR 방향으로 한 걸음씩 이동하며, "총펄스" 칸에 설정한 값이 완전 후진↔완전 전진 사이의 총 이동 스텝 수입니다(값을 줄이면 같은 펄스 수로 더 빨리 끝까지 이동, 늘리면 더 정밀하게 조금씩 이동 — 실제 서보의 전자기어비와 같은 개념). 몸통 위의 리밋스위치(LSR/LSE)로 원하는 위치에서 신호를 받을 수도 있습니다.', en:'A motor-driven electric cylinder (servo/stepper, pulse+direction). Each PULSE off→on edge steps it one increment in the DIR direction; the "Total Pulses" field sets how many steps span fully-retracted to fully-extended (lower it to reach full travel with fewer pulses, raise it for finer, slower steps — like a real servo\'s electronic gear ratio). The LSR/LSE limit switches on the body can also trigger at any position.'},
   'tower-lamp': {ko:'적층 타워램프입니다. COM(-)과 R/Y/G 각 신호선에 24V를 걸면 해당 색이 켜집니다.', en:'Stack tower lamp. Each color lights when its signal pin and COM(-) are both energized.'},
   'ind-lamp': {ko:'표시램프입니다. 색상을 선택할 수 있고, +/-에 24V가 걸리면 점등합니다.', en:'Indicator lamp. Pick a color; lights when + and - are both energized.'},
   'comm-ethernet': {ko:'Ethernet 통신 모듈입니다. P1/P2 포트로 PLC의 LAN 단자를 배선하면, 더블클릭해 두 PLC 사이의 가상 Modbus TCP 데이터 링크(D레지스터 교환)를 설정하고 패킷 모니터로 볼 수 있습니다(실제 TCP 통신이 아닌 시뮬레이션입니다).', en:'Ethernet comm module. Wire PLC LAN terminals into P1/P2, then double-click to set up a simulated Modbus TCP data link (D-register exchange) between two PLCs and watch it in the packet monitor (a simulation, not real TCP).'},
@@ -4894,6 +5171,8 @@ Object.assign(COMP_HELP_BLURB, {
   'pn-52-pilot-pilot': {ko:'5/2-WAY 공압작동 공압복귀형 밸브(양쪽 파일럿)입니다. X1이 눌리면 P→A, X2가 눌리면 P→B로 전환되며, 스프링이 없어 마지막으로 눌린 쪽 위치를 그대로 유지(래칭)합니다.', en:'5/2-way double pilot-actuated valve (no spring). X1 switches to P→A, X2 switches to P→B, and — with no spring — it latches at whichever side was pressed last.'},
   'pn-32-roller': {ko:'3/2-WAY 롤러레버작동 밸브입니다. 실린더 로드 등 기계 부품이 롤러를 누르는 동안만 P→A가 열립니다(양방향 모두 감지).', en:'3/2-way roller-lever valve. P→A opens only while a mechanical part (e.g. a cylinder rod) presses the roller (detects either direction).'},
   'pn-32-rollerdir': {ko:'3/2-WAY 방향성 롤러레버작동 밸브입니다. 한쪽 방향으로 지나갈 때만 작동하고 반대 방향은 무반응입니다 — 실제로는 롤러의 경사 방향으로 결정되며, 이 시뮬레이터에서는 "정방향 통과" 버튼으로 그 순간을 흉내냅니다.', en:'3/2-way directional roller-lever valve. Trips only when passed in one direction; the reverse direction has no effect — in real hardware this is set by the roller\'s ramp angle, simulated here with a "Pass Forward" button.'},
+  'pn-32-solenoid-spring': {ko:'3/2-WAY 솔레노이드작동 스프링복귀형 밸브(N/C)입니다. SOL+/SOL- 코일에 24V DC를 걸어 여자시키는 동안만 P→A가 열리고, 여자를 풀면 스프링으로 복귀합니다 — PLC 출력으로 직접 제어하는 "진짜" 밸브로, valve-single과 달리 P 포트에 실제 공급압력이 없으면 A에 압력이 나오지 않습니다(예: 컴프레서/서비스유니트가 꺼져 있으면 코일을 여자시켜도 동작 안 함).', en:'3/2-way solenoid-actuated, spring-return valve (N/C). Energizing coil SOL+/SOL- with 24V DC opens P→A; de-energizing springs it back — a genuine valve meant to be driven directly by a PLC output. Unlike valve-single, it needs REAL supply pressure at P: with no pressure there (e.g. compressor/service unit off), energizing the coil produces no pressure at A.'},
+  'pn-52-solenoid-solenoid': {ko:'5/2-WAY 양솔레노이드작동 밸브입니다. SOL1+/SOL1- 코일을 여자시키면 P→A로, SOL2+/SOL2- 코일을 여자시키면 P→B로 전환되며, 스프링이 없어 마지막으로 여자된 쪽 위치를 그대로 유지(래칭)합니다 — PLC 두 출력으로 직접 제어하는 "진짜" 밸브로, valve-double과 달리 P 포트에 실제 공급압력이 없으면 A/B 어느 쪽에도 압력이 나오지 않습니다(예: 컴프레서/서비스유니트가 꺼져 있으면 코일을 여자시켜도 동작 안 함).', en:'5/2-way double-solenoid valve. Energizing SOL1+/SOL1- switches P→A; energizing SOL2+/SOL2- switches P→B; with no spring, it latches at whichever coil was energized last — a genuine valve meant to be driven directly by two PLC outputs. Unlike valve-double, it needs REAL supply pressure at P: with no pressure there (e.g. compressor/service unit off), energizing either coil produces no pressure at A or B.'},
   'pn-and': {ko:'AND 밸브입니다. X1, X2 두 입력이 모두 가압되어야 A가 통과됩니다 — 두 조건이 동시에 만족될 때만 동작해야 하는 안전/인터록 회로에 사용합니다.', en:'AND valve. A passes through only when both X1 and X2 are pressurized — used for interlocks that must require two conditions at once.'},
   'pn-or': {ko:'OR 밸브입니다. X1, X2 중 하나라도 가압되면 A가 통과됩니다 — 두 곳 중 어디서 신호를 줘도 동작해야 하는 회로에 사용합니다.', en:'OR valve. A passes through when either X1 or X2 is pressurized — used where a signal from either of two places should trigger the same action.'},
   'pn-tconn': {ko:'T형 콘넥타(공압)입니다. 3개 포트가 내부적으로 하나의 배관으로 이어져 있어 배관을 분기할 때 사용합니다.', en:'T-connector (pneumatic). All 3 ports are internally one line — used to branch a pneumatic line.'},
@@ -7461,6 +7740,17 @@ function handleProjectFileSelected(input){
 
 /* ---------------- 릴리즈 노트 ---------------- */
 const RELEASE_NOTES = [
+  { ver:'Ver0.88', items:{
+    ko:['[진짜 솔레노이드+P/A포트 밸브 2종 추가] 서비스유니트(컴프레서)→편솔밸브(valve-single)→실린더로 배선해도 밸브가 자체적으로 압력을 만들어내서, 컴프레서를 꺼도 실린더가 멈추지 않는 문제에 대한 질문에 따라, ⑨ 공압 부품(표준형) 팔레트에 "3/2-WAY 솔레노이드 스프링복귀형 밸브(PLC용, N/C)"와 "5/2-WAY 양솔레노이드 밸브(PLC용)"를 추가했습니다. 두 부품 모두 SOL(+/-) 코일에 24V DC를 걸어 PLC 출력으로 직접 제어하면서도, 기존 파일럿/수동 밸브들과 동일하게 P 포트로 실제 압축공기를 받아야만 A/B로 압력이 전달되는 "진짜" 밸브입니다 — 컴프레서가 꺼져 있으면 코일을 아무리 여자시켜도 실린더가 움직이지 않습니다. 사용법을 보여주는 예제 "㉔ [공압+PLC 연동] 진짜 솔레노이드밸브(컴프레서 연동, P/A포트)"도 예제 갤러리에 추가했습니다.',
+        '[valve-single/valve-double 설명 보강] 위 혼동을 막기 위해, 기존 편솔/양솔밸브(valve-single/valve-double)의 "?" 도움말에 "⚠ 이 밸브는 P 포트 없이 코일이 여자되는 즉시 A(/B)에 자동으로 에어를 생성함 — 컴프레서 등 실제 공급압에 의존하지 않음"이라는 안내를 명확히 추가하고, 실제 공급압에 의존하는 PLC용 대체 부품(위 신규 2종)을 안내하도록 했습니다. (검토 결과 이렇게 자체적으로 공기를 만들어내는 부품은 valve-single/valve-double 두 개뿐이며, 다른 모든 밸브·부품은 이미 실제 P 포트 공급압에 의존하도록 되어 있습니다.)'],
+    en:['[2 new real solenoid+P/A-port valves] In response to a question about why a cylinder kept moving even with the compressor off when wired service-unit(compressor)→single-solenoid-valve(valve-single)→cylinder — because that valve self-generates its own pressure — added a "3/2-Way Solenoid Spring-Return Valve (PLC, N/C)" and a "5/2-Way Double-Solenoid Valve (PLC)" to the ⑨ Pneumatic Parts (Standard) palette. Both are driven directly by a PLC output via a 24V DC SOL(+/-) coil, but — just like the existing pilot/manual valves — only pass pressure to A/B when they actually receive real compressed air at their P port: with the compressor off, energizing the coil does nothing. Also added a new example, "㉔ [Pneumatic+PLC] Real solenoid valve wired to a real compressor (P/A ports)", showing how to wire and use it.',
+        '[Clarified valve-single/valve-double help text] To prevent the same confusion, the "?" help text for the existing valve-single/valve-double now clearly states "⚠ This valve has no P port — it automatically generates air at A(/B) the instant its coil is energized, independent of any real supply pressure such as a compressor," and points to the new PLC-oriented alternatives above for supply-dependent behavior. (A review confirmed valve-single/valve-double are the only two self-generating parts in the simulator — every other valve/part already depends on real P-port supply pressure.)'] } },
+  { ver:'Ver0.87', items:{
+    ko:['[배선 교차 타넘기] 아두이노 시뮬레이터와 동일하게, 배선 두 개가 화면상에서 서로 교차하면 나중에 만든 배선이 먼저 있던 배선 위로 작은 반원을 그리며 타고 넘어가는 모양으로 표시됩니다(실제 배선판에서 서로 닿지 않고 지나가는 전선을 표현하는 관례). 같은 핀에서 실제로 만나는 진짜 전기적 연결점은 타넘기로 그려지지 않으니 안심하세요.'],
+    en:['[Wire crossing hops] Just like the Arduino simulator, when two wires cross on screen, the more recently drawn one now hops over the earlier one with a small semicircular arc (the usual drafting convention for wires that pass without touching). A genuine electrical connection point, where wires actually meet at the same pin, is never drawn as a hop.'] } },
+  { ver:'Ver0.86', items:{
+    ko:['[전동 실린더 3종 추가] “공압/유압 실린더는 있는데 전동 실린더는 없나요?”라는 질문에 따라 ④ 공압/구동 액추에이터 팔레트에 전동 실린더(모터 구동) 3종을 추가했습니다. 공압/유압 실린더와 동일한 몸통+로드 그래픽과 몸통 위의 리밋스위치(LSR/LSE) 드래그 기능을 그대로 쓰지만, 압축공기/오일 대신 전기 신호로 직접 구동됩니다. ① 전동실린더(On-Off): COM(-)/FWD(+)/REV(+) 3핀으로 단순히 정회전/역회전 신호만 걸어주면 끝까지 이동하는 가장 기본형(밸브 코일처럼 COM+FWD 또는 COM+REV가 함께 여자되어야 동작). ② 전동실린더(정역+속도 아날로그출력): 배선은 ①과 동일하고 AO 단자가 추가되어, 모터가 돌고 있을 때 100%, 정지해 있을 때 0%인 아날로그 값을 PLC의 AI0/AI1에 보낼 수 있습니다(실제 아날로그 I/O 모듈처럼 한 스캔 지연되어 반영됩니다). ③ 전동실린더(서보, 펄스-방향): 기존 서보/스텝(servo-pulse) 부품과 동일하게 PULSE/DIR 입력으로 위치를 제어하되, 부품 위에서 “총펄스”(완전후진↔완전전진 간 필요한 펄스 수)를 직접 설정해 실린더처럼 몸통+로드가 실제로 이동하는 모습을 눈으로 확인할 수 있습니다. 세 종류 모두 ④ 공압/구동 액추에이터 팔레트에 추가되었습니다'],
+    en:['[3 new electric cylinders] In response to “there are pneumatic/hydraulic cylinders — isn\'t there an electric cylinder too?”, added 3 motor-driven electric cylinders to the ④ Pneumatic/Drive Actuators palette. They reuse the same body+rod graphic and the draggable body-mounted limit-switch (LSR/LSE) feature as the pneumatic/hydraulic cylinders, but are driven directly by electrical signals instead of air/oil. ① Electric Cylinder (On-Off): the simplest form — just 3 pins, COM(-)/FWD(+)/REV(+); energizing COM+FWD or COM+REV alone drives it all the way to the end (like a valve coil, both terminals of a direction must be energized together). ② Electric Cylinder (Fwd/Rev + Analog Speed Output): same wiring as ① plus an AO terminal that sends 100% while the motor is running and 0% when stopped to the PLC\'s AI0/AI1 (reflected with a one-scan delay, like a real analog I/O module). ③ Electric Cylinder (Servo, Pulse-Dir): position-controlled via PULSE/DIR inputs like the existing servo/stepper (servo-pulse) part, but you can set a "Total Pulses" value directly on the part so you can watch the body+rod actually travel as pulses accumulate. All three were added to the ④ Pneumatic/Drive Actuators palette'] } },
   { ver:'Ver0.85', items:{
     ko:['[\uBC30\uC120 \uAE30\uBCF8\uC0C9 \uC790\uB3D9 \uC9C0\uC815] \uC0C8\uB85C \uBC30\uC120\uC744 \uC5F0\uACB0\uD560 \uB54C \uC5B4\uB290 \uCABD \uB2E8\uC790\uAC00 VCC/\uC804\uC6D0(+)\uC778\uC9C0, GND/0V(-)\uC778\uC9C0\uC5D0 \uB530\uB77C \uBC30\uC120 \uC0C9\uC774 \uC790\uB3D9\uC73C\uB85C \uC815\uD574\uC9D1\uB2C8\uB2E4 \u2014 VCC\u00B7\uC804\uC6D0 \uCABD\uC5D0 \uB2FF\uC73C\uBA74 \uBE68\uAC15, GND\u00B70V(-) \uCABD\uC5D0 \uB2FF\uC73C\uBA74 \uD68C\uC0C9\uC774 \uAE30\uBCF8\uC0C9\uC73C\uB85C \uBD99\uC2B5\uB2C8\uB2E4(\uC2E0\uD638\uC120(\uBCF4\uB77C)\u00B7\uACF5\uC555(\uD558\uB298\uC0C9)\u00B7\uC720\uC555(\uD669\uAC08\uC0C9) \uB4F1 \uB2E4\uB978 \uACC4\uD1B5\uC740 \uC774\uC804\uACFC \uB3D9\uC77C). DC 0V(24V-) \uC0C9\uC0C1\uB3C4 \uAE30\uC874 \uD30C\uB791\uC5D0\uC11C AC220 N(\uC911\uC131\uC120)\uACFC \uAC19\uC740 \uD68C\uC0C9 \uACC4\uC5F4\uB85C \uD1B5\uC77C\uD588\uC2B5\uB2C8\uB2E4. \uBB3C\uB860 \uBC30\uC120\uC744 \uD074\uB9AD\uD574 \uB728\uB294 \uC0C9\uC0C1 \uD3B8\uC9D1\uAE30\uB85C \uC5B8\uC81C\uB4E0 \uC6D0\uD558\uB294 \uC0C9\uC73C\uB85C \uBC14\uAFC0 \uC218 \uC788\uC73C\uBA70, \uC774\uB294 \uADF8 \uAE30\uBCF8\uAC12\uB9CC \uBC14\uAFB8 \uAC83\uC785\uB2C8\uB2E4'],
     en:['[Automatic default wire color] When you connect a new wire, its color is now chosen automatically based on which side is VCC/power(+) versus GND/0V(-) \u2014 touching a VCC/power terminal defaults to red, touching a GND/0V(-) terminal defaults to gray (other systems like signal (purple), pneumatic (sky blue), hydraulic (tan) are unchanged). DC 0V (24V-) has also been recolored from blue to the same gray used for AC220 N (neutral), for consistency. You can still change any wire\'s color anytime via the color editor opened by clicking it \u2014 this only changes the starting default'] } },
@@ -8619,6 +8909,40 @@ const EXAMPLE_DEFS = [
       if (loadChk) loadChk.checked = true;
       $all('.placed-component').forEach(c => refreshComponentLabel(c.id));
       return psu;
+    } },
+  { nameKo:'㉔ [공압+PLC 연동] 진짜 솔레노이드밸브(컴프레서 연동, P/A포트)', nameEn:'㉔ [Pneumatic+PLC] Real solenoid valve wired to a real compressor (P/A ports)', category:'pneu',
+    descKo:'PLC 출력(Y0)이 3/2 솔레노이드밸브(pn-32-solenoid-spring)의 코일을 직접 여자시켜 실린더를 전진시키는 회로입니다. valve-single(편솔밸브)과 달리 이 밸브는 P 포트로 실제 압축공기를 받아야만 A로 압력을 내보냅니다 — 서비스 유니트(컴프레서)의 "▶ 가동" 버튼을 눌러보기 전(꺼진 상태)에는 PLC가 코일을 여자시켜도(램프는 켜져도) 실린더가 전혀 움직이지 않는 것을 먼저 확인한 뒤, 컴프레서를 켜고 다시 기동버튼을 눌러 차이를 비교해 보세요.',
+    descEn:'A circuit where PLC output Y0 directly energizes the coil of a 3/2 solenoid valve (pn-32-solenoid-spring) to extend a cylinder. Unlike valve-single, this valve only sends pressure to A when it actually receives compressed air at P — with the service unit (compressor) left OFF at start, try the start button first and see the cylinder stay put even while the PLC energizes the coil (the lamp still lights); then turn the compressor on and try again to see the difference.',
+    build(plcType){
+      document.getElementById('projectNameInput').value = currentLang==='en' ? 'Real Solenoid Valve + Compressor Example' : '진짜 솔레노이드밸브+컴프레서 연동 예제';
+      const plc = spawnComponent(plcType, 60, 60); document.getElementById(plc).dataset.label = 'PLC1';
+      const psu = spawnComponent('psu24v', 60, 340); document.getElementById(psu).dataset.label = 'PSU1';
+      const svc = spawnComponent('pn-service', 340, 340); document.getElementById(svc).dataset.label = 'SVC1(컴프레서)';
+      const gauge = spawnComponent('pn-gauge', 340, 500); document.getElementById(gauge).dataset.label = 'GAUGE1';
+      const pb1 = spawnComponent('pb-start', 340, 60); document.getElementById(pb1).dataset.label = 'PB1(기동)';
+      const v1 = spawnComponent('pn-32-solenoid-spring', 620, 200); document.getElementById(v1).dataset.label = 'VALVE1(솔레노이드)';
+      const cyl1 = spawnComponent('cyl-single', 900, 60); document.getElementById(cyl1).dataset.label = 'CYL1';
+
+      wireDirect(psu+'_OUTP', plc+'_24P'); wireDirect(psu+'_OUTN', plc+'_24N'); wireDirect(psu+'_OUTN', plc+'_COM');
+      wireDirect(psu+'_OUTP', svc+'_INP'); wireDirect(psu+'_OUTN', svc+'_INN');
+      wireDirect(svc+'_P', gauge+'_P');
+      wireDirect(svc+'_P', v1+'_P'); // 컴프레서(서비스유니트)의 실제 공급압을 밸브 P에 배선 — 이게 핵심
+      wireDirect(v1+'_A', cyl1+'_A');
+      wireDirect(psu+'_OUTN', v1+'_COILN');
+      wireDirect(plc+'_Y0', v1+'_COILP');
+      wireDirect(psu+'_OUTP', pb1+'_COM'); wireDirect(pb1+'_NO', plc+'_X1');
+      wireDirect(psu+'_OUTP', cyl1+'_LSE_COM'); wireDirect(cyl1+'_LSE_NO', plc+'_X0');
+
+      // 컴프레서는 일부러 꺼진 채로 시작합니다 — 예제 ㉑과 달리 자동으로 켜두지 않아,
+      // 사용자가 직접 "실제 공급압이 없으면 안 움직인다"는 차이를 체험하도록 합니다.
+      const prog = getPlcProg(plc);
+      prog.activeProgramIndex = 0;
+      prog.programs = [{ name:'Main', rungs: [
+        { groups:[[{addr:'X1',neg:false}]], coil:{type:'SET', addr:'Y0', preset:0} }, // 기동 -> 밸브 코일 여자(전진 시도)
+        { groups:[[{addr:'X0',neg:false}]], coil:{type:'RST', addr:'Y0', preset:0} }, // 전진완료(LSE) -> 밸브 소자(스프링 복귀)
+      ] }];
+      $all('.placed-component').forEach(c => refreshComponentLabel(c.id));
+      return plc;
     } },
 ];
 function openExampleGallery(){
