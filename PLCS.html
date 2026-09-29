@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>K군의 PLC 시뮬레이터 Ver0.88</title>
+<title>K군의 PLC 시뮬레이터 Ver0.90</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -764,7 +764,7 @@
   <div class="brand">
     <div class="brand-mark">P1</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.88</b>
+      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.90</b>
       <span data-i18n="brand.subtitle">Multi-Vendor PLC / HMI Virtual Commissioning</span>
     </div>
   </div>
@@ -947,11 +947,11 @@
    에이전트·실제 산업통신 프로토콜은 다음 버전으로 미룹니다(팔레트에는 자리를 잡아
    두고 "다음 버전에서 지원" 안내만 뜨게 해 확장 지점을 명확히 남겨둡니다).
    ============================================================ */
-const APP_VERSION = 'Ver0.88';
+const APP_VERSION = 'Ver0.90';
 
 /* ---------------- i18n ---------------- */
 const STRINGS = {
-  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.88", en: "K's PLC Simulator Ver0.88" },
+  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.90", en: "K's PLC Simulator Ver0.90" },
   "brand.subtitle": { ko: "Multi-Vendor PLC / HMI Virtual Commissioning", en: "Multi-Vendor PLC / HMI Virtual Commissioning" },
   "toolbar.newProject": { ko: "🆕 새 프로젝트", en: "🆕 New Project" },
   "toolbar.projectNameTitle": { ko: "프로젝트 이름", en: "Project name" },
@@ -1873,6 +1873,44 @@ function pointToSegmentDistance(p, a, b){
   t = Math.max(0, Math.min(1, t));
   return Math.hypot(p.x - (a.x+t*dx), p.y - (a.y+t*dy));
 }
+// [Ver0.89] 배선을 꺾는 점(분할용 동그라미 핸들)이 부품 몸체 내부에 놓이지 않도록, 겹치는
+// 부품이 있으면 그 부품 바깥(가장 가까운 변 + 여백)으로 밀어냅니다 — 더블클릭으로 새 점을
+// 추가할 때와, 이미 있는 점을 손으로 드래그해 옮길 때 둘 다에 적용합니다. 아두이노
+// 시뮬레이터의 wireObstacleBoxes() 전선-부품 겹침 방지와 같은 방식입니다. 이 배선 자신의
+// 양 끝이 속한 부품(excludeEls)은 당연히 검사 대상에서 제외합니다 — 안 그러면 핀 바로
+// 옆으로 붙는 정상적인 점까지 밀려나 버립니다.
+const WIRE_POINT_AVOID_MARGIN = 6;
+function wireComponentBoxes(excludeEls){
+  const inner = document.getElementById('canvasInner');
+  const innerRect = inner.getBoundingClientRect();
+  const boxes = [];
+  $all('.placed-component').forEach(el => {
+    if (excludeEls && excludeEls.includes(el)) return;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    boxes.push({
+      x1: (r.left - innerRect.left) / zoomLevel, y1: (r.top - innerRect.top) / zoomLevel,
+      x2: (r.right - innerRect.left) / zoomLevel, y2: (r.bottom - innerRect.top) / zoomLevel
+    });
+  });
+  return boxes;
+}
+function pushPointOutOfComponents(p, excludeEls){
+  const boxes = wireComponentBoxes(excludeEls);
+  boxes.forEach(b => {
+    if (p.x > b.x1 && p.x < b.x2 && p.y > b.y1 && p.y < b.y2){
+      const margin = WIRE_POINT_AVOID_MARGIN;
+      const dl = p.x - (b.x1 - margin), dr = (b.x2 + margin) - p.x;
+      const dt = p.y - (b.y1 - margin), db = (b.y2 + margin) - p.y;
+      const minD = Math.min(dl, dr, dt, db);
+      if (minD === dl) p.x = b.x1 - margin;
+      else if (minD === dr) p.x = b.x2 + margin;
+      else if (minD === dt) p.y = b.y1 - margin;
+      else p.y = b.y2 + margin;
+    }
+  });
+  return p;
+}
 function addWirePointTo(w, x, y){
   const pa = pinCenter(w.from), pb = pinCenter(w.to);
   const pts = wireFullPoints(w, pa, pb);
@@ -1881,7 +1919,10 @@ function addWirePointTo(w, x, y){
     const d = pointToSegmentDistance({x,y}, pts[i], pts[i+1]);
     if (d < bestDist){ bestDist = d; bestIdx = i; }
   }
-  w.points.splice(bestIdx, 0, {x,y});
+  const ownerA = w.from && w.from.closest('.placed-component');
+  const ownerB = w.to && w.to.closest('.placed-component');
+  const pt = pushPointOutOfComponents({x,y}, [ownerA, ownerB].filter(Boolean));
+  w.points.splice(bestIdx, 0, pt);
   updateAllWires();
 }
 function removeWirePointAt(w, index){
@@ -1951,7 +1992,12 @@ function updateAllWires(){
               if (Math.abs(y-pp.y) < SNAP) y = pp.y;
             });
           }
-          wireObj.points[idx] = { x, y };
+          // [Ver0.89] 이 점을 드래그해 부품 몸체 안으로 끌고 가려 해도, 그 부품 바깥으로
+          // 튕겨 나오도록 보정합니다(자기 자신의 양 끝 핀이 속한 부품은 제외).
+          const ownerA2 = wireObj.from && wireObj.from.closest('.placed-component');
+          const ownerB2 = wireObj.to && wireObj.to.closest('.placed-component');
+          const fixed = pushPointOutOfComponents({x,y}, [ownerA2, ownerB2].filter(Boolean));
+          wireObj.points[idx] = fixed;
           updateAllWires();
         }
         function onUp(){
@@ -4846,8 +4892,8 @@ const DV_OPTS = {
 const COMPONENT_DEFS = {
   'plc-ls':   { type:'plc-ls', cat:'plc', icon:'🖥️', label:{ko:'LS ELECTRIC PLC (XGB)', en:'LS ELECTRIC PLC (XGB)'}, render:plcRender, contributeOutputSource:plcContributeOutputSource, updateVisual:plcUpdateVisual },
   'plc-mit':  { type:'plc-mit', cat:'plc', icon:'🖥️', label:{ko:'Mitsubishi PLC (MELSEC)', en:'Mitsubishi PLC (MELSEC)'}, render:plcRender, contributeOutputSource:plcContributeOutputSource, updateVisual:plcUpdateVisual },
-  'plc-siemens': { type:'plc-siemens', cat:'plc', icon:'🖥️', label:{ko:'Siemens PLC (S7-1200)', en:'Siemens PLC (S7-1200)'}, render:plcRender },
-  'plc-omron': { type:'plc-omron', cat:'plc', icon:'🖥️', label:{ko:'Omron PLC (Sysmac)', en:'Omron PLC (Sysmac)'}, render:plcRender },
+  'plc-siemens': { type:'plc-siemens', cat:'plc', icon:'🖥️', label:{ko:'Siemens PLC (S7-1200)', en:'Siemens PLC (S7-1200)'}, render:plcRender, contributeOutputSource:plcContributeOutputSource, updateVisual:plcUpdateVisual },
+  'plc-omron': { type:'plc-omron', cat:'plc', icon:'🖥️', label:{ko:'Omron PLC (Sysmac)', en:'Omron PLC (Sysmac)'}, render:plcRender, contributeOutputSource:plcContributeOutputSource, updateVisual:plcUpdateVisual },
 
   'psu24v': { type:'psu24v', cat:'power', icon:'🔌', label:{ko:'24V DC SMPS', en:'24V DC SMPS'}, render:psu24vRender, updateVisual:psu24vUpdateVisual },
   'reg5v':  { type:'reg5v', cat:'power', icon:'🔋', label:{ko:'5V 레귤레이터', en:'5V Regulator'}, render:reg5vRender, updateVisual:reg5vUpdateVisual, contributeSource:reg5vContributeSource },
@@ -7740,6 +7786,22 @@ function handleProjectFileSelected(input){
 
 /* ---------------- 릴리즈 노트 ---------------- */
 const RELEASE_NOTES = [
+  { ver:'Ver0.90', items:{
+    ko:[
+      '[버그수정] Siemens · Omron PLC가 래더에서 출력(Y)을 켜도 실제로는 코일이나 램프 등 부하에 전기가 전달되지 않고(POWER/RUN LED도 켜지지 않고) 아날로그 입력(AI0/AI1)도 갱신되지 않던 문제를 고쳤습니다 — LS · Mitsubishi PLC에만 연결돼 있던 내부 연결 고리가 두 벤더에는 빠져 있던 것이 원인이었습니다. 이 때문에 Siemens/Omron PLC로 만든 프로젝트에서 밸브·모터·램프 등이 전혀 움직이지 않았다면 이번 업데이트로 정상 동작합니다.',
+    ],
+    en:[
+      '[Bug fix] Fixed Siemens and Omron PLCs: turning an output (Y) ON in the ladder program was not actually delivering power to coils/lamps/etc. wired to it (and the POWER/RUN status LEDs never lit, and AI0/AI1 analog inputs never updated) — the internal wiring that LS and Mitsubishi PLCs already had was missing for these two vendors. If a Siemens/Omron-based project had valves, motors, or lamps that simply never moved, this update fixes that.',
+    ],
+  } },
+  { ver:'Ver0.89', items:{
+    ko:[
+      '배선을 꺾을 때(더블클릭으로 점 추가) 또는 그 점을 손으로 드래그해 옮길 때, 점이 다른 부품의 몸체 안쪽으로 들어가지 않도록 항상 부품 바깥(가장 가까운 변 + 여백)으로 밀려나게 개선했습니다 — 점이 부품 뒤에 숨어 손으로 다시 집기 어려워지는 문제를 방지합니다.',
+    ],
+    en:[
+      'When bending a wire (double-click to add a point) or dragging an existing bend point, the point is now always pushed outside any component body it would otherwise land inside (to the nearest edge, with a small margin) — this prevents a point from hiding behind a component where it becomes hard to grab again.',
+    ],
+  } },
   { ver:'Ver0.88', items:{
     ko:['[진짜 솔레노이드+P/A포트 밸브 2종 추가] 서비스유니트(컴프레서)→편솔밸브(valve-single)→실린더로 배선해도 밸브가 자체적으로 압력을 만들어내서, 컴프레서를 꺼도 실린더가 멈추지 않는 문제에 대한 질문에 따라, ⑨ 공압 부품(표준형) 팔레트에 "3/2-WAY 솔레노이드 스프링복귀형 밸브(PLC용, N/C)"와 "5/2-WAY 양솔레노이드 밸브(PLC용)"를 추가했습니다. 두 부품 모두 SOL(+/-) 코일에 24V DC를 걸어 PLC 출력으로 직접 제어하면서도, 기존 파일럿/수동 밸브들과 동일하게 P 포트로 실제 압축공기를 받아야만 A/B로 압력이 전달되는 "진짜" 밸브입니다 — 컴프레서가 꺼져 있으면 코일을 아무리 여자시켜도 실린더가 움직이지 않습니다. 사용법을 보여주는 예제 "㉔ [공압+PLC 연동] 진짜 솔레노이드밸브(컴프레서 연동, P/A포트)"도 예제 갤러리에 추가했습니다.',
         '[valve-single/valve-double 설명 보강] 위 혼동을 막기 위해, 기존 편솔/양솔밸브(valve-single/valve-double)의 "?" 도움말에 "⚠ 이 밸브는 P 포트 없이 코일이 여자되는 즉시 A(/B)에 자동으로 에어를 생성함 — 컴프레서 등 실제 공급압에 의존하지 않음"이라는 안내를 명확히 추가하고, 실제 공급압에 의존하는 PLC용 대체 부품(위 신규 2종)을 안내하도록 했습니다. (검토 결과 이렇게 자체적으로 공기를 만들어내는 부품은 valve-single/valve-double 두 개뿐이며, 다른 모든 밸브·부품은 이미 실제 P 포트 공급압에 의존하도록 되어 있습니다.)'],
