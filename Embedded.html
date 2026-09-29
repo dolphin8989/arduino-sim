@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9994</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9995</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1140,6 +1140,21 @@
   .reg-warn.show{visibility:visible;}
   .comp-cccv .comp-pin-row, .comp-buck .comp-pin-row{flex-wrap:wrap; gap:5px 7px; justify-content:center;}
 
+  /* ---------- 🔌 2핀 DC 충전 단자(충전기) ---------- */
+  .comp-chargeport{width:172px; padding:11px; background:linear-gradient(160deg,#2c220f,#181209); border:1px solid #4a3a1a; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
+  .chargeport-jack{font-size:1.5rem; margin:2px 0 6px;}
+  .comp-chargeport .reg-row input[type="range"]{accent-color:#ffb454;}
+  .chargeport-readout{
+    background:#1a1206; border:1px solid #4a3a1a; border-radius:4px; color:#ffb454; font-family:'IBM Plex Mono',monospace;
+    font-size:.7rem; font-weight:600; padding:4px; margin-bottom:7px; text-align:center;
+  }
+  .comp-chargeport .comp-pin-row{flex-wrap:wrap; gap:5px 7px; justify-content:center;}
+  /* 극성 반전·과충전처럼 실제로는 장비가 망가질 수 있는 위험한 배선을 감지하면, 토스트가
+     사라진 뒤에도 계속 알아볼 수 있도록 관련 부품(충전 단자·배터리)에 깜빡이는 빨간 테두리를
+     둡니다(문제가 풀리면 자동으로 사라짐). */
+  .placed-component.charge-mistake{outline:2px solid var(--danger); outline-offset:3px; animation:chargeMistakeBlink 1s ease-in-out infinite;}
+  @keyframes chargeMistakeBlink{0%,100%{outline-color:var(--danger);} 50%{outline-color:transparent;}}
+
   .comp-transistor{width:126px; padding:10px; background:linear-gradient(160deg,#2a3648,#161c26); border:1px solid #3a4a5f; border-radius:9px; text-align:center; box-shadow:0 6px 14px rgba(0,0,0,.35);}
   .transistor-body{width:56px; height:56px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#454b53,#20242a 75%); border:2px solid #575d66; margin:6px auto; position:relative;}
   .transistor-led{width:11px; height:11px; border-radius:50%; background:#3a3a3a; margin:0 auto; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); box-shadow:inset 0 0 3px rgba(0,0,0,.6);}
@@ -1964,7 +1979,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9994</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9995</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -2129,7 +2144,7 @@
       </div>
       <div class="palette-group" data-group="power">
         <div class="palette-group-header" onclick="togglePaletteGroup(this)">
-          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.power">전원 장치</span><span class="pg-count">9</span>
+          <span class="pg-caret">▾</span><span class="pg-name" data-i18n="palette.group.power">전원 장치</span><span class="pg-count">10</span>
         </div>
         <div class="palette-group-body">
           <div class="palette-item" onclick="spawnComponent('psu')">
@@ -2155,6 +2170,10 @@
           <div class="palette-item" onclick="spawnComponent('battery')">
             <div class="swatch"><div style="width:18px;height:24px;border-radius:2px 2px 4px 4px;background:linear-gradient(180deg,#3ddc84,#0b5d3e);border:1px solid #1c3a24;"></div></div>
             <span data-i18n="palette.battery">충전식 배터리<br>(1.5/3.7/9/12/19.6V, 잔량 표시)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('chargeport')">
+            <div class="swatch"><div style="width:22px;height:16px;border-radius:2px;background:#181209;border:1px solid #ffb454;"></div></div>
+            <span data-i18n="palette.chargeport">DC 충전 단자<br>(0~48V 슬라이더, 배터리 충전용)</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('cccv')">
             <div class="swatch"><div style="width:24px;height:18px;border-radius:2px;background:#26303a;border:1px solid #5ad0e6;"></div></div>
@@ -3238,7 +3257,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9994", en: "K's Simulator Ver0.9994" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9995", en: "K's Simulator Ver0.9995" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -3569,6 +3588,13 @@ const STRINGS = {
   "comp.battery.gTitle": { ko: "전지 출력 기준(공통, −)", en: "Battery output reference (common, −)" },
   "bom.battery": { ko: "충전식 배터리", en: "Rechargeable Battery" },
   "palette.battery": { ko: "충전식 배터리<br>(1.5/3.7/9/12/19.6V, 잔량 표시)", en: "Rechargeable Battery<br>(1.5/3.7/9/12/19.6V, shows charge %)" },
+  "comp.chargeport.title": { ko: "DC 충전 단자 (2핀)", en: "DC Charging Port (2-pin)" },
+  "comp.chargeport.vTitle": { ko: "충전 출력 (+)", en: "Charging output (+)" },
+  "comp.chargeport.gTitle": { ko: "충전 출력 기준(−)", en: "Charging output reference (−)" },
+  "bom.chargeport": { ko: "DC 충전 단자", en: "DC Charging Port" },
+  "palette.chargeport": { ko: "DC 충전 단자<br>(0~48V 슬라이더, 배터리 충전용)", en: "DC Charging Port<br>(0~48V slider, for charging a battery)" },
+  "toast.batteryOvercharge": { ko: "배터리 정격보다 지나치게 높은 전압으로 충전 중입니다 — 과열·폭발 위험!", en: "Charging at a voltage far above the battery's rating — risk of overheating or explosion!" },
+  "toast.chargeportReversed": { ko: "충전 단자의 +/−가 배터리와 반대로(극성 반전) 연결되었습니다 — 배선을 확인하세요!", en: "The charging port's +/− is wired reversed relative to the battery — check the polarity!" },
   "comp.cccv.title": { ko: "CC/CV 충전기 모듈", en: "CC/CV Charger Module" },
   "comp.cccv.voltLabel": { ko: "출력 전압", en: "Output voltage" },
   "comp.cccv.currentLabel": { ko: "전류 제한(CC)", en: "Current limit (CC)" },
@@ -4183,7 +4209,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9994", en: "K's Arduino Simulator Ver0.9994" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9995", en: "K's Arduino Simulator Ver0.9995" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -7448,6 +7474,9 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9995', ko: [
+      '🔌 [2핀 DC 충전 단자 추가] "전원 장치" 팔레트에 실생활의 배럴잭/2핀 충전 커넥터를 단순화한 "DC 충전 단자" 부품을 새로 넣었습니다. 슬라이더(또는 숫자 직접입력)로 0~48V를 자유롭게 고르고, +/−를 충전식 배터리의 +/−에 연결하면 기존 배터리의 RC 충전곡선 로직이 그대로 동작해 전압이 서서히 그 값을 향해 차오르는 걸 볼 수 있습니다. 안전 교육을 위해 두 가지 실수를 즉시 감지해 경고합니다: ① 극성을 반대로 연결(+↔−)하면 토스트 메시지와 함께 충전 단자·배터리 둘 다에 빨간 테두리가 깜빡입니다(올바르게 고치면 자동으로 사라짐). ② 배터리 정격보다 지나치게 높은 전압(정격의 150% 이상)으로 충전을 시도하면 "과열·폭발 위험" 경고가 뜹니다(기존처럼 실제 충전 전압 자체는 정격의 110%를 넘지 않게 클램프됩니다). 둘 다 배선을 고치면 다시 잘못 연결했을 때 재차 경고가 뜹니다.',
+  ]},
   { ver: 'Ver0.9994', ko: [
       '🔌 [모터 드라이버 2종 + IMU 센서 추가] 사진으로 보내주신 실제 모듈 3개(HW-039/IBT_2, OUT1~4 스크류터미널의 듀얼 드라이버, MPU-6050/GY-521)의 핀맵을 그대로 찾아 부품 상자에 추가하고 실제로 동작하게 만들었습니다. ① "모터 드라이버(BTS7960/IBT-2, 43A)" — 실제 HW-039 보드 실크스크린 그대로 VCC/GND(로직 5V)·R_EN/RPWM(정회전)·L_EN/LPWM(역회전)·R_IS/L_IS(전류감지, 표시만)와 모터 전원용 B+/B-, 모터 출력용 M+/M-를 갖습니다. R_EN+RPWM이 함께 HIGH면 정회전, L_EN+LPWM이 함께 HIGH면 역회전, 둘 다 켜면 안전하게 정지합니다. ② "모터 드라이버(7A 2채널, 160W)" — 사진 속 보드와 같은 L298 로직 호환 듀얼 채널 드라이버로, 9-24V/PGND 전원 아래 A채널(ENA/IN1/IN2→OUT1/OUT2)과 B채널(ENB/IN3/IN4→OUT3/OUT4)을 독립 제어합니다. 기존 motordriver2와 달리 채널마다 방향 핀이 IN1+IN2 두 개라, 실제 L298처럼 IN a=H+IN b=L 정회전 / 반대면 역회전 / 둘이 같으면 정지(브레이크)로 동작합니다. ③ "6축 IMU(MPU-6050/GY-521)" — 기존에 따로 있던 "3축 자이로 센서"와 "3축 가속도 센서"를 한 부품 안에 합쳐, VCC/GND/SCL/SDA 배선 하나로 자이로(gX/gY/gZ)와 가속도(aX/aY/aZ) 값을 함께 읽을 수 있습니다(기존 자이로/가속도 블록·Gyroscope/Accelerometer 클래스가 코드 수정 없이 이 부품 하나로도 그대로 동작). 실제 보드에 있는 XDA/XCL(보조 I2C)·AD0(주소선택)·INT(인터럽트) 핀도 배선 참고용으로 함께 넣었습니다(값 시뮬레이션은 하지 않음)',
   ]},
@@ -9370,6 +9399,30 @@ function spawnComponent(type, dropX, dropY){
       <div class="comp-pin-row">
         <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.battery.vTitle" title="전지 출력 (+)"></div><span class="pin-cap cap-vcc">+</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.battery.gTitle" title="전지 출력 기준(공통, −)"></div><span class="pin-cap cap-gnd">−</span></div>
+      </div>`;
+  } else if (type === 'chargeport'){
+    // 2핀 DC 충전 단자 — 실생활에서 흔히 보는 배럴잭/2핀 충전 커넥터를 단순화한 "충전기"
+    // 부품입니다. comp-psu + dataset.mode='chargeport'로 기존 PSU 인프라(psuSourceParams 등)를
+    // 재사용해 전원 역할을 하되, 벤치 전원 공급기·소금물 전지처럼 별도 on/off 스위치 없이 늘
+    // 켜져 있는 "이미 꽂혀 있는 충전기"로 취급합니다(psu-switch가 항상 on). 전압은 0~48V
+    // 슬라이더(+숫자 직접입력)로 자유롭게 고릅니다. 충전식 배터리(comp-battery)의 V/G에
+    // 물리면 batteryTickUpdate()의 기존 RC 충전곡선 로직이 그대로 동작해 전압이 서서히
+    // 차오르는 걸 볼 수 있고, checkChargeportMistakes()가 매 틱 극성 반전·과전압(과충전)
+    // 배선을 감지해 토스트+테두리로 즉시 경고합니다.
+    div.classList.add('comp-psu', 'comp-chargeport');
+    div.dataset.mode = 'chargeport';
+    div.innerHTML = `
+      <div class="psu-title" data-i18n="comp.chargeport.title">DC 충전 단자 (2핀)</div>
+      <div class="chargeport-jack">🔌</div>
+      <div class="reg-row">
+        <input type="range" min="0" max="48" step="0.1" value="5" class="chargeport-volt" id="${id}_volt" oninput="chargeportSliderInput('${id}')">
+        <input type="number" min="0" max="48" step="0.1" value="5" class="chargeport-volt-num" id="${id}_voltnum" oninput="chargeportNumberInput('${id}')">
+      </div>
+      <div class="chargeport-readout" id="${id}_readout">5.0 V</div>
+      <div class="psu-switch on" id="${id}_switch"><div class="knob"></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.chargeport.vTitle" title="충전 출력 (+)"></div><span class="pin-cap cap-vcc">+</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" data-i18n-title="comp.chargeport.gTitle" title="충전 출력 기준(−)"></div><span class="pin-cap cap-gnd">−</span></div>
       </div>`;
   } else if (type === 'cccv'){
     // CC/CV(정전류/정전압) 충전기 모듈 — VIN+/VIN-는 변압기의 P1/P2와 완전히 같은 "측정 전용"
@@ -12041,6 +12094,7 @@ function updateDiodeVisual(el){
 const BATTERY_CHARGE_TAU_SEC = 6; // 충전 전압이 목표치의 상당 부분까지 다가가는 데 걸리는 대략적인 시간(초) — 교육용 데모 속도
 const BATTERY_TICK_SEC = 0.025; // runTick 물리 틱 간격(25ms)과 동일하게 맞춤
 const BATTERY_OVERCHARGE_CAP = 1.1; // 정격의 110%를 넘는 과충전은 흔한 배터리 보호회로처럼 상한을 둡니다(교육용 단순화)
+const BATTERY_OVERCHARGE_WARN_RATIO = 1.5; // 정격의 150%를 넘는 전압이 실제로 걸리고 있으면(예: 3.7V 셀에 12V+) 위 상한 클램프와는 별개로 "지금 위험한 전압이 걸려 있다" 자체를 즉시 경고
 function batteryRatedVoltChanged(id){
   const el = document.getElementById(id);
   if (!el) return;
@@ -12081,6 +12135,21 @@ function batteryTickUpdate(el){
     el.dataset.chargeVoltage = String(chargeV);
   }
   updateBatteryReadout(el);
+  // [Ver0.9995] 과충전 경고 — 정격의 BATTERY_OVERCHARGE_WARN_RATIO배를 넘는 전압이 지금 실제로
+  // 걸려 있으면(충전 단자를 너무 높은 전압으로 맞췄거나 잘못된 충전기를 물린 경우) 위 110%
+  // 상한 클램프와는 별개로 그 사실 자체를 경고합니다. dataset.overchargeWarn은 checkChargeportMistakes()가
+  // 같은 틱 안에서 극성 반전 여부와 함께 묶어 charge-mistake 시각 표시를 최종 결정하는 데 씁니다.
+  const overcharging = applied > rated * BATTERY_OVERCHARGE_WARN_RATIO;
+  if (overcharging){
+    if (el.dataset.overchargeWarn !== '1'){
+      spawnShortSpark(el);
+      showToast(tr('toast.batteryOvercharge'), true);
+      logSerial(`[${tr('comp.battery.title')}] ${tr('toast.batteryOvercharge')}`, 'both');
+    }
+    el.dataset.overchargeWarn = '1';
+  } else {
+    el.dataset.overchargeWarn = '0';
+  }
 }
 // 배터리 2개를 쇼트키 다이오드나 저항 없이(=netOf()로 직결, 즉 순수 전선/브레드보드 버스로만
 // 연결) 병렬로 이으면 실제로는 위험한 단락(두 전지의 전압 차만큼 아주 큰 전류가 순간적으로
@@ -12112,6 +12181,75 @@ function checkBatteryParallelShort(){
     }
   }
   batteries.forEach(el => { el.dataset.shorted = shortedNow.has(el) ? '1' : '0'; });
+}
+
+/* ---------- 🔌 2핀 DC 충전 단자(충전기) ---------- */
+function chargeportVoltage(el){
+  const slider = el.querySelector('.chargeport-volt');
+  const v = slider ? parseFloat(slider.value) : 5;
+  return isFinite(v) ? v : 0;
+}
+function updateChargeportReadout(el){
+  const readout = document.getElementById(`${el.id}_readout`);
+  if (readout) readout.textContent = `${chargeportVoltage(el).toFixed(1)} V`;
+}
+function chargeportSliderInput(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const slider = el.querySelector('.chargeport-volt'), num = el.querySelector('.chargeport-volt-num');
+  if (slider && num) num.value = slider.value;
+  updateChargeportReadout(el);
+}
+function chargeportNumberInput(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const slider = el.querySelector('.chargeport-volt'), num = el.querySelector('.chargeport-volt-num');
+  if (slider && num){
+    const min = parseFloat(slider.min), max = parseFloat(slider.max);
+    let v = parseFloat(num.value);
+    if (!isFinite(v)) v = min;
+    v = Math.max(min, Math.min(max, v));
+    num.value = v; slider.value = v;
+  }
+  updateChargeportReadout(el);
+}
+// checkBatteryParallelShort()와 완전히 같은 이유·같은 방식(netOf() 순수 위상 판정)으로, 충전
+// 단자의 +/−가 배터리의 −/+에 거꾸로 물린 "극성 반전"을 감지합니다. (두 전압원이 서로 충돌하는
+// 상황이라 정밀 저항망 솔버의 결과값만으로는 판정이 애매하므로, 배선 그래프 위상만으로
+// 판단합니다.) 과전압(과충전) 자체는 batteryTickUpdate()가 담당하며, 이 함수는 매 틱 그 결과
+// (dataset.overchargeWarn)와 극성 반전 여부를 합쳐 charge-mistake 시각 표시를 최종 결정합니다.
+const CHARGEPORT_REVERSED_WARNED = new Set(); // "포트id__배터리id" 조합별 1회성 경고 디바운스
+function checkChargeportMistakes(){
+  if (!isSimulating) return;
+  const ports = Array.from(document.querySelectorAll('.comp-chargeport'));
+  const batteries = Array.from(document.querySelectorAll('.comp-battery'));
+  const reversedNow = new Set();
+  ports.forEach(port => {
+    const pV = port.querySelector('[data-pin$="_V"]'), pG = port.querySelector('[data-pin$="_G"]');
+    if (!pV || !pG) return;
+    batteries.forEach(bat => {
+      const bV = bat.querySelector('[data-pin$="_V"]'), bG = bat.querySelector('[data-pin$="_G"]');
+      if (!bV || !bG) return;
+      const reversed = netOf(pV).has(bG) && netOf(pG).has(bV);
+      const key = port.id + '__' + bat.id;
+      if (reversed){
+        reversedNow.add(port); reversedNow.add(bat);
+        if (!CHARGEPORT_REVERSED_WARNED.has(key)){
+          CHARGEPORT_REVERSED_WARNED.add(key);
+          spawnShortSpark(port); spawnShortSpark(bat);
+          showToast(tr('toast.chargeportReversed'), true);
+          logSerial(`[${tr('comp.chargeport.title')}] ${tr('toast.chargeportReversed')}`, 'both');
+        }
+      } else {
+        CHARGEPORT_REVERSED_WARNED.delete(key);
+      }
+    });
+  });
+  ports.forEach(p => { p.dataset.reversedWarn = reversedNow.has(p) ? '1' : '0'; p.classList.toggle('charge-mistake', reversedNow.has(p)); });
+  batteries.forEach(b => {
+    b.dataset.reversedWarn = reversedNow.has(b) ? '1' : '0';
+    b.classList.toggle('charge-mistake', reversedNow.has(b) || b.dataset.overchargeWarn === '1');
+  });
 }
 
 // CC/CV 충전기 모듈·DC-DC 벅 컨버터 공용: IN+/IN-(변압기 P1/P2와 같은 "측정 전용" 핀 — 회로에
@@ -13241,6 +13379,7 @@ const COMP_HELP_BLURB = {
   generator:  { ko: '손잡이를 돌리는 속도에 비례해 V/G(GND) 사이에 전압이 발생합니다 — 직류 발전기입니다.', en: 'Cranking the handle generates a voltage across V/G(GND) proportional to crank speed — a simple DC generator.' },
   transformer:{ ko: '1차(입력) 쪽에 AC 전압을 걸면 권수비(N2/N1)만큼 곱해진 전압이 2차(출력) 쪽 V/G에 나타납니다 — DC를 걸면 2차에는 아무것도 나오지 않습니다.', en: 'AC on the primary is scaled by the turns ratio (N2/N1) onto the secondary V/G — DC on the primary yields nothing on the secondary.' },
   battery:{ ko: '+/− 단자로 전원처럼 씁니다. 드롭다운에서 정격 전압(1.5/3.7/9/12/14.8/19.6V — 14.8V는 4S 리튬이온 팩 기준)을 고르세요. +단자에 정격보다 높은 전압(CC/CV 충전기·벅 컨버터·PSU 등)을 걸어두면 서서히 충전되어 표시된 전압·잔량(%)이 오릅니다 — 배터리 2개를 쇼트키 다이오드나 저항 없이 +끼리·−끼리 직결하면(병렬 충전) 위험한 단락으로 판정해 경고합니다.', en: 'Use +/− like any power source. Pick a rated voltage (1.5/3.7/9/12/14.8/19.6V — 14.8V models a 4S Li-ion pack) from the dropdown. Apply a voltage higher than rated to + (from a CC/CV charger, buck converter, PSU, etc.) and it charges gradually, raising the shown voltage/percent — paralleling two batteries +to+/−to− with no Schottky diode or resistor is flagged as a dangerous short.' },
+  chargeport:{ ko: '실생활의 2핀 충전 단자(배럴잭/DC 커넥터 등)를 단순화한 부품입니다. 슬라이더(또는 숫자 입력)로 0~48V를 자유롭게 고르고, +/−를 충전식 배터리의 +/−에 연결하면 그 전압을 향해 서서히 충전되는 모습을 볼 수 있습니다(항상 켜져 있는 "이미 꽂힌 충전기"로 동작). 극성을 반대로 연결하거나(+↔−) 배터리 정격보다 지나치게 높은 전압을 걸면 즉시 경고(토스트+빨간 테두리)가 뜹니다 — 실제로 이런 실수를 하면 배터리가 손상되거나 화재로 이어질 수 있다는 것을 미리 체험해볼 수 있습니다.', en: 'A simplified 2-pin DC charger (barrel jack / DC connector). Freely pick 0~48V with the slider (or the number field); wire +/− to a rechargeable battery\'s +/− to watch it charge gradually toward that voltage (it behaves like an "already plugged-in" charger, always on). Wiring the polarity backwards (+↔−) or setting a voltage far above the battery\'s rating triggers an immediate warning (toast + red outline) — a safe way to preview what happens if you make that mistake with real hardware (battery damage or fire).' },
   cccv:{ ko: 'VIN+/VIN-에 입력 전원(배터리·PSU 등)을 연결하면, 슬라이더로 정한 전압이 VOUT+/VOUT-에 나옵니다(입력 전압을 넘을 수 없음). 전류 제한(CC) 값을 넘는 부하가 걸리면 경고가 뜹니다 — 입력이 없으면 출력도 없습니다.', en: 'Wire a source (battery, PSU, etc.) to VIN+/VIN-; VOUT+/VOUT- outputs the slider-set voltage (never higher than the input). A load past the CC current-limit setting shows a warning — no input means no output.' },
   buck:{ ko: 'IN+/IN-에 입력 전원을 연결하면, 슬라이더로 정한 전압(1.5~24V, 입력 전압을 넘을 수 없음)이 OUT+/OUT-에 나옵니다 — 배터리보다 더 낮은 정전압이 필요한 부하에 씁니다.', en: 'Wire a source to IN+/IN-; OUT+/OUT- outputs the slider-set voltage (1.5~24V, never higher than the input) — use it to step a battery down to a lower fixed voltage for a load.' },
   schottky:{ ko: '일반 다이오드와 같은 A(애노드)→K(캐소드) 한쪽 방향 소자이지만 문턱전압(Vf)이 훨씬 낮습니다(약 0.25V) — 배터리 2개를 병렬로 충전할 때 K쪽을 공통(+) 버스에 물려 각 배터리 사이의 역류(back-feed)를 막는 용도로 씁니다.', en: 'A one-way A(anode)→K(cathode) device like a regular diode, but with a much lower forward voltage (Vf ≈ 0.25V) — put its K side on the shared (+) bus when parallel-charging two batteries to block back-feed current between them.' },
@@ -13571,6 +13710,9 @@ function externalSourceOnNet(pinEl){
         // 충전 전압을 그대로 DC로). CC/CV 충전기·벅 컨버터는 변압기 2차와 같은 방식(입력이
         // 없으면 null=전원 없음)으로, 입력 전압을 클램프한 출력을 냅니다.
         if (psu.dataset.mode === 'battery' && pid.endsWith('_V')) return { type: 'volt', v: batteryVoltage(psu) };
+        // 2핀 DC 충전 단자 — 배터리/코인셀과 같은 방식(늘 켜진 "이미 꽂힌 전원", 슬라이더로
+        // 고른 전압을 그대로 DC로).
+        if (psu.dataset.mode === 'chargeport' && pid.endsWith('_V')) return { type: 'volt', v: chargeportVoltage(psu) };
         if (psu.dataset.mode === 'cccv' && pid.endsWith('_V')){ const v = cccvOutputVoltage(psu); return v == null ? null : { type: 'volt', v }; }
         if (psu.dataset.mode === 'buck' && pid.endsWith('_V')){ const v = buckOutputVoltage(psu); return v == null ? null : { type: 'volt', v }; }
         const m = pid.match(/(_L1|_L2|_L3|_L)$/);
@@ -14470,6 +14612,13 @@ function psuSourceParams(psuEl){
     const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
     if (!hotEl || !gndEl) return null;
     return { knownPairs: [{ el: hotEl, V: cx(batteryVoltage(psuEl), 0) }, { el: gndEl, V: cx(0, 0) }], omega: 0 };
+  }
+  // 2핀 DC 충전 단자 — 소금물 전지/충전식 배터리와 같은 이유(늘 켜져 있는 "이미 꽂힌 전원")로,
+  // 슬라이더로 고른 전압을 그대로 DC로 냅니다.
+  if (mode === 'chargeport'){
+    const hotEl = psuEl.querySelector('[data-pin$="_V"]'), gndEl = psuEl.querySelector('[data-pin$="_G"]');
+    if (!hotEl || !gndEl) return null;
+    return { knownPairs: [{ el: hotEl, V: cx(chargeportVoltage(psuEl), 0) }, { el: gndEl, V: cx(0, 0) }], omega: 0 };
   }
   // 변압기 — 1차에 걸린 실제 교류 전압(측정 전용 P1/P2)에 권수비(N2/N1)를 곱해 2차 출력으로
   // 그대로 냅니다. 1차가 비어있거나 DC(ω=0)면 2차는 전원으로 취급되지 않습니다(null).
@@ -15825,6 +15974,10 @@ function runTick(){
   // 뒤쪽 저항망 계산 전에 최신이어야 합니다.
   document.querySelectorAll('.comp-battery').forEach(batteryTickUpdate);
   checkBatteryParallelShort();
+  // 0-3b-2. [배터리/PMIC] 2핀 충전 단자(comp-chargeport)의 전압 표시를 갱신하고, 배터리와의
+  // 극성 반전 배선을 감지합니다(과전압 자체는 위 batteryTickUpdate가 이미 처리).
+  document.querySelectorAll('.comp-chargeport').forEach(updateChargeportReadout);
+  checkChargeportMistakes();
 
   // 0-3c. [배터리/PMIC] CC/CV 충전기·DC-DC 벅 컨버터의 출력 표시(전압/추정 전류)를 갱신합니다.
   document.querySelectorAll('.comp-cccv, .comp-buck').forEach(updateRegulatorDisplay);
@@ -19836,7 +19989,7 @@ function BOM_LABELS_FN(){ return {
   relay: tr('comp.relay.title'), relay220: tr('bom.relay220'), wallswitch: tr('bom.wallswitch'), benchpsu: tr('bom.benchpsu'),
   ac220: tr('bom.ac220'), ac3phase: tr('bom.ac3phase'), generator: tr('bom.generator'),
   coincell: tr('bom.coincell'), fruitbatt: tr('bom.fruitbatt'), oersted: tr('bom.oersted'),
-  battery: tr('bom.battery'), cccv: tr('bom.cccv'), buck: tr('bom.buck'), schottky: tr('bom.schottky'),
+  battery: tr('bom.battery'), chargeport: tr('bom.chargeport'), cccv: tr('bom.cccv'), buck: tr('bom.buck'), schottky: tr('bom.schottky'),
   diode: tr('bom.diode'), transistor: tr('bom.transistor'),
   transformer: tr('bom.transformer'), parallelwires: tr('bom.parallelwires'),
   electromagnet: tr('bom.electromagnet'), fuse: tr('bom.fuse'),
@@ -19913,7 +20066,7 @@ function schematicKindOf(ownerEl){
   // T1/T2)인 소자만 골라 표준 기호를 추가했습니다 — 모드(DC/AC단상/AC3상)에 따라 핀 구성이
   // 바뀌는 범용 PSU/AC220/3상/변압기는 아직 상자(box)로 남겨둡니다(잘못된 2핀 기호를 붙이면
   // 오히려 더 헷갈리기 때문). 건전지/과일전지/발전기는 항상 V/G 2핀만 있어 안전합니다.
-  if (ownerEl.classList.contains('comp-coincell') || ownerEl.classList.contains('comp-fruitbatt') || ownerEl.classList.contains('comp-generator') || ownerEl.classList.contains('comp-battery')) return 'battery';
+  if (ownerEl.classList.contains('comp-coincell') || ownerEl.classList.contains('comp-fruitbatt') || ownerEl.classList.contains('comp-generator') || ownerEl.classList.contains('comp-battery') || ownerEl.classList.contains('comp-chargeport')) return 'battery';
   if (ownerEl.classList.contains('comp-dcmotor') || ownerEl.classList.contains('comp-fan')) return 'motor';
   return 'box';
 }
@@ -22017,7 +22170,7 @@ function collapseNonBoardPaletteGroupsByDefault(){
  * (buildAiComponentCatalog) — 코드가 바뀌면 카탈로그도 자동으로 같이 바뀌므로, AI가 존재하지
  * 않는 핀 이름을 지어내 배선이 조용히 실패하는 사고를 원천적으로 막습니다.
  * ============================================================================ */
-const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','battselswitch','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','buzzeractive','buzzerpassive','bulb220','camera','canfdmodule','canmodule','capacitor','capacitor-e','cccv','barcodesensor','clampmeter','coincell','colorsensor','contactor','dac','dcmotor','dcmotor-enc','dcmotor-enc2','diode','dsensor-avoid','dsensor-ballswitch','dsensor-digitaltemp','dsensor-flame','dsensor-hallmag','dsensor-irrecv','dsensor-lightblock','dsensor-lightcup','dsensor-minireed','dsensor-reed','dsensor-shock','dsensor-tap','dsensor-tilt','dsensor-touch','dsensor-tracking','electromagnet','eocr','fan','flash7color','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','imu-mpu6050','iremit','joystick','laser','lcd','led','ledlantern','ledtube220','levelshifter','lcdi2c','lidar','mccb','motor3ph','motordriver','motordriver-7a2ch','motordriver-bts7960','motordriver2','motordriverenc','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-anahall','sensor-anatemp','sensor-heartbeat','sensor-humid','sensor-irdist2m','sensor-irdist3cm','sensor-irdist6m','sensor-irdist9m','sensor-ldr','sensor-linhall','sensor-rotary','sensor-soundbig','sensor-soundsm','sensor-temp','sensor-tempmod','sensor-water','servo','smdrgb','speaker','stepper','temphumid','terminalblock','timer','toggleswitch','transformer','transistor','twocolorled','ultrasonic','usbsound','visionsensor','wallswitch','wifiap'];
+const AI_COMPONENT_TYPES = ['a4988','ac220','ac3phase','accel','acmotor','acmotorctrl','auxrelay','battery','battselswitch','benchpsu','bldcdriver','bldcmotor','breadboard','btmodule','btn','buck','buzzeractive','buzzerpassive','bulb220','camera','chargeport','canfdmodule','canmodule','capacitor','capacitor-e','cccv','barcodesensor','clampmeter','coincell','colorsensor','contactor','dac','dcmotor','dcmotor-enc','dcmotor-enc2','diode','dsensor-avoid','dsensor-ballswitch','dsensor-digitaltemp','dsensor-flame','dsensor-hallmag','dsensor-irrecv','dsensor-lightblock','dsensor-lightcup','dsensor-minireed','dsensor-reed','dsensor-shock','dsensor-tap','dsensor-tilt','dsensor-touch','dsensor-tracking','electromagnet','eocr','fan','flash7color','flickerrelay','fruitbatt','fuse','generator','gyro','hdmimonitor','inductor','imu-mpu6050','iremit','joystick','laser','lcd','led','ledlantern','ledtube220','levelshifter','lcdi2c','lidar','mccb','motor3ph','motordriver','motordriver-7a2ch','motordriver-bts7960','motordriver2','motordriverenc','multimeter','oersted','oled','panelboard','parallelwires','pilotlamp','pmsensor','pot','powercable','psu','pushbutton','relay','relay220','resistor','rgbled','rpi3','rpi4','rpi5','rs485module','rs485servo','schottky','scope','selectorswitch','sensor-anahall','sensor-anatemp','sensor-heartbeat','sensor-humid','sensor-irdist2m','sensor-irdist3cm','sensor-irdist6m','sensor-irdist9m','sensor-ldr','sensor-linhall','sensor-rotary','sensor-soundbig','sensor-soundsm','sensor-temp','sensor-tempmod','sensor-water','servo','smdrgb','speaker','stepper','temphumid','terminalblock','timer','toggleswitch','transformer','transistor','twocolorled','ultrasonic','usbsound','visionsensor','wallswitch','wifiap'];
 // ('custom'은 사용자가 직접 그리는 빈 부품이라 AI가 고를 이유가 없어 목록에서 뺐습니다.)
 const AI_BOARD_TYPES = ['r3', 'r4', 'mega', 'esp32b', 'esp32d', 'esp32t'];
 
@@ -22307,6 +22460,16 @@ function applyAiComponentVoltage(item, el){
       slider.value = clamped;
       if (num) num.value = clamped;
       if (typeof updateRegulatorDisplay === 'function') updateRegulatorDisplay(el);
+    }
+  } else if (item.type === 'chargeport'){
+    const slider = el.querySelector('.chargeport-volt');
+    const num = el.querySelector('.chargeport-volt-num');
+    if (slider){
+      const min = parseFloat(slider.min), max = parseFloat(slider.max);
+      const clamped = Math.max(min, Math.min(max, target));
+      slider.value = clamped;
+      if (num) num.value = clamped;
+      if (typeof updateChargeportReadout === 'function') updateChargeportReadout(el);
     }
   }
 }
