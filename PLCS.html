@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>K군의 PLC 시뮬레이터 Ver0.92</title>
+<title>K군의 PLC 시뮬레이터 Ver0.94</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -148,7 +148,7 @@
     background-image:radial-gradient(circle,var(--grid-dot) 1px, transparent 1.2px);
     background-size:22px 22px;
   }
-  .canvas-inner{position:relative; width:2600px; height:1700px; transform-origin:0 0;}
+  .canvas-inner{position:relative; width:5200px; height:3600px; transform-origin:0 0;}
   /* 알루미늄 프로파일 슬라이드 랙 배경 — 실제 FESTO류 실습대처럼 부품이 T슬롯 프로파일 위에
      격자 간격으로 끼워지는 느낌을 흉내낸 순수 시각용 배경(부품 배치/스냅 로직에는 영향 없음). */
   .canvas-area.rack-theme{
@@ -548,6 +548,19 @@
     display:flex; flex-direction:column; transform:translateX(100%); transition:transform .26s ease, width .2s ease;
   }
   .side-drawer.open{transform:translateX(0);}
+  /* [Ver0.93] 래더 편집 창: 왼쪽 가장자리를 끌어 폭 조절, "⬓ 하단 분할"로 화면 아래쪽에 붙여 위아래 분할(위쪽 경계를 끌어 높이 조절) */
+  .ladder-drawer{width:min(1280px,72vw);}
+  .drawer-resizer{position:absolute; left:0; top:0; bottom:0; width:8px; cursor:ew-resize; z-index:8;}
+  .drawer-resizer:hover, .drawer-resizer.dragging{background:rgba(63,208,214,.28);}
+  .side-drawer.dock-bottom{top:auto; left:0; right:0; width:auto !important; height:var(--drawer-h,50vh); border-left:none; border-top:3px solid var(--teal); box-shadow:0 -10px 34px rgba(0,0,0,.55); transform:translateY(100%); transition:transform .26s ease;}
+  .side-drawer.dock-bottom.open{transform:translateY(0);}
+  .side-drawer.dock-bottom.maximized{height:92vh;}
+  .side-drawer.dock-bottom.collapsed{height:auto;}
+  .side-drawer.dock-bottom .drawer-resizer{left:0; right:0; top:0; bottom:auto; width:auto; height:8px; cursor:ns-resize;}
+  .ladder-zoom-wrap{zoom:var(--ladder-zoom,1.3);}
+  .ladder-zoom-ctl{display:inline-flex; align-items:center; gap:4px; margin-left:auto;}
+  .ladder-zoom-ctl .lz-val{min-width:48px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:.85rem; color:#fff;}
+  .ladder-drawer.help-hidden .ladder-legend, .ladder-drawer.help-hidden .ladder-shortcut-hint{display:none;}
   .side-drawer.maximized{width:98vw !important;}
   .side-drawer[hidden]{display:flex !important; transform:translateX(100%); pointer-events:none;}
   .side-drawer[hidden].open{display:flex !important;}
@@ -655,7 +668,7 @@
   .vendor-mit .rail{background:#c65420;}
   .vendor-siemens .rail{background:#00a0e3;}
   .vendor-omron .rail{background:#0aa650;}
-  .rung-num-badge{width:26px; flex:0 0 auto; display:flex; align-items:flex-start; justify-content:center; padding-top:6px; font-size:.68rem; color:#5c6673; cursor:grab; user-select:none; border-radius:4px;}
+  .rung-num-badge{width:26px; flex:0 0 auto; display:flex; align-items:flex-start; justify-content:center; padding-top:6px; font-size:.68rem; color:#2a323d; cursor:grab; user-select:none; border-radius:4px;}
   .rung-num-badge:hover{background:rgba(46,134,222,.12); color:#0d5ab5;}
   .rung-num-badge:active{cursor:grabbing;}
   .rung-diagram.rung-block-selected{background:rgba(46,134,222,.1); box-shadow:inset 3px 0 0 #2e86de;}
@@ -693,18 +706,18 @@
   .contact-sym .neg-mark{position:absolute;}
   .contact-del-btn{background:none; border:none; color:#b23; font-size:.6rem; cursor:pointer; opacity:.55; padding:0 2px;}
   .contact-del-btn:hover{opacity:1;}
-  .contact-mode-btn{position:absolute; margin-top:-2px; margin-left:24px; background:none; border:none; color:#8a95a3; font-size:.6rem; cursor:pointer; opacity:.55; padding:0 2px;}
+  .contact-mode-btn{position:absolute; margin-top:-2px; margin-left:24px; background:none; border:none; color:#2a323d; font-size:.6rem; cursor:pointer; opacity:.55; padding:0 2px;}
   .contact-mode-btn:hover{opacity:1; color:#0d5ab5;}
   .contact-sym.contact-cmp{padding-top:2px;}
   .contact-sym.contact-cmp .cmp-op-select{margin-top:1px; font-size:.6rem; border:1px solid #b9c2cc; border-radius:3px; background:#fff; color:#7a3f00; text-align:center; width:34px;}
   .contact-sym.contact-cmp .cmp-operand-input{margin-top:1px; font-size:.6rem; font-weight:700; background:#fff; border:1px solid #b9c2cc; border-radius:3px; padding:0 2px; width:40px; text-align:center;}
   .contact-sym.contact-cmp.contact-live .cmp-op-select, .contact-sym.contact-cmp.contact-live .cmp-operand-input{border-color:#1a9e4e; color:#0d7a37;}
   .data-op-input{font-size:.6rem; font-weight:700; background:#fff; border:1px solid #b9c2cc; border-radius:3px; padding:0 3px; width:38px; text-align:center;}
-  .data-op-arrow{font-size:.68rem; color:#5c6673; padding:0 1px;}
-  .add-contact-btn{font-size:.85rem; color:#5c6673; background:none; border:1px dashed #b9c2cc; border-radius:4px; width:26px; height:26px; cursor:pointer; align-self:center;}
+  .data-op-arrow{font-size:.68rem; color:#2a323d; padding:0 1px;}
+  .add-contact-btn{font-size:.85rem; color:#2a323d; background:none; border:1px dashed #b9c2cc; border-radius:4px; width:26px; height:26px; cursor:pointer; align-self:center;}
   .add-contact-btn:hover{border-color:#0d5ab5; color:#0d5ab5;}
   .branch-add-row{display:flex; align-items:center; padding-left:12px;}
-  .branch-add-row button{font-size:.62rem; color:#5c6673; background:none; border:1px dashed #b9c2cc; border-radius:4px; padding:2px 7px; cursor:pointer;}
+  .branch-add-row button{font-size:.62rem; color:#2a323d; background:none; border:1px dashed #b9c2cc; border-radius:4px; padding:2px 7px; cursor:pointer;}
   .coil-wrap{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:0 8px;}
   .coil-sym{width:40px; height:34px; border:2px solid #12305c; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:700; color:#12305c; background:#fff; cursor:pointer; position:relative;}
   .vendor-mit .coil-sym{border-color:#7a3312; color:#7a3312;}
@@ -762,6 +775,10 @@
      계속 알아볼 수 있습니다(문제가 해결되면 자동으로 사라짐). */
   .placed-component.polarity-reversed{outline:2px solid var(--danger); outline-offset:3px; animation:polarityBlink 1s ease-in-out infinite;}
   @keyframes polarityBlink{0%,100%{outline-color:var(--danger);} 50%{outline-color:transparent;}}
+  /* [가독성 개선] 전체 글자 크기 약 12% 확대 + 흐린 회색 글자를 흰색 계열로 */
+  html{font-size:18px;}
+  :root{ --text:#ffffff; --text-dim:#f1f4f8; --text-faint:#d4dae2; }
+  .ladder-canvas, .program-tab.active{ --text:#12161c; --text-dim:#3d4652; --text-faint:#5c6673; }
 </style>
 </head>
 <body>
@@ -770,7 +787,7 @@
   <div class="brand">
     <div class="brand-mark">P1</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.92</b>
+      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.94</b>
       <span data-i18n="brand.subtitle">Multi-Vendor PLC / HMI Virtual Commissioning</span>
     </div>
   </div>
@@ -953,11 +970,11 @@
    에이전트·실제 산업통신 프로토콜은 다음 버전으로 미룹니다(팔레트에는 자리를 잡아
    두고 "다음 버전에서 지원" 안내만 뜨게 해 확장 지점을 명확히 남겨둡니다).
    ============================================================ */
-const APP_VERSION = 'Ver0.92';
+const APP_VERSION = 'Ver0.94';
 
 /* ---------------- i18n ---------------- */
 const STRINGS = {
-  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.92", en: "K's PLC Simulator Ver0.92" },
+  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.94", en: "K's PLC Simulator Ver0.94" },
   "brand.subtitle": { ko: "Multi-Vendor PLC / HMI Virtual Commissioning", en: "Multi-Vendor PLC / HMI Virtual Commissioning" },
   "toolbar.newProject": { ko: "🆕 새 프로젝트", en: "🆕 New Project" },
   "toolbar.projectNameTitle": { ko: "프로젝트 이름", en: "Project name" },
@@ -5314,8 +5331,9 @@ function ensureLadderDrawer(){
   drawer = document.createElement('div');
   drawer.className = 'side-drawer ladder-drawer';
   drawer.id = 'ladderDrawer';
-  drawer.innerHTML = `<div class="drawer-head" id="ladderDrawerHead"><b id="ladderDrawerTitle"></b><button class="btn ghost drawer-collapse-btn" id="ladderCollapseBtn" onclick="toggleLadderDrawerCollapse()" data-i18n-title="ladder.collapseTitle" title="${tr('ladder.collapseTitle')}">▾</button><button class="btn ghost" id="ladderMaximizeBtn" onclick="toggleLadderMaximize()" title="${tr('ladder.maximizeHint')}">🗖</button><button class="btn ghost" onclick="closeLadderEditor()">${tr('popup.close')}</button></div>
-    <div class="drawer-body" id="ladderDrawerBody"></div>`;
+  drawer.innerHTML = `<div class="drawer-head" id="ladderDrawerHead"><b id="ladderDrawerTitle"></b><button class="btn ghost drawer-collapse-btn" id="ladderCollapseBtn" onclick="toggleLadderDrawerCollapse()" data-i18n-title="ladder.collapseTitle" title="${tr('ladder.collapseTitle')}">▾</button><button class="btn ghost" id="ladderDockBtn" onclick="toggleLadderDockBottom()" title="오른쪽 창 ↔ 화면 아래 분할 전환">⬓ 하단 분할</button><button class="btn ghost" id="ladderMaximizeBtn" onclick="toggleLadderMaximize()" title="${tr('ladder.maximizeHint')}">🗖</button><button class="btn ghost" onclick="closeLadderEditor()">${tr('popup.close')}</button></div>
+    <div class="drawer-body" id="ladderDrawerBody"></div><div class="drawer-resizer" id="ladderDrawerResizer" title="끌어서 크기 조절"></div>`;
+  bindLadderDrawerResizer(drawer);
   document.body.appendChild(drawer);
   let tab = document.getElementById('ladderDrawerTab');
   if (!tab){
@@ -5326,6 +5344,55 @@ function ensureLadderDrawer(){
     document.body.appendChild(tab);
   }
   return drawer;
+}
+let LADDER_ZOOM = 1.3, LADDER_DOCK_BOTTOM = false, LADDER_HELP_HIDDEN = false;
+function applyLadderViewPrefs(drawer){
+  drawer = drawer || document.getElementById('ladderDrawer');
+  if (!drawer) return;
+  drawer.classList.toggle('dock-bottom', LADDER_DOCK_BOTTOM);
+  drawer.classList.toggle('help-hidden', LADDER_HELP_HIDDEN);
+  drawer.style.setProperty('--ladder-zoom', LADDER_ZOOM);
+  const b = document.getElementById('ladderDockBtn');
+  if (b) b.textContent = LADDER_DOCK_BOTTOM ? '◨ 오른쪽 창' : '⬓ 하단 분할';
+}
+function toggleLadderDockBottom(){ LADDER_DOCK_BOTTOM = !LADDER_DOCK_BOTTOM; applyLadderViewPrefs(); }
+function setLadderZoom(z){
+  LADDER_ZOOM = Math.round(Math.max(0.6, Math.min(2.5, z)) * 10) / 10;
+  applyLadderViewPrefs();
+  const v = document.getElementById('ladderZoomVal');
+  if (v) v.textContent = Math.round(LADDER_ZOOM * 100) + '%';
+}
+function toggleLadderHelp(){
+  LADDER_HELP_HIDDEN = !LADDER_HELP_HIDDEN;
+  applyLadderViewPrefs();
+  const b = document.getElementById('ladderHelpBtn');
+  if (b) b.textContent = LADDER_HELP_HIDDEN ? '❔ 설명 보기' : '❔ 설명 숨기기';
+}
+function bindLadderDrawerResizer(drawer){
+  const rz = drawer.querySelector('.drawer-resizer');
+  if (!rz) return;
+  rz.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    rz.classList.add('dragging');
+    drawer.style.transition = 'none';
+    const mv = (ev) => {
+      if (drawer.classList.contains('dock-bottom')){
+        const h = Math.max(160, Math.min(window.innerHeight - 50, window.innerHeight - ev.clientY));
+        drawer.style.setProperty('--drawer-h', h + 'px');
+      } else {
+        const w = Math.max(380, Math.min(window.innerWidth - 40, window.innerWidth - ev.clientX));
+        drawer.style.width = w + 'px';
+      }
+    };
+    const up = () => { rz.classList.remove('dragging'); drawer.style.transition = ''; document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); };
+    document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+  });
+  // Ctrl + 마우스 휠로 래더 편집 영역만 확대/축소
+  drawer.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey || !e.target.closest('.ladder-zoom-wrap')) return;
+    e.preventDefault();
+    setLadderZoom(LADDER_ZOOM + (e.deltaY < 0 ? 0.1 : -0.1));
+  }, { passive:false });
 }
 function toggleLadderDrawer(){
   const drawer = document.getElementById('ladderDrawer');
@@ -5884,6 +5951,7 @@ function renderLadderEditor(plcId){
   const wasMaximized = drawer.classList.contains('maximized');
   const wasCollapsed = drawer.classList.contains('collapsed');
   drawer.className = 'side-drawer ladder-drawer open ' + vm.vendorClass + (wasMaximized ? ' maximized' : '') + (wasCollapsed ? ' collapsed' : '');
+  applyLadderViewPrefs(drawer);
   document.getElementById('ladderDrawerTitle').textContent = `${vm.shortName} — ${comp.dataset.label || plcId}`;
   document.getElementById('ladderDrawerHead').style.borderBottom = `3px solid ${vm.color}`;
   const tab = document.getElementById('ladderDrawerTab');
@@ -5908,6 +5976,7 @@ function renderLadderEditor(plcId){
     ${rungSelActive?`<button class="tb-btn" onclick="ladderRungClearSelection('${plcId}')">✕ ${tr('ladder.clearRungSel')}</button><span style="font-size:.66rem;color:var(--teal-strong);">${tr('ladder.rungSelCount').replace('{n}', LADDER_RUNG_SEL.indices.length)}</span>`:''}`}
     <span class="tb-sep"></span>
     <span style="font-size:.68rem;color:var(--text-dim);">${vm.shortName} · ${isRunning?(isPaused?('⏸ '+tr('toolbar.pausedStatus')):('● RUN #'+scanCount)):'■ STOP'}</span>
+    <span class="ladder-zoom-ctl"><button class="tb-btn" id="ladderHelpBtn" onclick="toggleLadderHelp()" title="위쪽 설명 글 숨기기/보기">${LADDER_HELP_HIDDEN ? '❔ 설명 보기' : '❔ 설명 숨기기'}</button><span class="tb-sep"></span><button class="tb-btn" onclick="setLadderZoom(LADDER_ZOOM-0.1)" title="편집 영역 축소 (Ctrl+휠)">🔍−</button><span class="lz-val" id="ladderZoomVal">${Math.round(LADDER_ZOOM*100)}%</span><button class="tb-btn" onclick="setLadderZoom(LADDER_ZOOM+0.1)" title="편집 영역 확대 (Ctrl+휠)">🔍+</button><button class="tb-btn" onclick="setLadderZoom(1.3)" title="기본 크기">↺</button></span>
   </div>`;
   if (warnings.length) html += `<div class="ladder-warn">⚠ ${warnings.join('<br>')}</div>`;
   if (BREAKPOINT_HIT.plcId === plcId) html += `<div class="ladder-warn bp-hit-banner">⏸ ${tr('debug.bpHit')}: ${BREAKPOINT_HIT.label} <button class="tb-btn" onclick="clearBreakpointHit();renderLadderEditor('${plcId}')">${tr('debug.bpClear')}</button></div>`;
@@ -5928,6 +5997,7 @@ function renderLadderEditor(plcId){
   html += `<button class="program-tab-add fbd-add" onclick="ladderAddFBDProgram('${plcId}')" title="${tr('ladder.fbdAddHint')}">+ ${tr('ladder.addFBDProgram')}</button>`;
   html += `<button class="program-tab-add sfc-add" onclick="ladderAddSFCProgram('${plcId}')" title="${tr('ladder.sfcAddHint')}">+ ${tr('ladder.addSFCProgram')}</button>`;
   html += `</div>`;
+  html += `<div class="ladder-zoom-wrap">`;
 
   if (isIL){
     html += ilEditorHTML(plcId, activeProgram);
@@ -5974,6 +6044,7 @@ function renderLadderEditor(plcId){
       <button onclick="ladderSaveILToFile('${plcId}')" title="${tr('ladder.saveILFileHint')}">💾 ${tr('ladder.saveILFile')}</button>` : ''}
     </div>`;
   }
+  html += `</div>`;
 
   document.getElementById('ladderDrawerBody').innerHTML = html;
   if (!isCustomMode) refreshLadderHighlight(plcId);
@@ -7879,340 +7950,48 @@ function handleProjectFileSelected(input){
 
 /* ---------------- 릴리즈 노트 ---------------- */
 const RELEASE_NOTES = [
-  { ver:'Ver0.92', items:{
-    ko:[
-      '래더 프로그램 창에 "💾 IL 파일로 저장" 버튼을 추가했습니다 — 현재 래더 프로그램을 그 PLC의 제조사(LS/미쓰비시/지멘스/오므론) 주소 표기법으로 변환해 텍스트 파일(.txt)로 내려받을 수 있습니다(기존 "📋 IL로 보기(내보내기)"는 IL 편집기에 다시 붙여넣는 용도라 내부 공통 주소를 그대로 유지합니다).',
-      '프로젝트 저장(.json) 시 사용된 PLC 제조사가 파일 이름(예: "_LS", 여러 메이커가 섞이면 "_LS+FX")과 저장 데이터 안에 자동으로 표시되도록 개선했습니다 — 파일만 보고도 어떤 메이커로 만든 프로젝트인지 바로 알 수 있습니다.',
-    ],
-    en:[
-      'Added a "💾 Save IL as File" button to the ladder program panel — download the current ladder program as a text (.txt) file with addresses converted to that PLC\'s vendor notation (LS/Mitsubishi/Siemens/Omron). (The existing "📋 View as IL (Export)" is meant for pasting back into the IL editor, so it still keeps the internal common addressing.)',
-      'Saving a project (.json) now automatically tags the file name (e.g. "_LS", or "_LS+FX" when multiple vendors are mixed) and the saved data with which PLC vendor(s) were used — so you can tell which maker a project was built for just from the file.',
-    ],
-  } },
-  { ver:'Ver0.91', items:{
-    ko:[
-      'PLC 전원단자(24V+/24V-)와 솔레노이드 밸브 등 극성이 있는 코일 부하(SOL+/SOL- 등)의 배선이 서로 뒤바뀐 채(극성 반전) 연결되면 즉시 경고창으로 알려주고, 문제가 해결될 때까지 해당 부품 테두리가 빨간색으로 깜빡이도록 개선했습니다 — 실수로 +/-를 반대로 연결해도 바로 알아챌 수 있습니다.',
-    ],
-    en:[
-      'Added immediate warnings for reversed-polarity wiring: if a PLC power terminal (24V+/24V-) or a polarized coil load such as a solenoid valve (SOL+/SOL- etc.) is wired with its +/- swapped, an alert now pops up right away, and the component\'s outline pulses red until the wiring is fixed — so a reversed connection is caught immediately instead of going unnoticed.',
-    ],
-  } },
-  { ver:'Ver0.90', items:{
-    ko:[
-      '[버그수정] Siemens · Omron PLC가 래더에서 출력(Y)을 켜도 실제로는 코일이나 램프 등 부하에 전기가 전달되지 않고(POWER/RUN LED도 켜지지 않고) 아날로그 입력(AI0/AI1)도 갱신되지 않던 문제를 고쳤습니다 — LS · Mitsubishi PLC에만 연결돼 있던 내부 연결 고리가 두 벤더에는 빠져 있던 것이 원인이었습니다. 이 때문에 Siemens/Omron PLC로 만든 프로젝트에서 밸브·모터·램프 등이 전혀 움직이지 않았다면 이번 업데이트로 정상 동작합니다.',
-    ],
-    en:[
-      '[Bug fix] Fixed Siemens and Omron PLCs: turning an output (Y) ON in the ladder program was not actually delivering power to coils/lamps/etc. wired to it (and the POWER/RUN status LEDs never lit, and AI0/AI1 analog inputs never updated) — the internal wiring that LS and Mitsubishi PLCs already had was missing for these two vendors. If a Siemens/Omron-based project had valves, motors, or lamps that simply never moved, this update fixes that.',
-    ],
-  } },
-  { ver:'Ver0.89', items:{
-    ko:[
-      '배선을 꺾을 때(더블클릭으로 점 추가) 또는 그 점을 손으로 드래그해 옮길 때, 점이 다른 부품의 몸체 안쪽으로 들어가지 않도록 항상 부품 바깥(가장 가까운 변 + 여백)으로 밀려나게 개선했습니다 — 점이 부품 뒤에 숨어 손으로 다시 집기 어려워지는 문제를 방지합니다.',
-    ],
-    en:[
-      'When bending a wire (double-click to add a point) or dragging an existing bend point, the point is now always pushed outside any component body it would otherwise land inside (to the nearest edge, with a small margin) — this prevents a point from hiding behind a component where it becomes hard to grab again.',
-    ],
-  } },
-  { ver:'Ver0.88', items:{
-    ko:['[진짜 솔레노이드+P/A포트 밸브 2종 추가] 서비스유니트(컴프레서)→편솔밸브(valve-single)→실린더로 배선해도 밸브가 자체적으로 압력을 만들어내서, 컴프레서를 꺼도 실린더가 멈추지 않는 문제에 대한 질문에 따라, ⑨ 공압 부품(표준형) 팔레트에 "3/2-WAY 솔레노이드 스프링복귀형 밸브(PLC용, N/C)"와 "5/2-WAY 양솔레노이드 밸브(PLC용)"를 추가했습니다. 두 부품 모두 SOL(+/-) 코일에 24V DC를 걸어 PLC 출력으로 직접 제어하면서도, 기존 파일럿/수동 밸브들과 동일하게 P 포트로 실제 압축공기를 받아야만 A/B로 압력이 전달되는 "진짜" 밸브입니다 — 컴프레서가 꺼져 있으면 코일을 아무리 여자시켜도 실린더가 움직이지 않습니다. 사용법을 보여주는 예제 "㉔ [공압+PLC 연동] 진짜 솔레노이드밸브(컴프레서 연동, P/A포트)"도 예제 갤러리에 추가했습니다.',
-        '[valve-single/valve-double 설명 보강] 위 혼동을 막기 위해, 기존 편솔/양솔밸브(valve-single/valve-double)의 "?" 도움말에 "⚠ 이 밸브는 P 포트 없이 코일이 여자되는 즉시 A(/B)에 자동으로 에어를 생성함 — 컴프레서 등 실제 공급압에 의존하지 않음"이라는 안내를 명확히 추가하고, 실제 공급압에 의존하는 PLC용 대체 부품(위 신규 2종)을 안내하도록 했습니다. (검토 결과 이렇게 자체적으로 공기를 만들어내는 부품은 valve-single/valve-double 두 개뿐이며, 다른 모든 밸브·부품은 이미 실제 P 포트 공급압에 의존하도록 되어 있습니다.)'],
-    en:['[2 new real solenoid+P/A-port valves] In response to a question about why a cylinder kept moving even with the compressor off when wired service-unit(compressor)→single-solenoid-valve(valve-single)→cylinder — because that valve self-generates its own pressure — added a "3/2-Way Solenoid Spring-Return Valve (PLC, N/C)" and a "5/2-Way Double-Solenoid Valve (PLC)" to the ⑨ Pneumatic Parts (Standard) palette. Both are driven directly by a PLC output via a 24V DC SOL(+/-) coil, but — just like the existing pilot/manual valves — only pass pressure to A/B when they actually receive real compressed air at their P port: with the compressor off, energizing the coil does nothing. Also added a new example, "㉔ [Pneumatic+PLC] Real solenoid valve wired to a real compressor (P/A ports)", showing how to wire and use it.',
-        '[Clarified valve-single/valve-double help text] To prevent the same confusion, the "?" help text for the existing valve-single/valve-double now clearly states "⚠ This valve has no P port — it automatically generates air at A(/B) the instant its coil is energized, independent of any real supply pressure such as a compressor," and points to the new PLC-oriented alternatives above for supply-dependent behavior. (A review confirmed valve-single/valve-double are the only two self-generating parts in the simulator — every other valve/part already depends on real P-port supply pressure.)'] } },
-  { ver:'Ver0.87', items:{
-    ko:['[배선 교차 타넘기] 아두이노 시뮬레이터와 동일하게, 배선 두 개가 화면상에서 서로 교차하면 나중에 만든 배선이 먼저 있던 배선 위로 작은 반원을 그리며 타고 넘어가는 모양으로 표시됩니다(실제 배선판에서 서로 닿지 않고 지나가는 전선을 표현하는 관례). 같은 핀에서 실제로 만나는 진짜 전기적 연결점은 타넘기로 그려지지 않으니 안심하세요.'],
-    en:['[Wire crossing hops] Just like the Arduino simulator, when two wires cross on screen, the more recently drawn one now hops over the earlier one with a small semicircular arc (the usual drafting convention for wires that pass without touching). A genuine electrical connection point, where wires actually meet at the same pin, is never drawn as a hop.'] } },
-  { ver:'Ver0.86', items:{
-    ko:['[전동 실린더 3종 추가] “공압/유압 실린더는 있는데 전동 실린더는 없나요?”라는 질문에 따라 ④ 공압/구동 액추에이터 팔레트에 전동 실린더(모터 구동) 3종을 추가했습니다. 공압/유압 실린더와 동일한 몸통+로드 그래픽과 몸통 위의 리밋스위치(LSR/LSE) 드래그 기능을 그대로 쓰지만, 압축공기/오일 대신 전기 신호로 직접 구동됩니다. ① 전동실린더(On-Off): COM(-)/FWD(+)/REV(+) 3핀으로 단순히 정회전/역회전 신호만 걸어주면 끝까지 이동하는 가장 기본형(밸브 코일처럼 COM+FWD 또는 COM+REV가 함께 여자되어야 동작). ② 전동실린더(정역+속도 아날로그출력): 배선은 ①과 동일하고 AO 단자가 추가되어, 모터가 돌고 있을 때 100%, 정지해 있을 때 0%인 아날로그 값을 PLC의 AI0/AI1에 보낼 수 있습니다(실제 아날로그 I/O 모듈처럼 한 스캔 지연되어 반영됩니다). ③ 전동실린더(서보, 펄스-방향): 기존 서보/스텝(servo-pulse) 부품과 동일하게 PULSE/DIR 입력으로 위치를 제어하되, 부품 위에서 “총펄스”(완전후진↔완전전진 간 필요한 펄스 수)를 직접 설정해 실린더처럼 몸통+로드가 실제로 이동하는 모습을 눈으로 확인할 수 있습니다. 세 종류 모두 ④ 공압/구동 액추에이터 팔레트에 추가되었습니다'],
-    en:['[3 new electric cylinders] In response to “there are pneumatic/hydraulic cylinders — isn\'t there an electric cylinder too?”, added 3 motor-driven electric cylinders to the ④ Pneumatic/Drive Actuators palette. They reuse the same body+rod graphic and the draggable body-mounted limit-switch (LSR/LSE) feature as the pneumatic/hydraulic cylinders, but are driven directly by electrical signals instead of air/oil. ① Electric Cylinder (On-Off): the simplest form — just 3 pins, COM(-)/FWD(+)/REV(+); energizing COM+FWD or COM+REV alone drives it all the way to the end (like a valve coil, both terminals of a direction must be energized together). ② Electric Cylinder (Fwd/Rev + Analog Speed Output): same wiring as ① plus an AO terminal that sends 100% while the motor is running and 0% when stopped to the PLC\'s AI0/AI1 (reflected with a one-scan delay, like a real analog I/O module). ③ Electric Cylinder (Servo, Pulse-Dir): position-controlled via PULSE/DIR inputs like the existing servo/stepper (servo-pulse) part, but you can set a "Total Pulses" value directly on the part so you can watch the body+rod actually travel as pulses accumulate. All three were added to the ④ Pneumatic/Drive Actuators palette'] } },
-  { ver:'Ver0.85', items:{
-    ko:['[\uBC30\uC120 \uAE30\uBCF8\uC0C9 \uC790\uB3D9 \uC9C0\uC815] \uC0C8\uB85C \uBC30\uC120\uC744 \uC5F0\uACB0\uD560 \uB54C \uC5B4\uB290 \uCABD \uB2E8\uC790\uAC00 VCC/\uC804\uC6D0(+)\uC778\uC9C0, GND/0V(-)\uC778\uC9C0\uC5D0 \uB530\uB77C \uBC30\uC120 \uC0C9\uC774 \uC790\uB3D9\uC73C\uB85C \uC815\uD574\uC9D1\uB2C8\uB2E4 \u2014 VCC\u00B7\uC804\uC6D0 \uCABD\uC5D0 \uB2FF\uC73C\uBA74 \uBE68\uAC15, GND\u00B70V(-) \uCABD\uC5D0 \uB2FF\uC73C\uBA74 \uD68C\uC0C9\uC774 \uAE30\uBCF8\uC0C9\uC73C\uB85C \uBD99\uC2B5\uB2C8\uB2E4(\uC2E0\uD638\uC120(\uBCF4\uB77C)\u00B7\uACF5\uC555(\uD558\uB298\uC0C9)\u00B7\uC720\uC555(\uD669\uAC08\uC0C9) \uB4F1 \uB2E4\uB978 \uACC4\uD1B5\uC740 \uC774\uC804\uACFC \uB3D9\uC77C). DC 0V(24V-) \uC0C9\uC0C1\uB3C4 \uAE30\uC874 \uD30C\uB791\uC5D0\uC11C AC220 N(\uC911\uC131\uC120)\uACFC \uAC19\uC740 \uD68C\uC0C9 \uACC4\uC5F4\uB85C \uD1B5\uC77C\uD588\uC2B5\uB2C8\uB2E4. \uBB3C\uB860 \uBC30\uC120\uC744 \uD074\uB9AD\uD574 \uB728\uB294 \uC0C9\uC0C1 \uD3B8\uC9D1\uAE30\uB85C \uC5B8\uC81C\uB4E0 \uC6D0\uD558\uB294 \uC0C9\uC73C\uB85C \uBC14\uAFC0 \uC218 \uC788\uC73C\uBA70, \uC774\uB294 \uADF8 \uAE30\uBCF8\uAC12\uB9CC \uBC14\uAFB8 \uAC83\uC785\uB2C8\uB2E4'],
-    en:['[Automatic default wire color] When you connect a new wire, its color is now chosen automatically based on which side is VCC/power(+) versus GND/0V(-) \u2014 touching a VCC/power terminal defaults to red, touching a GND/0V(-) terminal defaults to gray (other systems like signal (purple), pneumatic (sky blue), hydraulic (tan) are unchanged). DC 0V (24V-) has also been recolored from blue to the same gray used for AC220 N (neutral), for consistency. You can still change any wire\'s color anytime via the color editor opened by clicking it \u2014 this only changes the starting default'] } },
-  { ver:'Ver0.84', items:{
-    ko:['[배선 꺾임점 편집] 아두이노 시뮬레이터와 동일하게, 배선을 더블클릭하면 그 위치에 꺾임점("구멍")이 추가되고, 그 점을 드래그해서 원하는 모양으로 자유롭게 구부릴 수 있습니다. 점을 더블클릭하면 다시 삭제됩니다(가까운 다른 점/단자와 수평·수직으로 거의 맞으면 자동으로 스냅되어 깔끔하게 정리되고, Shift를 누른 채 드래그하면 스냅 없이 자유 배치됩니다). 새 배선은 이전과 동일하게 직각으로 한 번 꺾인 모양으로 시작합니다',
-        '[공압/유압 빗금 호스] 공압(파랑)·유압(황갈색) 배선이 이제 단색 "─" 선 대신, 실제 배관도의 해칭 표시와 비슷한 빗금(사선, "/////") 무늬 호스로 그려져 전기 배선과 한눈에 구분됩니다. 전기/신호 배선은 이전과 동일하게 단색 선으로 표시됩니다',
-        '[안내] "컴프레서"는 별도 부품이 아니라 "⑨ 공압 부품 > 서비스 유니트(컴프레서+FRL)" 안에 압축기 기능이 포함되어 있습니다 — "▶ 컴프레서 가동" 버튼으로 켜고 끕니다',
-        '[일러두기] 꺾임점/저장 파일 호환: 새로 배치한 배선의 꺾임점 위치는 프로젝트 저장/불러오기에도 그대로 유지됩니다. Ver0.83 이하 버전에서 저장한 예전 파일을 불러오면 꺾임점 정보가 없으므로, 불러오는 시점에 자동으로 기본 직각 꺾임 하나가 새로 계산되어 채워집니다'],
-    en:['[Draggable wire waypoints] Just like the Arduino simulator, double-clicking a wire now adds a bend point ("hole") at that spot, which you can drag anywhere to reshape the wire; double-clicking a point removes it again (dragging snaps to nearby points/terminals when close, matching them horizontally or vertically for a clean right angle — hold Shift while dragging to place it freely without snapping). A newly drawn wire still starts with the same single right-angle bend as before',
-        '[Hatched pneumatic/hydraulic hoses] Pneumatic (blue) and hydraulic (tan) wires are now drawn as a diagonally hatched ("/////") hose pattern instead of a plain solid line, so they stand out from electrical wiring at a glance. Electrical/signal wires remain plain solid lines as before',
-        '[Note] There is no separate standalone "compressor" part — the compressor function is built into "⑨ Pneumatic Parts > Service Unit (Compressor+FRL)", turned on/off with its "▶ Run Compressor" button',
-        '[Note] Waypoint positions on newly placed wires are saved and restored with the project. A project file saved in Ver0.83 or earlier has no waypoint data, so loading it automatically computes and fills in the default right-angle bend for each wire'] } },
-  { ver:'Ver0.83', items:{
-    ko:['[배선 직각화] 배선(전선/호스)이 이제 아두이노 시뮬레이터와 똑같이, 두 단자 사이를 곡선으로 부드럽게 잇는 대신 실제 배선판처럼 직각으로 딱 한 번만 꺾이는 형태로 그려집니다',
-        '[배선 번호 배지] 모든 배선의 양쪽 끝에 같은 번호·같은 색으로 된 작은 원형 배지가 붙습니다 — 곡선을 눈으로 따라가지 않아도 "이 배선이 반대쪽 어디에 연결됐는지"를 번호로 바로 맞춰볼 수 있습니다(좌측 "연결 현황" 패널의 목록 번호와도 동일하게 맞춰집니다)',
-        '[단자 배선 표시점] 뭔가 배선되어 있는 단자마다 그 배선과 같은 색의 작은 점이 단자 모서리에 표시되어, 배지를 보지 않고도 단자 자체에서 연결 여부를 바로 알 수 있습니다',
-        '["연결 현황" 패널 클릭 연동] 좌측 "연결 현황" 패널에서 배선 항목을 클릭하면 캔버스에서 그 배선이 선택되어 빛나고, 양쪽 단자가 짧게 깜빡여서 어느 단자끼리 이어졌는지 바로 확인할 수 있습니다'],
-    en:['[Right-angle wiring] Wires (electrical/hose) are now drawn with a single right-angle bend between the two terminals — like a real wiring board — instead of a smooth curve, matching the Arduino simulator\'s style',
-        '[Wire number badges] Every wire now shows a small numbered, colored circle badge at both of its ends — so you can match a wire to its other end by number without visually tracing the curve (the number matches its row in the "Connections" panel on the left)',
-        '[Wired-terminal dot] Any terminal that has something wired to it now shows a small dot in that wire\'s color at its corner, so you can tell a terminal is connected at a glance without looking for the badge',
-        '["Connections" panel click-to-highlight] Clicking a wire entry in the left "Connections" panel now selects (glows) that wire on the canvas and briefly flashes both of its terminals, so you can immediately see which two terminals it links'] } },
-  { ver:'Ver0.82', items:{
-    ko:['[리밋스위치 위치 드래그] 실린더 내장 리밋스위치(LSR/LSE)가 이제 실린더 몸통 위의 작은 마커를 마우스로 드래그해서 트립 위치(0~100%, 기본값은 완전후진/완전전진)를 원하는 지점으로 옮길 수 있습니다 — 실제 실습대에서 리드스위치를 레일 위에서 밀어 위치를 바꾸는 것과 같은 방식입니다. 이에 맞춰 실린더 피스톤 위치도 예전의 "명령 즉시 논리적으로 끝까지 이동" 방식에서 속도 슬라이더에 설정한 시간 동안 실제로 0~100% 연속적으로 이동하는 방식으로 바뀌어, 중간에 옮겨둔 리밋스위치를 실제로 지나가는 순간에도 신호를 받을 수 있습니다(예: 스트로크 중간에서 미리 감속/정지/방향전환 신호를 주는 회로 실습)',
-        '[일러두기] 리밋스위치는 지정한 트립 위치 근방(허용오차 약 ±3%)에 피스톤이 머물러 있거나 그 지점을 지나가는 순간에 반응합니다. 기본 위치(0%/100%)에 그대로 두면 예전과 동일하게 완전 후진/완전 전진 상태에서 계속 붙어있고, 중간으로 옮기면 피스톤이 지나가는 짧은 순간에만 반응(펄스성 신호)합니다'],
-    en:['[Draggable limit-switch position] The cylinder\'s built-in limit switches (LSR/LSE) can now be repositioned by dragging a small marker on the cylinder body — the trip point (0–100%, defaulting to fully-retracted/fully-extended) can be moved anywhere along the stroke, just like sliding a reed switch along a rail on real training equipment. To support this, piston position no longer jumps to its logical end the instant a command is given — it now moves continuously through 0–100% over the time set by the speed slider, so a limit switch left at a mid-stroke position actually gets triggered as the piston passes it (e.g. circuits that slow down, stop, or reverse partway through the stroke)',
-        '[Note] A limit switch reacts when the piston is resting near its trip point (about ±3% tolerance) or the instant it passes through that point. Left at the defaults (0%/100%) it behaves exactly as before — staying engaged throughout the fully-retracted/fully-extended state — while a mid-stroke position only fires briefly (a pulse) as the piston passes'] } },
-  { ver:'Ver0.81', items:{
-    ko:['[UI 개선] 래더 편집기 창 상단에 작은 ▾ 화살표 버튼을 추가했습니다 — 아두이노 시뮬레이터처럼 클릭하면 편집 중인 내용/선택 상태는 그대로 유지한 채 창 본문만 접고 펼칠 수 있습니다(✕ 닫기, 🗖 최대화 버튼과는 별개 기능)',
-        '[UI 개선] 화면을 처음 열었을 때 좌측 부품 상자(팔레트)의 모든 카테고리가 기본적으로 접힌 상태로 시작하도록 변경했습니다 — 부품 종류가 많아졌으므로 필요한 카테고리만 클릭해서 펼쳐 보면 됩니다'],
-    en:['[UI improvement] Added a small ▾ arrow button to the ladder editor drawer header — like the Arduino simulator, clicking it collapses/expands just the drawer body while keeping your current edits/selection intact (separate from the ✕ close and 🗖 maximize buttons)',
-        '[UI improvement] The left parts palette now starts with every category collapsed by default when the simulator first loads — click a category to expand only the parts you need'] } },
-  { ver:'Ver0.8', items:{
-    ko:['[대형 신규] 공압/유압 실습 서브시스템을 새로 추가했습니다. 팔레트에 "⑨ 공압 부품(표준형)"(22종)과 "⑩ 유압 부품"(24종) 카테고리가 새로 생겼습니다 — 서비스 유니트(컴프레서+FRL)와 Power Unit(펌프)이 실제로 압력(bar)을 만들어, P(공급)/T(배기·탱크)/A·B(작업 포트) 구조를 갖춘 각종 밸브(수동/롤러레버/파일럿 작동 방향제어 밸브, 압력 시퀀스·감압·릴리프·카운터밸런스 밸브, 유량제어 밸브, 체크 밸브, AND/OR 논리 밸브 등)를 거쳐 실린더·유압 모터까지 실제로 전달됩니다',
-        '[실린더 오토 리밋스위치] 기존/신규 모든 실린더(단동·복동·쿠션내장형·투명·유압)에 리드스위치 방식의 자동 리밋스위치(LSR=후진완료, LSE=전진완료)가 내장되어, 실제 피스톤 위치에 따라 자동으로 접점이 열리고 닫힙니다 — 별도 센서 부품 없이 바로 PLC 입력에 배선해 위치 검출 실습을 할 수 있습니다',
-        '[전원 공급 연동] 서비스 유니트/Power Unit 모두 24V+/24V- 입력이 실제로 걸려야 가동되며, Power Unit 과부하 차단기(트립 테스트/리셋 가능)를 거쳐 배선하면 전기-공압-유압이 하나로 이어진 실전형 회로를 구성할 수 있습니다',
-        '[배선 종류 배지] 배선을 시작할 첫 단자를 클릭하면 화면 상단에 "⚡ 전기 배선 / 🔵 공압 배선 / 🟠 유압 배선" 배지가 떠서 지금 어떤 종류를 잇고 있는지 바로 알 수 있습니다',
-        '[예제 갤러리 4종 추가] "⑳ 공압 표준 공급회로", "㉑ 공압-PLC 연동 1행정 자동복귀(오토 리밋스위치)", "㉒ 유압 표준 공급회로", "㉓ 유압 카운터밸런스 회로"를 예제 갤러리에서 바로 불러올 수 있습니다',
-        '[신규] "🌀 공압/유압 검증" 패널을 추가했습니다 — 배선되지 않은 공압/유압 부품, 압력원 누락, 차단기 트립 등을 경고로 알려주고, 모든 배관(호스) 지점의 실시간 압력(bar)을 표로 보여줘 실제로 공기/오일이 회로를 따라 잘 전달되고 있는지 바로 확인할 수 있습니다',
-        '[신규] "🔧 랙 배경" 버튼으로 캔버스를 알루미늄 프로파일 실습대 느낌의 격자 배경으로 바꿀 수 있습니다(순수 시각 효과이며 배치/배선 로직에는 영향 없음)',
-        '[정직한 한계] 이 시뮬레이터는 압력을 "있음/bar 수치"로만 다루는 유무·크기 기반 근사치이며, 실제 유체역학(유량 방정식, 점도, 관 마찰손실)을 계산하지 않습니다. 압력 보상 유량제어 밸브의 보정 로직, 어큐뮬레이터의 실제 축압/방압 동특성, 호스 길이(1500/1000/600mm)에 따른 압력손실 차이는 모델링하지 않았고(호스는 배선 그 자체로 대체), "하중(웨이트 블록)"은 장식용이며 실제 부하 효과는 실린더 자신의 "부하 있음" 체크박스로 구현됩니다. 기존 편솔/양솔밸브(valve-single/double)와 3개의 기존 PLC 예제는 이전과 동일하게 동작하도록 전혀 건드리지 않았습니다(하위 호환)'],
-    en:['[Major new feature] Added a full pneumatic/hydraulic training subsystem. The palette now has "⑨ Pneumatic Parts (Standard)" (22 types) and "⑩ Hydraulic Parts" (24 types) — a service unit (compressor+FRL) and a power unit (pump) generate real pressure (bar) that flows through P(supply)/T(exhaust/tank)/A,B(work port) valves (manual/roller-lever/pilot-actuated directional valves, pressure sequence/reducing/relief/counterbalance valves, flow control valves, check valves, AND/OR logic valves, etc.) all the way to cylinders and hydraulic motors',
-        '[Cylinder auto limit switches] Every cylinder (single/double-acting, cushioned, transparent, hydraulic — old and new) now has built-in reed-switch-style auto limit switches (LSR = retract complete, LSE = extend complete) that open/close automatically based on real piston position — wire them straight to a PLC input for position-detection practice with no extra sensor part needed',
-        '[Power supply integration] Both the service unit and power unit only run once real 24V+/24V- reaches them, and wiring through the power unit\'s overload breaker (trip-test/reset capable) lets you build a fully-linked electrical-pneumatic-hydraulic circuit',
-        '[Wire-type badge] Clicking the first terminal to start a wire now shows an "⚡ Electrical / 🔵 Pneumatic / 🟠 Hydraulic" badge at the top of the screen so you always know what kind of line you\'re about to connect',
-        '[4 new gallery examples] "⑳ Pneumatic Standard Supply Circuit", "㉑ Pneumatic+PLC Single-Stroke Auto-Return (auto limit switch)", "㉒ Hydraulic Standard Supply Circuit", and "㉓ Hydraulic Counterbalance Circuit" can now be loaded directly from the Example Gallery',
-        '[New] Added a "🌀 Pneumatic/Hydraulic Check" panel — it flags unwired pneumatic/hydraulic parts, missing pressure sources, and tripped breakers, and shows a live table of the current pressure (bar) at every hose point, so you can directly confirm air/oil is actually circulating through the circuit',
-        '[New] A "🔧 Rack Background" button switches the canvas to an aluminum-profile-trainer-style grid background (a pure visual effect with no effect on placement/wiring logic)',
-        '[Honest limitations] This simulator treats pressure as a presence/bar-value approximation, not real fluid dynamics (no flow equations, viscosity, or pipe friction loss). The pressure-compensated flow control valve\'s compensation logic, an accumulator\'s real charge/discharge dynamics, and pressure-loss differences from hose length (1500/1000/600mm) are not modeled (hoses are represented by the wire itself); the "Load (weight block)" part is decorative, with the actual load effect implemented via the cylinder\'s own "Loaded" checkbox. The existing single/double solenoid valves and all 3 pre-existing PLC examples were left completely untouched and behave exactly as before (backward compatible)'] } },
-  { ver:'Ver0.77', items:{
-    ko:['[신규] 식별용 센서 3종 추가 — 🎨 컬러 센서, 🏷️ 바코드 센서, 📷 스마트 카메라(머신비전). "③ 산업용 24V 센서/조작스위치" 팔레트에서 찾을 수 있습니다',
-        '[컬러 센서] "감지 색상(시뮬레이션)"과 "판별 색상(목표)" 두 드롭다운을 제공합니다. 둘이 일치하면 디지털 OUT이 켜지고(PNP/NPN 선택 가능), AO 단자는 감지된 색상마다 다른 값(없음=0%~흰색=100%)을 내보내는 아날로그 출력이라 PLC AI0/AI1에 배선해 CMP 명령으로 색상 코드를 직접 비교하는 실습도 가능합니다. "빨간 박스→Y0, 파란 박스→Y1"처럼 만들려면 판별 색상이 다른 센서를 여러 개 놓고 각각 다른 입력에 연결하세요',
-        '[바코드/비전 센서, 정직한 한계] 실제 바코드 스캐너와 머신비전은 시리얼(RS-232/RS-485)이나 이더넷으로 문자열·이미지 데이터를 주고받지만, 이 시뮬레이터의 PLC는 비트(X/Y/M)와 16비트 정수 레지스터(D)만 다루고 문자열은 지원하지 않습니다. 그래서 바코드 값은 숫자(0~9999)로, 머신비전은 PASS/FAIL 디지털 신호 + X/Y 위치오차 숫자로 단순화했습니다 — 두 센서 모두 값을 사람이 직접 설정하는 시뮬레이션 방식이며, 실제 카메라 영상 처리나 레이저 스캔을 구현한 것은 아닙니다',
-        '[개선] evaluateElectricalNets()의 net 상태에 있던 "analog" 필드(이전까지 정의만 되어 있고 실제로 값을 채우는 부품이 없었음)를 컬러/바코드/비전 센서가 처음으로 실제 사용하게 되어, AI0/AI1 아날로그 입력이 이제 진짜 다단계 숫자 값을 전달합니다'],
-    en:['[New] Added 3 identification sensors — 🎨 Color Sensor, 🏷️ Barcode Sensor, 📷 Smart Camera (Machine Vision). Find them in the "③ 24V Sensors/Operator Switches" palette',
-        '[Color sensor] Provides two dropdowns: "Sensed color (simulated)" and "Target color". The digital OUT turns on when they match (PNP/NPN selectable), and the AO pin is an analog output that varies by sensed color (none=0% through white=100%) — wire it to the PLC\'s AI0/AI1 to practice comparing color codes with a CMP instruction. To build "red box → Y0, blue box → Y1", place several sensors with different target colors wired to different inputs',
-        '[Barcode/vision sensors, honest limitation] Real barcode scanners and machine vision systems exchange string/image data over serial (RS-232/RS-485) or Ethernet, but this simulator\'s PLC only handles bits (X/Y/M) and 16-bit integer registers (D), with no string support. So the barcode value is simplified to a number (0-9999), and the vision system to a PASS/FAIL digital signal plus numeric X/Y position offsets — both sensors are manually-set simulations, not an actual implementation of image processing or laser scanning',
-        '[Improvement] The "analog" field that has existed on evaluateElectricalNets()\'s net state since earlier (defined but never actually populated by any component) is now genuinely used by the new color/barcode/vision sensors, so the AI0/AI1 analog inputs carry real multi-level numeric values for the first time'] } },
-  { ver:'Ver0.76', items:{
-    ko:['[신규] 유지형(매인테인드/올터네이트, "푸시-푸시") 조작 푸시버튼 추가 — 한 번 누르면 COM-NO 접점이 닫힌 채로 유지되고, 다시 한 번 눌러야 열립니다. Ver0.75의 시작/정지 푸시버튼(모멘터리, 손 떼면 복귀)과는 반대로 "계속 켜둬야 하는" 신호(모드 선택, 자동/수동 전환 등)에 사용하세요',
-        '(참고) 리밋스위치와 동작 방식(클릭해서 토글)은 같지만, 리밋스위치는 "기계 레버가 눌린 상태"를 흉내내는 센서이고 유지형 푸시버튼은 사람이 조작하는 조작반 스위치라는 용도 차이가 있습니다'],
-    en:['[New] Added a maintained (alternate-action, "push-push") operator pushbutton — one click closes the COM-NO contact and it stays closed; a second click opens it again. Unlike Ver0.75\'s Start/Stop pushbuttons (momentary, spring-return), use this for signals that need to stay on (mode-select, auto/manual switching, etc.)',
-        '(Note) Mechanically it behaves like the limit switch (click to toggle), but the limit switch simulates a mechanical lever being held down while this represents an operator-actuated panel switch'] } },
-  { ver:'Ver0.75', items:{
-    ko:['[신규] 조작 푸시버튼 3종 추가 — 시작 푸시버튼(NO, 녹색), 정지 푸시버튼(NC, 적색), 비상정지 E-STOP(NC, 버섯형). "③ 산업용 24V 센서/조작스위치" 팔레트에서 찾을 수 있습니다',
-        '[핵심] 기존 리밋스위치는 클릭할 때마다 상태가 유지되는 토글 방식(레버가 눌린 채로 고정된 기계 장치를 흉내냄)이었지만, 이번에 추가된 시작/정지 푸시버튼은 마우스로 누르고 있는 동안만 접점이 바뀌고 손을 떼면 즉시 스프링 복귀하는 진짜 모멘터리(순간접점) 방식입니다. 이 차이 덕분에 PLC 교육의 가장 기본적인 실습인 "자기유지(셀프홀딩) 회로"(START 순간접점 + STOP 순간접점 + 출력 코일 자신의 b접점으로 상태를 유지)를 실제 산업 현장과 동일한 방식으로 연습할 수 있습니다. 비상정지(E-STOP)는 반대로 실제 동작(눌러서 잠금 - 돌려서 해제)에 맞춰 클릭할 때마다 트립 상태가 유지되는 래칭 방식입니다',
-        '[참고] "산업용 모터와 PLC 드라이버가 필요하다"는 요청과 관련해 확인해 드리면, 3상 유도전동기(motor3ph)·전자접촉기 MC(mc-contactor)·인버터 VFD(vfd)·서보/스텝 모터(servo-pulse)는 이미 "④ 공압/구동 액추에이터" 팔레트에 들어있던 부품입니다(새로 추가한 것이 아닙니다). 컨베이어를 구동하려면 PLC의 Y 출력 → MC 접촉기의 코일(또는 VFD의 RUN 입력) → 3상 유도전동기 순서로 배선하시면 됩니다',
-        '(참고/정직한 한계) 새 푸시버튼들은 저장/불러오기 시 눌림 상태 자체를 별도로 저장하지 않습니다(리밋스위치의 눌림 상태 저장도 기존부터 동일한 한계였습니다) — 모멘터리 버튼은 어차피 프로젝트를 다시 열 때 "안 눌린" 상태로 시작하는 것이 실제 동작과도 맞습니다'],
-    en:['[New] Added 3 operator pushbutton components — Start pushbutton (NO, green), Stop pushbutton (NC, red), and Emergency Stop E-STOP (NC, mushroom-head). Find them in the "③ 24V Sensors/Operator Switches" palette',
-        '[Key change] The existing limit switch is a toggle (it click-latches, simulating a mechanical lever held down), but the new Start/Stop pushbuttons are genuinely momentary: the contact changes only while the mouse button is held down and springs back the instant it’s released. This makes it possible to practice PLC training’s most fundamental exercise, the self-holding (seal-in) circuit (a momentary START contact + a momentary STOP contact + the output coil’s own contact holding itself on), the same way it works on a real control panel. The E-STOP button, by contrast, latches on each click (matching a real E-STOP’s push-to-lock/twist-to-release behavior)',
-        '[Note] Regarding the request for "an industrial motor and PLC driver": the 3-phase induction motor (motor3ph), magnetic contactor MC (mc-contactor), VFD inverter (vfd), and servo/stepper (servo-pulse) already existed in the "④ Pneumatic/Drive Actuators" palette before this release (they were not newly added). To drive a conveyor, wire a PLC Y output → the MC contactor’s coil (or the VFD’s RUN input) → the 3-phase motor',
-        '(Note/honest limitation) The new pushbuttons don’t separately persist their pressed state across save/load (the limit switch’s pressed state has always had the same limitation) — since they’re momentary anyway, starting "unpressed" when a project is reopened matches real-world behavior'] } },
-  { ver:'Ver0.74', items:{
-    ko:['[안정화] Ver0.73에서 새로 생긴 브레이크포인트(_bpLines)·FBD 피드백 캐시(_delayed)가 프로젝트 저장/불러오기 과정에서 조용히 깨져 있던 문제를 고쳤습니다 — 이전에는 줄 번호 브레이크포인트를 설정한 뒤 프로젝트를 저장하고 다시 불러오면 RUN 시 오류가 날 수 있었습니다. 이제는 저장 시 안전하게 배열로 바꿔 기록하고, 불러올 때 다시 정상 형태로 복원(및 FBD/SFC는 파생 데이터를 다시 계산)합니다',
-        '[개선] SFC 전환 조건식에 오류가 있을 때 뜨는 오류 메시지에서, 조건 입력창에는 의미 없는 "N번째 줄" 표시를 제거해 더 명확하게 표시합니다',
-        '[개선] FBD/SFC 프로그램 모드 안내문에 정직한 한계(AND/OR/XOR 입력 2~4개까지, SFC는 N/S/R 동작 한정자만 지원)를 직접 표시해, 릴리즈 노트를 따로 찾아보지 않아도 편집기 화면에서 바로 확인할 수 있게 했습니다',
-        '(참고) 이번 버전은 기능 추가 없이 Ver0.73의 안정성을 다지는 작업입니다 — 기존 회귀 테스트 전체 재확인 + 저장/불러오기 회귀 테스트 신규 추가'],
-    en:['[Stabilization] Fixed a latent bug where the new breakpoint storage (_bpLines) and FBD feedback cache (_delayed) added in Ver0.73 silently broke across project save/load — previously, saving and reloading a project after setting an IL/ST line breakpoint could cause a runtime error on RUN. Both are now safely converted to arrays when saved and properly restored (and FBD/SFC derived data is recomputed) on load',
-        '[Improvement] SFC transition-condition compile errors no longer show a meaningless "line N:" prefix in the single-line condition field, making the message clearer',
-        '[Improvement] The FBD/SFC mode legend now states its honest limitations directly (AND/OR/XOR support 2-4 inputs; SFC supports only the N/S/R action qualifiers) so students see them right in the editor, not only in the release notes',
-        '(Note) This release is a stabilization pass with no new features — the full existing regression suite was re-verified and a new save/load regression test was added'] } },
-  { ver:'Ver0.73', items:{
-    ko:['[신규] 함수블록 다이어그램(FBD, IEC 61131-3) 프로그램 언어 지원 — "+ FBD 프로그램 추가" 버튼으로 새 FBD 프로그램을 만들고, AND/OR/XOR/NOT/CMP(비교)/ARITH(사칙연산)/TON(타이머)/CTU(카운터)/OUT·SET·RST(코일)/MOVE(데이터 전송) 블록을 추가할 수 있습니다. 각 블록의 입력 핀은 자유롭게 마우스로 선을 긋는 방식이 아니라, 드롭다운에서 "주소"(X0/D0 등 직접 입력)·"상수"(고정값)·"블록출력"(다른 블록의 계산 결과) 중 하나를 골라 연결하는 구조적 편집 방식입니다 — 이는 실습 난이도와 화면 복잡도를 낮추기 위한 의도적인 단순화이며, 신호가 흐르는 순서(위상정렬)와 계산 결과 자체는 실제 FBD와 동일하게 동작합니다. 블록을 자기 자신 쪽으로 되먹임(피드백) 연결해도 이전 스캔 값을 사용해 안전하게 동작합니다(무한루프·오류 없음)',
-        '[신규] 순차 흐름도(SFC, Sequential Function Chart) 프로그램 언어 지원 — "+ SFC 프로그램 추가" 버튼으로 스텝(단계)과 전환(화살표)을 추가할 수 있습니다. 각 스텝에는 N(활성 중 계속 켜짐)·S(진입 시 한 번만 SET)·R(진입 시 한 번만 RESET) 동작을 붙일 수 있고, 전환 조건은 ST와 동일한 문법(AND/OR/NOT/비교식, 타이머 사용 등)을 그대로 사용하며 "T"라는 특수 변수로 "이 스텝에 머문 시간(ms)"을 조건에 쓸 수 있습니다(예: T >= 3000). 한 전환에 여러 도착 스텝을 연결하면 동시분기(하나에서 여러 갈래로), 여러 출발 스텝을 연결하면 동시수렴(여러 갈래가 모두 활성일 때만 합류)이 되어 실제 SFC의 동시분기/합류 구조를 지원합니다',
-        '(참고/정직한 한계) SFC의 동작 한정자는 IEC 표준의 N/S/R 세 가지만 지원합니다(D·L·SD·DS·SL·P 같은 시간 지정 한정자는 지원하지 않음) — 실습 난이도를 낮추기 위한 단순화입니다',
-        '[신규] 디버깅 지원(브레이크포인트) — 래더(rung 왼쪽 ⏸ 버튼)·FBD(블록 카드 ⏸ 버튼)·SFC(스텝 카드 ⏸ 버튼)·IL·ST(에디터 하단 "줄 번호 브레이크포인트"에 줄 번호 추가) 5개 언어 모두에서 브레이크포인트를 켜고 끌 수 있습니다. RUN 중에 해당 지점(코일 통전/블록 출력 참/스텝 진입/해당 줄 실행)이 그 스캔에서 활성화되면, 다음 스캔이 시작되기 전에 자동으로 일시정지하고 에디터 상단에 어떤 지점에서 멈췄는지 배너로 표시합니다. 이미 있던 일시정지(⏸)/한 스캔씩 실행(⏩) 버튼과 함께 쓰면 브레이크포인트로 멈춘 뒤 한 스캔씩 이어서 실행해볼 수 있습니다',
-        '(참고/정직한 한계) 이 브레이크포인트는 "스캔 경계" 기준입니다 — 실제 PLC는 한 스캔 안의 모든 출력이 항상 동시에 유효해야 하므로, 명령어 하나하나를 멈추는 진짜 "한 줄씩 실행" 디버거가 아니라 "이 지점이 활성화된 스캔이 끝나면 다음 스캔 시작 전에 멈춘다"는 방식입니다. 실시간 감시(워치)는 이미 있던 "📊 데이터 모니터" 패널(X/Y/M/D/T/C 값 실시간 확인·강제 입력)과 FBD/SFC 에디터 자체의 실시간 출력값 표시(블록 출력 칩, 활성 스텝 강조)로 충분히 지원됩니다',
-        '(안내) 이번 버전으로 "IEC 61131-3 표준 언어(ST+FBD+SFC) + 회사별 코딩 스타일 + 디버깅 지원" 요청이 모두 구현되었습니다(Ver0.72의 ST에 이어 FBD·SFC·브레이크포인트 추가)'],
-    en:['[New] Function Block Diagram (FBD, IEC 61131-3) language support — use "+ Add FBD Program" to create a new FBD program and add AND/OR/XOR/NOT/CMP(compare)/ARITH(arithmetic)/TON(timer)/CTU(counter)/OUT·SET·RST(coils)/MOVE(data transfer) blocks. Rather than drawing wires freehand with the mouse, each block\'s input pins are wired through a dropdown choosing "address" (direct X0/D0 entry), "constant" (a fixed value), or "block output" (another block\'s computed result) — a deliberate simplification to keep the screen and the learning curve manageable, while execution order (topological sort) and the computed results behave exactly like real FBD. Wiring a block\'s output back into its own input (feedback) works safely using the previous scan\'s value (no infinite loop, no error)',
-        '[New] Sequential Function Chart (SFC) language support — use "+ Add SFC Program" to add steps and transitions (arrows). Each step can carry N (stays on continuously while active), S (SET once on entry), or R (RESET once on entry) actions, and transition conditions use the same syntax as ST (AND/OR/NOT, comparisons, timers, etc.), with a special variable "T" meaning "milliseconds elapsed in this step" usable in a condition (e.g. T >= 3000). Linking one transition to several destination steps creates a simultaneous divergence (one branch splits into several), and linking several source steps creates a simultaneous convergence (several branches join only once all are active) — supporting real SFC\'s AND-split/AND-join structures',
-        '(Note/honest limitation) SFC action qualifiers support only the three IEC N/S/R qualifiers (not the timed D/L/SD/DS/SL/P qualifiers) — a simplification to keep things approachable',
-        '[New] Debugging support (breakpoints) — breakpoints can now be toggled on/off across all five languages: Ladder (⏸ button left of each rung), FBD (⏸ button on each block card), SFC (⏸ button on each step card), and IL/ST (add a line number under the "Line breakpoints" control at the bottom of the editor). While running, if that point (a coil gets power / a block\'s output is true / a step is entered / that line executes) becomes active during a scan, the simulator automatically pauses before the next scan starts and shows a banner at the top of the editor naming what was hit. Combine this with the existing pause (⏸) / step-one-scan (⏩) buttons to step forward scan-by-scan after a breakpoint stops you',
-        '(Note/honest limitation) These are "scan-boundary" breakpoints — since a real PLC must keep every output in a scan valid at the same instant, this isn\'t a true instruction-by-instruction debugger; it pauses right after the scan in which the watched point became active finishes, not mid-instruction. Live watching is already covered by the existing "📊 Data Monitor" panel (live X/Y/M/D/T/C values with force-override) plus the FBD/SFC editors\' own live output display (block output chips, active-step highlighting)',
-        '(Note) With this release, the full "IEC 61131-3 standard languages (ST+FBD+SFC) + vendor coding styles + debugging support" request is complete (FBD, SFC, and breakpoints added on top of Ver0.72\'s ST)'] } },
-  { ver:'Ver0.72', items:{
-    ko:['[신규] IEC 61131-3 구조화 텍스트(ST) 프로그램 언어 지원 — 각 PLC 프로그램 탭에 "+ ST 프로그램 추가" 버튼으로 C언어와 비슷한 구조적 텍스트 프로그램을 새로 추가할 수 있습니다. IF/ELSIF/ELSE/END_IF, FOR..TO..BY..DO..END_FOR, WHILE..DO..END_WHILE, REPEAT..UNTIL..END_REPEAT 같은 구조적 제어문과 AND/OR/XOR/NOT/MOD 연산자, 비교 연산자(= <> < > <= >=), 사칙연산을 지원합니다',
-        '[신규] 타이머/카운터도 실제 IEC 함수블록 호출 방식으로 사용합니다 — T0(IN:=조건, PT:=시간); 뒤에 T0.Q(출력)·T0.ET(경과시간), C0(CU:=조건, R:=리셋, PV:=설정값); 뒤에 C0.Q·C0.CV로 결과를 읽습니다. 다른 프로그램 호출은 CALL(\'프로그램명\'); 형태입니다(작은따옴표라 한글 이름도 그대로 사용 가능)',
-        '[신규] 4개 회사(LS ELECTRIC/Mitsubishi/Siemens/Omron) 모두 같은 IEC 표준 문법을 쓰지만, 주소 표기는 래더/IL과 동일하게 각 회사의 실제 표기 스타일(LS P0000/M0000/T000/D0000, Mitsubishi X0/Y0/M0/T0/D0 그대로, Siemens I0.0/Q0.0/M0.0/MW0, Omron 0.00/100.00/W0.00/D0)을 그대로 입력·표시합니다. 특히 Siemens는 TIA Portal(SCL)의 실제 관례대로 타이머/카운터 인스턴스 이름을 "T0"처럼 따옴표로 감싸고, 시간값도 3000이 아닌 T#3S 같은 IEC 시간 리터럴로 씁니다',
-        '(참고/정직한 한계) 이번 ST 구현에는 VAR...END_VAR 지역변수 선언 블록이 없습니다(FOR 반복문의 반복 변수만 지역 변수로 쓸 수 있습니다) — 실습 난이도를 낮추기 위한 단순화입니다. 또한 ST → 래더 자동 변환 버튼은 제공하지 않습니다(IF/FOR/WHILE 같은 임의의 제어 흐름은 래더 다이어그램으로 안전하게 되돌릴 수 없어서인데, 이는 실제 상용 IEC 61131-3 툴체인 대부분에서도 마찬가지입니다). 무한 반복문을 실수로 작성해도 한 스캔당 실행 단계 수를 안전하게 제한해 브라우저가 멈추지 않도록 보호합니다',
-        '(안내) 이번 버전은 "IEC 61131-3 표준 언어 + 회사별 코딩 스타일" 요청의 1단계입니다. 구조화 텍스트(ST)를 먼저 구현했고, 함수블록 다이어그램(FBD)과 순차 흐름도(SFC)는 다음 업데이트에서 이어서 추가할 예정입니다'],
-    en:['[New] IEC 61131-3 Structured Text (ST) language support — each PLC\'s program tabs now have a "+ Add ST Program" button to create a new C-like structured text program. Supports structured control statements (IF/ELSIF/ELSE/END_IF, FOR..TO..BY..DO..END_FOR, WHILE..DO..END_WHILE, REPEAT..UNTIL..END_REPEAT), AND/OR/XOR/NOT/MOD operators, comparison operators (= <> < > <= >=), and arithmetic',
-        '[New] Timers/counters are called as real IEC function blocks — T0(IN:=cond, PT:=time); then read T0.Q (output) / T0.ET (elapsed), and C0(CU:=cond, R:=reset, PV:=preset); then read C0.Q / C0.CV. Calling another program uses CALL(\'ProgramName\'); (single-quoted, so Korean names work directly)',
-        '[New] All four vendors (LS ELECTRIC/Mitsubishi/Siemens/Omron) share the same IEC-standard grammar, but — just like Ladder/IL — addresses are entered/displayed in each vendor\'s real notation (LS P0000/M0000/T000/D0000, Mitsubishi X0/Y0/M0/T0/D0 unchanged, Siemens I0.0/Q0.0/M0.0/MW0, Omron 0.00/100.00/W0.00/D0). Siemens in particular follows real TIA Portal (SCL) convention, quoting timer/counter instance names like "T0" and writing time values as IEC time literals such as T#3S instead of 3000',
-        '(Note/honest limitations) This ST implementation has no VAR...END_VAR local-variable declaration block (only FOR-loop induction variables act as local variables) — a simplification to keep things approachable. There is also no ST-to-Ladder auto-conversion button (arbitrary control flow like IF/FOR/WHILE can\'t be safely converted back to a ladder diagram — true of most real commercial IEC 61131-3 toolchains too). An accidental infinite loop is safely capped at a fixed number of execution steps per scan so it can\'t freeze the browser',
-        '(Note) This release is phase 1 of the "IEC 61131-3 standard languages + vendor-specific coding styles" request. Structured Text (ST) was implemented first; Function Block Diagram (FBD) and Sequential Function Chart (SFC) are planned for upcoming updates'] } },
-  { ver:'Ver0.71', items:{
-    ko:['[검증/보강] PLC-PLC 통신(통신 모듈의 마스터/슬레이브 데이터 링크)이 두 개의 완전히 독립된 실제 PLC 인스턴스 사이에서도 정확하게 동작함을 확인했습니다 — comm-ethernet/comm-serial 부품을 두 PLC의 LAN 단자에 실제로 배선하고 더블클릭해 링크(D영역 범위 → 상대 PLC D영역 범위)를 추가하면, RUN 중 매 스캔마다 값이 계속 갱신되어 전달됩니다(한 번만 복사되는 것이 아님)',
-        '[수정] 통신 편집기 드로어를 한 번도 연 적이 없는 상태에서 링크를 추가/수정하면 발생하던 잠재적 오류(내부 DOM 참조 누락)를 방어적으로 처리',
-        '[신규] 프로젝트 저장/불러오기에 통신 링크 설정(comm-ethernet/comm-serial의 마스터↔슬레이브 D영역 매핑)이 포함되도록 확장 — 이전에는 저장되지 않아 다시 열면 링크가 사라졌습니다'],
-    en:['[Verified/hardened] Confirmed that PLC-to-PLC communication (a comm module\'s master/slave data link) works correctly between two fully independent real PLC instances — wire a comm-ethernet/comm-serial part to both PLCs\' LAN terminals, double-click it to add a link (a D-register range → the peer PLC\'s D-register range), and values keep updating every scan while RUN is active (not a one-shot copy)',
-        '[Fix] Defensively handled a latent error when adding/editing a link before the comm editor drawer had ever been opened once (a missing internal DOM reference)',
-        '[New] Saving/loading a project now also includes comm-link configuration (comm-ethernet/comm-serial master↔slave D-register mappings) — previously this was not saved and links disappeared on reopening'] } },
-  { ver:'Ver0.70', items:{
-    ko:['[신규] 외부 연동 브릿지(🌉): "K군의 통합 시뮬레이터"에서 이 PLC 시뮬레이터를 아두이노/ESP32 시뮬레이터와 연동시키기 위한 부품이 팔레트 "⑤ 통신" 칸에 추가되었습니다. HMI/VC 연동과 같은 원칙으로, 이 부품의 LAN 단자를 통신 모듈을 거쳐 대상 PLC의 LAN 단자와 실제로 배선해야만 통합 셸이 그 PLC의 값을 읽고 강제 입력을 걸 수 있습니다. 이 PLC 시뮬레이터를 단독으로 열었을 때는 이 부품이 있어도 아무 동작도 하지 않습니다(통합 셸에서만 의미가 있음)'],
-    en:['[New] External Link Bridge (🌉): a new part in the "⑤ Communications" palette section lets "K\'s Integrated Simulator" connect this PLC simulator with the Arduino/ESP32 simulator. Following the same principle as HMI/VC Link, this part\'s LAN terminal must be wired through a comm module into the target PLC\'s LAN terminal before the integrated shell can read that PLC\'s values or force inputs on it. Opening this PLC simulator standalone does nothing with this part — it only matters inside the integrated shell'] } },
-  { ver:'Ver0.69', items:{
-    ko:['[신규] 벤더별 주소 표기 확장: LS ELECTRIC(XG5000)에서 보조릴레이(M0000)·타이머(T000)·카운터(C000)·데이터레지스터(D0000)까지 XGB 표기 형식으로 표시/입력됩니다(지난 버전까지는 입출력 P0000/P0020만 변환되었음). Mitsubishi(X0/Y0/M0/T0/C0/D0), Siemens(I0.0/Q0.0/M0.0/MW0), Omron(0.00/100.00/W0.00/D0) 표기는 그대로 유지됩니다',
-        '[신규] 래더 심볼도 벤더별로 다르게 표시: 단순 비트 코일(OUT/SET/RST/PLS/PLF)은 4사 모두 둥근 코일(⚪)로 표시되지만, 타이머·카운터·데이터명령(MOV/ADD 등)·CALL 같은 "응용명령"은 벤더별로 모양이 달라집니다 — LS·Mitsubishi는 대괄호 응용명령 박스([ TON ], [ MOV ]) 스타일, Siemens(TIA Portal)는 실제 IEC 규격처럼 좌상단 EN·우상단 ENO가 붙은 사각 펑션 박스 스타일, Omron(Sysmac Studio)은 그림자 없는 플랫하고 모던한 박스 스타일로 표시됩니다. 접점 색상·래더 캔버스 배경색도 4사 테마 컬러(LS 블루/Mitsubishi 오렌지/Siemens 사이언/Omron 그린)로 전부 구분됩니다',
-        '(참고) 이번에도 내부 래더 스캔·메모리 연산은 공통 X/Y/M/T/C/D 주소의 단일 엔진으로 그대로 동작하며, 벤더별 표기·심볼은 화면(뷰어/에디터) 표시 전용입니다 — 저장 파일·프리셋·CALL 서브프로그램 호환성에는 영향이 없습니다. 실제 각사 상용 툴의 100% 재현이 아닌, 실습실 적응력을 높이기 위한 교육용 근사치입니다'],
-    en:['[New] Extended vendor address notation: LS ELECTRIC (XG5000 style) now also shows/accepts aux relays (M0000), timers (T000), counters (C000) and data registers (D0000) in XGB notation — previously only inputs/outputs (P0000/P0020) were converted. Mitsubishi (X0/Y0/M0/T0/C0/D0), Siemens (I0.0/Q0.0/M0.0/MW0), and Omron (0.00/100.00/W0.00/D0) notation is unchanged',
-        '[New] Ladder symbol shapes now differ by vendor too: simple bit coils (OUT/SET/RST/PLS/PLF) still render as a round coil (⚪) on all 4 vendors, but "application instructions" — timers, counters, data instructions (MOV/ADD, etc.) and CALL — now look different per vendor: LS/Mitsubishi use a bracketed instruction-box style ([ TON ], [ MOV ]), Siemens (TIA Portal) uses a rectangular IEC-style function box with EN at the top-left and ENO at the top-right, and Omron (Sysmac Studio) uses a flat, shadow-free, modern box style. Contact colors and the ladder canvas background are also now distinguished by each vendor\'s theme color (LS blue / Mitsubishi orange / Siemens cyan / Omron green)',
-        '(Note) The internal ladder scan and memory logic still run on one shared engine using common X/Y/M/T/C/D addressing — the vendor notation and symbols are display-only, in the viewer/editor screens, so saved files, presets, and CALL sub-programs remain fully compatible. This is an educational approximation meant to build familiarity with real commercial tools, not a 100% reproduction of any vendor\'s actual software'] } },
-  { ver:'Ver0.68', items:{
-    ko:['[신규] VC 연동(WebSocket)도 이제 실제 배선이 필요함: 팔레트 "⑤ 통신" 칸에 🖥️ "VC 연동 게이트웨이" 부품이 추가되었습니다. 지난 버전에서 HMI에 적용한 것과 같은 원리로, 이 게이트웨이의 LAN 단자를 🌐 Ethernet 또는 🔗 CAN/RS-485 통신 모듈을 거쳐 대상 PLC의 LAN 단자와 실제로 배선해야만, 좌측 하단 "🔌 VC 연동" 패널의 WebSocket 송수신이 그 PLC의 데이터를 실제로 주고받습니다. 배선이 없으면 WebSocket 자체는 연결되어도 데이터는 오가지 않으며, 패널에 🟢게이트웨이 연결됨/🔴게이트웨이 연결 안됨 배지가 실시간으로 표시됩니다',
-        '[신규] PLC 표면에 제조사 배지 표시: 각 PLC 부품 상단 색상 바에 "LS"/"FX"/"S7"/"NX" 같은 제조사 축약 배지가 추가되어, 캔버스에 여러 PLC를 늘어놓아도 어느 회사 제품인지 한눈에 구분할 수 있습니다',
-        '(참고) 기존에 만들어 둔 프로젝트를 이 버전에서 열었을 때 VC 연동이 "게이트웨이 연결 안됨"으로 보인다면, 🖥️ VC 연동 게이트웨이 부품을 캔버스에 추가하고 통신 모듈을 거쳐 해당 PLC와 배선해 주세요'],
-    en:['[New] VC Link (WebSocket) now also requires real wiring: a 🖥️ "VC Link Gateway" part has been added to the "⑤ Communications" palette section. Following the same principle applied to HMI in the previous version, this gateway\'s LAN terminal must be wired through a 🌐 Ethernet or 🔗 CAN/RS-485 comm module into the same network as the target PLC\'s LAN terminal before the WebSocket exchange in the "🔌 VC Link" panel (bottom-left) actually carries that PLC\'s data. Without that wiring, the WebSocket itself can still connect, but no data flows, and the panel shows a live 🟢Gateway linked/🔴Gateway not linked badge',
-        '[New] Manufacturer badge shown on the PLC body: each PLC part\'s colored top bar now carries a manufacturer abbreviation badge — "LS"/"FX"/"S7"/"NX" — so multiple PLCs on the canvas can be told apart by maker at a glance',
-        '(Note) If an existing saved project shows "Gateway not linked" for VC Link in this version, add a 🖥️ VC Link Gateway part to the canvas and wire it through a comm module to that PLC'] } },
-  { ver:'Ver0.67', items:{
-    ko:['[변경] HMI가 실제로 통신 모듈에 배선되어야 PLC 값을 읽고 제어함: 지금까지는 HMI 화면 편집기에서 "연결할 PLC"를 드롭다운으로 고르기만 하면 배선 없이도 곧바로 그 PLC 메모리를 읽고 쓸 수 있었습니다. 이제는 그 선택이 실제 HMI의 "주소 설정"에 해당하는 것일 뿐이고, 이 HMI의 LAN 단자를 🌐 Ethernet 또는 🔗 CAN/RS-485 통신 모듈을 거쳐 그 PLC의 LAN 단자와 같은 네트워크 구간으로 실제 배선해야만 값을 읽고 제어할 수 있습니다(실제 산업 현장에서 HMI에 PLC 주소를 설정해도 통신 케이블이 꽂혀 있지 않으면 통신이 안 되는 것과 같은 개념). 배선이 안 되어 있으면 HMI 화면에 "연결 안됨" 경고가 표시되고, 화면 편집기에도 🟢연결됨/🔴연결 안됨 배지가 실시간으로 표시됩니다. 기존에 만들어 둔 프로젝트를 이 버전에서 열면, HMI를 배선해 주기 전까지는 "연결 안됨"으로 보일 수 있습니다',
-        '(참고) PLC↔PLC 사이의 통신 모듈(가상 Modbus TCP/CAN 데이터 링크) 기능 자체는 이전 버전 그대로이며, 이번 변경은 그 통신 모듈에 HMI도 실제로 연결해야 동작하도록 만든 것입니다. PLC-PLC 데이터 링크(마스터/슬레이브)의 대상 목록에는 여전히 PLC만 나타납니다'],
-    en:['[Changed] An HMI must now be physically wired to a comm module to actually read/control PLC values: previously, picking a "PLC to bind to" from a dropdown in the HMI screen editor was enough to immediately read and write that PLC\'s memory, with no wiring required. Now that dropdown is only the HMI\'s own "address configuration" — to actually read/control values, this HMI\'s LAN terminal must be wired through a 🌐 Ethernet or 🔗 CAN/RS-485 comm module into the same network segment as that PLC\'s LAN terminal (the same way a real HMI can have a PLC address configured yet still not communicate if its cable isn\'t actually plugged in). When not wired, the HMI screen shows a "Not linked" warning, and the screen editor shows a live 🟢Linked/🔴Not linked badge. Existing saved projects may show "Not linked" in this version until the HMI is wired up',
-        '(Note) The PLC↔PLC comm module feature itself (the simulated Modbus TCP/CAN data link) is unchanged from the previous version — this change only requires an HMI to also be actually wired into that same comm module to work. The PLC-PLC data link (master/slave) target list still only ever lists PLCs'] } },
-  { ver:'Ver0.66', items:{
-    ko:['[신규] 예제 갤러리: 상단 툴바의 "📖 예제 갤러리" 버튼을 누르면 LS ELECTRIC/Mitsubishi/Siemens/Omron 4개 벤더 탭에서 동일한 내용의 예제 19종을 고를 수 있습니다. AND/OR/B접점/SET·RST 자기유지/OR 피드백 자기유지/인터록/TON/CTU/PLS/PLF/비교(CMP)접점/MOV·ADD/INC·DEC/CALL 서브프로그램/IL 니모닉 같은 기초 개념 예제 15종과, 실제 부품으로 배선된 실전형 예제 4종(공급-가공-송출-분류, 검사-포장, 승강-분류, 그리고 이번에 새로 추가된 금속/비금속 선별 컨베이어)을 포함합니다. 내부 래더 엔진은 항상 벤더 무관 주소를 사용하고 화면 표시만 벤더별 표기로 바뀌므로, 카드를 클릭하면 현재 선택된 벤더 탭의 PLC로 동일한 로직이 그대로 만들어집니다(이번 버전부터 Omron도 처음으로 예제/프리셋에서 실제로 사용됩니다)',
-        '[변경] 기존 "🏭 프리셋 불러오기" 드롭다운 메뉴(3종)를 없애고, 그 내용을 위 예제 갤러리의 "실전배선" 카테고리로 통합했습니다. 예전 방식으로 코드에서 직접 프리셋을 불러오던 loadPresetByKey()/loadPreset_*() 함수들은 그대로 남아있어 하위 호환됩니다'],
-    en:['[New] Example Gallery: the "📖 Example Gallery" button in the top toolbar opens a picker with 4 vendor tabs — LS ELECTRIC, Mitsubishi, Siemens, Omron — each offering the exact same 19 examples. It includes 15 basic-concept examples (AND, OR, NC contact, SET/RST latch, OR-feedback latch, interlock, TON, CTU, PLS, PLF, CMP comparison contact, MOV/ADD, INC/DEC, CALL sub-program, IL mnemonics) plus 4 realistic wired process examples (Supply-Process-Transport-Sort, Inspect-Pack, Lift-Sort, and a newly added metal/non-metal sorting conveyor). Since the internal ladder engine always uses vendor-agnostic addresses and only the on-screen notation changes per vendor, clicking a card builds the identical logic on whichever vendor tab is currently selected (this is also the first version where Omron is actually used by an example/preset)',
-        '[Changed] Removed the old "🏭 Load Preset" dropdown menu (3 items) and folded its content into the "Wired" category of the new Example Gallery above. The underlying loadPresetByKey()/loadPreset_*() functions used by the old code path still exist and remain backward compatible'] } },
-  { ver:'Ver0.65', items:{
-    ko:['[신규] 래더 편집 키보드 단축키: 접점 그룹이나 코일을 클릭해 선택한 뒤 F5=A접점(NO) 추가, F6=B접점(NC) 추가, Shift+F5=P접점(상승엣지) 추가, F7=바로 아래에 새 랑 추가, F8=코일 종류 순환 전환, F9=OR 분기(그로개) 추가 — 실제 상용 PLC 래더 IDE(GX Works/XG5000 계열)의 단축키 관행을 참고했습니다. 편집기가 열려있는 동안은 F5 등을 눌러도 브라우저가 새로고침되지 않습니다',
-        '[신규] 디바이스 코멘트(주소별 태그명): 래더 편집기 툴바의 "📝 디바이스 코멘트" 버튼으로 X/Y/M/D 주소마다 한글(또는 영문) 태그명을 붙일 수 있고, 래더 다이어그램의 해당 접점·코일 위에 작게 표시됩니다. 주소는 항상 내부 표기로 저장되므로 벤더(LS/미쓰비시/지멘스/오므론)를 바꿔도 코멘트가 유지되며, 프로젝트 저장/불러오기에도 함께 저장됩니다',
-        '[신규] 컨베이어 워크피스 금속/비금속 다양화: 스마트 컨베이어의 "🔩 금속"/"◽ 비금속" 버튼으로 재질이 다른 워크피스를 투입할 수 있고(회색=금속, 갈색=비금속), 내장 센서를 광전형/유도형/정전형 중에서 선택할 수 있습니다 — 유도형은 금속 워크피스만 감지하고 광전형·정전형은 재질과 무관하게 모두 감지해, 실제 산업 현장에서 센서 종류를 고르는 기준을 그대로 체험할 수 있습니다',
-        '[신규] 래더 랑(rung) 블록 편집 — 다중선택/복사·붙여넣기/드래그 재배치: 랑 번호를 클릭해 선택하고(Ctrl+클릭=다중 선택, Shift+클릭=범위 선택), Ctrl+C/Ctrl+V로 선택한 랑을 복사·붙여넣기 하거나, 랑 번호를 드래그해 다른 위치(또는 맨 아래)로 순서를 바꿀 수 있습니다. 선택되어 있던 랑을 드래그하면 여러 랑이 한 블록으로 함께 이동합니다',
-        '[신규] IL(니모닉)↔래더 다이어그램 양방향 변환: 기존에는 래더→IL 내보내기만 가능했지만, 이번 버전부터 IL 편집기의 "🔧 래더로 변환" 버튼으로 IL 프로그램을 컴파일한 뒤 그 결과를 새 래더 다이어그램 프로그램으로 만들 수 있습니다(원본 IL 프로그램은 그대로 유지). LD/AND/OR·ANB/ORB·MPS/MRD/MPP를 포함한 대부분의 IL 구조와 비교접점·데이터 명령어(MOV/ADD 등)를 지원하며, 하나의 조건에서 여러 출력이 이어지는 IL은 동일 조건을 가진 여러 랑으로 정확히 분해됩니다. 다만 래더는 랑 하나당 코일 하나만 표현할 수 있어, 지나치게 복잡한 분기(체인 수 폭발)를 가진 IL은 변환이 안전하게 거부됩니다',
-        '(참고) 지난 라운드(Ver0.64)에서 예고했던 "[PLC 시뮬레이터 상용화 고도화 및 비주얼 컴포넌트(VC) 연동 검토 보고서]"의 2·3라운드(중간~고난도) 항목 5종이 이번 버전으로 모두 반영되어, 최초 9개 체크리스트 항목이 전부 구현 완료되었습니다',
-        '(버그 수정) 래더 다이어그램에서 접점(들)과 "+" 버튼 뒤로 오른쪽 레일(코일)까지 연결선이 그려지지 않고 끊겨 보이던 문제를 수정 — 이제 각 랑(rung)마다 왼쪽 레일부터 코일까지 하나의 연속된 가로선으로 이어져, 실제 래더 다이어그램과 동일하게 표시됩니다'],
-    en:['[New] Ladder-editor keyboard shortcuts: click a contact group or coil to select it, then F5 = add an NO contact, F6 = add an NC contact, Shift+F5 = add a rising-edge (P) contact, F7 = add a new rung right below, F8 = cycle the coil type, F9 = add an OR branch — modeled on the shortcut conventions of real commercial PLC ladder IDEs (GX Works/XG5000-style). While the editor is open, these keys no longer trigger a browser refresh',
-        '[New] Device comments (per-address tag names): the "📝 Device Comments" button in the ladder editor toolbar lets you attach a Korean or English tag name to any X/Y/M/D address, shown in small text above the matching contact/coil in the diagram. Addresses are always stored in internal form, so comments survive switching vendors (LS/Mitsubishi/Siemens/Omron), and they are saved and restored with the project',
-        '[New] Metal/non-metal conveyor workpieces: the smart conveyor\'s "🔩 Metal"/"◽ Non-metal" buttons add a workpiece of the chosen material (gray = metal, tan = non-metal), and its built-in sensor can be set to photoelectric, inductive, or capacitive — inductive detects only metal workpieces, while photoelectric and capacitive detect either material, mirroring how sensor types are actually chosen on a real production line',
-        '[New] Ladder rung block editing — multi-select / copy-paste / drag reorder: click a rung number to select it (Ctrl+click to multi-select, Shift+click for a range), use Ctrl+C/Ctrl+V to copy and paste selected rungs, or drag a rung number to reorder it (to another position, or to the very end). Dragging a rung that is part of the current selection moves the whole block together',
-        '[New] Bidirectional IL (mnemonic) ↔ ladder-diagram conversion: previously only ladder→IL export was available; this version adds a "🔧 Convert to Ladder" button in the IL editor that compiles the current IL program and turns the result into a new ladder-diagram program (the original IL program is left untouched). It supports most IL constructs — LD/AND/OR, ANB/ORB, MPS/MRD/MPP — plus comparison contacts and data instructions (MOV/ADD, etc.); IL where several outputs are chained off one condition is correctly split into several rungs sharing that condition. Because the ladder model can only represent one coil per rung, IL whose branching is too complex (a combinatorial explosion of OR-chains) is safely refused rather than converted incorrectly',
-        '(Note) All 5 medium-to-high-difficulty items from rounds 2–3 of the "[PLC Simulator Commercialization Enhancement and Visual Components (VC) Integration Review Report]" promised in the previous round (Ver0.64) have now shipped, completing all 9 items on the original checklist',
-        '(Bug fix) Fixed the ladder diagram\'s connecting line stopping short after the contact(s)/"+" button instead of continuing to the right rail (coil) — each rung now shows one continuous horizontal line from the left rail all the way to the coil, matching a real ladder diagram'] } },
-  { ver:'Ver0.64', items:{
-    ko:['[신규] 데이터 모니터 / Force I/O: 좌측 하단 "📊 데이터 모니터" 탭에서 PLC를 선택하면 X/Y/M/D/T·C 전체 값을 실시간으로 볼 수 있습니다. X/Y/M 비트를 클릭하면 정상→강제 ON→강제 OFF→정상 순으로 전환되고(초록=강제ON, 빨강=강제OFF), D레지스터는 값을 입력해 고정하고 ↺로 해제합니다. 강제 값은 RUN 중 매 스캔마다 실제 배선/로직 계산 결과 위에 덮어써집니다(입력은 로직 계산 전에, 출력은 로직 계산 후에 적용되어 실제 상용 PLC의 Force 기능과 동일한 순서로 동작)',
-        '[신규] 스캔 타임 제어(1스캔 일시정지/1스텝): RUN 중 상단의 "⏸ 일시정지" 버튼을 누르면 PLC는 RUN 상태를 유지한 채(메모리/출력 값 보존) 스캔 타이머만 멈춥니다. 이 상태에서 "⏭ 1스텝" 버튼으로 정확히 한 스캔만 진행시킬 수 있어, 래더 로직을 한 스캔씩 따라가며 디버깅할 수 있습니다. "▶ 재개"로 다시 자동 스캔을 시작하고, STOP을 누르면 항상 일시정지 상태가 초기화됩니다',
-        '[신규] 단락(쇼트) 보호: 24V+ 단자와 24V- 단자가 배선(또는 닫힌 접점)으로 직접 이어지면 — 같은 SMPS 자체 단락뿐 아니라 서로 다른 두 SMPS 사이의 교차 단락까지 — 전류량 계산 없이 즉시 감지해 경고 팝업을 띄우고 해당 SMPS를 트립(출력 차단) 상태로 만듭니다. 트립된 SMPS는 빨간 테두리·빨간 LED·"트립(출력 차단됨)" 표시와 함께 출력을 멈추며, 배선을 고친 뒤 "🔄 리셋" 버튼을 눌러야 다시 전원이 돌아옵니다(실제 SMPS의 과전류 보호를 흉내낸 교육용 근사치이며, 현재는 DC 24V 라인만 감지 대상입니다)',
-        '[신규] 실린더 속도 컨트롤러: 단동/복동 실린더 부품 하단에 "⏱ 속도" 슬라이더(0.1~3.0초)가 추가되어, 미터아웃 유량조절밸브처럼 전진/후진 애니메이션 속도를 조절할 수 있습니다. 값은 프로젝트 저장/불러오기에도 함께 저장됩니다(실제 유량·압력 계산이 아닌 시각적 교육용 근사치입니다)',
-        '[신규] VC(비주얼 컴포넌트) 연동용 WebSocket 클라이언트: 좌측 하단 "🔌 VC 연동" 탭에서 PLC를 선택하고 ws:// 주소로 접속하면, RUN 중 PLC의 X/Y/M/D 상태를 200ms 주기로 그 서버에 전송하고, 서버가 보내는 강제 입력값을 받아 위 Force I/O에 그대로 적용합니다. 검토 보고서에서 결론 내린 대로 이 시뮬레이터는 OPC UA/Modbus TCP 소켓이나 6축 역기구학을 직접 지원하지 않으므로, 실제 Visual Components와 연결하려면 사용자가 별도의 PC에서 WebSocket↔OPC UA/Modbus TCP 중계 서버를 구축해야 합니다 — 이번 버전은 그 1단계인 "시뮬레이터 쪽 WebSocket 클라이언트"만 구현했으며, 로컬 모의(mock) 서버로 송수신을 검증했고 실제 Visual Components와의 end-to-end 연동 검증은 이루어지지 않았습니다',
-        '(버그 수정) 언어를 영어로 전환한 뒤 새로 배치하는 부품의 안내 문구(data-i18n 요소)가 한국어로 남아있던 문제를 수정 — 부품을 배치하는 순간 현재 언어로 즉시 번역되도록 배치 로직을 보강했습니다(기존에 이미 배치된 부품에는 영향 없음)'],
-    en:['[New] Data Monitor / Force I/O: pick a PLC from the "📊 Data Monitor" tab (bottom-left) to see all X/Y/M/D/T/C values live. Click an X/Y/M bit to cycle Normal → Forced ON → Forced OFF → Normal (green = forced ON, red = forced OFF); type a value into a D register to pin it, click ↺ to release it. Forced values override the real wiring/logic result every scan while RUN is active (inputs are applied before the logic runs, outputs after — the same order real commercial PLCs use for Force)',
-        '[New] Scan-time control (1-scan pause / step): while RUN is active, the "⏸ Pause" button at the top stops only the scan timer while the PLC stays in RUN (memory/outputs are preserved). While paused, "⏭ Step" advances exactly one scan, letting you debug ladder logic one scan at a time. "▶ Resume" restarts automatic scanning, and pressing STOP always resets the pause state',
-        '[New] Short-circuit protection: if a 24V+ terminal is connected directly to a 24V- terminal by wiring (or a closed contact) — whether within one SMPS or across two different SMPS units — it is detected immediately (by direct-connection topology, not current calculation), a warning pops up, and the affected SMPS trips (output cut off). A tripped SMPS shows a red border, a red LED, and a "Tripped (output cut off)" label, and stays off until its "🔄 Reset" button is pressed after the wiring is fixed (an educational approximation of real SMPS overcurrent protection; only DC 24V lines are currently checked)',
-        '[New] Cylinder speed controller: single- and double-acting cylinders now have a "⏱ Speed" slider (0.1–3.0s) that adjusts the extend/retract animation speed, approximating a meter-out flow control valve. The value is saved and restored with the project (a visual teaching aid, not a real flow/pressure calculation)',
-        '[New] WebSocket client for VC (Visual Components) integration: pick a PLC in the "🔌 VC Link" tab (bottom-left) and connect to a ws:// address — while RUN is active, the PLC\'s X/Y/M/D state is sent to that server every 200ms, and forced-input values the server sends back are applied through the Force I/O above. As the review report concluded, this simulator has no direct OPC UA/Modbus TCP sockets or 6-axis inverse kinematics, so a real Visual Components link still requires the user to build a separate WebSocket↔OPC UA/Modbus TCP relay server on their own machine — this version only implements the first step, the simulator-side WebSocket client, verified against a local mock server; no end-to-end verification against a real Visual Components instance was performed',
-        '(Bug fix) Fixed newly-placed parts keeping their Korean data-i18n text after switching the language to English — placement now translates a part to the current language immediately (parts already on the canvas were unaffected)'] } },
-  { ver:'Ver0.63', items:{
-    ko:['(확인/보강) 하단 교육용 사용 안내 문구, 상단 한국어/영문 전환 메뉴는 이미 구현되어 있었음을 확인 — 툴바 우측의 언어 선택(한국어/English)을 바꾸면 메뉴 전체가 전환됩니다',
-        '(버그 수정) AI 도우미 입력창의 안내 문구(placeholder)가 언어를 영어로 바꿔도 한국어로 남아있던 문제 수정 — data-i18n-ph 속성을 실제로 반영하도록 언어 전환 로직을 보강해, 앞으로 추가되는 입력창 placeholder도 자동으로 언어 전환에 포함됩니다'],
-    en:['(Verified) Confirmed the bottom-of-page educational-use notice and the top-bar Korean/English language menu were already in place — switching the language selector in the toolbar (한국어/English) translates the entire menu',
-        '(Bug fix) Fixed the AI Assistant input field\'s placeholder text staying in Korean even after switching to English — the language-switch logic now actually applies the data-i18n-ph attribute, so any input placeholder added in the future will also switch language automatically'] } },
-  { ver:'Ver0.62', items:{
-    ko:['상단 툴바에 있던 "🗒 릴리즈 노트"·"🤖 AI 도우미" 버튼을 없애고, 화면 좌측 하단(부품 상자 옆)의 작은 탭으로 옮겼습니다 — 탭을 클릭하면 그 자리에서 바로 위로 패널이 펼쳐지고, 다시 클릭하면 접힙니다(가운데 팝업/우측 서랍 방식에서 전환)',
-        'AI 도우미와 릴리즈 노트 패널은 한 번에 하나만 펼쳐지도록 했습니다 — 하나를 열면 다른 하나는 자동으로 접힙니다. 두 기능 모두 이전과 동일하게 동작합니다(대화 내용은 패널을 접었다 펼쳐도 유지됨)'],
-    en:['Removed the "🗒 Release Notes" and "🤖 AI Assistant" buttons from the top toolbar and moved them to small tabs in the bottom-left corner of the screen (next to the parts palette) — click a tab to expand its panel upward from that spot, click again to collapse it (replacing the old center-popup / right-side-drawer style)',
-        'Only one of the AI Assistant and Release Notes panels can be expanded at a time — opening one automatically collapses the other. Both features work exactly as before (the AI chat history is preserved across collapsing/expanding the panel)'] } },
-  { ver:'Ver0.61', items:{
-    ko:['래더 명령어 대폭 확장: 데이터 연산 코일 MOV/ADD/SUB/MUL/DIV/INC/DEC 추가 — D레지스터끼리, 또는 D레지스터와 상수/아날로그입력(AI)을 사용해 사칙연산·증감·이동 연산을 코일에서 바로 수행할 수 있습니다(0으로 나누기는 안전하게 무시되고 크래시하지 않음, 결과는 16비트 정수 범위로 clamp됨)',
-        '비교 접점 추가: 접점 옆의 "⇄" 버튼으로 일반접점을 비교접점으로 전환하면 =,<>,>,>=,<,<= 연산자로 D레지스터/AI/상수를 비교하는 접점을 만들 수 있습니다(예: D1 > 50)',
-        '엣지(미분) 접점 및 펄스 코일 추가: 접점의 기호를 클릭하면 NO→NC→상승엣지(P)→하강엣지(N) 순서로 전환됩니다. 코일 종류에 PLS(상승엣지에서 1스캔만 ON)/PLF(하강엣지에서 1스캔만 ON) 펄스 출력을 추가했습니다',
-        '복합 분기 회로 해석을 위한 스택 엔진(MPS/MRD/MPP) 도입 — 이번 버전부터 새로 추가된 "IL(니모닉) 프로그램" 모드에서 사용할 수 있습니다. 프로그램 탭 옆의 "+ IL 프로그램 추가" 버튼으로 만들 수 있고, LD/AND/OR(+I/P/F 접미사로 반전·상승엣지·하강엣지), ANB/ORB(블록 결합), MPS/MRD/MPP(한 지점에서 여러 출력으로 분기), LDCMP/ANDCMP/ORCMP(비교), 그리고 OUT/SET/RST/PLS/PLF/TON/CTU/CRST/MOV/ADD/SUB/MUL/DIV/INC/DEC/CALL 명령을 텍스트로 한 줄씩 입력합니다. "컴파일" 버튼을 눌러야 실제 실행에 반영되며, 문법 오류가 있으면 오류 목록만 보여주고 이전에 정상 컴파일된 로직은 그대로 안전하게 계속 실행됩니다',
-        '텍스트/니모닉 기반 붙여넣기: 위 IL 편집창에 니모닉 텍스트를 직접 입력·붙여넣기하면 그대로 컴파일되어 실행되는 프로그램이 되므로, 별도의 대량 붙여넣기 모달 없이 텍스트 붙여넣기만으로 로직을 일괄 작성할 수 있습니다',
-        '래더 다이어그램 → IL 내보내기: 랑이 있는 래더 프로그램에서 "📋 IL로 보기(내보내기)" 버튼을 누르면 현재 다이어그램을 니모닉 텍스트로 변환해 보여줍니다(복사해서 IL 프로그램에 붙여넣어 재사용 가능한 최선의 근사치 변환이며, 반대 방향인 IL→다이어그램 변환은 지원하지 않습니다)',
-        '주의(교육용 근사치): 이번에 추가된 명령어 세트는 특정 상용 PLC 제조사(미쓰비시 FX 계열 등)의 니모닉 표기를 참고해 만든 교육용 근사치이며, 실제 인증된 벤더 컴파일러의 명령어 사양과 100% 동일하지 않습니다. 이중 코일(같은 주소를 두 랑에서 OUT) 검사는 현재 래더 다이어그램 모드에만 적용되고, IL 프로그램 내부에는 적용되지 않습니다',
-        '(버그 수정) RUN 중 화면 강조 표시가 엣지(P/N) 접점의 통전 여부를 실제 스캔과 별개로 한 번 더 계산하면서 엣지가 스캔당 두 번 소모되어 화면에 켜지는 순간이 보이지 않던 문제를 수정 — 이제 계산 결과를 캐시해서 화면 표시용으로 재사용합니다'],
-    en:['Substantially expanded the ladder instruction set: added data-operation coils MOV/ADD/SUB/MUL/DIV/INC/DEC — perform arithmetic, increment/decrement, and move operations directly from a coil using D-registers together with constants or the analog input (AI) (division by zero is safely ignored, never crashes; results are clamped to a 16-bit integer range)',
-        'Added comparison contacts: use the "⇄" button beside a contact to switch it from a bit contact to a comparison contact using =, <>, >, >=, <, <= against a D-register / AI / constant (e.g. D1 > 50)',
-        'Added edge (differential) contacts and pulse coils: clicking a contact\'s symbol now cycles NO → NC → rising-edge (P) → falling-edge (N). Added PLS (one-scan pulse on rising edge) / PLF (one-scan pulse on falling edge) coil types',
-        'Introduced a stack-based engine (MPS/MRD/MPP) for interpreting complex branch circuits — available in the new "IL (mnemonic) program" mode added this version. Create one via the "+ Add IL Program" button next to the program tabs, then enter mnemonic instructions one per line: LD/AND/OR (with I/P/F suffixes for invert/rising-edge/falling-edge), ANB/ORB (block combination), MPS/MRD/MPP (branching from one point to several outputs), LDCMP/ANDCMP/ORCMP (comparison), and OUT/SET/RST/PLS/PLF/TON/CTU/CRST/MOV/ADD/SUB/MUL/DIV/INC/DEC/CALL. Click "Compile" to apply changes to execution; a syntax error only shows the error list and safely keeps running the last successfully compiled logic',
-        'Text/mnemonic-based paste: typing or pasting mnemonic text directly into the IL editor compiles and runs as a program, so bulk logic entry works via plain text paste without a separate bulk-import modal',
-        'Ladder diagram → IL export: in a ladder program that has rungs, click "View as IL (Export)" to convert the current diagram into mnemonic text (a best-effort, copy-and-reuse conversion into an IL program; the reverse direction, IL → diagram, is not supported)',
-        'Educational-approximation notice: this instruction set is modeled on the mnemonic conventions of a specific commercial PLC family (Mitsubishi FX-style, among others) as an educational approximation, and is not guaranteed to exactly match any certified vendor compiler\'s instruction behavior. Double-coil (same address used as OUT in two rungs) checking currently applies only to ladder-diagram-mode programs, not inside IL programs',
-        '(Bug fix) Fixed an issue where the RUN-time highlight refresh re-evaluated edge (P/N) contacts a second time separately from the actual scan, consuming the edge twice per scan so the highlighted "on" moment was never visible — the computed result is now cached and reused for display'] } },
-  { ver:'Ver0.6', items:{
-    ko:['부품 이름 바꾸기 기능 추가: 모든 부품 좌측 상단의 "✎" 버튼을 누르면 원하는 이름을 직접 입력할 수 있습니다(띄어쓰기 포함 자유 입력, 빈 값으로 두면 기본 이름으로 복귀) — 그동안 저장은 되지만 화면에 보이지 않던 "이름표(label)" 기능을 실제로 쓸 수 있게 만들었습니다',
-        '래더 편집기의 접점/코일 주소 입력칸을 텍스트 입력에서 드롭다운 선택 방식으로 전면 교체 — 더 이상 주소를 직접 타이핑할 필요 없이 X/Y/M/T/C 중 종류를 목록에서 고르기만 하면 됩니다(벤더별로 선택한 PLC사에 맞는 표기로 보임: 예) LS는 P0000/P0020, Siemens는 I0.0/Q0.0 등). 코일 종류를 바꿔 주소 영역이 안 맞게 되면(예: OUT→TON) 자동으로 유효한 주소로 보정됩니다',
-        '래더 편집기 창에 "최대화" 버튼(🗖) 추가 — 누르면 창이 화면 대부분을 채우도록 커지고, 다시 누르면 원래의 옆에서 열리는 패널 크기로 되돌아갑니다',
-        '신규 부품 "스마트 컨베이어(센서+분류)" 추가(팔레트 ⑧번 카테고리): M+/M-에 24V를 걸면 벨트가 돌고, "📦 제품 투입" 버튼으로 올린 박스가 벨트를 따라 흐릅니다. 벨트에 내장된 광전센서(SEN, PNP/NPN 선택 가능)가 박스를 감지해 SEN_OUT 신호를 내며, 그 순간 G+/G-가 여자되어 있으면 박스가 아래 갈래길로 분류되어 나가고, 아니면 그대로 직진합니다',
-        'PLC 래더로 M+ 를 껐다 켜면 벨트 위 박스가 실제로 멈췄다가 다시 움직이는 "자동 정지"도 별도 특수 코드 없이 배선 자체의 결과로 구현됩니다',
-        '주의(교육용 근사치): 컨베이어의 모든 박스는 종류/색상 구분 없이 동일하며, 실제 산업용 컨베이어의 물리 엔진이 아닌 단순 위치 보간 기반입니다. 센서와 게이트(분류대)는 벨트당 각 1개로 한정됩니다',
-        '(버그 수정) 부품을 개별 삭제(Delete/Backspace)할 때 HMI/통신/로봇/컨베이어의 내부 상태와 관련 편집창이 "새 프로젝트" 때처럼 완전히 정리되지 않던 문제를 수정 — 이제 부품을 지우면 관련 편집 패널도 확실히 닫히고 내부 상태도 함께 삭제됩니다'],
-    en:['Added a component rename feature: click the "✎" button in the top-left corner of any part to type a custom name (spaces allowed; leaving it blank reverts to the default name) — this finally exposes the "label" data that was already being saved but never shown on screen',
-        'Replaced the ladder editor\'s free-text contact/coil address field with dropdown selectors — pick X/Y/M/T/C from a list instead of typing an address by hand (shown per the selected PLC vendor\'s own notation, e.g. LS shows P0000/P0020, Siemens shows I0.0/Q0.0). Changing a coil\'s type so its old address type no longer applies (e.g. OUT→TON) now auto-corrects it to a valid address',
-        'Added a maximize button (🗖) to the ladder editor drawer — click it to expand the drawer to fill most of the screen, click again to return to the normal side-panel size',
-        'Added a new "Smart Conveyor (Sensor + Sorting)" part (palette category ⑧): energize M+/M- to run the belt, and boxes added via the "📦 Insert Product" button ride along it. A built-in photoelectric sensor (SEN, PNP/NPN selectable) detects a box and drives SEN_OUT — if G+/G- is energized at that instant the box diverts onto a branch lane, otherwise it continues straight',
-        'Toggling M+ off/on from PLC ladder logic genuinely stops and resumes a box on the belt ("auto-stop") — this falls out naturally from the wiring model with no special-case code',
-        'Educational-approximation notice: all conveyor boxes are identical (no color/size distinction) and movement is simple position interpolation, not a real physics engine; each belt is limited to one sensor and one sorting gate',
-        '(Bug fix) Deleting a single component (Delete/Backspace) now fully clears its HMI/comm/robot/conveyor internal state and closes any related editor panel, matching the cleanup that already happened on "New Project"'] } },
-  { ver:'Ver0.5', items:{
-    ko:['상단 툴바에 "🤖 AI 도우미" 버튼 추가 — 규칙 기반(패턴 매칭) 오프라인 도우미로, 실제 AI 모델이나 인터넷 연결 없이 동작하며 이 페이지의 현재 시뮬레이터 상태만 그대로 읽어서 답변함',
-        '배선 진단: "왜 Y0가 안 켜져?", "경고램프 확인해줘"처럼 부품 이름이나 X/Y/M 주소를 포함해 물어보면, 전원/RUN 상태, 해당 단자의 통전 여부, 관련 배선 경고를 찾아 알려줌',
-        '상태 요약, 이중 코일 점검, 카운터(CTU)·타이머(TON/TOF)·서브프로그램(CALL) 작성법, 벤더별 주소 표기, 통신(Modbus/CAN) 연결법, 3D 로봇 암 사용법, 프리셋 목록 등 자주 묻는 질문에 대한 안내도 제공',
-        '주의(교육용 근사치): 실제 LLM이 아닌 정해진 규칙(패턴)과 조건문으로만 동작하는 오프라인 기능입니다. 목록에 없는 자유로운 질문이나 이 시뮬레이터 밖의 지식에는 답할 수 없으며, 질문 패턴이 일치할 때만 관련 정보를 보여줍니다',
-        '(버그 수정) 새 프로젝트 시작 시 3D 로봇 암의 자세/포인트 상태와 편집 패널이 완전히 초기화되지 않던 문제 수정 — 이제 통신/래더/HMI 패널과 동일하게 로봇 패널도 확실히 닫히고 초기화됨',
-        '이로써 이전에 안내한 "구현이 빠진 부분" 목록의 4가지 항목(벤더 확장, 산업통신, 3D 로봇 OLP, AI 에이전트)이 모두 구현 완료되었습니다'],
-    en:['Added an "🤖 AI Assistant" button to the top toolbar — a rule-based (pattern-matching) offline helper that runs with no real AI model and no network access, answering only from this page\'s own live simulator state',
-        'Wiring diagnosis: ask something like "why is Y0 not on?" or "check the warning lamp" (naming a part or an X/Y/M address) and it reports power/RUN status, whether that terminal is energized, and any related wiring warnings',
-        'Also answers common questions: status summaries, double-coil checks, how to use counters (CTU), timers (TON/TOF), and sub-programs (CALL), vendor address formats, how to set up comms (Modbus/CAN), how to use the 3D robot arm, and the list of presets',
-        'Educational-approximation notice: this is not a real LLM — it is an offline feature driven entirely by fixed rules (pattern matching) and conditionals. It cannot answer free-form questions outside its list or draw on knowledge beyond this simulator; it only surfaces information when your question matches a known pattern',
-        '(Bug fix) Fixed the 3D robot arm\'s pose/point state and its editor panel not being fully reset when starting a new project — the robot panel now closes and resets reliably, just like the comm/ladder/HMI panels',
-        'With this, all four items from the previously disclosed "what\'s not implemented yet" list (vendor expansion, industrial comms, 3D robot OLP, and the AI agent) are now complete'] } },
-  { ver:'Ver0.4', items:{
-    ko:['"3축 로봇 암(OLP)" 부품 추가(기본형): 팔레트 ⑦번 카테고리에서 배치, TRIG+/TRIG- 단자와 BUSY 단자를 가진 부품으로 다른 부품들과 동일하게 배선 가능',
-        '더블클릭하면 우측 패널에서 3D 스테이지로 베이스(회전)·숄더·엘보우 3개 관절과 그리퍼 개폐를 직접 조작할 수 있고, 원하는 자세를 "포인트"로 여러 개 가르친 뒤 순서대로 재생(선형보간) 가능',
-        '재생 시작 방법은 두 가지: ① TRIG+/− 단자에 배선된 신호의 상승 엣지(예: PLC의 Y출력을 직접 배선), ② 패널 하단에서 특정 PLC의 특정 Y출력을 지정하는 "PLC 트리거" 드롭다운(배선 없이도 동작) — 재생 중에는 BUSY 단자가 24V를 출력해 램프나 PLC 입력에 연결할 수 있음',
-        '주의(교육용 근사치): 실제 three.js 등 3D 렌더링 엔진이 아닌 순수 CSS 3D 변환으로 구현한 단순 시각화이며, 역기구학(IK)·충돌 검사·속도/가속도 프로파일은 구현되어 있지 않습니다. 관절은 3축(베이스/숄더/엘보우)+그리퍼로 한정되고, 포인트 사이는 항상 선형보간으로만 이동합니다',
-        '하단 상태바 문구를 최신 구현 범위(4개 PLC사 + CALL + HMI + 가상 산업통신 + 3D 로봇 OLP 기본형)에 맞게 갱신 — 남은 항목은 AI 에이전트뿐'],
-    en:['Added a "3-Axis Robot Arm (OLP)" part (basic tier): placed from palette category ⑦, wired like any other part via its TRIG+/TRIG- and BUSY terminals',
-        'Double-click opens a side panel with a 3D stage where you can directly jog the base (rotation), shoulder, and elbow joints plus the gripper, teach the current pose as a "point" any number of times, and play the taught points back in sequence via linear interpolation',
-        'Playback can be started two ways: (1) a rising edge on the wired TRIG+/− signal (e.g. a PLC Y output wired directly to it), or (2) a "PLC Trigger" dropdown at the bottom of the panel that watches a specific PLC\'s Y output with no wiring required — the BUSY terminal outputs 24V while playing, so it can drive a lamp or a PLC input',
-        'Educational-approximation notice: this is a plain CSS-3D-transform visualization, not a real 3D engine like three.js, and there is no inverse kinematics, collision detection, or velocity/acceleration profiling. Joints are limited to 3 axes (base/shoulder/elbow) plus a gripper, and motion between points is always linear interpolation',
-        'Updated the footer status line to reflect current scope (4 PLC vendors + CALL + HMI + simulated industrial comms + basic-tier 3D robot OLP) — only the AI agent remains'] } },
-  { ver:'Ver0.3', items:{
-    ko:['실제 산업통신을 흉내내는 가상 시뮬레이션 추가: Ethernet(Modbus TCP)·CAN/RS-485 통신 모듈이 이제 P1/P2 단자로 배선 가능해짐',
-        'PLC의 LAN 단자를 통신 모듈에 배선해 같은 네트워크 구간으로 묶은 뒤, 모듈을 더블클릭하면 우측 패널에서 두 PLC 사이의 데이터 링크(마스터 D레지스터 → 슬레이브 D레지스터)를 설정할 수 있음',
-        '설정한 링크는 RUN 중 매 스캔 실제로 값을 복사하고, 그 내역이 실시간 "패킷 모니터" 로그(타임스탬프 포함)로 표시됨 — 네트워크 케이블(배선)을 끊으면 그 즉시 데이터 전송도 끊기는 것까지 반영',
-        '주의: 브라우저 특성상 실제 TCP 소켓이나 시리얼 포트를 여는 것은 불가능하므로, 이 기능은 같은 페이지 안에서 프로토콜을 흉내내는 교육용 시뮬레이션입니다(실제 Modbus/CAN 패킷 포맷·타이밍·에러처리를 구현한 것은 아님, 데이터도 D 레지스터 영역만 지원)'],
-    en:['Added a simulated industrial-communications layer: the Ethernet (Modbus TCP) and CAN/RS-485 comm modules can now be wired via P1/P2 ports',
-        'Wire a PLC\'s LAN terminal into a comm module to put it on that network segment, then double-click the module to open a side panel and configure a data link (master D-registers → slave D-registers) between two PLCs',
-        'Configured links actually copy data every scan while running, with the exchange shown live in a timestamped "packet monitor" log — unplugging the network wiring immediately stops the data transfer, too',
-        'Note: browsers cannot open real TCP sockets or serial ports, so this is an educational simulation that mimics the protocol on the same page (it does not implement real Modbus/CAN packet formats, timing, or error handling, and only D-register data is supported)'] } },
-  { ver:'Ver0.2', items:{
-    ko:['Siemens(TIA Portal)·Omron(Sysmac Studio) PLC를 "준비중" 자리에서 실제로 스캔·래더 실행이 되는 PLC로 전환 — 이제 4개사(LS·Mitsubishi·Siemens·Omron) 모두 실제 프로그램을 넣고 돌릴 수 있음',
-        '벤더별 주소 표기 도입: 래더 편집기의 접점/코일 주소칸이 LS는 P0000~형(XGB 방식), Siemens는 I0.0/Q0.0/M0.0형, Omron은 0.00/100.00형으로 보이고 입력됨(Mitsubishi는 원래부터 X/Y/M 표기라 그대로). 내부 저장 형식은 그대로 X/Y/M/T/C라 저장파일 호환성은 유지 — 실제 각사 스펙을 100% 반영한 것은 아닌 교육용 근사치',
-        '서브 프로그램에 실제 CALL(호출) 동작 추가: 코일 타입에 CALL을 넣고 대상 프로그램을 선택하면, Main 프로그램의 해당 랑이 켜질 때만 그 서브프로그램이 실행되고 끝나면 호출한 자리로 복귀함(자기 자신을 호출하는 등 순환 호출은 자동으로 막힘). Main은 이전처럼 매 스캔 자동 실행되고, 나머지는 CALL로 호출될 때만 실행',
-        '프리셋을 3종으로 확장(상단 "프리셋 불러오기" 드롭다운): 기존 "공급-가공-송출-분류" 외에, CALL 서브프로그램 예제인 "검사-포장", 카운터(CTU) 예제인 "승강-분류" 추가',
-        '"5V 로직 표시등" 부품 추가 — 5V 레귤레이터의 OUT 단자에 실제로 연결해 전력이 오는지 확인할 수 있는 5V 부하 (지금까지는 5V를 소비하는 부품이 없었음)'],
-    en:['Siemens (TIA Portal) and Omron (Sysmac Studio) PLCs are no longer placeholders — they now run real scan/ladder execution just like LS and Mitsubishi, so all 4 vendors can run real programs',
-        'Added vendor-styled address display: contact/coil address fields in the ladder editor now show and accept LS-style P0000+ addresses, Siemens-style I0.0/Q0.0/M0.0, and Omron-style 0.00/100.00 (Mitsubishi already matched real X/Y/M notation, so it is unchanged). Internal storage stays X/Y/M/T/C for save-file compatibility — this is an educational approximation, not a spec-accurate implementation of each vendor',
-        'Added real CALL execution for sub-programs: set a coil to CALL and pick a target program — that sub-program now runs only while the calling rung in Main is energized, then execution returns to where it was called from (self/circular calls are automatically blocked). Main still runs automatically every scan; other programs run only when called',
-        'Expanded presets to 3 (via the "Load Preset" dropdown): the original Supply-Process-Transport-Sort, plus "Inspect-Pack" (a CALL sub-program example) and "Lift-Sort" (a CTU counter example)',
-        'Added a "5V Logic Indicator" part — a real 5V load you can wire to a 5V regulator\'s OUT terminal to confirm it is actually delivering power (previously nothing consumed 5V)'] } },
-  { ver:'Ver0.1.2', items:{
-    ko:['PLC 본체 재설계: 입력(X0~X15)은 위쪽, 출력(Y0~Y15)은 아래쪽으로 나눠 배치하고, 전원(24V+/24V-/COM)과 신규 LAN 단자는 우측 하단에 모아 배치',
-        '입출력 16점(X0~15, Y0~15)으로 확장 + 아날로그 입력 2점(AI0/AI1, 압력·레이저·라이다 센서 등에서 0~100% 값 수신) 신설',
-        'PLC 상단에 실물처럼 POWER/RUN/ERROR 상태 LED와 각 입출력 옆에 개별 LED를 추가 — 배선된 전원이 있으면 STOP 상태에서도 POWER LED가 켜지고, 입출력이 ON되면 해당 LED가 실제로 초록색으로 켜짐',
-        '래더 편집기와 HMI 편집기를 화면 중앙 팝업에서 이전 아두이노 시뮬레이터와 같은 "우측에서 열고 닫히는 슬라이드 패널" 방식으로 전환 — 세로 탭을 눌러 언제든 다시 열 수 있음',
-        '래더 편집기를 접점 칩 버튼 나열 방식에서 실제 래더 다이어그램(좌우 전원 레일, 릴레이 접점 기호, 코일 기호, OR 분기)처럼 다시 그림 — RUN 중에는 전류가 흐르는 접점/랑이 초록색으로 강조',
-        '벤더별 색상 테마 강화: LS ELECTRIC(XG5000 느낌의 블루), Mitsubishi(GX Works3 느낌의 오렌지)로 편집기 헤더/강조색 구분',
-        '"서브 프로그램" 지원: 한 PLC에 여러 개의 이름 붙은 프로그램(랑 묶음)을 만들고 탭으로 전환·이름변경·삭제 가능 (모든 프로그램은 스캔마다 등록 순서대로 이어서 실행 — CALL/RET 같은 점프 호출은 아직 없음)',
-        '자동화산업기사 프리셋 템플릿이 신규 프로그램 구조와 맞물리도록 내부 저장 방식 수정'],
-    en:['Redesigned the PLC body: inputs (X0-X15) now sit on top, outputs (Y0-Y15) on the bottom, with power (24V+/24V-/COM) and a new LAN terminal grouped at the bottom-right',
-        'Expanded I/O to 16 points each (X0-15, Y0-15) and added 2 analog inputs (AI0/AI1, reading 0-100% from pressure/laser/lidar-type sensors)',
-        'Added realistic POWER/RUN/ERROR status LEDs on the PLC body plus a per-point LED on every I/O pin — the POWER LED now reflects actual wiring even while stopped, and each I/O LED lights green when energized',
-        'Converted the ladder and HMI editors from center-screen popups into a right-side sliding drawer (same pattern as the Arduino simulator), reopenable anytime via a vertical tab',
-        'Redrew the ladder editor as an actual ladder diagram (power rails, relay-contact symbols, coil symbols, OR branches) instead of a row of contact-chip buttons — energized contacts/rungs highlight green while running',
-        'Stronger vendor theming: LS ELECTRIC (XG5000-style blue) vs Mitsubishi (GX Works3-style orange) header/accent colors',
-        'Added "sub-program" support: a PLC can hold multiple named programs (rung groups), switchable/renamable/deletable via tabs (all programs execute in registration order every scan — no CALL/RET subroutine jumps yet)',
-        'Updated the automation-exam preset template to match the new multi-program save structure'] } },
-  { ver:'Ver0.1.1', items:{
-    ko:['부품이 "빠져나오지 않는" 문제 수정: 부품 상자에서 드래그가 되지 않는 환경(트랙패드 등)에서도, 항목을 그냥 클릭만 하면 캔버스 중앙 부근에 바로 배치되도록 대체 수단을 추가',
-        '안내(About) 팝업이 다국어 처리 오류로 "about.body"라는 글자 그대로 표시되던 문제 수정',
-        '릴리즈 노트/안내 팝업이 숨김 상태에서도 항상 화면에 보이던 표시 오류 수정',
-        '통신 모듈(Ethernet/CAN·RS-485) 더블클릭 시 PLC 벤더 문구가 뜨던 안내문을 통신 모듈에 맞게 일반화'],
-    en:['Fixed components not "coming out" of the palette: clicking a palette item now also drops it near the canvas center, as a fallback for environments (e.g. trackpads) where HTML5 drag doesn\'t register',
-        'Fixed the About popup literally showing the text "about.body" due to a missing translation key',
-        'Fixed release-notes/about popups always rendering on top even while hidden',
-        'Generalized the placeholder message shown when double-clicking a comm module (it previously used PLC-specific wording)'] } },
-  { ver:'Ver0.1', items:{
-    ko:['최초 배포: 전기/공압 회로 엔진(PSU·AC220·AC380·24V 센서 9종·리밋스위치·공압 액추에이터·모터/MC/VFD/서보·램프)',
-        'LS ELECTRIC / Mitsubishi PLC 스캔 엔진 + 래더 편집기(접점/코일/SET·RST/TON·CTU) 실제 동작 — Siemens/Omron은 팔레트 자리만 마련',
-        'HMI 터치패널 에디터(비트램프/터치스위치/숫자표시·입력/알람요약/트렌드) — PLC 메모리(X/Y/M/T/C/D) 매핑',
-        '자동화산업기사형 4공정(공급-가공-송출-분류) 프리셋 템플릿 + 예제 래더 1세트',
-        '프로젝트 저장/열기(JSON), 배선 오류 린터(COM 미결선, NPN 센서 직결), KO/EN 다국어'],
-    en:['Initial release: circuit engine (PSU/AC220/AC380, 9 sensor types, limit switch, pneumatic actuators, motor/MC/VFD/servo, lamps)',
-        'LS ELECTRIC / Mitsubishi PLC scan engine + ladder editor (contacts/coils/SET-RST/TON/CTU) — Siemens/Omron are palette placeholders only',
-        'HMI touch-panel editor (bit lamp/touch switch/numeric display+input/alarm summary/trend) bound to PLC memory',
-        'Automation-exam-style 4-station preset (supply-process-transport-sort) with a sample ladder program',
-        'Save/open project (JSON), wiring linter (missing COM, direct NPN-to-PLC wiring), KO/EN i18n'] } },
+  { ver:'Ver0.94', items:{ ko:['확대/축소 배지를 화면 맨 아래 표시줄로 이동', '작업 공간 확장(부품 위치에 따라 자동 확장)'], en:['Zoom badge moved to bottom bar', 'Larger, auto-expanding workspace'] } },
+  { ver:'Ver0.93', items:{
+    ko:['래더 창 크기 조절 · 하단 분할 기능 추가', '래더 편집 영역 확대/축소 기능 추가', '래더 설명 숨기기 기능 추가', '떠 있는 창(VC 연동 등) 드래그 이동 · 하단 붙이기 기능 추가', '전체 글자 크기 확대 · 흰색으로 가독성 개선', '릴리즈 노트 간결화'],
+    en:['Ladder window resize & bottom-split added', 'Ladder editing zoom added', 'Hide ladder help text added', 'Floating panels (VC Link etc.) draggable & dockable to bottom', 'Larger, white UI text', 'Release notes shortened'] } },
+  { ver:'Ver0.92', items:{ ko:['IL 파일 저장 기능 추가', '저장 파일명에 PLC 제조사 표시 추가'], en:['Save IL as file added', 'PLC vendor tag in saved file name added'] } },
+  { ver:'Ver0.91', items:{ ko:['전원 · 코일 극성 반전 경고 기능 추가'], en:['Polarity reversal warning added'] } },
+  { ver:'Ver0.90', items:{ ko:['Siemens · Omron 출력 부하 전달 버그 수정'], en:['Siemens/Omron output load bug fixed'] } },
+  { ver:'Ver0.89', items:{ ko:['배선 꺾임점 부품 안쪽 진입 방지 수정'], en:['Wire bend points kept outside parts'] } },
+  { ver:'Ver0.88', items:{ ko:['솔레노이드 P/A 포트 밸브 2종 부품 추가', '편솔 · 양솔 밸브 도움말 보강'], en:['2 solenoid valves with P/A ports added', 'Valve help text improved'] } },
+  { ver:'Ver0.87', items:{ ko:['배선 교차 타넘기 표시 추가'], en:['Wire crossing hops added'] } },
+  { ver:'Ver0.86', items:{ ko:['전동 실린더 3종 부품 추가'], en:['3 electric cylinders added'] } },
+  { ver:'Ver0.85', items:{ ko:['배선 기본색 자동 지정 기능 추가'], en:['Automatic default wire color added'] } },
+  { ver:'Ver0.84', items:{ ko:['배선 꺾임점 편집 기능 추가', '공압 · 유압 빗금 호스 표시 추가'], en:['Wire bend point editing added', 'Hatched pneumatic/hydraulic hoses added'] } },
+  { ver:'Ver0.83', items:{ ko:['배선 직각화', '배선 번호 배지 추가', '단자 배선 표시점 추가', '연결 현황 클릭 연동 추가'], en:['Right-angle wiring', 'Wire number badges added', 'Wired-terminal dots added', 'Connection list click highlight added'] } },
+  { ver:'Ver0.82', items:{ ko:['실린더 리밋스위치 위치 드래그 기능 추가'], en:['Draggable cylinder limit switch position added'] } },
+  { ver:'Ver0.81', items:{ ko:['래더 창 접기 버튼 추가', '팔레트 기본 접힘으로 변경'], en:['Ladder window collapse button added', 'Palette starts collapsed'] } },
+  { ver:'Ver0.8', items:{ ko:['공압(22종) · 유압(24종) 부품 추가', '실린더 오토 리밋스위치 추가', '배선 종류 배지 추가', '공압/유압 예제 4종 추가', '공압/유압 검증 패널 추가', '랙 배경 기능 추가'], en:['22 pneumatic & 24 hydraulic parts added', 'Cylinder auto limit switches added', 'Wire type badge added', '4 fluid-power examples added', 'Fluid-power check panel added', 'Rack background added'] } },
+  { ver:'Ver0.77', items:{ ko:['컬러 · 바코드 · 비전 센서 부품 추가', '아날로그 넷 값 기능 추가'], en:['Color/barcode/vision sensors added', 'Analog net values added'] } },
+  { ver:'Ver0.76', items:{ ko:['유지형 푸시버튼 부품 추가'], en:['Maintained pushbutton added'] } },
+  { ver:'Ver0.75', items:{ ko:['시작 · 정지 · 비상정지 푸시버튼 부품 추가'], en:['Start/Stop/E-STOP pushbuttons added'] } },
+  { ver:'Ver0.74', items:{ ko:['브레이크포인트 저장/불러오기 버그 수정', 'SFC 오류 메시지 수정'], en:['Breakpoint save/load bug fixed', 'SFC error message fixed'] } },
+  { ver:'Ver0.73', items:{ ko:['FBD 언어 추가', 'SFC 언어 추가', '브레이크포인트 디버깅 기능 추가'], en:['FBD language added', 'SFC language added', 'Breakpoint debugging added'] } },
+  { ver:'Ver0.72', items:{ ko:['ST(구조화 텍스트) 언어 추가', 'IEC 타이머 · 카운터 함수블록 추가'], en:['ST language added', 'IEC timer/counter FBs added'] } },
+  { ver:'Ver0.71', items:{ ko:['PLC 간 통신 검증 · 보강', '통신 링크 저장 기능 추가'], en:['PLC-to-PLC comm verified', 'Comm links saved in project'] } },
+  { ver:'Ver0.70', items:{ ko:['외부 연동 브릿지 부품 추가'], en:['External link bridge part added'] } },
+  { ver:'Ver0.69', items:{ ko:['벤더별 주소 표기 확장', '벤더별 래더 심볼 표시 추가'], en:['Vendor address notation extended', 'Vendor-specific ladder symbols added'] } },
+  { ver:'Ver0.68', items:{ ko:['VC 연동 게이트웨이 부품 추가', 'PLC 제조사 배지 표시 추가'], en:['VC Link gateway part added', 'PLC vendor badge added'] } },
+  { ver:'Ver0.67', items:{ ko:['HMI 통신 모듈 배선 필수로 변경'], en:['HMI now requires comm module wiring'] } },
+  { ver:'Ver0.66', items:{ ko:['예제 갤러리 기능 추가'], en:['Example gallery added'] } },
+  { ver:'Ver0.65', items:{ ko:['래더 단축키(F5~F9) 추가', '디바이스 코멘트 기능 추가', '금속/비금속 워크피스 추가', '랑 복사 · 붙여넣기 · 재배치 기능 추가', 'IL ↔ 래더 변환 기능 추가', '래더 연결선 끊김 버그 수정'], en:['Ladder shortcuts (F5-F9) added', 'Device comments added', 'Metal/non-metal workpieces added', 'Rung copy/paste/reorder added', 'IL ↔ ladder conversion added', 'Ladder line gap bug fixed'] } },
+  { ver:'Ver0.64', items:{ ko:['데이터 모니터 · Force I/O 기능 추가', '일시정지 · 1스텝 기능 추가', '24V 단락 보호 기능 추가', '실린더 속도 조절 기능 추가', 'VC 연동(WebSocket) 기능 추가', '영어 전환 문구 버그 수정'], en:['Data monitor & Force I/O added', 'Pause & single step added', '24V short protection added', 'Cylinder speed control added', 'VC Link (WebSocket) added', 'English text bug fixed'] } },
+  { ver:'Ver0.63', items:{ ko:['AI 도우미 영어 안내 문구 버그 수정'], en:['AI assistant placeholder bug fixed'] } },
+  { ver:'Ver0.62', items:{ ko:['릴리즈 노트 · AI 도우미 좌측 하단 탭으로 이동'], en:['Release notes & AI moved to bottom-left tabs'] } },
+  { ver:'Ver0.61', items:{ ko:['데이터 연산 명령(MOV/ADD 등) 추가', '비교 접점 추가', '엣지 접점 · 펄스 코일 추가', 'IL(니모닉) 프로그램 추가', '래더 → IL 내보내기 추가', '엣지 접점 표시 버그 수정'], en:['Data instructions (MOV/ADD etc.) added', 'Compare contacts added', 'Edge contacts & pulse coils added', 'IL programs added', 'Ladder → IL export added', 'Edge contact display bug fixed'] } },
+  { ver:'Ver0.6', items:{ ko:['부품 이름 바꾸기 기능 추가', '래더 주소 드롭다운 선택으로 변경', '래더 창 최대화 버튼 추가', '스마트 컨베이어 부품 추가', '부품 삭제 시 상태 정리 버그 수정'], en:['Part rename added', 'Ladder address dropdowns', 'Ladder maximize button added', 'Smart conveyor added', 'Part delete cleanup bug fixed'] } },
+  { ver:'Ver0.5', items:{ ko:['AI 도우미(오프라인) 기능 추가', '로봇 초기화 버그 수정'], en:['Offline AI assistant added', 'Robot reset bug fixed'] } },
+  { ver:'Ver0.4', items:{ ko:['3축 로봇 암(OLP) 부품 추가'], en:['3-axis robot arm (OLP) added'] } },
+  { ver:'Ver0.3', items:{ ko:['Ethernet · CAN/RS-485 통신 모듈 기능 추가', '패킷 모니터 추가'], en:['Ethernet & CAN/RS-485 comm modules added', 'Packet monitor added'] } },
+  { ver:'Ver0.2', items:{ ko:['Siemens · Omron PLC 동작 추가', '벤더별 주소 표기 추가', 'CALL 서브프로그램 기능 추가', '프리셋 3종 추가', '5V 로직 표시등 부품 추가'], en:['Siemens & Omron PLCs enabled', 'Vendor address notation added', 'CALL subprograms added', '3 presets added', '5V logic indicator added'] } },
+  { ver:'Ver0.1.2', items:{ ko:['PLC 본체 재설계(입출력 16점, AI 2점, LAN)', '상태 LED 추가', '래더 · HMI 슬라이드 패널로 변경', '래더 다이어그램 표시로 변경', '벤더별 색상 테마 추가', '서브 프로그램 기능 추가'], en:['PLC body redesigned (16 I/O, 2 AI, LAN)', 'Status LEDs added', 'Ladder/HMI slide panels', 'Real ladder diagram view', 'Vendor color themes added', 'Subprograms added'] } },
+  { ver:'Ver0.1.1', items:{ ko:['부품 클릭 배치 기능 추가', '안내 팝업 문구 버그 수정', '팝업 표시 버그 수정', '통신 모듈 안내 문구 수정'], en:['Click-to-place parts added', 'About popup text bug fixed', 'Popup display bug fixed', 'Comm module text fixed'] } },
+  { ver:'Ver0.1', items:{ ko:['최초 배포: 전기/공압 회로 엔진', 'LS · Mitsubishi PLC 래더 편집기', 'HMI 터치패널 에디터', '자동화산업기사 프리셋', '프로젝트 저장/열기 · 다국어'], en:['First release: electrical/pneumatic engine', 'LS/Mitsubishi ladder editor', 'HMI touch panel editor', 'Automation technician preset', 'Project save/open, KO/EN'] } },
 ];
 function toggleReleaseNotes(){
   const panel = document.getElementById('rnBlPanel');
@@ -9177,5 +8956,188 @@ init();
 
 
 </script>
+<style>
+  /* [Ver0.9996 / PLC Ver0.93] 떠 있는 창(VC 연동·데이터 모니터·AI·릴리즈 노트·각종 안내창) 공통:
+     제목줄을 잡고 드래그로 이동 + "⬇ 하단" 버튼으로 화면 맨 아래에 가로로 붙이기(높이 조절 가능) */
+  .kfp-head-grab{cursor:move; user-select:none;}
+  .kfp-btn{font-family:inherit; font-size:.8rem; font-weight:600; padding:4px 10px; margin-left:6px; border-radius:6px;
+    border:1px solid var(--border-strong,#39434f); background:var(--bg-panel-2,#1c222b); color:#fff; cursor:pointer; white-space:nowrap;}
+  .kfp-dock-btn{margin-left:auto; margin-right:8px;}
+  .kfp-btn:hover{border-color:var(--teal,#12a4ab);}
+  .kfp-btns{display:inline-flex; align-items:center; gap:0; margin-left:auto;}
+  .kfp-docked{position:fixed !important; left:0 !important; right:0 !important; bottom:0 !important; top:auto !important;
+    width:auto !important; max-width:none !important; min-width:0 !important; height:var(--kfp-dock-h,38vh) !important; max-height:none !important;
+    border-radius:0 !important; transform:none !important; margin:0 !important; z-index:2600 !important;
+    border-top:3px solid var(--teal,#12a4ab) !important; display:flex !important; flex-direction:column !important;}
+  .kfp-docked[hidden]{display:none !important;}
+  .kfp-docked .bl-panel-body, .kfp-docked > .rn-body{flex:1 1 auto !important; min-height:0 !important; max-height:none !important; overflow:auto !important;}
+  .plclink-panel.kfp-docked{display:block !important; overflow-y:auto !important;}
+  .kfp-grip{display:none;}
+  .kfp-docked > .kfp-grip{display:block; position:absolute; left:0; right:0; top:0; height:8px; cursor:ns-resize; z-index:5;}
+  .kfp-docked > .kfp-grip:hover{background:rgba(63,208,214,.25);}
+  .rn-overlay:has(.kfp-docked){background:transparent !important; pointer-events:none;}
+  .rn-overlay:has(.kfp-docked) .kfp-docked{pointer-events:auto;}
+  .rn-overlay:has(.kfp-moved){background:rgba(0,0,0,.25);}
+</style>
+<script>
+(function(){
+  var PAIRS = [
+    ['.bl-panel', '.bl-panel-head'],
+    ['.rn-modal', '.rn-head'],
+    ['.plclink-panel', '.plclink-panel-header']
+  ];
+  var DOCK_LABEL = '⬇ 하단', UNDOCK_LABEL = '⬆ 띄우기';
+  function panelOfHead(head){
+    for (var i = 0; i < PAIRS.length; i++){
+      if (head.matches(PAIRS[i][1])){ var p = head.closest(PAIRS[i][0]); if (p) return p; }
+    }
+    return null;
+  }
+  function headSelector(){ return PAIRS.map(function(p){ return p[1]; }).join(','); }
+  function resetPanel(panel){
+    ['position','left','top','right','bottom','margin','transform'].forEach(function(k){ panel.style[k] = ''; });
+    panel.classList.remove('kfp-moved');
+  }
+  function setDocked(panel, on){
+    var btn = panel.querySelector(':scope > * .kfp-dock-btn');
+    if (on){ resetPanel(panel); panel.classList.add('kfp-docked'); }
+    else { panel.classList.remove('kfp-docked'); resetPanel(panel); }
+    if (btn) btn.textContent = on ? UNDOCK_LABEL : DOCK_LABEL;
+  }
+  function enhance(head){
+    if (head.__kfp) return;
+    var panel = panelOfHead(head);
+    if (!panel) return;
+    head.__kfp = true;
+    head.classList.add('kfp-head-grab');
+    head.title = head.title || '제목줄을 끌어서 이동 · 더블클릭하면 원래 자리로';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'kfp-btn kfp-dock-btn';
+    btn.textContent = panel.classList.contains('kfp-docked') ? UNDOCK_LABEL : DOCK_LABEL;
+    btn.title = '화면 하단에 붙이기 / 다시 띄우기';
+    btn.addEventListener('click', function(e){ e.stopPropagation(); setDocked(panel, !panel.classList.contains('kfp-docked')); });
+    // 닫기 버튼 바로 앞에 끼워 넣습니다(없으면 제목줄 맨 끝).
+    var closeBtn = null;
+    var cands = head.querySelectorAll('button');
+    for (var i = cands.length - 1; i >= 0; i--){ if (/닫기|✕|Close/.test(cands[i].textContent)){ closeBtn = cands[i]; break; } }
+    if (closeBtn && closeBtn.parentNode) closeBtn.parentNode.insertBefore(btn, closeBtn);
+    else head.appendChild(btn);
+    if (!panel.querySelector(':scope > .kfp-grip')){
+      var grip = document.createElement('div');
+      grip.className = 'kfp-grip';
+      grip.title = '끌어서 높이 조절';
+      panel.insertBefore(grip, panel.firstChild);
+      grip.addEventListener('mousedown', function(e){
+        e.preventDefault(); e.stopPropagation();
+        function mv(ev){
+          var h = Math.max(120, Math.min(window.innerHeight - 60, window.innerHeight - ev.clientY));
+          panel.style.setProperty('--kfp-dock-h', h + 'px');
+        }
+        function up(){ document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); }
+        document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+      });
+    }
+  }
+  function scan(root){
+    var sel = headSelector();
+    (root || document).querySelectorAll(sel).forEach(enhance);
+  }
+  document.addEventListener('mousedown', function(e){
+    if (e.button !== 0) return;
+    var t = e.target;
+    if (!t.closest) return;
+    var head = t.closest(headSelector());
+    if (!head) return;
+    if (t.closest('button, input, select, textarea, a, label')) return;
+    var panel = panelOfHead(head);
+    if (!panel) return;
+    enhance(head);
+    if (panel.classList.contains('kfp-docked')) return;
+    var r = panel.getBoundingClientRect();
+    var offX = e.clientX - r.left, offY = e.clientY - r.top;
+    var started = false;
+    function mv(ev){
+      if (!started){
+        if (Math.abs(ev.clientX - e.clientX) < 3 && Math.abs(ev.clientY - e.clientY) < 3) return;
+        started = true;
+        panel.style.position = 'fixed';
+        panel.style.margin = '0';
+        panel.style.transform = 'none';
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+        panel.style.width = r.width + 'px';
+        panel.classList.add('kfp-moved');
+      }
+      var x = Math.max(-r.width + 80, Math.min(window.innerWidth - 80, ev.clientX - offX));
+      var y = Math.max(0, Math.min(window.innerHeight - 40, ev.clientY - offY));
+      panel.style.left = x + 'px';
+      panel.style.top = y + 'px';
+    }
+    function up(){ document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); }
+    document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+    e.preventDefault();
+  });
+  document.addEventListener('dblclick', function(e){
+    var t = e.target;
+    if (!t.closest || t.closest('button, input, select, textarea, a')) return;
+    var head = t.closest(headSelector());
+    if (!head) return;
+    var panel = panelOfHead(head);
+    if (panel && !panel.classList.contains('kfp-docked')){ resetPanel(panel); panel.style.width = ''; }
+  });
+  function start(){
+    scan();
+    try {
+      new MutationObserver(function(muts){
+        for (var i = 0; i < muts.length; i++){
+          for (var j = 0; j < muts[i].addedNodes.length; j++){
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType === 1){ if (n.matches && n.matches(headSelector())) enhance(n); else if (n.querySelector) scan(n); }
+          }
+        }
+      }).observe(document.body, { childList:true, subtree:true });
+    } catch (err) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
+
+<style>
+  /* [확대 배지 하단 고정] 캔버스 위에 떠 있던 확대/축소 배지를 맨 아래 저작권 표시줄 오른쪽 끝에 붙입니다 */
+  .app-footer{position:relative; padding-right:210px !important; padding-left:12px !important;}
+  .app-footer .zoom-badge{position:absolute !important; right:10px; left:auto; top:50%; bottom:auto; transform:translateY(-50%);
+    box-shadow:none; background:var(--bg-panel-2,#1c222b); pointer-events:auto; padding:2px 6px; z-index:30;}
+</style>
+<script>
+(function(){
+  // 캔버스 작업 공간: 기본 크기를 넓히고, 부품이 오른쪽/아래 가장자리에 가까워지면 자동으로 더 늘립니다.
+  var BASE_W = 5200, BASE_H = 3600, MARGIN_W = 1600, MARGIN_H = 1100;
+  function grow(){
+    var inner = document.getElementById('canvasInner');
+    if (!inner) return;
+    var r = 0, b = 0, kids = inner.children;
+    for (var i = 0; i < kids.length; i++){
+      var el = kids[i];
+      if (!el.classList || !el.classList.contains('placed-component')) continue;
+      r = Math.max(r, el.offsetLeft + el.offsetWidth);
+      b = Math.max(b, el.offsetTop + el.offsetHeight);
+    }
+    var w = Math.max(BASE_W, r + MARGIN_W), h = Math.max(BASE_H, b + MARGIN_H);
+    if (parseInt(inner.style.width, 10) !== w) inner.style.width = w + 'px';
+    if (parseInt(inner.style.height, 10) !== h) inner.style.height = h + 'px';
+  }
+  function start(){
+    var badge = document.querySelector('.zoom-badge');
+    var footer = document.querySelector('footer.app-footer');
+    if (badge && footer) footer.appendChild(badge);
+    grow();
+    document.addEventListener('mouseup', function(){ setTimeout(grow, 0); });
+    setInterval(grow, 1500);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
+
 </body>
 </html>

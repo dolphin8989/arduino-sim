@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
+  html{font-size:18px;}
   :root{
     --bg-app:#10141a;
     --bg-panel:#161b22;
@@ -14,7 +15,7 @@
     --border:#28313c;
     --border-strong:#39434f;
     --text:#e8edf3;
-    --text-dim:#8b96a5;
+    --text-dim:#e6ebf0;
     --teal:#12a4ab;
     --teal-strong:#3fd0d6;
     --amber:#f2a53d;
@@ -152,7 +153,7 @@
   <!-- VC 연동 설치법 및 다운로드 링크 섹션 -->
   <div class="vc-section">
     <h4 id="vcSectionTitle">🔌 Visual Components (VC) 연동 리소스</h4>
-    <p style="font-size: 0.78rem; color: var(--text-dim);" id="vcSectionDesc">디지털 트윈 및 VC 연동을 위한 PC 설치 가이드와 관련 파일 패키지입니다.</p>
+    <p style="font-size: 0.78rem; color: var(--text-dim);" id="vcSectionDesc">디지털 트윈 및 VC 연동을 위한 PC 설치 가이드, 관련 파일 패키지, Node 프로그램입니다.</p>
     <div class="vc-links">
       <a href="https://drive.google.com/file/d/1jlVityPW0E0h29X64DDahA6K8geccHFo/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="vc-link-btn" id="vcGuideBtn">
         📖 VC 연동 PC 설치법 보기
@@ -160,11 +161,14 @@
       <a href="https://drive.google.com/file/d/10IPtPiampcTz-Zag-sP_tSVGI-8ucqGr/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="vc-link-btn" id="vcZipBtn">
         📦 관련 ZIP 파일 다운로드
       </a>
+      <a href="https://drive.google.com/file/d/1mBXkZBybLd04g4ny5M1nS5jgMMu4Fezd/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="vc-link-btn" id="vcNodeBtn">
+        🟢 VC 연동용 Node 프로그램 다운로드
+      </a>
     </div>
   </div>
 
   <div class="hub-footer" id="txtFooter">
-    © Developer Kim Jong-wook. Educational Virtual Commissioning Platform.
+    © Developer Kim,JongUk. Educational Virtual Commissioning Platform.
   </div>
 </div>
 
@@ -201,9 +205,10 @@
       intTitle: "통합 시뮬레이터",
       intDesc: "아두이노 엔진과 PLC 엔진을 릴레이 인터페이스 브릿지로 연결한 종합 샌드박스.",
       vcTitle: "🔌 Visual Components (VC) 연동 리소스",
-      vcDesc: "디지털 트윈 및 VC 연동을 위한 PC 설치 가이드와 관련 파일 패키지입니다.",
+      vcDesc: "디지털 트윈 및 VC 연동을 위한 PC 설치 가이드, 관련 파일 패키지, Node 프로그램입니다.",
       vcGuide: "📖 VC 연동 PC 설치법 보기",
       vcZip: "📦 관련 ZIP 파일 다운로드",
+      vcNode: "🟢 VC 연동용 Node 프로그램 다운로드",
       footer: "Educational Virtual Commissioning Platform.",
       modalTitle: "보안 인증 필요",
       modalDesc: "이 시뮬레이터에 접근하려면 관리자 암호를 입력해야 합니다.",
@@ -224,9 +229,10 @@
       intTitle: "Integrated Simulator",
       intDesc: "Comprehensive sandbox connecting Arduino and PLC engines via relay interface bridge.",
       vcTitle: "🔌 Visual Components (VC) Integration Resources",
-      vcDesc: "PC installation guide and related file package for digital twin and VC integration.",
+      vcDesc: "PC installation guide, file package and Node program for digital twin and VC integration.",
       vcGuide: "📖 View VC Installation Guide",
       vcZip: "📦 Download Related ZIP File",
+      vcNode: "🟢 Download Node Program for VC",
       footer: "Educational Virtual Commissioning Platform.",
       modalTitle: "Security Authentication",
       modalDesc: "Please enter the administrator password to access this simulator.",
@@ -259,8 +265,9 @@
     document.getElementById('vcSectionDesc').textContent = t.vcDesc;
     document.getElementById('vcGuideBtn').textContent = t.vcGuide;
     document.getElementById('vcZipBtn').textContent = t.vcZip;
+    document.getElementById('vcNodeBtn').textContent = t.vcNode;
 
-    document.getElementById('txtFooter').textContent = "© Developer Kim Jong-wook. " + t.footer;
+    document.getElementById('txtFooter').textContent = "© Developer Kim,JongUk. " + t.footer;
     document.getElementById('modalTitle').textContent = t.modalTitle;
     document.getElementById('modalDesc').textContent = t.modalDesc;
     document.getElementById('errorMsg').textContent = t.errorMsg;
