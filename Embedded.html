@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9998</title>
+<title>K군의 아두이노 시뮬레이터 Ver0.9999</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -228,6 +228,11 @@
     border-radius:5px; padding:4px 8px; cursor:pointer;
   }
   .wire-editor .we-del:hover{background:#3a1a17;}
+  /* [Ver0.9999] 전선 굵기/종류/직각 정리 */
+  .wire-editor select{font-family:inherit; font-size:.72rem; background:#141820; color:#fff; border:1px solid #3a3f47; border-radius:5px; padding:3px 4px;}
+  .wire-editor .we-btn{font-family:inherit; font-size:.7rem; color:#fff; background:#20303a; border:1px solid #3a5566; border-radius:5px; padding:4px 8px; cursor:pointer; white-space:nowrap;}
+  .wire-editor .we-btn:hover{background:#2a4250;}
+  .wire-editor .we-check{display:flex; align-items:center; gap:5px; font-size:.7rem; color:#fff; cursor:pointer;}
 
   /* [신기능] 보드를 뺀 모든 부품 오른쪽 위에 붙는 작은 "?" 도움말 버튼과, 눌렀을 때 뜨는
      연결 설명 팝업 — "어디를 연결해서 어떻게 동작되는지 알 수가 없다"는 요청에 따라, 각 핀의
@@ -1996,7 +2001,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9998</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9999</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -3274,7 +3279,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9998", en: "K's Simulator Ver0.9998" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9999", en: "K's Simulator Ver0.9999" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -4226,7 +4231,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9998", en: "K's Arduino Simulator Ver0.9998" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9999", en: "K's Arduino Simulator Ver0.9999" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -7448,6 +7453,7 @@ document.getElementById('canvasInner').addEventListener('mousemove', (e) => {
 });
 document.addEventListener('mouseup', () => {
   const justDraggedEl = activeDrag;
+  if (draggingWirePoint && WIRE_ORTHO_MODE && !(window.event && window.event.shiftKey)) orthogonalizeWire(draggingWirePoint.wireObj);
   activeDrag = null; draggingWirePoint = null;
   if (justDraggedEl && !justDraggedEl.classList.contains('board')) syncBreadboardPlugs(justDraggedEl);
   // 발전기 크랭크 버튼 위에서 손을 뗐어야 할 mouseup이 (부품을 끄는 도중 마우스가 버튼을 벗어나
@@ -7491,6 +7497,7 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver0.9999', ko: ['전선 굵기 · 선 종류 변경 기능 추가', '전선 직각 정리 · 직각 모드 기능 추가', '선택한 부품 방향키 이동 기능 추가(회로도 그리기 포함)'] },
   { ver: 'Ver0.9998', ko: ['회로도 그리기: 선 색상 변경 기능 추가', '회로도 그리기: 선 굵기(가는선~아주 굵은선) 변경 기능 추가', '회로도 그리기: 선 종류(실선/파선/점선/일점쇄선) 변경 기능 추가', '회로도 그리기: 직각 정리 · 직각 모드 기능 추가'] },
   { ver: 'Ver0.9997', ko: ['Uno R3 · Mega 2560 보드 외형을 실제 핀아웃 그림 기준으로 수정', '확대/축소 배지를 화면 맨 아래 표시줄로 이동', '작업 공간 확장(부품 위치에 따라 자동 확장)'] },
   { ver: 'Ver0.9996', ko: [
@@ -8100,6 +8107,30 @@ document.addEventListener('keydown', (e) => {
   e.preventDefault();
   captureUndoSnapshot();
   rotateComponent(selectedComponent, 90);
+});
+
+// [Ver0.9999] 선택한 부품을 키보드 방향키로 이동 (방향키 = 5px, Shift+방향키 = 1px 미세 이동)
+let __nudgeLastAt = 0, __nudgeSyncTimer = null;
+document.addEventListener('keydown', (e) => {
+  const dirs = { ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1] };
+  const d = dirs[e.key];
+  if (!d || e.ctrlKey || e.metaKey || e.altKey) return;
+  const activeTag = document.activeElement?.tagName;
+  if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT' || document.activeElement?.isContentEditable) return;
+  const el = selectedComponent;
+  if (!el || !el.isConnected) return;
+  e.preventDefault();
+  const now = Date.now();
+  if (now - __nudgeLastAt > 700){ captureUndoSnapshot(); if (!el.classList.contains('board')) detachFromBreadboard(el); }
+  __nudgeLastAt = now;
+  const step = e.shiftKey ? 1 : 5;
+  el.style.left = Math.max(0, (parseFloat(el.style.left) || 0) + d[0] * step) + 'px';
+  el.style.top = Math.max(0, (parseFloat(el.style.top) || 0) + d[1] * step) + 'px';
+  updateAllWires();
+  if (!el.classList.contains('board')){
+    clearTimeout(__nudgeSyncTimer);
+    __nudgeSyncTimer = setTimeout(() => { if (el.isConnected) syncBreadboardPlugs(el); }, 500);
+  }
 });
 
 function deleteComponent(el){
@@ -13149,6 +13180,59 @@ function setWireColor(wireObj, color){
   updateLegend();
 }
 
+// [Ver0.9999] 전선 굵기/종류 + 직각 정리(회로도 그리기와 같은 방식)
+let WIRE_ORTHO_MODE = true;
+function wireDashArray(kind, wid){
+  const k = wid || 3;
+  if (kind === 'dot') return '0.1,' + (k * 2.4);
+  if (kind === 'dash') return (k * 3.5) + ',' + (k * 2.2);
+  if (kind === 'dashdot') return (k * 4.5) + ',' + (k * 1.8) + ',0.1,' + (k * 1.8);
+  return '';
+}
+function applyWireStyle(w){
+  if (!w || !w.element) return;
+  const wid = w.width || 3;
+  w.element.style.strokeWidth = wid + 'px';
+  const da = wireDashArray(w.dash, wid);
+  w.element.style.strokeDasharray = da;
+  w.element.style.strokeLinecap = w.dash === 'dot' ? 'round' : '';
+}
+function setWireStyle(w, field, value){ w[field] = value; applyWireStyle(w); }
+function wireSimplifyPts(pts){
+  const out = [];
+  pts.forEach(q => {
+    const p = out[out.length - 1];
+    if (p && Math.abs(p.x - q.x) < 0.5 && Math.abs(p.y - q.y) < 0.5) return;
+    out.push({ x: q.x, y: q.y });
+  });
+  for (let i = out.length - 2; i >= 1; i--){
+    const a = out[i - 1], b = out[i], c = out[i + 1];
+    if ((Math.abs(a.x - b.x) < 0.5 && Math.abs(b.x - c.x) < 0.5) || (Math.abs(a.y - b.y) < 0.5 && Math.abs(b.y - c.y) < 0.5)) out.splice(i, 1);
+  }
+  return out;
+}
+function orthogonalizeWire(w){
+  if (!w || w.isPlugWire) return;
+  const pts = [pinCenter(w.from), ...(w.points || []), pinCenter(w.to)];
+  let out = [pts[0]], lastHoriz = null;
+  for (let i = 1; i < pts.length; i++){
+    const p = out[out.length - 1], q = pts[i];
+    if (Math.abs(p.x - q.x) >= 0.5 && Math.abs(p.y - q.y) >= 0.5){
+      const corner = lastHoriz === true ? { x: p.x, y: q.y } : { x: q.x, y: p.y };
+      out.push(corner);
+      lastHoriz = Math.abs(corner.y - q.y) < 0.5;
+    } else {
+      lastHoriz = Math.abs(p.y - q.y) < 0.5;
+    }
+    out.push({ x: q.x, y: q.y });
+  }
+  out = wireSimplifyPts(out);
+  w.points = out.slice(1, out.length - 1);
+  updateWirePosition(w);
+  w.pointEls.forEach((el, i) => { el.__idx = i; });
+}
+function orthogonalizeAllWires(){ captureUndoSnapshot(); wires.forEach(orthogonalizeWire); }
+
 // 전선을 클릭(또는 연결 현황 목록에서 색상 점을 클릭)하면 뜨는 색상 선택 팝오버.
 const WIRE_COLOR_PRESETS = ['#3fd0d6', '#ff3b3b', '#3b82f6', '#31d158', '#ffd23f', '#ff8c1f', '#ffffff', '#8b93a1', '#000000'];
 let activeWireEditor = null;
@@ -13168,10 +13252,15 @@ function openWireEditor(wireObj, clientX, clientY){
     <div class="we-label" data-i18n="wire.colorLabel">전선 색상</div>
     <div class="we-swatches">${WIRE_COLOR_PRESETS.map(c => `<div class="we-swatch${c === wireObj.color ? ' we-active' : ''}" style="background:${c}" data-color="${c}"></div>`).join('')}</div>
     <div class="we-row"><span class="we-label" data-i18n="wire.customLabel">직접 선택</span><input type="color" value="${wireObj.color}"></div>
+    <div class="we-row"><span class="we-label">굵기</span><select class="we-width"><option value="1.5">가는선</option><option value="3">보통</option><option value="5">굵은선</option><option value="7">아주 굵은선</option></select></div>
+    <div class="we-row"><span class="we-label">종류</span><select class="we-dash"><option value="solid">실선 ───</option><option value="dash">파선 - - -</option><option value="dot">점선 · · ·</option><option value="dashdot">일점쇄선 -·-·</option></select></div>
+    <button class="we-btn we-apply-all" title="이 선의 색상·굵기·종류를 모든 전선에 적용">모든 선에 같은 스타일</button>
+    <div class="we-row"><button class="we-btn we-ortho">⊾ 이 선 직각 정리</button><button class="we-btn we-ortho-all">⊾ 전체</button></div>
+    <label class="we-check" title="꺾임점을 옮긴 뒤 자동으로 직각으로 맞춥니다 (Shift를 누르고 끌면 자유 이동)"><input type="checkbox" class="we-ortho-mode" ${WIRE_ORTHO_MODE ? 'checked' : ''}> 직각 모드</label>
     <button class="we-del" data-i18n="wire.deleteBtn">🗑 전선 삭제</button>`;
   document.body.appendChild(box);
   // 화면 밖으로 나가지 않도록 위치 보정
-  const bw = 178, bh = 150;
+  const bw = 200, bh = 330;
   box.style.left = Math.min(clientX + 8, window.innerWidth - bw - 8) + 'px';
   box.style.top = Math.min(clientY + 8, window.innerHeight - bh - 8) + 'px';
   box.querySelectorAll('.we-swatch').forEach(sw => {
@@ -13179,6 +13268,15 @@ function openWireEditor(wireObj, clientX, clientY){
   });
   box.querySelector('input[type=color]').oninput = (e) => setWireColor(wireObj, e.target.value);
   box.querySelector('.we-del').onclick = (e) => { e.stopPropagation(); captureUndoSnapshot(); deleteWire(wireObj); };
+  const wSel = box.querySelector('.we-width'), dSel = box.querySelector('.we-dash');
+  wSel.value = String(wireObj.width || 3); if (!wSel.value) wSel.value = '3';
+  dSel.value = wireObj.dash || 'solid';
+  wSel.onchange = () => { captureUndoSnapshot(); setWireStyle(wireObj, 'width', parseFloat(wSel.value)); };
+  dSel.onchange = () => { captureUndoSnapshot(); setWireStyle(wireObj, 'dash', dSel.value); };
+  box.querySelector('.we-apply-all').onclick = (e) => { e.stopPropagation(); captureUndoSnapshot(); wires.forEach(w => { if (w.isPlugWire) return; setWireColor(w, wireObj.color); w.width = wireObj.width; w.dash = wireObj.dash; applyWireStyle(w); }); };
+  box.querySelector('.we-ortho').onclick = (e) => { e.stopPropagation(); captureUndoSnapshot(); orthogonalizeWire(wireObj); };
+  box.querySelector('.we-ortho-all').onclick = (e) => { e.stopPropagation(); orthogonalizeAllWires(); };
+  box.querySelector('.we-ortho-mode').onchange = (e) => { WIRE_ORTHO_MODE = e.target.checked; };
   box.onclick = (e) => e.stopPropagation();
   activeWireEditor = box;
 }
@@ -20782,6 +20880,14 @@ function schematicPopupScriptSource(){
     "  var active = document.activeElement;",
     "  if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;",
     "  if (e.ctrlKey || e.metaKey || e.altKey) return;",
+    "  var ad = {ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1]}[e.key];",
+    "  if (ad && selectedNodeIdx >= 0){",
+    "    e.preventDefault();",
+    "    var st = e.shiftKey ? 1 : 5, nd = MODEL.nodes[selectedNodeIdx];",
+    "    nd.x += ad[0] * st; nd.y += ad[1] * st;",
+    "    renderAll(); clearTimeout(window.__schNudgeT); window.__schNudgeT = setTimeout(syncToOpener, 300);",
+    "    return;",
+    "  }",
     "  var key = e.key.toLowerCase();",
     "  if (key === 'r'){",
     "    if (selectedNodeIdx < 0) return;",
@@ -22102,7 +22208,7 @@ function serializeProject(){
     const from = pinDescriptorFor(w.from, boardIndexByDomId, compIndexById);
     const to = pinDescriptorFor(w.to, boardIndexByDomId, compIndexById);
     if (!from || !to) return null;
-    return { from, to, color: w.color, points: (w.points || []).map(p => ({ x: p.x, y: p.y })), plug: !!w.isPlugWire };
+    return { from, to, color: w.color, points: (w.points || []).map(p => ({ x: p.x, y: p.y })), plug: !!w.isPlugWire, width: w.width || undefined, dash: w.dash || undefined };
   }).filter(Boolean);
 
   const projectName = (document.getElementById('projectNameInput')?.value || '').trim() || tr('toolbar.untitledProject');
@@ -22236,6 +22342,9 @@ function restoreProjectState(data){
     setWireColor(wireObj, w.color || WIRE_DEFAULT_COLOR);
     wireObj.points = Array.isArray(w.points) ? w.points.map(p => ({ x: p.x, y: p.y })) : [];
     wireObj.isPlugWire = !!w.plug;
+    if (w.width) wireObj.width = w.width;
+    if (w.dash) wireObj.dash = w.dash;
+    applyWireStyle(wireObj);
     updateWirePosition(wireObj);
   });
 

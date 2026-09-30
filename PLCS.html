@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>K군의 PLC 시뮬레이터 Ver0.94</title>
+<title>K군의 PLC 시뮬레이터 Ver0.95</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -171,6 +171,14 @@
   svg#wireCanvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2; overflow:visible;}
   .wire-path{fill:none; stroke-width:3; stroke-linecap:round; pointer-events:stroke; cursor:pointer; opacity:.92;}
   .wire-path:hover{opacity:1; filter:drop-shadow(0 0 3px rgba(255,255,255,.5));}
+  .plc-wire-tools{position:fixed; top:130px; left:50%; transform:translateX(-50%); z-index:1800; display:flex; align-items:center; gap:8px; flex-wrap:wrap; max-width:94vw;
+    background:var(--bg-panel); border:1px solid var(--teal); border-radius:10px; padding:8px 12px; box-shadow:0 10px 26px rgba(0,0,0,.5); font-size:.78rem; color:#fff;}
+  .plc-wire-tools[hidden]{display:none;}
+  .plc-wire-tools label{display:flex; align-items:center; gap:4px; cursor:pointer;}
+  .plc-wire-tools select, .plc-wire-tools button{font-family:inherit; font-size:.76rem; background:var(--bg-panel-2); color:#fff; border:1px solid var(--border-strong); border-radius:6px; padding:4px 8px; cursor:pointer;}
+  .plc-wire-tools button:hover{border-color:var(--teal);}
+  .plc-wire-tools .pwt-del{color:#ff8a80;}
+  .plc-wire-tools input[type=color]{width:34px; height:26px; border:1px solid var(--border-strong); border-radius:4px; background:none; padding:1px;}
   .wire-path.wire-selected{opacity:1; filter:drop-shadow(0 0 5px rgba(255,255,255,.85));}
   .wire-path.wire-fault{stroke-dasharray:5 4;}
   /* [Ver0.84] 꺾임점(핸들) 전용 레이어 — 부품(z-index:3)보다 위(z-index:5)에 그려서, 부품에
@@ -787,7 +795,7 @@
   <div class="brand">
     <div class="brand-mark">P1</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.94</b>
+      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.95</b>
       <span data-i18n="brand.subtitle">Multi-Vendor PLC / HMI Virtual Commissioning</span>
     </div>
   </div>
@@ -970,11 +978,11 @@
    에이전트·실제 산업통신 프로토콜은 다음 버전으로 미룹니다(팔레트에는 자리를 잡아
    두고 "다음 버전에서 지원" 안내만 뜨게 해 확장 지점을 명확히 남겨둡니다).
    ============================================================ */
-const APP_VERSION = 'Ver0.94';
+const APP_VERSION = 'Ver0.95';
 
 /* ---------------- i18n ---------------- */
 const STRINGS = {
-  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.94", en: "K's PLC Simulator Ver0.94" },
+  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.95", en: "K's PLC Simulator Ver0.95" },
   "brand.subtitle": { ko: "Multi-Vendor PLC / HMI Virtual Commissioning", en: "Multi-Vendor PLC / HMI Virtual Commissioning" },
   "toolbar.newProject": { ko: "🆕 새 프로젝트", en: "🆕 New Project" },
   "toolbar.projectNameTitle": { ko: "프로젝트 이름", en: "Project name" },
@@ -2017,6 +2025,9 @@ function updateAllWires(){
     path.setAttribute('d', wirePathDWithHops(pts, i, earlierPtsList));
     path.setAttribute('class','wire-path'+(w===selectedWire?' wire-selected':'')+(hoseUrl?' wire-hose':''));
     path.style.stroke = hoseUrl || w.color;
+    // [Ver0.95] 배선 굵기/종류(실선·파선·점선·일점쇄선)
+    { const wid = w.width || (hoseUrl ? 0 : 3); if (wid) path.style.strokeWidth = wid + 'px';
+      const da = plcWireDashArray(w.dash, w.width || 3); if (da){ path.style.strokeDasharray = da; if (w.dash === 'dot') path.style.strokeLinecap = 'round'; } }
     // 한 번 클릭 = 배선 선택, 더블클릭 = 그 위치에 꺾임점 추가(둘이 서로 걸리지 않도록 클릭을
     // 잠깐 지연시켰다가 곧바로 더블클릭이 들어오면 취소합니다 — 아두이노 시뮬레이터와 동일).
     let clickTimer = null;
@@ -2067,9 +2078,10 @@ function updateAllWires(){
           wireObj.points[idx] = fixed;
           updateAllWires();
         }
-        function onUp(){
+        function onUp(ev){
           document.removeEventListener('mousemove', onMove);
           document.removeEventListener('mouseup', onUp);
+          if (PLC_WIRE_ORTHO_MODE && !(ev && ev.shiftKey)){ plcOrthogonalizeWire(wireObj); updateAllWires(); }
         }
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onUp);
@@ -2094,6 +2106,90 @@ function updateAllWires(){
     if (w.from){ w.from.classList.add('pin-wired'); w.from.style.setProperty('--wire-dot-color', w.color); }
     if (w.to){ w.to.classList.add('pin-wired'); w.to.style.setProperty('--wire-dot-color', w.color); }
   });
+  try { syncPlcWireTools(); } catch(e){}
+}
+// [Ver0.95] 배선 도구(색상/굵기/종류/직각 정리) — 배선을 클릭해 선택하면 화면 위쪽에 나타납니다.
+let PLC_WIRE_ORTHO_MODE = true;
+function plcWireDashArray(kind, wid){
+  const k = wid || 3;
+  if (kind === 'dot') return '0.1,' + (k * 2.4);
+  if (kind === 'dash') return (k * 3.5) + ',' + (k * 2.2);
+  if (kind === 'dashdot') return (k * 4.5) + ',' + (k * 1.8) + ',0.1,' + (k * 1.8);
+  return '';
+}
+function plcSimplifyPts(pts){
+  const out = [];
+  pts.forEach(q => { const p = out[out.length-1]; if (p && Math.abs(p.x-q.x) < 0.5 && Math.abs(p.y-q.y) < 0.5) return; out.push({x:q.x, y:q.y}); });
+  for (let i = out.length-2; i >= 1; i--){
+    const a = out[i-1], b = out[i], c = out[i+1];
+    if ((Math.abs(a.x-b.x) < 0.5 && Math.abs(b.x-c.x) < 0.5) || (Math.abs(a.y-b.y) < 0.5 && Math.abs(b.y-c.y) < 0.5)) out.splice(i, 1);
+  }
+  return out;
+}
+function plcOrthogonalizeWire(w){
+  if (!w || !w.from || !w.to) return;
+  const pts = [pinCenter(w.from), ...(w.points||[]), pinCenter(w.to)];
+  let out = [pts[0]], lastHoriz = null;
+  for (let i = 1; i < pts.length; i++){
+    const p = out[out.length-1], q = pts[i];
+    if (Math.abs(p.x-q.x) >= 0.5 && Math.abs(p.y-q.y) >= 0.5){
+      const corner = lastHoriz === true ? {x:p.x, y:q.y} : {x:q.x, y:p.y};
+      out.push(corner);
+      lastHoriz = Math.abs(corner.y - q.y) < 0.5;
+    } else lastHoriz = Math.abs(p.y-q.y) < 0.5;
+    out.push({x:q.x, y:q.y});
+  }
+  out = plcSimplifyPts(out);
+  w.points = out.slice(1, out.length-1);
+}
+function ensurePlcWireTools(){
+  let box = document.getElementById('plcWireTools');
+  if (box) return box;
+  box = document.createElement('div');
+  box.id = 'plcWireTools';
+  box.className = 'plc-wire-tools';
+  box.hidden = true;
+  box.innerHTML = `<b>배선 도구</b>
+    <label>색상 <input type="color" id="pwtColor"></label>
+    <label>굵기 <select id="pwtWidth"><option value="1.5">가는선</option><option value="3">보통</option><option value="5">굵은선</option><option value="7">아주 굵은선</option></select></label>
+    <label>종류 <select id="pwtDash"><option value="solid">실선 ───</option><option value="dash">파선 - - -</option><option value="dot">점선 · · ·</option><option value="dashdot">일점쇄선 -·-·</option></select></label>
+    <button type="button" id="pwtAll" title="이 선의 색상·굵기·종류를 모든 배선에 적용">모든 선에 같은 스타일</button>
+    <button type="button" id="pwtOrtho">⊾ 이 선 직각 정리</button>
+    <button type="button" id="pwtOrthoAll">⊾ 전체 직각 정리</button>
+    <label title="꺾임점을 옮긴 뒤 자동으로 직각으로 맞춥니다 (Shift를 누르고 끌면 자유 이동)"><input type="checkbox" id="pwtOrthoMode" checked> 직각 모드</label>
+    <button type="button" id="pwtDel" class="pwt-del">🗑 삭제</button>
+    <button type="button" id="pwtClose" title="선택 해제">✕</button>`;
+  document.body.appendChild(box);
+  box.addEventListener('mousedown', e => e.stopPropagation());
+  box.addEventListener('click', e => e.stopPropagation());
+  const W = () => selectedWire;
+  box.querySelector('#pwtColor').addEventListener('input', e => { if (W()){ W().color = e.target.value; updateAllWires(); refreshLegend(); } });
+  box.querySelector('#pwtWidth').addEventListener('change', e => { if (W()){ W().width = parseFloat(e.target.value); updateAllWires(); } });
+  box.querySelector('#pwtDash').addEventListener('change', e => { if (W()){ W().dash = e.target.value; updateAllWires(); } });
+  box.querySelector('#pwtAll').addEventListener('click', () => { const w = W(); if (!w) return; wires.forEach(o => { o.color = w.color; o.width = w.width; o.dash = w.dash; }); updateAllWires(); refreshLegend(); });
+  box.querySelector('#pwtOrtho').addEventListener('click', () => { if (W()){ plcOrthogonalizeWire(W()); updateAllWires(); } });
+  box.querySelector('#pwtOrthoAll').addEventListener('click', () => { wires.forEach(plcOrthogonalizeWire); updateAllWires(); });
+  box.querySelector('#pwtOrthoMode').addEventListener('change', e => { PLC_WIRE_ORTHO_MODE = e.target.checked; });
+  box.querySelector('#pwtDel').addEventListener('click', () => { if (W()){ const w = W(); selectedWire = null; removeWire(w); } });
+  box.querySelector('#pwtClose').addEventListener('click', () => { selectedWire = null; updateAllWires(); });
+  return box;
+}
+function syncPlcWireTools(){
+  const box = ensurePlcWireTools();
+  const w = selectedWire && wires.includes(selectedWire) ? selectedWire : null;
+  box.hidden = !w;
+  if (!w) return;
+  const c = box.querySelector('#pwtColor');
+  let col = w.color || '';
+  if (!/^#[0-9a-f]{6}$/i.test(col)){
+    const t = document.createElement('span'); t.style.color = col; document.body.appendChild(t);
+    const m = getComputedStyle(t).color.match(/\d+/g); t.remove();
+    if (m) col = '#' + m.slice(0,3).map(n => (+n).toString(16).padStart(2,'0')).join('');
+  }
+  if (/^#[0-9a-f]{6}$/i.test(col)) c.value = col;
+  box.querySelector('#pwtWidth').value = String(w.width || 3);
+  box.querySelector('#pwtDash').value = w.dash || 'solid';
+  box.querySelector('#pwtOrthoMode').checked = PLC_WIRE_ORTHO_MODE;
 }
 // [Ver0.83] 연결 현황(범례) 패널에서 항목을 클릭하면 그 배선을 선택(캔버스에서 빛남)하고,
 // 양쪽 단자를 짧게 깜빡여서 곡선을 눈으로 따라가지 않아도 어느 단자끼리 이어졌는지 바로
@@ -2133,6 +2229,21 @@ function makeDraggable(el){
     document.addEventListener('mouseup', onUp);
   });
 }
+// [Ver0.95] 선택한 부품을 키보드 방향키로 이동 (방향키 = 5px, Shift+방향키 = 1px 미세 이동)
+document.addEventListener('keydown', (e) => {
+  const d = { ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1] }[e.key];
+  if (!d || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.closest && e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+  const ld = document.getElementById('ladderDrawer');
+  if (ld && ld.contains(document.activeElement)) return;
+  const el = document.querySelector('.placed-component.selected-comp');
+  if (!el) return;
+  e.preventDefault();
+  const step = e.shiftKey ? 1 : 5;
+  el.style.left = Math.max(0, (parseFloat(el.style.left)||0) + d[0]*step) + 'px';
+  el.style.top = Math.max(0, (parseFloat(el.style.top)||0) + d[1]*step) + 'px';
+  updateAllWires();
+});
 document.getElementById('canvasArea').addEventListener('mousedown', (e) => {
   if (e.target.id==='canvasArea' || e.target.id==='canvasInner'){
     if (selectedPinEl){ selectedPinEl.classList.remove('selected-src'); selectedPinEl=null; }
@@ -7875,7 +7986,7 @@ function saveProjectToFile(){
     plcVendors: plcVendorNames,
     powerOn, scanCycleMs,
     components: $all('.placed-component').map(c => ({ id:c.id, type:c.dataset.type, x:parseFloat(c.style.left)||0, y:parseFloat(c.style.top)||0, persist:collectPersist(c), label:c.dataset.label||'' })),
-    wires: wires.map(w => ({ from:w.from.id, to:w.to.id, color:w.color, points:w.points||[] })),
+    wires: wires.map(w => ({ from:w.from.id, to:w.to.id, color:w.color, points:w.points||[], width:w.width||undefined, dash:w.dash||undefined })),
     plcPrograms: PLC_PROG,
     plcMem: PLC_MEM,
     hmiState: HMI_STATE,
@@ -7914,7 +8025,7 @@ function handleProjectFileSelected(input){
       bindPinEvents();
       (data.wires||[]).forEach(w => {
         const a = document.getElementById(w.from), b = document.getElementById(w.to);
-        if (a && b) wires.push({ id:'w'+(++wireColorSeq), from:a, to:b, color:w.color || ROLE_COLOR[pinRoleOf(a)], points: Array.isArray(w.points) ? w.points : [wireBendPoint(pinCenter(a), pinCenter(b))] });
+        if (a && b) wires.push({ id:'w'+(++wireColorSeq), from:a, to:b, color:w.color || ROLE_COLOR[pinRoleOf(a)], points: Array.isArray(w.points) ? w.points : [wireBendPoint(pinCenter(a), pinCenter(b))], width: w.width || undefined, dash: w.dash || undefined });
       });
       Object.assign(PLC_PROG, data.plcPrograms||{});
       // 저장 시 Set(_bpLines/fbd._delayed 등)이 배열/일반 객체로 바뀌었을 수 있으므로, 불러온 뒤
@@ -7950,6 +8061,7 @@ function handleProjectFileSelected(input){
 
 /* ---------------- 릴리즈 노트 ---------------- */
 const RELEASE_NOTES = [
+  { ver:'Ver0.95', items:{ ko:['배선 도구 추가(색상 · 굵기 · 선 종류 변경)', '배선 직각 정리 · 직각 모드 기능 추가', '선택한 부품 방향키 이동 기능 추가'], en:['Wire tools added (color, width, line style)', 'Wire right-angle tidy & ortho mode added', 'Move selected part with arrow keys'] } },
   { ver:'Ver0.94', items:{ ko:['확대/축소 배지를 화면 맨 아래 표시줄로 이동', '작업 공간 확장(부품 위치에 따라 자동 확장)'], en:['Zoom badge moved to bottom bar', 'Larger, auto-expanding workspace'] } },
   { ver:'Ver0.93', items:{
     ko:['래더 창 크기 조절 · 하단 분할 기능 추가', '래더 편집 영역 확대/축소 기능 추가', '래더 설명 숨기기 기능 추가', '떠 있는 창(VC 연동 등) 드래그 이동 · 하단 붙이기 기능 추가', '전체 글자 크기 확대 · 흰색으로 가독성 개선', '릴리즈 노트 간결화'],
