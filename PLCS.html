@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>K군의 PLC 시뮬레이터 Ver0.95</title>
+<title>K군의 PLC 시뮬레이터 Ver0.961</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -478,6 +478,87 @@
 
   /* ---------- PLC 본체(위: 입력 X, 아래: 출력 Y, 우하단: 전원/LAN) ---------- */
   .plc-box{min-width:400px; padding-bottom:6px;}
+  /* ---------- [Ver0.96] 실제 PLC 외형 ---------- */
+  .plc-skin{padding:0 !important; gap:0 !important; display:flex; flex-direction:column; align-items:stretch !important; min-width:0; overflow:visible;}
+  .plc-skin .comp-label{margin:0; padding:4px 6px; color:#fff; background:#15181b; border-radius:0 0 4px 4px;}
+  .plc-strip{display:flex; align-items:flex-end; justify-content:center; gap:10px; padding:4px 10px; background:#2e3236;}
+  .plc-strip-bottom{align-items:flex-start;}
+  .plc-tgroup{display:flex; flex-direction:column; align-items:center; gap:1px;}
+  .plc-tg-pins{display:flex; gap:3px;}
+  .plc-tg-label{font-family:'IBM Plex Mono',monospace; font-size:.5rem; letter-spacing:.04em; opacity:.85; white-space:nowrap;}
+  .plc-term{gap:1px; min-width:22px;}
+  .plc-term .pin-cap{font-size:.5rem; color:inherit; opacity:.95;}
+  .plc-term .pin-mini{width:13px; height:13px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #f3f5f6, #9aa3a9 55%, #5b6268);}
+  .plc-term .pin-mini::before{content:''; position:absolute; left:2px; right:2px; top:50%; height:1.5px; margin-top:-.75px; background:#3a4046; transform:rotate(-35deg);}
+  .plc-face{display:flex; align-items:stretch; gap:10px; padding:10px 12px;}
+  .plc-face-left{display:flex; flex-direction:column; gap:5px; min-width:92px;}
+  .plc-face-center{flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px; padding:6px 8px; border-radius:4px;}
+  .plc-face-right{display:flex; gap:6px; align-items:stretch;}
+  .plc-ledrow{display:flex; align-items:center; gap:6px;}
+  .plc-ledrow > b{font-family:'IBM Plex Mono',monospace; font-size:.52rem; min-width:44px; white-space:nowrap;}
+  .plc-ledcells{display:flex; gap:3px; flex-wrap:nowrap;}
+  .plc-ledcell{display:flex; flex-direction:column; align-items:center; gap:1px; width:17px;}
+  .plc-ledcell i{font-style:normal; font-family:'IBM Plex Mono',monospace; font-size:.46rem; opacity:.9;}
+  .plc-ledcell .io-led{width:9px; height:6px; border-radius:1px; background:#3a3f36; box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);}
+  .plc-ledcell .io-led.on{background:#ffcf33; box-shadow:0 0 5px 1px #ffcf33;}
+  .plc-status{display:flex; flex-direction:column; gap:3px;}
+  .plc-st{display:flex; align-items:center; gap:5px; font-family:'IBM Plex Mono',monospace; font-size:.52rem;}
+  .plc-status .status-led{width:9px; height:6px; border-radius:1px;}
+  .plc-rj45{width:30px; height:22px; background:#15181b; border:2px solid #9aa3a9; border-radius:3px; display:flex; gap:2px; align-items:flex-start; justify-content:center; padding-top:3px;}
+  .plc-rj45 i{width:3px; height:6px; background:#d8b25c;}
+  .plc-lan{flex-direction:column; align-items:center;}
+  .plc-lan .pin-mini{border-radius:2px; background:#15181a;}
+  .plc-lan .pin-mini::before{display:none;}
+  /* LS XGB — 밝은 회색 몸체, 위·아래 짙은 단자 커버 */
+  .skin-ls{background:#d9dcdf; color:#2a2e33; border:1px solid #9ea5ab; border-radius:4px;}
+  .skin-ls .plc-strip{background:#3b3f44; color:#e8ecef;}
+  .skin-ls .plc-strip-top{border-radius:4px 4px 0 0;}
+  .ls-tag{background:#d6252b; color:#fff; font-weight:800; font-size:.62rem; padding:1px 6px; width:max-content; letter-spacing:.06em;}
+  .ls-model{font-family:'IBM Plex Mono',monospace; font-size:.6rem; font-weight:700;}
+  .ls-logo{font-style:italic; font-weight:800; font-size:.9rem; color:#7a8189; margin-top:auto;}
+  .skin-ls .plc-face-center{background:#cfd3d7;}
+  .skin-ls .plc-ledcell .io-led{background:#5a4f3a;}
+  .ls-cover{width:54px; border:1px solid #a9b0b6; border-radius:3px; background:linear-gradient(#e2e5e8,#cdd1d5); box-shadow:inset 0 3px 0 #b5bbc1;}
+  .plc-vents{height:12px; background:repeating-linear-gradient(90deg,#b6bcc1 0 18px,#9aa1a7 18px 20px); border-top:1px solid #9aa1a7;}
+  .skin-ls .status-led{background:#555;}
+  /* Mitsubishi MELSEC-Q — 모듈형 랙(빨간 전원 모듈 + CPU + 입출력 모듈) */
+  .skin-mit{background:#1f2327; border:1px solid #0e1012; border-radius:4px; color:#e8ecef;}
+  .q-rack{display:flex; gap:3px; padding:6px 6px 0; align-items:stretch;}
+  .q-mod{display:flex; flex-direction:column; gap:6px; align-items:center; background:linear-gradient(90deg,#3a3f45,#4a5057 45%,#3a3f45); border:1px solid #15181b; border-radius:3px; padding:6px 5px 4px; min-height:250px;}
+  .q-mod-name{font-family:'IBM Plex Mono',monospace; font-size:.55rem; font-weight:700; text-align:center; background:#15181b; color:#fff; padding:2px 5px; border-radius:2px; width:100%;}
+  .q-power{background:linear-gradient(90deg,#b8141b,#d8262d 45%,#b8141b); width:76px;}
+  .q-power .q-mod-name{background:#7a0d12;}
+  .q-power-face{margin-top:auto; font-weight:800; font-size:.5rem; letter-spacing:.05em;}
+  .q-cpu{width:78px;}
+  .q-slot{width:52px; height:14px; background:#23272b; border:1px solid #111; border-radius:2px;}
+  .q-io{width:176px;}
+  .q-ad{width:70px;}
+  .q-ledwin{display:grid; grid-template-columns:repeat(8, 17px); gap:2px 3px; background:#101214; padding:4px; border-radius:2px;}
+  .q-label-strip{background:#e9ecef; color:#1b1f23; font-family:'IBM Plex Mono',monospace; font-size:.5rem; text-align:center; padding:3px 6px; border-radius:2px; width:100%;}
+  .q-mod-terms{margin-top:auto; display:flex; gap:4px; justify-content:center; align-items:flex-end; flex-wrap:wrap; background:#26292d; padding:4px 3px 2px; border-radius:2px; width:100%;}
+  .q-terms-2row{flex-direction:column; align-items:center;}
+  .q-terms-2row > div{display:flex; gap:0;}
+  .q-terms-2row .plc-term{min-width:21px;}
+  .skin-mit .plc-status{flex-direction:column;}
+  /* Siemens S7-1200 — 청회색 몸체, 위(입력)·아래(출력) 단자대 */
+  .skin-siemens{background:linear-gradient(#aab6bd,#8f9ca4); color:#1b2227; border:1px solid #6d7a82; border-radius:4px;}
+  .skin-siemens .plc-strip{background:#5f6c74; color:#eef3f5;}
+  .skin-siemens .plc-face-center{background:#7e8b93; color:#eef3f5;}
+  .s7-brand{font-weight:800; color:#00868b; font-size:.8rem; letter-spacing:.04em;}
+  .s7-name{font-weight:700; font-size:.62rem; color:#23303a;}
+  .s7-cpu{font-family:'IBM Plex Mono',monospace; font-size:.55rem; color:#23303a;}
+  .skin-siemens .plc-face-right{flex-direction:column; justify-content:center;}
+  /* Omron CP1E — 검은 몸체, 위·아래 나사 단자대, 가운데 LED 표시창 */
+  .skin-omron{background:#1b1c1e; color:#e9ebed; border:1px solid #000; border-radius:5px;}
+  .skin-omron .plc-strip{background:#111213; color:#fff;}
+  .skin-omron .plc-strip-top{border-radius:5px 5px 0 0;}
+  .skin-omron .plc-strip-bottom{border-radius:0 0 0 0;}
+  .om-brand{font-weight:800; font-size:.8rem; letter-spacing:.02em;}
+  .om-model{font-family:'IBM Plex Mono',monospace; font-size:.58rem; font-weight:700;}
+  .om-panel{flex-direction:row !important; gap:10px; background:#0d0e0f; border:1px solid #333; align-items:center;}
+  .om-exp{writing-mode:vertical-rl; font-family:'IBM Plex Mono',monospace; font-size:.55rem; border:1px solid #444; border-radius:3px; padding:6px 2px;}
+  .skin-omron .plc-ledcell .io-led{background:#2c2622;}
+
   .plc-topbar{width:100%; display:flex; align-items:center; gap:8px; color:#fff; font-size:.72rem; font-weight:700; padding:5px 8px; border-radius:5px 5px 0 0; margin:-8px -10px 4px;}
   .plc-topbar-name{flex:1; letter-spacing:.02em;}
   .plc-brand-badge{background:#fff; font-weight:800; font-size:.72rem; padding:1px 7px; border-radius:4px; letter-spacing:.03em; box-shadow:0 1px 3px rgba(0,0,0,.35);}
@@ -709,7 +790,7 @@
   .vendor-omron .contact-sym svg *{stroke:#0b6b38; stroke-width:1.4;}
   .contact-sym.contact-live svg *{stroke:#1a9e4e !important; stroke-width:2.4;}
   .contact-sym .addr-badge{margin-top:2px; font-size:.62rem; font-weight:700; background:#fff; border:1px solid #b9c2cc; border-radius:3px; padding:0 4px; width:46px; text-align:center;}
-  select.addr-badge.addr-select{width:64px !important; cursor:pointer; -webkit-appearance:menulist;}
+  select.addr-badge.addr-select{width:84px !important; cursor:pointer; -webkit-appearance:menulist;}
   .contact-sym.contact-live .addr-badge{border-color:#1a9e4e; color:#0d7a37;}
   .contact-sym .neg-mark{position:absolute;}
   .contact-del-btn{background:none; border:none; color:#b23; font-size:.6rem; cursor:pointer; opacity:.55; padding:0 2px;}
@@ -795,12 +876,14 @@
   <div class="brand">
     <div class="brand-mark">P1</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.95</b>
+      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.961</b>
       <span data-i18n="brand.subtitle">Multi-Vendor PLC / HMI Virtual Commissioning</span>
     </div>
   </div>
   <div class="toolbar">
     <button class="btn ghost" onclick="startNewProject()" data-i18n="toolbar.newProject">🆕 새 프로젝트</button>
+    <button class="btn ghost" id="btnUndo" onclick="plcUndo()" title="실행 취소 (Ctrl+Z)" disabled>↶ 실행 취소</button>
+    <button class="btn ghost" id="btnRedo" onclick="plcRedo()" title="다시 실행 (Ctrl+Y / Ctrl+Shift+Z)" disabled>↷ 다시 실행</button>
     <input type="text" id="projectNameInput" class="project-name-input" value="제목없음 프로젝트" data-i18n-title="toolbar.projectNameTitle" title="프로젝트 이름">
     <select id="scanCycleSelect" class="scan-select" onchange="setScanCycle(this.value)" data-i18n-title="toolbar.scanCycleTitle" title="PLC 스캔 주기">
       <option value="10">10ms</option>
@@ -978,11 +1061,11 @@
    에이전트·실제 산업통신 프로토콜은 다음 버전으로 미룹니다(팔레트에는 자리를 잡아
    두고 "다음 버전에서 지원" 안내만 뜨게 해 확장 지점을 명확히 남겨둡니다).
    ============================================================ */
-const APP_VERSION = 'Ver0.95';
+const APP_VERSION = 'Ver0.961';
 
 /* ---------------- i18n ---------------- */
 const STRINGS = {
-  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.95", en: "K's PLC Simulator Ver0.95" },
+  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.961", en: "K's PLC Simulator Ver0.961" },
   "brand.subtitle": { ko: "Multi-Vendor PLC / HMI Virtual Commissioning", en: "Multi-Vendor PLC / HMI Virtual Commissioning" },
   "toolbar.newProject": { ko: "🆕 새 프로젝트", en: "🆕 New Project" },
   "toolbar.projectNameTitle": { ko: "프로젝트 이름", en: "Project name" },
@@ -1100,7 +1183,7 @@ const STRINGS = {
   "vc.log.closed": { ko: "연결이 종료되었습니다.", en: "Connection closed." },
   "vc.log.error": { ko: "연결 오류가 발생했습니다.", en: "A connection error occurred." },
   "vc.dblclickHint": { ko: "(더블클릭: VC 연동 패널)", en: "(double-click: VC Link panel)" },
-  "vc.gwLinkHint": { ko: "🖥️ VC 연동 게이트웨이 부품을 캔버스에 놓고, 그 LAN 단자를 통신 모듈(🌐/🔗)을 거쳐 대상 PLC의 LAN 단자와 배선해야 아래 WebSocket 송수신이 실제로 PLC 데이터를 주고받습니다. 배선이 없으면 소켓 연결은 되어도 데이터는 오가지 않습니다.", en: "Place a 🖥️ VC Link Gateway part on the canvas and wire its LAN terminal through a comm module (🌐/🔗) to the target PLC's LAN terminal — only then does the WebSocket exchange below actually carry PLC data. Without that wiring, the socket can connect but no data flows." },
+  "vc.gwLinkHint": { ko: "🖥️ VC 연동 게이트웨이 부품을 캔버스에 놓고, 그 LAN 단자를 통신 모듈(🌐/🔗)을 거쳐 대상 PLC의 LAN 단자와 배선해야 아래 WebSocket 송수신이 실제로 PLC 데이터를 주고받습니다. 배선이 없으면 소켓 연결은 되어도 데이터는 오가지 않습니다. HMI와 VC를 같은 PLC에 동시에 연결하려면 🔀 이더넷 스위칭 허브(5포트)에 PLC·HMI·VC 게이트웨이의 LAN을 각각 꽂으세요.", en: "Place a 🖥️ VC Link Gateway part on the canvas and wire its LAN terminal through a comm module (🌐/🔗) to the target PLC's LAN terminal — only then does the WebSocket exchange below actually carry PLC data. Without that wiring, the socket can connect but no data flows." },
   "vc.gwLinkStatus.linked": { ko: "🟢 게이트웨이 연결됨", en: "🟢 Gateway linked" },
   "vc.gwLinkStatus.notLinked": { ko: "🔴 게이트웨이 연결 안됨", en: "🔴 Gateway not linked" },
   "bridge.dblclickHint": { ko: "(외부 연동 — 통합 셸에서 사용)", en: "(External link — used by the integrated shell)" },
@@ -1786,6 +1869,58 @@ function updateWireTypeBadge(pin){
   el.style.color = info.color;
   el.hidden = false;
 }
+
+// [Ver0.961] 새 배선의 꺾임점을 항상 부품 "밖"으로 — 각 단자가 붙어 있는 부품의 가장 가까운 가장자리
+// 바깥으로 먼저 수직으로 빠져나온 뒤(출구점), 두 출구점을 직각(ㄱ자)으로 잇습니다. 두 가지 꺾는
+// 방법 중 다른 부품 몸체를 덜 가로지르는 쪽을 고릅니다.
+function plcCompBox(el){
+  const inner = document.getElementById('canvasInner').getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  return { x1:(r.left-inner.left)/zoomLevel, y1:(r.top-inner.top)/zoomLevel, x2:(r.right-inner.left)/zoomLevel, y2:(r.bottom-inner.top)/zoomLevel };
+}
+function plcExitPoint(pin, p){
+  const owner = pin.closest('.placed-component');
+  if (!owner) return { pt:{x:p.x, y:p.y}, dir:'none' };
+  const b = plcCompBox(owner), G = 16;
+  const d = { left:p.x-b.x1, right:b.x2-p.x, top:p.y-b.y1, bottom:b.y2-p.y };
+  const dir = Object.keys(d).reduce((m,k) => d[k] < d[m] ? k : m, 'left');
+  if (dir==='left') return { pt:{x:b.x1-G, y:p.y}, dir };
+  if (dir==='right') return { pt:{x:b.x2+G, y:p.y}, dir };
+  if (dir==='top') return { pt:{x:p.x, y:b.y1-G}, dir };
+  return { pt:{x:p.x, y:b.y2+G}, dir };
+}
+function plcSegHitsBox(a, c, b){
+  const minx = Math.min(a.x,c.x), maxx = Math.max(a.x,c.x), miny = Math.min(a.y,c.y), maxy = Math.max(a.y,c.y);
+  return maxx > b.x1 && minx < b.x2 && maxy > b.y1 && miny < b.y2;
+}
+function plcRouteWire(a, b){
+  const pa = pinCenter(a), pb = pinCenter(b);
+  const ea = plcExitPoint(a, pa), eb = plcExitPoint(b, pb);
+  const boxes = $all('.placed-component').map(plcCompBox);
+  const cost = (pts) => { let n = 0; for (let i=0;i<pts.length-1;i++) boxes.forEach(bx => { if (plcSegHitsBox(pts[i], pts[i+1], bx)) n++; }); return n; };
+  const A = ea.pt, B = eb.pt;
+  const cands = [];
+  if (Math.abs(A.x-B.x) < 0.5 || Math.abs(A.y-B.y) < 0.5) cands.push([A, B]);
+  cands.push([A, {x:B.x, y:A.y}, B]);
+  cands.push([A, {x:A.x, y:B.y}, B]);
+  // 세 번 꺾기(가운데에서 한 번 더): 두 출구가 서로 마주 보지 않을 때 더 깔끔한 경우가 많습니다.
+  const midY = (A.y + B.y) / 2, midX = (A.x + B.x) / 2;
+  cands.push([A, {x:A.x, y:midY}, {x:B.x, y:midY}, B]);
+  cands.push([A, {x:midX, y:A.y}, {x:midX, y:B.y}, B]);
+  // 두 부품 전체를 위/아래/왼쪽/오른쪽으로 크게 돌아가는 우회 경로도 후보로 둡니다.
+  const oa = a.closest('.placed-component'), ob = b.closest('.placed-component');
+  if (oa && ob){
+    const ba = plcCompBox(oa), bb = plcCompBox(ob), M = 24;
+    const top = Math.min(ba.y1, bb.y1) - M, bot = Math.max(ba.y2, bb.y2) + M, lef = Math.min(ba.x1, bb.x1) - M, rig = Math.max(ba.x2, bb.x2) + M;
+    [top, bot].forEach(y => cands.push([A, {x:A.x, y}, {x:B.x, y}, B]));
+    [lef, rig].forEach(x => cands.push([A, {x, y:A.y}, {x, y:B.y}, B]));
+  }
+  let best = cands[0], bestCost = Infinity;
+  const len = (pts) => { let L = 0; for (let i=0;i<pts.length-1;i++) L += Math.abs(pts[i].x-pts[i+1].x) + Math.abs(pts[i].y-pts[i+1].y); return L; };
+  cands.forEach(c => { const k = cost(c) * 100000 + len(c) + c.length * 20; if (k < bestCost){ bestCost = k; best = c; } });
+  const full = plcSimplifyPts([pa, ...best, pb]);
+  return full.slice(1, full.length - 1);
+}
 function createWire(a, b){
   if (a===b) return;
   if (wires.some(w => (w.from===a&&w.to===b)||(w.from===b&&w.to===a))) return;
@@ -1802,7 +1937,8 @@ function createWire(a, b){
   // (아두이노 시뮬레이터와 동일한 시작 모양). [Ver0.84] 이 점은 이후 사용자가 배선을
   // 더블클릭해서 추가하거나, 점을 더블클릭해서 지우거나, 드래그로 옮길 수 있는 진짜
   // "꺾임점(구멍)"입니다.
-  const points = [wireBendPoint(pinCenter(a), pinCenter(b))];
+  let points;
+  try { points = plcRouteWire(a, b); } catch(e){ points = [wireBendPoint(pinCenter(a), pinCenter(b))]; }
   wires.push({ id: 'w'+(++wireColorSeq), from:a, to:b, color, points });
   updateAllWires();
   refreshLegend();
@@ -3772,6 +3908,19 @@ function commRender(id, def){
     <div class="comp-label">${labelOf(def)} <span class="ladder-hint" data-i18n="comm.dblclickHint">(더블클릭: 통신 설정)</span></div>
   </div>`;
 }
+// [Ver0.961] 이더넷 스위칭 허브 — PLC·HMI·VC 게이트웨이·다른 PLC를 한 네트워크에 여러 대 묶을 때 사용.
+// 5개 포트는 내부적으로 모두 같은 네트워크 구간입니다(실제 스위칭 허브처럼).
+function commSwitchRender(id, def){
+  let ports = '';
+  for (let i=1;i<=5;i++) ports += pinHTML(id,'P'+i,'sig','P'+i,'P'+i,true);
+  return `
+  <div class="comp-box comm-live comm-switch-box">
+    <button class="comp-help-btn" onclick="showCompHelp(this,'${def.type}')">?</button>
+    <div class="comp-icon">${def.icon}</div>
+    <div class="comp-pin-row">${ports}</div>
+    <div class="comp-label">${labelOf(def)}</div>
+  </div>`;
+}
 function vcGatewayRender(id, def){
   // VC(Visual Components) 연동용 외부 게이트웨이 부품 — LAN 단자를 통신 모듈(comm-ethernet/
   // comm-serial)을 거쳐 대상 PLC의 LAN 단자와 실제로 배선해야, 좌측 하단 "VC 연동" 패널의
@@ -3896,9 +4045,9 @@ function getActiveProgram(id){
 function getActiveRungs(id){ return getActiveProgram(id).rungs; }
 const VENDOR_META = {
   'plc-ls':    { vendorClass:'vendor-ls',   name:'LS ELECTRIC XGB', shortName:'XG5000', color:'#0d5ab5', badge:'LS' },
-  'plc-mit':   { vendorClass:'vendor-mit',  name:'Mitsubishi MELSEC FX', shortName:'GX Works3', color:'#c65420', badge:'FX' },
+  'plc-mit':   { vendorClass:'vendor-mit',  name:'Mitsubishi MELSEC-Q', shortName:'GX Works3', color:'#c65420', badge:'Q' },
   'plc-siemens': { vendorClass:'vendor-siemens', name:'Siemens S7-1200', shortName:'TIA Portal', color:'#00a0e3', badge:'S7' },
-  'plc-omron': { vendorClass:'vendor-omron', name:'Omron Sysmac', shortName:'Sysmac Studio', color:'#0aa650', badge:'NX' },
+  'plc-omron': { vendorClass:'vendor-omron', name:'Omron SYSMAC CP1E', shortName:'Sysmac Studio', color:'#0aa650', badge:'CP' },
 };
 /* -------- 벤더별 주소 표기 변환(표시 전용) --------
    내부 엔진은 항상 X/Y/M/T/C/D 공통 주소를 그대로 씁니다(저장/프리셋/CALL 호환성 유지).
@@ -3910,8 +4059,9 @@ function vendorAddrToDisplay(vendorClass, addr){
   if (!m) return addr;
   const area = m[1], idx = parseInt(m[2],10);
   if (vendorClass==='vendor-ls'){
-    if (area==='X') return 'P'+String(idx).padStart(4,'0');
-    if (area==='Y') return 'P'+String(20+idx).padStart(4,'0');
+    // [Ver0.96] 실제 XGB 표기: 입력 P00000~P0000F, 출력 P00040~P0004F (끝자리 16진수 비트)
+    if (area==='X') return 'P0000'+idx.toString(16).toUpperCase();
+    if (area==='Y') return 'P0004'+idx.toString(16).toUpperCase();
     if (area==='M') return 'M'+String(idx).padStart(4,'0');
     if (area==='T') return 'T'+String(idx).padStart(3,'0');
     if (area==='C') return 'C'+String(idx).padStart(3,'0');
@@ -3926,18 +4076,25 @@ function vendorAddrToDisplay(vendorClass, addr){
     return addr;
   }
   if (vendorClass==='vendor-omron'){
-    if (area==='X') return '0.'+String(idx).padStart(2,'0');
-    if (area==='Y') return '100.'+String(idx).padStart(2,'0');
+    // [Ver0.96] 실제 CP1E 표기: 입력 0.00~0.11 → 1.00~1.03, 출력 100.00~100.07 → 101.00~101.07
+    if (area==='X') return idx < 12 ? '0.'+String(idx).padStart(2,'0') : '1.'+String(idx-12).padStart(2,'0');
+    if (area==='Y') return idx < 8 ? '100.'+String(idx).padStart(2,'0') : '101.'+String(idx-8).padStart(2,'0');
     if (area==='M') return 'W0.'+String(idx).padStart(2,'0');
     return addr;
   }
-  return addr; // Mitsubishi는 실제 표기와 이미 같아(X/Y/M/T/C/D) 변환 없음
+  if (vendorClass==='vendor-mit'){
+    // [Ver0.96] 실제 MELSEC-Q 표기: X/Y는 16진수(X0~XF, Y0~YF)
+    if (area==='X' || area==='Y') return area + idx.toString(16).toUpperCase();
+  }
+  return addr;
 }
 function vendorAddrFromDisplay(vendorClass, disp){
   if (!disp) return disp;
   disp = String(disp).trim().toUpperCase();
   if (vendorClass==='vendor-ls'){
-    let m = /^P(\d{3,4})$/.exec(disp);
+    let m5 = /^P([0-9A-F]{4})([0-9A-F])$/.exec(disp);
+    if (m5){ const word = parseInt(m5[1],10), bit = parseInt(m5[2],16); if (word===0) return 'X'+bit; if (word===4) return 'Y'+bit; }
+    let m = /^P(\d{3,4})$/.exec(disp); // 예전(Ver0.95 이하) 표기 P0000~/P0020~도 계속 인식
     if (m){ const n = parseInt(m[1],10); return n>=20 ? 'Y'+(n-20) : 'X'+n; }
     m = /^M(\d{3,4})$/.exec(disp); if (m) return 'M'+parseInt(m[1],10);
     m = /^T(\d{2,3})$/.exec(disp); if (m) return 'T'+parseInt(m[1],10);
@@ -3954,11 +4111,18 @@ function vendorAddrFromDisplay(vendorClass, disp){
   }
   if (vendorClass==='vendor-omron'){
     let m = /^0\.(\d+)$/.exec(disp); if (m) return 'X'+parseInt(m[1],10);
+    m = /^1\.(\d+)$/.exec(disp); if (m) return 'X'+(12+parseInt(m[1],10));
     m = /^100\.(\d+)$/.exec(disp); if (m) return 'Y'+parseInt(m[1],10);
+    m = /^101\.(\d+)$/.exec(disp); if (m) return 'Y'+(8+parseInt(m[1],10));
     m = /^W0\.(\d+)$/.exec(disp); if (m) return 'M'+parseInt(m[1],10);
     return disp;
   }
-  return disp; // Mitsubishi는 그대로
+  if (vendorClass==='vendor-mit'){
+    const m = /^([XY])([0-9A-F]+)$/.exec(disp);
+    // 16진수 글자(A~F)가 있으면 16진수, 숫자만이면 예전 저장 파일과의 호환을 위해 10진수로 해석
+    if (m) return m[1] + (/[A-F]/.test(m[2]) ? parseInt(m[2],16) : parseInt(m[2],10));
+  }
+  return disp;
 }
 function plcIoPinHTML(id, suf, ledSuf, above){
   const dot = `<div class="pin-mini role-sig" data-pin="${id}_${suf}" id="${id}_${suf}"></div>`;
@@ -3968,8 +4132,178 @@ function plcIoPinHTML(id, suf, ledSuf, above){
     ? `<div class="pin-col io-pin-top">${cap}${led}${dot}</div>`
     : `<div class="pin-col io-pin-bottom">${dot}${led}${cap}</div>`;
 }
+
+/* [Ver0.96] 실제 PLC 외형(LS XGB / MELSEC-Q / S7-1200 / CP1E) — 배선 단자는 최대한 바깥쪽(위·아래
+   가장자리)에, 입출력 확인용 LED는 가운데에 모았습니다. 단자·LED 번호는 각 회사 실제 표기입니다.
+   핀 id(X0~X15, Y0~Y15, AI0/AI1, 24P/24N/COM/LAN)는 예전과 같아 저장 파일·예제는 그대로 동작합니다. */
+function plcHex(i){ return i.toString(16).toUpperCase(); }
+function plcIoLabels(vendorClass){
+  const X = [], Y = [];
+  for (let i=0;i<PLC_IO_COUNT;i++){
+    if (vendorClass==='vendor-ls'){ X.push({s:'0'+plcHex(i)}); Y.push({s:'4'+plcHex(i)}); }
+    else if (vendorClass==='vendor-mit'){ X.push({s:'X'+plcHex(i)}); Y.push({s:'Y'+plcHex(i)}); }
+    else if (vendorClass==='vendor-siemens'){ X.push({s:'.'+(i%8)}); Y.push({s:'.'+(i%8)}); }
+    else { X.push({s: i<12 ? String(i).padStart(2,'0') : String(i-12).padStart(2,'0')}); Y.push({s: String(i%8).padStart(2,'0')}); }
+  }
+  return {X, Y};
+}
+function plcTerm(id, suf, role, label, title, side){
+  const dot = `<div class="pin-mini role-${role}" data-pin="${id}_${suf}" id="${id}_${suf}"></div>`;
+  const cap = `<span class="pin-cap">${label}</span>`;
+  return `<div class="pin-col plc-term plc-term-${side}" title="${title}">${side==='top' ? dot+cap : cap+dot}</div>`;
+}
+function plcTermGroup(label, inner, side){
+  const lab = label ? `<div class="plc-tg-label">${label}</div>` : '';
+  return `<div class="plc-tgroup">${side==='top' ? `<div class="plc-tg-pins">${inner}</div>${lab}` : `${lab}<div class="plc-tg-pins">${inner}</div>`}</div>`;
+}
+function plcLedCell(id, key, label){
+  return `<span class="plc-ledcell"><span class="io-led" id="${id}_${key}_led"></span><i>${label}</i></span>`;
+}
+function plcLedRow(title, cellsHtml){ return `<div class="plc-ledrow"><b>${title}</b><div class="plc-ledcells">${cellsHtml}</div></div>`; }
+function plcStatusLeds(id, names){
+  return `<div class="plc-status">${names.map(n => `<div class="plc-st"><span class="status-led ${n[0]}" ${n[1]?`id="${id}_${n[1]}"`:''}></span><span>${n[2]}</span></div>`).join('')}</div>`;
+}
+function plcRenderReal(id, def){
+  const vm = VENDOR_META[def.type];
+  const vc = vm.vendorClass;
+  const L = plcIoLabels(vc);
+  const addr = (a) => vendorAddrToDisplay(vc, a);
+  const xs = (from, to, side) => { let h=''; for (let i=from;i<to;i++) h += plcTerm(id,'X'+i,'sig',L.X[i].s, addr('X'+i)+' (입력)', side||'top'); return h; };
+  const ys = (from, to, side) => { let h=''; for (let i=from;i<to;i++) h += plcTerm(id,'Y'+i,'sig',L.Y[i].s, addr('Y'+i)+' (출력)', side||'bottom'); return h; };
+  const xl = (from, to) => { let h=''; for (let i=from;i<to;i++) h += plcLedCell(id,'X'+i,L.X[i].s); return h; };
+  const yl = (from, to) => { let h=''; for (let i=from;i<to;i++) h += plcLedCell(id,'Y'+i,L.Y[i].s); return h; };
+  const help = `<button class="comp-help-btn" onclick="showCompHelp(this,'${def.type}')">?</button>`;
+  const dbl = `ondblclick="openLadderEditor('${id}')"`;
+  const foot = `<div class="comp-label">${labelOf(def)} <span class="ladder-hint" data-i18n="plc.dblclickHint">(더블클릭: 래더 편집)</span></div>`;
+  const lan = (label) => `<div class="pin-col plc-term plc-lan" title="LAN (Ethernet)"><div class="plc-rj45">${'<i></i>'.repeat(4)}</div><div class="pin-mini role-sig" data-pin="${id}_LAN" id="${id}_LAN"></div><span class="pin-cap">${label}</span></div>`;
+
+  if (vc === 'vendor-ls'){
+    return `<div class="comp-box plc-box plc-skin skin-ls ${vc}" ${dbl}>${help}
+      <div class="plc-strip plc-strip-top">
+        ${plcTermGroup('POWER', plcTerm(id,'24P','dc24p','24V','24V+ 전원','top')+plcTerm(id,'24N','dc24n','0V','24V- 전원','top'), 'top')}
+        ${plcTermGroup('', plcTerm(id,'COM','sig','COM','입력 COM','top'), 'top')}
+        ${plcTermGroup('IN  P00000~P0000F', xs(0,16), 'top')}
+      </div>
+      <div class="plc-face">
+        <div class="plc-face-left">
+          <div class="ls-tag">XGB</div>
+          <div class="ls-model">XBC-DN32SU</div>
+          ${plcStatusLeds(id, [['pwr','pwrled','PWR'],['run','runled','RUN'],['err','errled','ERR']])}
+          <div class="ls-logo">LS</div>
+        </div>
+        <div class="plc-face-center">
+          ${plcLedRow('IN', xl(0,16))}
+          ${plcLedRow('OUT', yl(0,16))}
+        </div>
+        <div class="plc-face-right"><div class="ls-cover"></div><div class="ls-cover"></div></div>
+      </div>
+      <div class="plc-strip plc-strip-bottom">
+        ${plcTermGroup('OUT  P00040~P0004F', ys(0,16), 'bottom')}
+        ${plcTermGroup('ANALOG', plcTerm(id,'AI0','sig','AI0','아날로그 입력 AI0 (0~100%)','bottom')+plcTerm(id,'AI1','sig','AI1','아날로그 입력 AI1 (0~100%)','bottom'), 'bottom')}
+        ${plcTermGroup('', lan('LAN'), 'bottom')}
+      </div>
+      <div class="plc-vents"></div>
+      ${foot}</div>`;
+  }
+  if (vc === 'vendor-mit'){
+    const modLeds = (key, from, to, lab) => { let h=''; for (let i=from;i<to;i++) h += plcLedCell(id, key+i, lab[i].s.slice(1)); return h; };
+    return `<div class="comp-box plc-box plc-skin skin-mit ${vc}" ${dbl}>${help}
+      <div class="q-rack">
+        <div class="q-mod q-power">
+          <div class="q-mod-name">Q61P</div>
+          ${plcStatusLeds(id, [['pwr','pwrled','POWER']])}
+          <div class="q-power-face">MITSUBISHI</div>
+          <div class="q-mod-terms">${plcTerm(id,'24P','dc24p','+24V','24V+ 전원','bottom')}${plcTerm(id,'24N','dc24n','24G','24V- 전원','bottom')}</div>
+        </div>
+        <div class="q-mod q-cpu">
+          <div class="q-mod-name">Q06UDH<br>CPU</div>
+          ${plcStatusLeds(id, [['run','runled','RUN'],['err','errled','ERR'],['usr','','USER'],['bat','','BAT']])}
+          <div class="q-slot"></div><div class="q-slot"></div>
+          <div class="q-mod-terms">${lan('ETH')}</div>
+        </div>
+        <div class="q-mod q-io">
+          <div class="q-mod-name">QX40</div>
+          <div class="q-ledwin">${modLeds('X',0,16,L.X)}</div>
+          <div class="q-label-strip">X0~XF<br>DC24V IN</div>
+          <div class="q-mod-terms q-terms-2row"><div>${xs(0,8,'bottom')}</div><div>${xs(8,16,'bottom')}</div>${plcTerm(id,'COM','sig','COM','입력 COM','bottom')}</div>
+        </div>
+        <div class="q-mod q-io">
+          <div class="q-mod-name">QY40P</div>
+          <div class="q-ledwin">${modLeds('Y',0,16,L.Y)}</div>
+          <div class="q-label-strip">Y0~YF<br>TR OUT</div>
+          <div class="q-mod-terms q-terms-2row"><div>${ys(0,8)}</div><div>${ys(8,16)}</div></div>
+        </div>
+        <div class="q-mod q-ad">
+          <div class="q-mod-name">Q64AD</div>
+          <div class="q-label-strip">ANALOG<br>IN</div>
+          <div class="q-mod-terms">${plcTerm(id,'AI0','sig','CH1','아날로그 입력 AI0 (0~100%)','bottom')}${plcTerm(id,'AI1','sig','CH2','아날로그 입력 AI1 (0~100%)','bottom')}</div>
+        </div>
+      </div>
+      ${foot}</div>`;
+  }
+  if (vc === 'vendor-siemens'){
+    return `<div class="comp-box plc-box plc-skin skin-siemens ${vc}" ${dbl}>${help}
+      <div class="plc-strip plc-strip-top">
+        ${plcTermGroup('24VDC', plcTerm(id,'24P','dc24p','L+','24V+ 전원 (L+)','top')+plcTerm(id,'24N','dc24n','M','24V- 전원 (M)','top'), 'top')}
+        ${plcTermGroup('', plcTerm(id,'COM','sig','1M','입력 COM (1M)','top'), 'top')}
+        ${plcTermGroup('DI a', xs(0,8), 'top')}
+        ${plcTermGroup('DI b', xs(8,16), 'top')}
+        ${plcTermGroup('AI', plcTerm(id,'AI0','sig','0','아날로그 입력 AI 0 (0~100%)','top')+plcTerm(id,'AI1','sig','1','아날로그 입력 AI 1 (0~100%)','top'), 'top')}
+      </div>
+      <div class="plc-face">
+        <div class="plc-face-left">
+          <div class="s7-brand">SIEMENS</div>
+          ${plcStatusLeds(id, [['run','runled','RUN/STOP'],['err','errled','ERROR'],['pwr','pwrled','MAINT']])}
+          ${lan('X1 P1')}
+        </div>
+        <div class="plc-face-center">
+          ${plcLedRow('DI a', xl(0,8))}${plcLedRow('DI b', xl(8,16))}
+          ${plcLedRow('DQ a', yl(0,8))}${plcLedRow('DQ b', yl(8,16))}
+        </div>
+        <div class="plc-face-right">
+          <div class="s7-name">SIMATIC<br>S7-1200</div>
+          <div class="s7-cpu">CPU 1214C<br>DC/DC/DC</div>
+        </div>
+      </div>
+      <div class="plc-strip plc-strip-bottom">
+        ${plcTermGroup('DQ a', ys(0,8), 'bottom')}
+        ${plcTermGroup('DQ b', ys(8,16), 'bottom')}
+      </div>
+      ${foot}</div>`;
+  }
+  // Omron CP1E
+  return `<div class="comp-box plc-box plc-skin skin-omron ${vc}" ${dbl}>${help}
+    <div class="plc-strip plc-strip-top">
+      ${plcTermGroup('', plcTerm(id,'24P','dc24p','+','24V+ 전원','top')+plcTerm(id,'24N','dc24n','−','24V- 전원','top'), 'top')}
+      ${plcTermGroup('', plcTerm(id,'COM','sig','COM','입력 COM','top'), 'top')}
+      ${plcTermGroup('0CH  IN', xs(0,12), 'top')}
+      ${plcTermGroup('1CH', xs(12,16), 'top')}
+    </div>
+    <div class="plc-face">
+      <div class="plc-face-left">
+        <div class="om-brand">omron</div>
+        <div class="om-model">SYSMAC<br>CP1E</div>
+        ${lan('PERIPHERAL')}
+      </div>
+      <div class="plc-face-center om-panel">
+        ${plcStatusLeds(id, [['pwr','pwrled','POWER'],['run','runled','RUN'],['err','errled','ERR/ALM']])}
+        <div>
+          ${plcLedRow('IN 0CH', xl(0,12))}${plcLedRow('IN 1CH', xl(12,16))}
+          ${plcLedRow('OUT 100CH', yl(0,8))}${plcLedRow('OUT 101CH', yl(8,16))}
+        </div>
+      </div>
+      <div class="plc-face-right"><div class="om-exp">EXP</div></div>
+    </div>
+    <div class="plc-strip plc-strip-bottom">
+      ${plcTermGroup('100CH  OUT', ys(0,8), 'bottom')}
+      ${plcTermGroup('101CH', ys(8,16), 'bottom')}
+      ${plcTermGroup('ANALOG', plcTerm(id,'AI0','sig','AI0','아날로그 입력 AI0 (0~100%)','bottom')+plcTerm(id,'AI1','sig','AI1','아날로그 입력 AI1 (0~100%)','bottom'), 'bottom')}
+    </div>
+    ${foot}</div>`;
+}
 function plcRender(id, def){
   const vm = VENDOR_META[def.type];
+  if (!vm.stub) return plcRenderReal(id, def);
   const half = PLC_IO_COUNT/2;
   let insTop1='', insTop2='', outsBot1='', outsBot2='';
   for (let i=0;i<half;i++) insTop1 += plcIoPinHTML(id,'X'+i,'X'+i+'_led',true);
@@ -5112,6 +5446,7 @@ const COMPONENT_DEFS = {
 
   'comm-ethernet': { type:'comm-ethernet', cat:'comm', icon:'🌐', label:{ko:'Ethernet (Modbus TCP/MC Protocol)', en:'Ethernet (Modbus TCP/MC Protocol)'}, render:commRender },
   'comm-serial': { type:'comm-serial', cat:'comm', icon:'🔗', label:{ko:'CAN/RS-485 (패킷 모니터)', en:'CAN/RS-485 (Packet Monitor)'}, render:commRender },
+  'comm-switch': { type:'comm-switch', cat:'comm', icon:'🔀', label:{ko:'이더넷 스위칭 허브(5포트)', en:'Ethernet Switch (5-port)'}, render:commSwitchRender },
   'vc-gateway': { type:'vc-gateway', cat:'comm', icon:'🖥️', label:{ko:'VC 연동 게이트웨이(WebSocket)', en:'VC Link Gateway (WebSocket)'}, render:vcGatewayRender },
   'net-bridge': { type:'net-bridge', cat:'comm', icon:'🌉', label:{ko:'외부 연동 브릿지(아두이노/ESP32)', en:'External Link Bridge (Arduino/ESP32)'}, render:netBridgeRender },
 
@@ -5178,7 +5513,7 @@ const PALETTE_CATEGORIES = [
   { key:'power', titleKo:'② 전원장치', titleEn:'② Power Supplies', types:['psu24v','reg5v','logic5v','ac220term','ac380term'] },
   { key:'sensor', titleKo:'③ 산업용 24V 센서/조작스위치', titleEn:'③ 24V Sensors/Operator Switches', types:['sen-ind','sen-cap','sen-photo-diff','sen-photo-thru','limit-sw','auto-sw','sen-pressure','sen-laser','sen-lidar','sen-color','sen-barcode','sen-vision','pb-start','pb-stop','pb-estop','pb-maintain'] },
   { key:'actuator', titleKo:'④ 공압/구동 액추에이터', titleEn:'④ Pneumatic/Drive Actuators', types:['cyl-single','cyl-double','ecyl-onoff','ecyl-anlg','ecyl-servo','valve-single','valve-double','motor3ph','mc-contactor','vfd','servo-pulse','tower-lamp','ind-lamp'] },
-  { key:'comm', titleKo:'⑤ 통신', titleEn:'⑤ Communications', types:['comm-ethernet','comm-serial','vc-gateway','net-bridge'] },
+  { key:'comm', titleKo:'⑤ 통신', titleEn:'⑤ Communications', types:['comm-ethernet','comm-switch','comm-serial','vc-gateway','net-bridge'] },
   { key:'hmi', titleKo:'⑥ HMI', titleEn:'⑥ HMI', types:['hmi-panel'] },
   { key:'robot', titleKo:'⑦ 3D 로봇(OLP)', titleEn:'⑦ 3D Robot (OLP)', types:['robot-arm'] },
   { key:'conveyor', titleKo:'⑧ 컨베이어(제품 이송)', titleEn:'⑧ Conveyor (Product Transport)', types:['conveyor-sensor'] },
@@ -5366,6 +5701,7 @@ const COMP_HELP_BLURB = {
   'tower-lamp': {ko:'적층 타워램프입니다. COM(-)과 R/Y/G 각 신호선에 24V를 걸면 해당 색이 켜집니다.', en:'Stack tower lamp. Each color lights when its signal pin and COM(-) are both energized.'},
   'ind-lamp': {ko:'표시램프입니다. 색상을 선택할 수 있고, +/-에 24V가 걸리면 점등합니다.', en:'Indicator lamp. Pick a color; lights when + and - are both energized.'},
   'comm-ethernet': {ko:'Ethernet 통신 모듈입니다. P1/P2 포트로 PLC의 LAN 단자를 배선하면, 더블클릭해 두 PLC 사이의 가상 Modbus TCP 데이터 링크(D레지스터 교환)를 설정하고 패킷 모니터로 볼 수 있습니다(실제 TCP 통신이 아닌 시뮬레이션입니다).', en:'Ethernet comm module. Wire PLC LAN terminals into P1/P2, then double-click to set up a simulated Modbus TCP data link (D-register exchange) between two PLCs and watch it in the packet monitor (a simulation, not real TCP).'},
+  'comm-switch': {ko:'이더넷 스위칭 허브입니다. P1~P5 다섯 포트가 모두 같은 네트워크로 묶입니다. PLC의 LAN, HMI의 LAN, VC 연동 게이트웨이의 LAN을 각각 아무 포트에나 꽂으면 HMI와 VC를 한 PLC에 동시에 연결할 수 있습니다(PLC 여러 대도 가능).', en:'Ethernet switching hub. Ports P1–P5 are all on the same network. Plug the PLC LAN, HMI LAN and VC gateway LAN into any ports to use HMI and VC with one PLC at the same time (multiple PLCs also work).'},
   'comm-serial': {ko:'CAN/RS-485 통신 모듈입니다. P1/P2 포트로 PLC의 LAN 단자를 배선하면, 더블클릭해 두 PLC 사이의 가상 CAN 데이터 링크(D레지스터 교환)를 설정하고 패킷 모니터로 볼 수 있습니다(실제 시리얼 통신이 아닌 시뮬레이션입니다).', en:'CAN/RS-485 comm module. Wire PLC LAN terminals into P1/P2, then double-click to set up a simulated CAN data link (D-register exchange) between two PLCs and watch it in the packet monitor (a simulation, not a real serial port).'},
   'vc-gateway': {ko:'VC(Visual Components) 연동 게이트웨이입니다. 이 부품의 LAN 단자를 통신 모듈(🌐 Ethernet 또는 🔗 CAN/RS-485)을 거쳐 대상 PLC의 LAN 단자와 같은 네트워크로 실제 배선해야, 좌측 하단 "🔌 VC 연동" 패널에서 그 PLC의 상태를 외부 WebSocket 서버로 실제로 주고받습니다. 배선이 안 되어 있으면 WebSocket 자체는 연결되어도 데이터는 오가지 않습니다(실제 산업 현장에서 SCADA/OPC UA 게이트웨이가 PLC 네트워크에 물려 있어야 하는 것과 같은 개념).', en:'A VC (Visual Components) link gateway. Wire this part\'s LAN terminal through a comm module (🌐 Ethernet or 🔗 CAN/RS-485) into the same network as the target PLC\'s LAN terminal — only then does the "🔌 VC Link" panel (bottom-left) actually exchange that PLC\'s state with the external WebSocket server. Without that wiring, the WebSocket itself can still connect, but no data flows (the same idea as a real SCADA/OPC UA gateway needing to actually be on the PLC network).'},
   'net-bridge': {ko:'K군의 통합 시뮬레이터에서 이 PLC 시뮬레이터를 아두이노/ESP32 시뮬레이터와 연동시키는 외부 브릿지입니다. 이 부품의 LAN 단자를 통신 모듈(🌐 Ethernet 또는 🔗 CAN/RS-485)을 거쳐 대상 PLC의 LAN 단자와 같은 네트워크로 실제 배선해야, 통합 셸(바깥 페이지)의 "🌉 PLC 연동" 패널이 그 PLC의 X/Y/M/D 값을 읽고 강제 입력을 걸 수 있습니다. 이 PLC 시뮬레이터 단독 실행(통합 셸 없이)에서는 이 부품이 있어도 아무 동작도 하지 않습니다.', en:'An external bridge that lets K\'s Integrated Simulator connect this PLC simulator with the Arduino/ESP32 simulator. Wire this part\'s LAN terminal through a comm module (🌐 Ethernet or 🔗 CAN/RS-485) into the same network as the target PLC\'s LAN terminal — only then can the outer shell\'s "🌉 PLC Link" panel read that PLC\'s X/Y/M/D values and force inputs on it. Running this PLC simulator standalone (outside the integrated shell) does nothing with this part.'},
@@ -5771,17 +6107,17 @@ function ladderAddILProgram(plcId){
 // 소프트웨어에서 흔히 보이는 스타일로 보여줍니다.
 const ST_STARTER_TEMPLATES = {
   'vendor-ls': `// XG5000 스타일 구조화 텍스트(ST) 예시
-IF P0000 AND NOT P0001 THEN
-    P0020 := TRUE;
+IF P00000 AND NOT P00001 THEN
+    P00040 := TRUE;
 ELSE
-    P0020 := FALSE;
+    P00040 := FALSE;
 END_IF;
 
-T000(IN := P0000, PT := 3000);   // 3초 On-delay 타이머
-P0021 := T000.Q;
+T000(IN := P00000, PT := 3000);   // 3초 On-delay 타이머
+P00041 := T000.Q;
 
-C000(CU := P0001, R := P0002, PV := 5);   // 5회 카운트
-P0022 := C000.Q;
+C000(CU := P00001, R := P00002, PV := 5);   // 5회 카운트
+P00042 := C000.Q;
 `,
   'vendor-mit': `// GX Works3 스타일 구조화 텍스트(ST) 예시
 IF X0 AND NOT X1 THEN
@@ -7043,11 +7379,12 @@ function computeNetworkGroups(){
     const type = comp.dataset.type;
     let pins = [];
     if (type==='comm-ethernet' || type==='comm-serial') pins = [comp.id+'_P1', comp.id+'_P2'];
+    else if (type==='comm-switch') pins = [1,2,3,4,5].map(i => comp.id+'_P'+i);
     else if ((VENDOR_META[type] && !VENDOR_META[type].stub) || type==='hmi-panel' || type==='vc-gateway' || type==='net-bridge'){
       if (document.getElementById(comp.id+'_LAN')) pins = [comp.id+'_LAN'];
     }
     pins.forEach(p => { lanPinIds.add(p); find(p); });
-    if (pins.length===2) union(pins[0], pins[1]); // 통신모듈은 두 포트가 내부적으로 하나의 구간(허브 통과)
+    if (pins.length>=2) for (let i=1;i<pins.length;i++) union(pins[0], pins[i]); // 통신모듈/스위치는 모든 포트가 내부적으로 하나의 구간(허브 통과)
   });
   wires.forEach(w => { if (lanPinIds.has(w.from.id) && lanPinIds.has(w.to.id)) union(w.from.id, w.to.id); });
   const groups = {};
@@ -7730,7 +8067,7 @@ const AI_RULES = [
       aiL('Main은 매 스캔 자동 실행되고, 나머지 프로그램은 그 랑이 켜질 때만 실행 후 복귀합니다. 자기 자신을 호출하는 등 순환 호출은 자동으로 막힙니다.', 'Main runs automatically every scan; other programs run only while the calling rung is energized, then return. Self/circular calls are blocked automatically.'),
     ].join('\n') },
   { test:q => /(지멘스|siemens|오므론|omron|미쓰비시|mitsubishi|\bls\b).*주소|주소.*(지멘스|siemens|오므론|omron)|vendor\s*address|address\s*format/i.test(q), handle: () => [
-      aiL('벤더별 주소 표기: LS는 P0000~(입력)/P0020~(출력)/M0000(보조릴레이)/T000(타이머)/C000(카운터)/D0000(데이터) 형식, Mitsubishi는 X0/Y0/M0/T0/C0/D0 그대로, Siemens는 I0.0/Q0.0/M0.0(바이트.비트)/MW0(워드) 형식, Omron은 0.00(입력)/100.00(출력)/W0.00(작업비트)/D0 형식으로 표시됩니다. 심볼 모양도 벤더별로 달라요 — LS·Mitsubishi는 둥근 코일과 대괄호 응용명령 박스, Siemens는 타이머·데이터명령이 EN/ENO 펑션 박스, Omron은 플랫한 현대식 스타일입니다.', 'Vendor address styles: LS shows P0000+ (inputs)/P0020+ (outputs)/M0000 (aux relay)/T000 (timer)/C000 (counter)/D0000 (data), Mitsubishi shows plain X0/Y0/M0/T0/C0/D0, Siemens shows I0.0/Q0.0/M0.0 (byte.bit)/MW0 (word), and Omron shows 0.00 (inputs)/100.00 (outputs)/W0.00 (work bit)/D0. Symbol shapes differ too — LS/Mitsubishi use round coils and bracketed instruction boxes, Siemens shows timers/data instructions as EN/ENO function boxes, and Omron uses a flat, modern style.'),
+      aiL('벤더별 주소 표기: LS는 P00000~P0000F(입력)/P00040~P0004F(출력)/M0000(보조릴레이)/T000(타이머)/C000(카운터)/D0000(데이터) 형식, Mitsubishi는 X0/Y0/M0/T0/C0/D0 그대로, Siemens는 I0.0/Q0.0/M0.0(바이트.비트)/MW0(워드) 형식, Omron은 0.00(입력)/100.00(출력)/W0.00(작업비트)/D0 형식으로 표시됩니다. 심볼 모양도 벤더별로 달라요 — LS·Mitsubishi는 둥근 코일과 대괄호 응용명령 박스, Siemens는 타이머·데이터명령이 EN/ENO 펑션 박스, Omron은 플랫한 현대식 스타일입니다.', 'Vendor address styles: LS shows P0000+ (inputs)/P0020+ (outputs)/M0000 (aux relay)/T000 (timer)/C000 (counter)/D0000 (data), Mitsubishi shows plain X0/Y0/M0/T0/C0/D0, Siemens shows I0.0/Q0.0/M0.0 (byte.bit)/MW0 (word), and Omron shows 0.00 (inputs)/100.00 (outputs)/W0.00 (work bit)/D0. Symbol shapes differ too — LS/Mitsubishi use round coils and bracketed instruction boxes, Siemens shows timers/data instructions as EN/ENO function boxes, and Omron uses a flat, modern style.'),
       aiL('내부적으로는 모두 X/Y/M/T/C로 저장되므로 저장 파일 호환성은 유지되며, 화면 표시만 벤더에 맞게 바뀌는 교육용 근사치입니다.', 'Internally everything is still stored as X/Y/M/T/C for save-file compatibility — only the on-screen display changes per vendor, as an educational approximation.'),
     ].join('\n') },
   { test:q => /통신|comm|모드버스|modbus|\bcan\b|rs-?485/i.test(q), handle: () => [
@@ -8052,6 +8389,7 @@ function handleProjectFileSelected(input){
       scanCycleMs = data.scanCycleMs || 20;
       document.getElementById('scanCycleSelect').value = String(scanCycleMs);
       document.getElementById('projectNameInput').value = data.projectName || '';
+      if (String(data.version||'') < 'Ver0.96') plcMakeRoom(); // 예전 버전 파일만 자리 정리
       updateAllWires(); refreshLegend(); evaluateElectricalNets();
     } catch(err){ alert(tr('err.loadFail') + '\n' + err.message); }
     input.value = '';
@@ -8059,8 +8397,127 @@ function handleProjectFileSelected(input){
   reader.readAsText(file);
 }
 
+
+/* ---------------- [Ver0.96] 실행 취소 / 다시 실행 (Ctrl+Z / Ctrl+Y) ----------------
+   사용자가 마우스·키보드로 무언가를 바꿀 때마다(부품 배치/이동/삭제, 배선, 래더·ST 편집, 이름 변경 등)
+   잠시 뒤 캔버스 전체 상태를 한 장 찍어 두고, 직전 상태와 다르면 되돌리기 목록에 쌓습니다.
+   RUN 중 계속 바뀌는 PLC 메모리(X/Y/M/T/C/D 값)는 되돌리기 대상에서 뺍니다. */
+const PLC_UNDO = [], PLC_REDO = [];
+const PLC_UNDO_LIMIT = 60;
+let PLC_UNDO_LAST = null, PLC_UNDO_RESTORING = false, PLC_UNDO_TIMER = null;
+function plcUndoReplacer(k, v){
+  if (v instanceof Set) return Array.from(v);
+  if (typeof k === 'string' && k.charAt(0) === '_' && k !== '_bp' && k !== '_bpLines') return undefined;
+  if (k === 'warnings') return undefined;
+  return v;
+}
+function plcCollectState(){
+  return {
+    components: $all('.placed-component').map(c => ({ id:c.id, type:c.dataset.type, x:parseFloat(c.style.left)||0, y:parseFloat(c.style.top)||0, persist:collectPersist(c), label:c.dataset.label||'' })),
+    wires: wires.map(w => ({ from:w.from.id, to:w.to.id, color:w.color, points:w.points||[], width:w.width||undefined, dash:w.dash||undefined })),
+    plcPrograms: PLC_PROG, hmiState: HMI_STATE, deviceComments: DEVICE_COMMENTS, commLinks: COMM_LINKS,
+  };
+}
+function plcSnapshot(){ try { return JSON.stringify(plcCollectState(), plcUndoReplacer); } catch(e){ return null; } }
+function plcApplyState(json){
+  const data = JSON.parse(json);
+  const keepMem = {}; Object.keys(PLC_MEM).forEach(k => keepMem[k] = PLC_MEM[k]);
+  const ladderFor = window.__ladderEditorOpenFor;
+  const ld = document.getElementById('ladderDrawer');
+  const ladderWasOpen = !!(ladderFor && ld && ld.classList.contains('open'));
+  const selWireIdx = selectedWire ? wires.indexOf(selectedWire) : -1;
+  PLC_UNDO_RESTORING = true;
+  try {
+    const running = isRunning;
+    if (running) toggleRun();
+    clearCanvas();
+    let maxSeq = 0;
+    (data.components||[]).forEach(c => {
+      spawnComponentWithId(c.type, c.x, c.y, c.id);
+      const num = parseInt((c.id.match(/c(\d+)_/)||[])[1] || '0', 10);
+      if (num>maxSeq) maxSeq = num;
+      const el = document.getElementById(c.id);
+      if (el && c.label){ el.dataset.label = c.label; refreshComponentLabel(c.id); }
+      applyPersist(el, c.persist);
+    });
+    compCount = maxSeq;
+    bindPinEvents();
+    (data.wires||[]).forEach(w => {
+      const a = document.getElementById(w.from), b = document.getElementById(w.to);
+      if (a && b) wires.push({ id:'w'+(++wireColorSeq), from:a, to:b, color:w.color, points: Array.isArray(w.points) ? w.points : [], width:w.width||undefined, dash:w.dash||undefined });
+    });
+    Object.assign(PLC_PROG, data.plcPrograms||{});
+    Object.keys(PLC_PROG).forEach(plcId => {
+      (PLC_PROG[plcId].programs||[]).forEach(program => {
+        if (program._bpLines !== undefined) program._bpLines = new Set(Array.isArray(program._bpLines) ? program._bpLines : Object.values(program._bpLines||{}));
+        try {
+          if (program.mode === 'fbd' && program.fbd) fbdRebuildOrder(program);
+          if (program.mode === 'sfc' && program.sfc) sfcRebuildAll(program, fbdActiveVendorClass(plcId));
+        } catch(e){}
+      });
+    });
+    Object.keys(keepMem).forEach(k => { if (document.getElementById(k)) PLC_MEM[k] = keepMem[k]; });
+    Object.assign(HMI_STATE, data.hmiState||{});
+    Object.assign(DEVICE_COMMENTS, data.deviceComments||{});
+    Object.assign(COMM_LINKS, data.commLinks||{});
+    if (selWireIdx >= 0 && wires[selWireIdx]) selectedWire = wires[selWireIdx]; else selectedWire = null;
+    updateAllWires(); refreshLegend(); evaluateElectricalNets();
+    if (ladderWasOpen && document.getElementById(ladderFor)) openLadderEditor(ladderFor);
+    if (running) toggleRun();
+  } finally {
+    PLC_UNDO_RESTORING = false;
+  }
+}
+function plcUpdateUndoButtons(){
+  const u = document.getElementById('btnUndo'), r = document.getElementById('btnRedo');
+  if (u) u.disabled = !PLC_UNDO.length;
+  if (r) r.disabled = !PLC_REDO.length;
+}
+function plcCheckpoint(){
+  if (PLC_UNDO_RESTORING) return;
+  const snap = plcSnapshot();
+  if (snap === null) return;
+  if (PLC_UNDO_LAST === null){ PLC_UNDO_LAST = snap; return; }
+  if (snap === PLC_UNDO_LAST) return;
+  PLC_UNDO.push(PLC_UNDO_LAST);
+  if (PLC_UNDO.length > PLC_UNDO_LIMIT) PLC_UNDO.shift();
+  PLC_REDO.length = 0;
+  PLC_UNDO_LAST = snap;
+  plcUpdateUndoButtons();
+}
+function plcScheduleCheckpoint(){ clearTimeout(PLC_UNDO_TIMER); PLC_UNDO_TIMER = setTimeout(plcCheckpoint, 350); }
+function plcUndo(){
+  plcCheckpoint(); // 방금 한 변경이 아직 기록 전이면 먼저 기록
+  if (!PLC_UNDO.length) return;
+  const prev = PLC_UNDO.pop();
+  PLC_REDO.push(PLC_UNDO_LAST);
+  PLC_UNDO_LAST = prev;
+  plcApplyState(prev);
+  plcUpdateUndoButtons();
+}
+function plcRedo(){
+  if (!PLC_REDO.length) return;
+  const next = PLC_REDO.pop();
+  PLC_UNDO.push(PLC_UNDO_LAST);
+  PLC_UNDO_LAST = next;
+  plcApplyState(next);
+  plcUpdateUndoButtons();
+}
+['mouseup','keyup','change','input','drop'].forEach(ev => document.addEventListener(ev, () => plcScheduleCheckpoint(), true));
+document.addEventListener('keydown', (e) => {
+  if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+  const t = e.target;
+  if (t && t.closest && t.closest('input,textarea,select,[contenteditable="true"]')) return; // 입력칸 안에서는 브라우저 기본 되돌리기
+  const k = e.key.toLowerCase();
+  if (k === 'z' && !e.shiftKey){ e.preventDefault(); plcUndo(); }
+  else if ((k === 'z' && e.shiftKey) || k === 'y'){ e.preventDefault(); plcRedo(); }
+}, true);
+setTimeout(plcCheckpoint, 600);
+
 /* ---------------- 릴리즈 노트 ---------------- */
 const RELEASE_NOTES = [
+  { ver:'Ver0.961', items:{ ko:['새 배선 꺾임점을 부품 밖으로 배치(부품을 피해 우회)', '이더넷 스위칭 허브(5포트) 부품 추가 — HMI · VC 동시 연결'], en:['New wire bends placed outside parts', 'Ethernet switch (5-port) added — HMI + VC at once'] } },
+  { ver:'Ver0.96', items:{ ko:['실행 취소 · 다시 실행 기능 추가(Ctrl+Z / Ctrl+Y)', 'PLC 4종 외형 실사형으로 변경(LS XGB · MELSEC-Q · S7-1200 · CP1E)', '단자 · LED 번호 실제 표기로 변경(LS P00000/P00040, 미쓰비시 X0~XF, 오므론 0CH/1CH·100CH/101CH)', '배선 단자 바깥쪽 · 확인용 LED 가운데 배치'], en:['Undo/redo added (Ctrl+Z / Ctrl+Y)', 'Realistic bodies for 4 PLCs', 'Real vendor terminal/LED numbering', 'Terminals on outer edges, I/O LEDs in the center'] } },
   { ver:'Ver0.95', items:{ ko:['배선 도구 추가(색상 · 굵기 · 선 종류 변경)', '배선 직각 정리 · 직각 모드 기능 추가', '선택한 부품 방향키 이동 기능 추가'], en:['Wire tools added (color, width, line style)', 'Wire right-angle tidy & ortho mode added', 'Move selected part with arrow keys'] } },
   { ver:'Ver0.94', items:{ ko:['확대/축소 배지를 화면 맨 아래 표시줄로 이동', '작업 공간 확장(부품 위치에 따라 자동 확장)'], en:['Zoom badge moved to bottom bar', 'Larger, auto-expanding workspace'] } },
   { ver:'Ver0.93', items:{
@@ -8461,6 +8918,7 @@ function loadPresetByKey(key){
   if (key==='inspect-pack') loadPreset_InspectPack();
   else if (key==='lift-sort') loadPreset_LiftSort();
   else loadPreset_SupplyProcessTransportSort();
+  plcMakeRoom();
   updateAllWires(); refreshLegend(); evaluateElectricalNets();
   alert(tr('preset.loaded'));
   const presetMenuEl = document.getElementById('presetMenu');
@@ -9043,6 +9501,34 @@ function renderExampleGalleryGrid(){
     </div>`;
   }).join('');
 }
+
+/* [Ver0.96] 새 PLC 외형은 예전보다 커서, 예전 배치(예제·프리셋·저장 파일)의 옆 부품과 겹칠 수 있습니다.
+   불러온 직후 PLC와 겹치는 부품을 오른쪽(또는 아래)으로 밀어 자리를 만들고, 관련 배선 꺾임점을 다시 잡습니다. */
+function plcMakeRoom(){
+  const comps = () => $all('.placed-component');
+  const L = el => parseFloat(el.style.left)||0, T = el => parseFloat(el.style.top)||0;
+  const moved = new Set();
+  const plcs = comps().filter(c => VENDOR_META[c.dataset.type]).sort((a,b) => L(a)-L(b));
+  plcs.forEach(p => {
+    for (let guard = 0; guard < 30; guard++){
+      const pl = L(p), pt = T(p), pr = pl + p.offsetWidth + 24, pb = pt + p.offsetHeight + 24;
+      const hit = comps().find(o => o !== p && L(o) < pr && L(o) + o.offsetWidth > pl - 10 && T(o) < pb && T(o) + o.offsetHeight > pt - 10);
+      if (!hit) break;
+      if (L(hit) >= pl + 60){
+        const dx = pr - L(hit), from = L(hit);
+        comps().forEach(o => { if (o !== p && L(o) >= from){ o.style.left = (L(o) + dx) + 'px'; moved.add(o); } });
+      } else {
+        const dy = pb - T(hit), from = T(hit);
+        comps().forEach(o => { if (o !== p && T(o) >= from && L(o) < pr){ o.style.top = (T(o) + dy) + 'px'; moved.add(o); } });
+      }
+    }
+  });
+  wires.forEach(w => {
+    const a = w.from.closest('.placed-component'), b = w.to.closest('.placed-component');
+    const touchesPlc = (a && VENDOR_META[a.dataset.type]) || (b && VENDOR_META[b.dataset.type]);
+    if (touchesPlc || moved.has(a) || moved.has(b)){ try { w.points = plcRouteWire(w.from, w.to); } catch(e){ w.points = [wireBendPoint(pinCenter(w.from), pinCenter(w.to))]; } }
+  });
+}
 function loadGalleryExample(idx){
   const ex = EXAMPLE_DEFS[idx];
   if (!ex) return;
@@ -9050,6 +9536,7 @@ function loadGalleryExample(idx){
   if (isRunning) toggleRun();
   clearCanvas();
   ex.build(EG_ACTIVE_VENDOR);
+  plcMakeRoom();
   updateAllWires(); refreshLegend(); evaluateElectricalNets();
   closeExampleGallery();
   alert(tr('example.loaded'));

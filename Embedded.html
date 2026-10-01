@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver0.9999</title>
+<title>K군의 아두이노 시뮬레이터 Ver1.01</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1990,6 +1990,54 @@
   /* [가독성 개선] 전체 글자 크기 약 12% 확대 + 흐린 회색 글자를 흰색 계열로 */
   html{font-size:18px;}
   :root{ --text:#ffffff; --text-dim:#f1f4f8; --text-faint:#d4dae2; }
+
+  /* ---------- [Ver1.0] 부품 실사형 그림 + 브레드보드 도킹 ---------- */
+  .real-art{display:flex; justify-content:center; margin:0 0 4px; pointer-events:none;}
+  .real-art-svg{display:block; max-width:100%; height:auto; filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));}
+  .real-pcb{border-radius:4px !important; border:1px solid rgba(0,0,0,.65) !important; box-shadow:0 6px 14px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.08) !important;}
+  .real-pcb::before, .real-pcb::after{content:''; position:absolute; top:5px; width:8px; height:8px; border-radius:50%; background:#0b0e12; box-shadow:0 0 0 2px #d8b25c; pointer-events:none;}
+  .real-pcb::before{left:5px;} .real-pcb::after{right:5px;}
+  .real-pcb-blue{background:linear-gradient(160deg,#2476c4,#134f8c) !important;}
+  .real-pcb-black{background:linear-gradient(160deg,#2f3136,#16171a) !important;}
+  .real-pcb-red{background:linear-gradient(160deg,#c9433b,#8f1f1b) !important;}
+  .real-pcb-green{background:linear-gradient(160deg,#23884c,#135530) !important;}
+  .real-pcb .pot-title, .real-pcb .relay-title, .real-pcb .comp-label, .real-pcb .ts-title{color:#fff !important;}
+  .real-pcb .comp-pin-row{background:#141518; padding:3px 5px 2px; border-radius:2px; width:max-content; margin-left:auto; margin-right:auto;}
+  .real-pcb .pin-cap{color:#fff !important;}
+  .has-real-art.comp-ultrasonic .us-body{display:none;}
+  .has-real-art.comp-diode .diode-body{display:none;}
+  .has-real-art.comp-capacitor .cap-body{display:none;}
+  .has-real-art.comp-transistor .transistor-body{width:16px; height:16px; margin:2px auto; border-width:1px;}
+  .has-real-art.comp-buzzer .buzzer-dome{display:none;}
+  .has-real-art.comp-diode, .has-real-art.comp-transistor{background:rgba(255,255,255,.03) !important; border:1px dashed rgba(255,255,255,.14) !important; box-shadow:none !important;}
+  .has-real-art.comp-temphumid .joy-axis-label, .has-real-art .joy-axis-val{color:#fff;}
+  /* 브레드보드 도킹: 핀 간격을 구멍 간격(22px)에 정확히 맞춥니다(핀 12px + 간격 10px). */
+  .bb-dock .comp-pin-row, .bb-dock .rgb-pin-row{gap:10px !important; flex-wrap:nowrap !important; justify-content:center;}
+  .bb-dock .comp-pin-row > .pin-col, .bb-dock .rgb-pin-row > .pin-col{width:12px; min-width:12px; flex:0 0 12px;}
+  .bb-dock .comp-pin-row .pin-cap{font-size:.46rem;}
+  .bb-dock .comp-pin-row .pin-mini{box-shadow:0 0 0 2px #0d0e10;}
+
+  /* ---------- [Ver1.01] 도킹 모드(⤓): 실제 부품 모양 + 다리만 남기고 브레드보드에 꽂기 ---------- */
+  .dock-toggle-btn{position:absolute; top:-7px; right:14px; width:19px; height:17px; border-radius:5px; background:#3fd0d6; color:#04262a;
+    border:1px solid rgba(0,0,0,.4); font-size:.72rem; font-weight:800; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:6; padding:0;}
+  .dock-toggle-btn.on{background:#ffd23f;}
+  .dock-mode{width:auto !important; min-width:0 !important; padding:6px 8px 0 !important;}
+  .dock-mode > :not(.real-art):not(.comp-pin-row):not(.rgb-pin-row):not(.comp-help-btn):not(.dock-toggle-btn):not(.psu-switch):not(.dsensor-trig):not(.btn-cap):not(input[type=range]):not(.joy-axis-row){display:none !important;}
+  .dock-mode:not(.real-pcb){background:transparent !important; border:none !important; box-shadow:none !important;}
+  .dock-mode input[type=range]{width:90px !important; margin:0 auto 2px !important; display:block;}
+  .dock-mode .joy-axis-row{margin:0 0 2px !important;}
+  .dock-mode .joy-axis-label{display:none;}
+  .dock-mode .dsensor-trig{font-size:.5rem !important; padding:2px 4px !important; margin:0 0 4px !important;}
+  .dock-mode .real-art{margin-bottom:0;}
+  /* 다리(핀)는 몸체 "아래로" 튀어나옵니다: 핀 이름은 기판 위(실크 인쇄), 그 아래로 다리, 다리 끝이 꽂히는 핀입니다. */
+  .dock-mode{padding-bottom:4px !important;}
+  .dock-mode .comp-pin-row, .dock-mode .rgb-pin-row{background:transparent !important; padding:0 !important; margin:2px auto -30px !important; box-shadow:none !important; align-items:flex-start;}
+  .dock-mode .comp-pin-row > .pin-col, .dock-mode .rgb-pin-row > .pin-col{position:relative; flex-direction:column-reverse; justify-content:flex-end; gap:0; padding:0;}
+  .dock-mode .comp-pin-row > .pin-col > .pin-mini, .dock-mode .rgb-pin-row > .pin-col > .pin-mini{margin-top:22px; width:10px; height:10px; border-width:2px; border-radius:1px;}
+  .dock-mode .comp-pin-row > .pin-col::before, .dock-mode .rgb-pin-row > .pin-col::before{content:''; position:absolute; bottom:8px; left:50%; width:3px; height:24px; margin-left:-1.5px; border-radius:1px; background:linear-gradient(90deg,#8e959b,#eef1f3 50%,#8e959b); z-index:-1;}
+  .dock-mode.real-pcb .comp-pin-row > .pin-col::before{background:linear-gradient(90deg,#9a7a2e,#f3d27a 50%,#9a7a2e);}
+  .dock-mode.real-pcb .comp-pin-row > .pin-col::after{content:''; position:absolute; top:11px; left:50%; width:12px; height:7px; margin-left:-6px; background:#141518; border-radius:1px;}
+  .dock-mode .pin-cap{position:relative; z-index:1; line-height:1.1;}
 </style>
 </head>
 <body>
@@ -2001,7 +2049,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver0.9999</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver1.01</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -3279,7 +3327,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver0.9999", en: "K's Simulator Ver0.9999" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver1.01", en: "K's Simulator Ver1.01" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -4231,7 +4279,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver0.9999", en: "K's Arduino Simulator Ver0.9999" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.01", en: "K's Arduino Simulator Ver1.01" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -7349,7 +7397,7 @@ function makeDraggable(el){
   el.addEventListener('mousedown', (e) => {
     // 핀/터치스크린은 각자 다른 용도(배선 연결, 터치 그림)로 마우스를 쓰므로 절대 드래그를
     // 가로채면 안 됩니다 — 완전히 그대로 둡니다.
-    if (e.target.closest('.pin, .pin-mini, .tft-screen, .comp-scope canvas, .scope-zoom-handle, .scope-measure-handle, .comp-help-btn')) return;
+    if (e.target.closest('.pin, .pin-mini, .tft-screen, .comp-scope canvas, .scope-zoom-handle, .scope-measure-handle, .comp-help-btn, .dock-toggle-btn')) return;
     // 저항값 입력칸, 모드 선택 셀렉트, 커패시터 극성 버튼, 리셋 버튼처럼 부품 "중앙"을 차지하고
     // 있는 조작 요소는, 그냥 누르기만 하면(움직임 없이 떼면) 원래대로 클릭/포커스/값 변경이
     // 되어야 하지만, 누른 채로 조금이라도 끌면 그 순간부터 부품 자체를 드래그하는 것으로
@@ -7497,6 +7545,8 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver1.01', ko: ['센서 모듈 · 가변저항 · 트랜지스터 등 도킹 모드(⤓) 추가 — 다리(핀)가 나와 브레드보드에 꽂힘'] },
+  { ver: 'Ver1.0', ko: ['부품 외형 실사형으로 변경(센서 모듈 PCB · 부품 그림)', '브레드보드 도킹 지원 부품 55종으로 확대(핀 간격 2.54mm 맞춤)'] },
   { ver: 'Ver0.9999', ko: ['전선 굵기 · 선 종류 변경 기능 추가', '전선 직각 정리 · 직각 모드 기능 추가', '선택한 부품 방향키 이동 기능 추가(회로도 그리기 포함)'] },
   { ver: 'Ver0.9998', ko: ['회로도 그리기: 선 색상 변경 기능 추가', '회로도 그리기: 선 굵기(가는선~아주 굵은선) 변경 기능 추가', '회로도 그리기: 선 종류(실선/파선/점선/일점쇄선) 변경 기능 추가', '회로도 그리기: 직각 정리 · 직각 모드 기능 추가'] },
   { ver: 'Ver0.9997', ko: ['Uno R3 · Mega 2560 보드 외형을 실제 핀아웃 그림 기준으로 수정', '확대/축소 배지를 화면 맨 아래 표시줄로 이동', '작업 공간 확장(부품 위치에 따라 자동 확장)'] },
@@ -10758,7 +10808,138 @@ function spawnComponent(type, dropX, dropY){
   } else if (type === 'cccv' || type === 'buck'){
     updateRegulatorDisplay(div);
   }
+  try { realisticDecorate(div, type); } catch (e) { console.error(e); }
   return id;
+}
+
+/* ============ [Ver1.0] 부품 실사형 그림 + 브레드보드 도킹 ============
+   각 부품의 기존 동작(슬라이더/클릭 트리거/LED 표시 등)은 그대로 두고, 맨 위에 실제 부품과 비슷한
+   그림(SVG)을 얹고 몸체를 실제 모듈 PCB처럼 꾸밉니다. 브레드보드에 꽂을 수 있는 부품은 핀 간격을
+   브레드보드 구멍 간격(22px = 2.54mm)에 정확히 맞춰, 놓기만 하면 모든 다리가 한 번에 꽂힙니다.
+   모터·전원장치·220V 기기·계측기·보드처럼 실제로 브레드보드에 꽂지 않는 부품은 제외합니다. */
+const REAL_DOCK_TYPES = new Set(['led','rgbled','resistor','capacitor','capacitor-e','inductor','diode','schottky','transistor',
+  'toggleswitch','pot','buzzerpassive','buzzeractive','twocolorled','smdrgb','laser','iremit','flash7color',
+  'sensor-ldr','sensor-temp','sensor-humid','temphumid','ultrasonic','joystick','lcdi2c','oled','colorsensor',
+  'sensor-water','sensor-irdist9m','sensor-irdist6m','sensor-irdist2m','sensor-irdist3cm','sensor-soundsm','sensor-soundbig',
+  'sensor-linhall','sensor-anahall','sensor-anatemp','sensor-tempmod','sensor-heartbeat','sensor-rotary',
+  'dsensor-avoid','dsensor-tracking','dsensor-touch','dsensor-flame','dsensor-minireed','dsensor-reed','dsensor-shock',
+  'dsensor-ballswitch','dsensor-tilt','dsensor-lightcup','dsensor-tap','dsensor-lightblock','dsensor-irrecv','dsensor-hallmag','dsensor-digitaltemp']);
+// 모듈형(PCB에 실장된) 부품 — 몸체를 실제 모듈 기판처럼 꾸밉니다. 값: 기판 색
+const REAL_PCB_TYPES = {
+  'ultrasonic':'blue','joystick':'black','temphumid':'blue','sensor-humid':'blue','relay':'blue','lcdi2c':'green','oled':'black',
+  'gyro':'blue','imu-mpu6050':'blue','accel':'blue','colorsensor':'black','pmsensor':'black','sensor-temp':'blue',
+  'sensor-water':'red','sensor-irdist9m':'black','sensor-irdist6m':'black','sensor-irdist2m':'black','sensor-irdist3cm':'black',
+  'sensor-soundsm':'blue','sensor-soundbig':'blue','sensor-linhall':'blue','sensor-anahall':'blue','sensor-anatemp':'blue','sensor-tempmod':'blue',
+  'sensor-heartbeat':'blue','sensor-rotary':'blue','sensor-ldr':'blue','twocolorled':'black','smdrgb':'black','laser':'black','iremit':'black','flash7color':'black',
+  'dsensor-avoid':'blue','dsensor-tracking':'blue','dsensor-touch':'red','dsensor-flame':'blue','dsensor-minireed':'black','dsensor-reed':'blue',
+  'dsensor-shock':'black','dsensor-ballswitch':'black','dsensor-tilt':'black','dsensor-lightcup':'black','dsensor-tap':'black',
+  'dsensor-lightblock':'black','dsensor-irrecv':'black','dsensor-hallmag':'black','dsensor-digitaltemp':'blue',
+  'buzzerpassive':'green','canmodule':'blue','canfdmodule':'blue','rs485module':'blue','btmodule':'green','wifiap':'black','levelshifter':'blue',
+  'motordriver':'red','motordriver2':'red','motordriverenc':'red','a4988':'green','motordriver-bts7960':'red','motordriver-7a2ch':'red','dac':'blue','camera':'green'
+};
+// 부품 종류별 "주요 부품" 그림 종류
+const REAL_PART_KIND = {
+  'capacitor':'ceramic','diode':'diode','schottky':'schottky','transistor':'to92npn','buzzeractive':'buzzer','buzzerpassive':'buzzerpcb',
+  'sensor-ldr':'ldr','sensor-temp':'to92','sensor-humid':'dht','temphumid':'dht','ultrasonic':'hcsr04','joystick':'joystick',
+  'pot':'rotarypot','sensor-water':'water','sensor-irdist9m':'sharp','sensor-irdist6m':'sharp','sensor-irdist2m':'sharp','sensor-irdist3cm':'irpair',
+  'sensor-soundsm':'mic','sensor-soundbig':'micbig','sensor-linhall':'hall','sensor-anahall':'hall','sensor-anatemp':'thermistor','sensor-tempmod':'to92',
+  'sensor-heartbeat':'heart','sensor-rotary':'encoder','dsensor-avoid':'irpair','dsensor-tracking':'tcrt','dsensor-touch':'touch','dsensor-flame':'irled',
+  'dsensor-minireed':'reed','dsensor-reed':'reed','dsensor-shock':'spring','dsensor-ballswitch':'can','dsensor-tilt':'can','dsensor-lightcup':'cup',
+  'dsensor-tap':'spring','dsensor-lightblock':'fork','dsensor-irrecv':'irrecv','dsensor-hallmag':'hall','dsensor-digitaltemp':'to92',
+  'laser':'laser','iremit':'irled','twocolorled':'led5','smdrgb':'smd5050','flash7color':'led5','gyro':'qfn','imu-mpu6050':'qfn','accel':'qfn','colorsensor':'tcs'
+};
+function realArtSVG(kind){
+  const W = 96, H = 40;
+  const leg = (x, y1, y2) => `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="#c9ced3" stroke-width="2"/>`;
+  const trimmer = `<rect x="70" y="8" width="16" height="16" rx="2" fill="#2a6fd6"/><circle cx="78" cy="16" r="5" fill="#e9e4d4"/><path d="M75 16h6M78 13v6" stroke="#8a7b55" stroke-width="1.5"/>`;
+  const smdLeds = `<rect x="8" y="6" width="6" height="4" fill="#ff4a3d"/><rect x="8" y="14" width="6" height="4" fill="#4aff6a" opacity=".85"/>`;
+  let body = '';
+  switch (kind){
+    case 'ceramic': body = `${leg(40,22,40)}${leg(56,22,40)}<ellipse cx="48" cy="16" rx="15" ry="13" fill="#d98a2b" stroke="#9c5d16"/><text x="48" y="20" font-size="9" text-anchor="middle" fill="#5a3208" font-family="monospace">104</text>`; break;
+    case 'diode': case 'schottky': body = `<line x1="4" y1="20" x2="92" y2="20" stroke="#c9ced3" stroke-width="2"/><rect x="30" y="12" width="36" height="16" rx="3" fill="${kind==='diode'?'#1c1c1e':'#7a2b1f'}"/><rect x="58" y="12" width="5" height="16" fill="#d8dcdf"/><text x="44" y="23" font-size="6" fill="#aaa" text-anchor="middle" font-family="monospace">${kind==='diode'?'1N4007':'1N5819'}</text>`; break;
+    case 'to92npn': case 'to92': body = `${leg(38,26,40)}${leg(48,26,40)}${leg(58,26,40)}<path d="M34 6 h28 v20 h-28 z" fill="#1e1f22"/><path d="M34 6 q14 -6 28 0" fill="#2a2b2f"/><text x="48" y="19" font-size="6" fill="#bbb" text-anchor="middle" font-family="monospace">${kind==='to92'?'LM35':'2N2222'}</text>`; break;
+    case 'buzzer': body = `<circle cx="48" cy="20" r="17" fill="#141416" stroke="#6a6d73" stroke-width="1.5"/><circle cx="48" cy="20" r="4" fill="#2c2d31"/><text x="37" y="12" font-size="9" fill="#ddd" font-family="monospace">+</text><rect x="36" y="30" width="24" height="5" fill="#f2f2f2" opacity=".85"/>`; break;
+    case 'buzzerpcb': body = `<circle cx="48" cy="20" r="15" fill="#141416" stroke="#6a6d73" stroke-width="1.5"/><circle cx="48" cy="20" r="3" fill="#2c2d31"/>`; break;
+    case 'ldr': body = `${leg(42,28,40)}${leg(54,28,40)}<circle cx="48" cy="17" r="12" fill="#e9dcc0" stroke="#b9a57a"/><path d="M40 12 h16 M40 16 h16 M40 20 h16 M40 24 h16" stroke="#c2451d" stroke-width="1.6"/><path d="M56 12 v4 M40 16 v4 M56 20 v4" stroke="#c2451d" stroke-width="1.6"/>`; break;
+    case 'dht': body = `<rect x="30" y="2" width="36" height="36" rx="2" fill="#2d8bd1"/>${Array.from({length:5},(_,r)=>Array.from({length:4},(_,c)=>`<rect x="${34+c*8}" y="${6+r*6.4}" width="5" height="4" fill="#1a5f95"/>`).join('')).join('')}`; break;
+    case 'hcsr04': body = `<circle cx="28" cy="20" r="15" fill="#c9ced3" stroke="#8a9096" stroke-width="2"/><circle cx="28" cy="20" r="9" fill="#2a2d31"/><circle cx="68" cy="20" r="15" fill="#c9ced3" stroke="#8a9096" stroke-width="2"/><circle cx="68" cy="20" r="9" fill="#2a2d31"/><rect x="44" y="3" width="8" height="6" rx="3" fill="#d9dde0"/>`; break;
+    case 'joystick': body = `<rect x="30" y="2" width="36" height="36" rx="3" fill="#2b2d31"/><circle cx="48" cy="20" r="13" fill="#3a3c41"/><circle cx="48" cy="20" r="8" fill="#161719"/>`; break;
+    case 'relaycube': body = `<rect x="22" y="2" width="52" height="36" rx="2" fill="#1f5fd1"/><text x="48" y="16" font-size="6" fill="#e6eefc" text-anchor="middle" font-family="monospace">SRD-05VDC</text><text x="48" y="26" font-size="6" fill="#e6eefc" text-anchor="middle" font-family="monospace">-SL-C</text>`; break;
+    case 'rotarypot': body = `${leg(34,28,40)}${leg(48,28,40)}${leg(62,28,40)}<rect x="26" y="10" width="44" height="20" rx="3" fill="#2a6fd6"/><circle cx="48" cy="14" r="11" fill="#c9ced3" stroke="#7b8288"/><rect x="46.5" y="4" width="3" height="10" fill="#3a3f45"/>`; break;
+    case 'slideswitch': body = `${leg(36,28,40)}${leg(48,28,40)}${leg(60,28,40)}<rect x="26" y="12" width="44" height="16" rx="2" fill="#1f2022"/><rect x="31" y="15" width="34" height="10" fill="#0e0f10"/><rect x="36" y="4" width="10" height="14" rx="1" fill="#2a2c30"/>`; break;
+    case 'water': body = `<rect x="18" y="2" width="60" height="36" rx="2" fill="#c8302b"/>${[0,1,2,3,4,5,6].map(i=>`<rect x="${24+i*7.5}" y="6" width="3" height="28" fill="#d9b25c"/>`).join('')}`; break;
+    case 'sharp': body = `<rect x="18" y="6" width="60" height="28" rx="4" fill="#26272a"/><circle cx="34" cy="20" r="8" fill="#0b0b0c" stroke="#3d3f43"/><circle cx="62" cy="20" r="8" fill="#0b0b0c" stroke="#3d3f43"/><text x="48" y="31" font-size="5" fill="#888" text-anchor="middle" font-family="monospace">GP2Y0A</text>`; break;
+    case 'irpair': body = `${smdLeds}<rect x="30" y="4" width="10" height="18" rx="5" fill="#dfe8f5" opacity=".9"/><rect x="46" y="4" width="10" height="18" rx="5" fill="#111"/>${trimmer}`; break;
+    case 'tcrt': body = `${smdLeds}<rect x="34" y="8" width="24" height="14" rx="2" fill="#141416"/><circle cx="41" cy="15" r="3.5" fill="#6aa7ff"/><circle cx="51" cy="15" r="3.5" fill="#222"/>${trimmer}`; break;
+    case 'mic': body = `${smdLeds}<circle cx="40" cy="18" r="10" fill="#c9ced3" stroke="#7b8288"/><circle cx="40" cy="18" r="6" fill="#1b1c1e"/>${trimmer}`; break;
+    case 'micbig': body = `${smdLeds}<circle cx="40" cy="18" r="14" fill="#c9ced3" stroke="#7b8288"/><circle cx="40" cy="18" r="9" fill="#1b1c1e"/>${trimmer}`; break;
+    case 'hall': body = `${smdLeds}<path d="M34 8 h14 v10 h-14 z" fill="#1d1e21"/>${leg(37,18,30)}${leg(41,18,30)}${leg(45,18,30)}${trimmer}`; break;
+    case 'thermistor': body = `${smdLeds}<ellipse cx="40" cy="12" rx="5" ry="6" fill="#2a2a2c"/>${leg(38,17,30)}${leg(42,17,30)}${trimmer}`; break;
+    case 'heart': body = `<circle cx="48" cy="20" r="17" fill="#6b3cd6"/><path d="M48 28 l-8 -8 a5 5 0 0 1 8 -6 a5 5 0 0 1 8 6 z" fill="#f2f2f2"/>`; break;
+    case 'encoder': body = `<rect x="32" y="8" width="32" height="26" rx="2" fill="#c9ced3"/><circle cx="48" cy="20" r="9" fill="#8a9096"/><rect x="45" y="6" width="6" height="16" rx="1" fill="#d9dde0"/>`; break;
+    case 'touch': body = `<circle cx="48" cy="20" r="15" fill="#d8b25c" opacity=".35"/><circle cx="48" cy="20" r="11" fill="none" stroke="#e9e4d4" stroke-width="1.5"/><text x="48" y="23" font-size="7" fill="#fff" text-anchor="middle" font-family="monospace">TOUCH</text>`; break;
+    case 'irled': body = `${smdLeds}<rect x="36" y="4" width="10" height="16" rx="5" fill="#1b1b1d"/>${leg(39,20,30)}${leg(43,20,30)}${trimmer}`; break;
+    case 'reed': body = `<rect x="22" y="14" width="44" height="10" rx="5" fill="#d9f0f2" opacity=".75" stroke="#9ab"/><line x1="10" y1="19" x2="36" y2="19" stroke="#c9ced3" stroke-width="2"/><line x1="52" y1="19" x2="78" y2="19" stroke="#c9ced3" stroke-width="2"/>`; break;
+    case 'spring': body = `<path d="M34 30 q4 -4 0 -8 q-4 -4 0 -8 q4 -4 0 -8" fill="none" stroke="#c9ced3" stroke-width="2" transform="translate(12 0)"/><rect x="40" y="30" width="16" height="6" fill="#2a2c30"/>`; break;
+    case 'can': body = `<rect x="38" y="4" width="20" height="24" rx="4" fill="#b9c0c6" stroke="#7b8288"/>${leg(44,28,38)}${leg(52,28,38)}`; break;
+    case 'cup': body = `<path d="M36 6 h24 l-4 24 h-16 z" fill="#c9ced3" stroke="#7b8288"/><circle cx="48" cy="12" r="3" fill="#ff4a3d"/>`; break;
+    case 'fork': body = `<path d="M30 6 h12 v26 h12 v-26 h12 v30 h-36 z" fill="#1b1c1e"/>`; break;
+    case 'irrecv': body = `<rect x="38" y="4" width="20" height="20" rx="2" fill="#1b1c1e"/><circle cx="48" cy="12" r="6" fill="#2f3136"/>${leg(43,24,36)}${leg(48,24,36)}${leg(53,24,36)}`; break;
+    case 'laser': body = `<rect x="28" y="12" width="40" height="14" rx="3" fill="#c9a86a"/><rect x="66" y="15" width="6" height="8" fill="#6b5a3a"/><circle cx="74" cy="19" r="2.2" fill="#ff2b2b"/>`; break;
+    case 'led5': body = `${leg(42,28,40)}${leg(54,28,40)}<path d="M38 28 v-14 a10 10 0 0 1 20 0 v14 z" fill="#f4f4f4" opacity=".85" stroke="#bbb"/>`; break;
+    case 'smd5050': body = `<rect x="38" y="10" width="20" height="20" fill="#f4f1e8"/><circle cx="48" cy="20" r="7" fill="#fff6d8" stroke="#d8c890"/>`; break;
+    case 'qfn': body = `<rect x="38" y="10" width="20" height="20" fill="#16171a"/><circle cx="41" cy="13" r="1.2" fill="#888"/><text x="48" y="23" font-size="5" fill="#aaa" text-anchor="middle" font-family="monospace">MPU</text>`; break;
+    case 'tcs': body = `<rect x="38" y="10" width="20" height="20" fill="#16171a"/><circle cx="30" cy="20" r="4" fill="#fffbe6"/><circle cx="66" cy="20" r="4" fill="#fffbe6"/>`; break;
+    default: return '';
+  }
+  return `<svg class="real-art-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+}
+// [Ver1.01] 카드형 UI가 있는 부품(센서 모듈·가변저항·트랜지스터 등)은 평소엔 지금처럼 카드로 보이다가,
+// 오른쪽 위 화살표(⤓)로 "도킹 모드"를 켜면 실제 부품 모양 + 다리(핀)만 남아 브레드보드에 꽂힙니다.
+// LED·저항·커패시터처럼 원래 부품 모양인 소자와 디스플레이 모듈은 예전처럼 항상 꽂힙니다.
+const ALWAYS_DOCK_TYPES = new Set(['led','rgbled','resistor','capacitor','capacitor-e','inductor','diode','schottky','twocolorled','smdrgb','laser','iremit','flash7color','buzzeractive','buzzerpassive','lcdi2c','oled']);
+function isDockToggleType(type){ return REAL_DOCK_TYPES.has(type) && !ALWAYS_DOCK_TYPES.has(type); }
+function compTypeOf(el){ return (el.id || '').replace(/^comp_/, '').replace(/_\d+$/, ''); }
+function canPlugIntoBreadboard(el){
+  const t = compTypeOf(el);
+  if (!isDockToggleType(t)) return true;
+  return el.classList.contains('dock-mode');
+}
+function setDockMode(el, on, silent){
+  if (!el) return;
+  el.classList.toggle('dock-mode', !!on);
+  const b = el.querySelector(':scope > .dock-toggle-btn');
+  if (b){ b.textContent = on ? '⤒' : '⤓'; b.title = on ? '카드 모드로 (설정 조절)' : '도킹 모드로 (핀이 나와 브레드보드에 꽂힘)'; b.classList.toggle('on', !!on); }
+  if (silent) return;
+  if (on) syncBreadboardPlugs(el); else detachFromBreadboard(el);
+  updateAllWires();
+}
+function realisticDecorate(div, type){
+  if (!div || div.classList.contains('board')) return;
+  if (REAL_DOCK_TYPES.has(type)) div.classList.add('bb-dock');
+  if (isDockToggleType(type)){
+    const tb = document.createElement('button');
+    tb.type = 'button';
+    tb.className = 'dock-toggle-btn';
+    tb.textContent = '⤓';
+    tb.title = '도킹 모드로 (핀이 나와 브레드보드에 꽂힘)';
+    tb.addEventListener('mousedown', e => e.stopPropagation());
+    tb.addEventListener('click', e => { e.stopPropagation(); captureUndoSnapshot(); setDockMode(div, !div.classList.contains('dock-mode')); });
+    div.appendChild(tb);
+  }
+  const pcb = REAL_PCB_TYPES[type];
+  if (pcb) div.classList.add('real-pcb', 'real-pcb-' + pcb);
+  const kind = REAL_PART_KIND[type];
+  const svg = kind ? realArtSVG(kind) : '';
+  if (svg){
+    div.classList.add('has-real-art', 'real-kind-' + kind);
+    const art = document.createElement('div');
+    art.className = 'real-art';
+    art.innerHTML = svg;
+    // 제목 줄(있으면) 바로 아래, 없으면 맨 위에 얹습니다.
+    const title = div.querySelector(':scope > .pot-title, :scope > .relay-title, :scope > .ts-title');
+    if (title && title.nextSibling) div.insertBefore(art, title.nextSibling); else div.insertBefore(art, div.firstChild);
+  }
 }
 
 // [브레드보드 개선] 행 이름(a~e/f~j)과 구멍 하나를 만드는 로직을 resizeBreadboard()에서도
@@ -12613,6 +12794,7 @@ const BB_SNAP_DIST = 26; // 캔버스 좌표계 기준 허용 오차(px)
 function syncBreadboardPlugs(el){
   const pins = Array.from(el.querySelectorAll('.pin-mini'));
   if (!pins.length) return;
+  if (typeof canPlugIntoBreadboard === 'function' && !canPlugIntoBreadboard(el)){ detachFromBreadboard(el); return; }
 
   // 1) 이미 자동으로 꽂혀 있던 핀 중, 더 이상 그 구멍 근처가 아니면 "뽑힌 것"으로 보고 지웁니다.
   pins.forEach(pin => {
@@ -22197,6 +22379,7 @@ function serializeProject(){
     fields: serializeComponentFields(el),
     switches: serializeComponentSwitches(el),
     rotation: el.dataset.rotation || '0',
+    dock: el.classList.contains('dock-mode') || undefined,
     // [Ver0.9974] 오실로스코프 채널 ON/OFF는 <input>/<select>도 아니고("전원 스위치"류처럼
     // 시뮬레이션 정지 시 자동으로 꺼지면 안 되는 화면 표시 상태라) id를 "_switch"/"_toggle"로
     // 끝내지도 않아서, serializeComponentFields/Switches 어느 쪽에도 안 잡힙니다 — 스코프일 때만
@@ -22326,6 +22509,7 @@ function restoreProjectState(data){
       restoreComponentFields(el, c.fields);
       restoreComponentSwitches(el, c.switches);
       if (c.rotation) setComponentRotation(el, parseInt(c.rotation, 10) || 0);
+      if (c.dock) setDockMode(el, true, true);
       // [Ver0.9974] 저장 당시 켜져 있던 오실로스코프 채널을 그대로 복원합니다(없으면 전부 OFF).
       if (el.classList.contains('comp-scope') && Array.isArray(c.scopeChannelOn)){
         c.scopeChannelOn.forEach((on, i) => { if (on) setScopeChannelOn(newId, i + 1, true); });
