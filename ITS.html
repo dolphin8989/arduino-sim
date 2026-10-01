@@ -272,6 +272,8 @@
 
   .placed-component{position:absolute; z-index:3; cursor:move; transform-origin:50% 50%;}
   .placed-component.selected-comp{outline:2px dashed var(--focus); outline-offset:5px; border-radius:6px; z-index:4;}
+  /* [Ver1.04] 브레드보드는 선택해도 항상 바닥판(맨 아래) — 꽂힌 부품·전선을 가리지 않습니다 */
+  .placed-component.comp-breadboard, .placed-component.comp-breadboard.selected-comp{z-index:1 !important;}
 
   /* [회전 시 라벨 방향 고정] "R" 키로 부품을 90/180/270도 회전해도 텍스트 라벨(핀 캡션·
      제목·부제·값 표시)만은 항상 읽기 편한 정방향을 유지하도록, 부품 전체 회전과 반대
@@ -2125,7 +2127,7 @@
     <div class="brand-mark">U4</div>
     <div class="brand-text">
       <b>K군의 통합 시뮬레이터 Ver0.961</b>
-      <span>아두이노(Ver1.03) + PLC(Ver0.961) · 2단계 연동(릴레이 인터페이스)</span>
+      <span>아두이노(Ver1.04) + PLC(Ver0.961) · 2단계 연동(릴레이 인터페이스)</span>
     </div>
   </div>
   <div class="mode-switch" id="modeSwitch">
@@ -3629,7 +3631,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver1.03", en: "K's Simulator Ver1.03" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver1.04", en: "K's Simulator Ver1.04" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -4581,7 +4583,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.03", en: "K's Arduino Simulator Ver1.03" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.04", en: "K's Arduino Simulator Ver1.04" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -7796,13 +7798,15 @@ document.getElementById('canvasInner').addEventListener('mousemove', (e) => {
     return;
   }
   if (!activeDrag) return;
-  if (!dragSnapshotTaken){ dragSnapshotTaken = true; captureUndoSnapshot(); detachFromBreadboard(activeDrag); } // 실제로 움직이기 시작한 첫 순간에만 한 번
+  if (!dragSnapshotTaken){ dragSnapshotTaken = true; captureUndoSnapshot(); detachFromBreadboard(activeDrag); if (activeDrag.classList.contains('comp-breadboard')) beginBreadboardGroupMove(activeDrag); } // 실제로 움직이기 시작한 첫 순간에만 한 번
   activeDrag.style.left = ((e.clientX - canvasRect.left) / canvasZoom - dragOffset.x) + 'px';
   activeDrag.style.top = ((e.clientY - canvasRect.top) / canvasZoom - dragOffset.y) + 'px';
+  if (activeDrag.__bbGroup) applyBreadboardGroupMove(activeDrag);
   updateAllWires();
 });
 document.addEventListener('mouseup', () => {
   const justDraggedEl = activeDrag;
+  if (justDraggedEl && justDraggedEl.__bbGroup) justDraggedEl.__bbGroup = null;
   if (draggingWirePoint && WIRE_ORTHO_MODE && !(window.event && window.event.shiftKey)) orthogonalizeWire(draggingWirePoint.wireObj);
   activeDrag = null; draggingWirePoint = null;
   if (justDraggedEl && !justDraggedEl.classList.contains('board')) syncBreadboardPlugs(justDraggedEl);
@@ -7847,6 +7851,7 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver1.04', ko: ['브레드보드에 꽂힌 부품 함께 이동 기능 추가', '배선 브레드보드 위로 그리기 수정'] },
   { ver: 'Ver1.03', ko: ['부품 검색 기능 추가', '코드 창 높이 조절(위아래 드래그) 기능 추가', '코드 에디터 전체화면 기능 추가'] },
   { ver: 'Ver1.02', ko: ['상단 직각 보조 ON/OFF 버튼 추가', '3핀 슬라이드 스위치(SPDT) 부품 추가 — 브레드보드 장착 가능'] },
   { ver: 'Ver1.01', ko: ['센서 모듈 · 가변저항 · 트랜지스터 등 도킹 모드(⤓) 추가 — 다리(핀)가 나와 브레드보드에 꽂힘'] },
@@ -8478,8 +8483,11 @@ document.addEventListener('keydown', (e) => {
   if (now - __nudgeLastAt > 700){ captureUndoSnapshot(); if (!el.classList.contains('board')) detachFromBreadboard(el); }
   __nudgeLastAt = now;
   const step = e.shiftKey ? 1 : 5;
+  const isBB = el.classList.contains('comp-breadboard');
+  if (isBB) beginBreadboardGroupMove(el);
   el.style.left = Math.max(0, (parseFloat(el.style.left) || 0) + d[0] * step) + 'px';
   el.style.top = Math.max(0, (parseFloat(el.style.top) || 0) + d[1] * step) + 'px';
+  if (isBB){ applyBreadboardGroupMove(el); el.__bbGroup = null; }
   updateAllWires();
   if (!el.classList.contains('board')){
     clearTimeout(__nudgeSyncTimer);
@@ -13136,7 +13144,41 @@ function pinCenter(pinEl){
 // 구멍 정중앙에 딱 맞지 않아도 티가 안 남) 훨씬 너그럽게 잡아도 됩니다. 부품을 브레드보드
 // 근처에 대충 놓기만 해도 자연스럽게 꽂히도록 넉넉히 키웠습니다.
 const BB_SNAP_DIST = 26; // 캔버스 좌표계 기준 허용 오차(px)
+// [Ver1.04] 브레드보드에 꽂힌 부품은 브레드보드와 한 몸 — 브레드보드를 끌거나 방향키로 옮기면
+// 꽂힌 부품들과, 양 끝이 모두 이 묶음 안에 있는 전선(점퍼선)의 꺾임점도 함께 움직입니다.
+function breadboardChildren(bb){
+  const holes = new Set(bb.querySelectorAll('.bb-hole'));
+  const kids = new Set();
+  wires.forEach(w => {
+    if (!w.isPlugWire) return;
+    const h = holes.has(w.from) ? w.from : (holes.has(w.to) ? w.to : null);
+    if (!h) return;
+    const other = h === w.from ? w.to : w.from;
+    const c = other && other.closest('.placed-component');
+    if (c && c !== bb) kids.add(c);
+  });
+  return Array.from(kids);
+}
+function beginBreadboardGroupMove(bb){
+  const kids = breadboardChildren(bb);
+  const group = new Set([bb, ...kids]);
+  const inGroup = pin => { const c = pin && pin.closest('.placed-component'); return !!(c && group.has(c)); };
+  bb.__bbGroup = {
+    x0: parseFloat(bb.style.left) || 0, y0: parseFloat(bb.style.top) || 0,
+    kids: kids.map(k => ({ el: k, x: parseFloat(k.style.left) || 0, y: parseFloat(k.style.top) || 0 })),
+    wires: wires.filter(w => !w.isPlugWire && w.points && w.points.length && inGroup(w.from) && inGroup(w.to))
+                .map(w => ({ w, pts: w.points.map(p => ({ x: p.x, y: p.y })) }))
+  };
+}
+function applyBreadboardGroupMove(bb){
+  const g = bb.__bbGroup;
+  if (!g) return;
+  const dx = (parseFloat(bb.style.left) || 0) - g.x0, dy = (parseFloat(bb.style.top) || 0) - g.y0;
+  g.kids.forEach(k => { k.el.style.left = (k.x + dx) + 'px'; k.el.style.top = (k.y + dy) + 'px'; });
+  g.wires.forEach(o => { o.w.points = o.pts.map(p => ({ x: p.x + dx, y: p.y + dy })); });
+}
 function syncBreadboardPlugs(el){
+  if (el && el.classList && el.classList.contains('comp-breadboard')) return; // 브레드보드 자신은 다른 구멍에 꽂히지 않습니다
   const pins = Array.from(el.querySelectorAll('.pin-mini'));
   if (!pins.length) return;
   if (typeof canPlugIntoBreadboard === 'function' && !canPlugIntoBreadboard(el)){ detachFromBreadboard(el); return; }
@@ -13325,6 +13367,8 @@ function wireObstacleBoxes(excludeEls){
   const boxes = [];
   document.querySelectorAll('.placed-component').forEach(el => {
     if (excludeEls.includes(el)) return;
+    // [Ver1.04] 브레드보드는 "바닥판"이라 장애물이 아닙니다 — 전선이 브레드보드를 돌아가지 않고 그 위로 그려집니다.
+    if (el.classList.contains('comp-breadboard')) return;
     const r = el.getBoundingClientRect();
     if (!r.width || !r.height) return;
     boxes.push({
