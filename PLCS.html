@@ -869,6 +869,61 @@
   :root{ --text:#ffffff; --text-dim:#f1f4f8; --text-faint:#d4dae2; }
   .ladder-canvas, .program-tab.active{ --text:#12161c; --text-dim:#3d4652; --text-faint:#5c6673; }
 </style>
+<style>/* [다중 선택 · 메뉴 접기] */
+  /* ==== [다중 선택] 러버밴드 상자 · 선택 표시 · 선택 막대 ==== */
+  .ms-marquee{position:fixed; z-index:99990; pointer-events:none; border:1.5px solid #3fa9ff; background:rgba(63,169,255,.13); border-radius:2px;}
+  .ms-marquee.crossing{border:1.5px dashed #31d158; background:rgba(49,209,88,.12);}
+  .ms-marquee[hidden]{display:none;}
+  body.ms-marqueeing, body.ms-marqueeing *{user-select:none !important; cursor:crosshair !important;}
+  body.ms-group-dragging, body.ms-group-dragging *{cursor:grabbing !important;}
+  .placed-component.ms-selected{outline:2px dashed #ffb020 !important; outline-offset:4px; border-radius:6px; box-shadow:0 0 0 6px rgba(255,176,32,.10);}
+  .wire-path.ms-wire-sel{opacity:1 !important; filter:drop-shadow(0 0 2px #ffb020) drop-shadow(0 0 5px #ffb020) !important;}
+  .ms-bar{position:fixed; left:50%; top:60px; transform:translateX(-50%); z-index:1850; width:max-content; display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; max-width:94vw;
+    background:rgba(22,27,34,.96); border:1px solid #ffb020; border-radius:10px; padding:7px 12px; box-shadow:0 10px 26px rgba(0,0,0,.5); font-size:.78rem; color:#fff;}
+  .ms-bar[hidden]{display:none;}
+  .ms-bar b{color:#ffcf70; font-weight:600;}
+  .ms-bar .ms-bar-hint{font-size:.7rem; color:#c9d1d9;}
+  .ms-bar button{font-family:inherit; font-size:.76rem; background:#20262e; color:#fff; border:1px solid #3a4452; border-radius:6px; padding:4px 10px; cursor:pointer;}
+  .ms-bar button:hover{border-color:#ffb020;}
+  .ms-bar .ms-bar-del{color:#ff8a80;}
+
+  /* ==== [메뉴 접기] 상단 메뉴 최소화 ==== */
+  .hdr-min-btn{flex:0 0 auto; font-family:inherit; font-size:.72rem; background:transparent; color:#fff; border:1px dashed rgba(255,255,255,.35); border-radius:6px; padding:4px 9px; cursor:pointer; white-space:nowrap; margin:0 6px;}
+  .hdr-min-btn:hover{border-color:var(--teal, #3fd0d6); border-style:solid;}
+  body.hdr-min > header{min-height:0 !important; padding:3px 12px !important; flex-wrap:nowrap !important; row-gap:0 !important;}
+  body.hdr-min > header .brand-text span{display:none;}
+  body.hdr-min > header .brand-text b{font-size:.8rem;}
+  body.hdr-min > header .brand-mark{width:20px; height:20px; font-size:10px;}
+  body.hdr-min > header .toolbar{flex-wrap:nowrap !important; gap:5px;}
+  body.hdr-min > header .toolbar > *:not(.hdr-keep){display:none !important;}
+  body.hdr-min > header .btn, body.hdr-min > header .mode-switch button{padding:4px 10px; font-size:.74rem;}
+  body.hdr-min > header .power-switch-label, body.hdr-min > header .scan-badge{padding:3px 7px;}
+
+  /* 코드 에디터(아두이노) 윗부분 접기 — 상태줄 · 사이클 통계 · 내보내기 · 안내문 · 블록 난이도 줄 숨김 */
+  .ed-min-btn{font-size:.7rem !important; padding:4px 8px !important; white-space:nowrap;}
+  body.ce-top-min .code-editor-popup .build-status-bar,
+  body.ce-top-min .code-editor-popup .cycle-stats,
+  body.ce-top-min .code-editor-popup .code-export-group,
+  body.ce-top-min .code-editor-popup .example-gallery-hint,
+  body.ce-top-min .code-editor-popup .block-editor-hint,
+  body.ce-top-min .code-editor-popup .block-editor-toolbar + .block-editor-toolbar{display:none !important;}
+  body.ce-top-min .code-editor-popup .popup-head{padding-top:5px; padding-bottom:5px;}
+  body.ce-top-min .code-editor-popup .example-buttons{margin-bottom:4px;}
+  body.ce-top-min .code-editor-popup .editor-tabs, body.ce-top-min .code-editor-popup .block-editor-toolbar{flex-wrap:nowrap; overflow-x:auto;}
+
+  /* 래더 편집기(PLC) 윗부분 접기 — 설명 · 단축키 안내 · 치트시트 숨기고, 도구줄/프로그램 탭은 한 줄로 */
+  body.ladder-top-min .ladder-drawer .ladder-legend,
+  body.ladder-top-min .ladder-drawer .ladder-shortcut-hint,
+  body.ladder-top-min .ladder-drawer .il-cheatsheet{display:none !important;}
+  body.ladder-top-min .ladder-drawer .drawer-head{padding:6px 12px;}
+  body.ladder-top-min .ladder-drawer .ladder-toolbar,
+  body.ladder-top-min .ladder-drawer .program-tabs,
+  body.ladder-top-min .ladder-drawer .il-toolbar,
+  body.ladder-top-min .ladder-drawer .fbd-toolbar{flex-wrap:nowrap !important; overflow-x:auto; overflow-y:hidden; scrollbar-width:thin;}
+  body.ladder-top-min .ladder-drawer .ladder-toolbar > *, body.ladder-top-min .ladder-drawer .program-tabs > *{flex:0 0 auto; white-space:nowrap;}
+  body.ladder-top-min .ladder-drawer .ladder-toolbar{margin-bottom:6px; padding:5px 10px;}
+  body.ladder-top-min .ladder-drawer .program-tabs{margin-bottom:6px;}
+</style>
 </head>
 <body>
 
@@ -925,7 +980,7 @@
   <div class="palette">
     <div class="palette-title" data-i18n="palette.title">부품 상자</div>
     <div class="palette-items" id="paletteItems"><!-- built by JS: buildPalette() --></div>
-    <div class="palette-hint" data-i18n="palette.hint"><b>도움말:</b> 부품을 캔버스로 드래그해서 배치하고, 단자(핀)를 클릭한 뒤 다른 단자를 클릭하면 전선이 연결됩니다. PLC/HMI 부품은 더블클릭하면 전용 에디터가 열립니다.</div>
+    <div class="palette-hint" data-i18n="palette.hint"><b>도움말:</b> 부품을 캔버스로 드래그해서 배치하고, 단자(핀)를 클릭한 뒤 다른 단자를 클릭하면 전선이 연결됩니다. PLC/HMI 부품은 더블클릭하면 전용 에디터가 열립니다. 빈 곳을 드래그하면 여러 부품·전선을 한꺼번에 선택해 함께 이동하거나 Delete로 지울 수 있습니다.</div>
   </div>
 
   <div class="canvas-area" id="canvasArea">
@@ -1093,7 +1148,7 @@ const STRINGS = {
   "ds.examSection": { ko: "— 자동화산업기사 —", en: "— Automation Engineer Exam —" },
   "ds.qnet": { ko: "Q-net 공개문제 자료실 (큐넷)", en: "Q-net Exam Papers (Korean)" },
   "palette.title": { ko: "부품 상자", en: "Component Box" },
-  "palette.hint": { ko: "<b>도움말:</b> 부품을 캔버스로 드래그하거나, 그냥 클릭만 해도 캔버스 중앙 부근에 바로 배치됩니다. 단자(핀)를 클릭한 뒤 다른 단자를 클릭하면 전선이 연결됩니다. PLC/HMI 부품은 더블클릭하면 전용 에디터가 열립니다.", en: "<b>Tip:</b> Drag parts onto the canvas, or simply click one to drop it near the canvas center. Click a pin then another pin to wire them. Double-click a PLC/HMI part to open its editor." },
+  "palette.hint": { ko: "<b>도움말:</b> 부품을 캔버스로 드래그하거나, 그냥 클릭만 해도 캔버스 중앙 부근에 바로 배치됩니다. 단자(핀)를 클릭한 뒤 다른 단자를 클릭하면 전선이 연결됩니다. PLC/HMI 부품은 더블클릭하면 전용 에디터가 열립니다. 빈 곳을 드래그하면 여러 부품·전선을 한꺼번에 선택해 함께 이동하거나 Delete로 지울 수 있습니다.", en: "<b>Tip:</b> Drag parts onto the canvas, or simply click one to drop it near the canvas center. Click a pin then another pin to wire them. Double-click a PLC/HMI part to open its editor." },
   "palette.itemHint": { ko: "드래그해서 배치하거나 클릭하면 바로 추가됩니다.", en: "Drag to place, or just click to add it instantly." },
   "legend.title": { ko: "연결 현황", en: "Connections" },
   "legend.collapseTitle": { ko: "연결 현황 패널 숨기기", en: "Hide connection panel" },
@@ -9738,5 +9793,570 @@ init();
 })();
 </script>
 
+<script>
+/* ==== [성능 개선] 부품이 많을 때 버벅임 줄이기 ====
+   동작(계산 결과)은 그대로 두고, "같은 순간에 여러 번 반복하던 똑같은 조회"만 한 번으로 줄입니다.
+   1) 시뮬레이션 1틱 동안: 부품 종류별 목록(document.querySelectorAll('.comp-…'))을 틱마다 한 번만 조회
+      — 부품 목록은 틱 도중에 바뀌지 않으므로 결과가 같습니다(틱이 끝나면 즉시 버림).
+   2) 전선 다시 그리기 1회 동안: 핀 위치·부품 상자·전선 우회 경로를 한 번만 계산해 재사용
+      — 위치를 읽고/쓰고를 번갈아 하던 "강제 레이아웃 재계산"이 사라집니다. */
+(function(){
+  const IS_PLC = (typeof plcUndo === 'function') && (typeof zoomLevel !== 'undefined');
+  const IS_EMB = !IS_PLC && (typeof canvasZoom !== 'undefined') && (typeof runTick === 'function');
+
+  /* ---------- 공통: 전선 그리기 배치 캐시 ---------- */
+  let G = null, depth = 0;
+  function batched(fn){
+    return function(){
+      const outer = depth++ === 0;
+      if (outer) G = { pin: new Map(), inner: null, boxes: null, pins: null, routed: new Map() };
+      try {
+        if (outer && G && typeof wires !== 'undefined' && wires.length > 1){
+          // 쓰기(SVG 갱신) 전에 필요한 위치를 한꺼번에 읽어 둡니다 → 레이아웃 재계산 1회
+          for (const w of wires){ if (w.from) pinCenter(w.from); if (w.to) pinCenter(w.to); }
+        }
+        return fn.apply(this, arguments);
+      } finally {
+        if (--depth === 0) G = null;
+      }
+    };
+  }
+  if (typeof pinCenter === 'function'){
+    const _pc = pinCenter;
+    pinCenter = function(el){
+      if (!G || !el) return _pc(el);
+      let c = G.pin.get(el);
+      if (!c){ c = _pc(el); G.pin.set(el, c); }
+      return { x: c.x, y: c.y };
+    };
+  }
+
+  if (IS_PLC){
+    if (typeof canvasPointFromClientXY === 'function'){
+      const _cp = canvasPointFromClientXY;
+      canvasPointFromClientXY = function(cx, cy){
+        if (!G) return _cp(cx, cy);
+        if (!G.inner) G.inner = document.getElementById('canvasInner').getBoundingClientRect();
+        return { x: (cx - G.inner.left) / zoomLevel, y: (cy - G.inner.top) / zoomLevel };
+      };
+    }
+    if (typeof updateAllWires === 'function') updateAllWires = batched(updateAllWires);
+  }
+
+  if (IS_EMB){
+    const innerRect = () => (G.inner || (G.inner = document.getElementById('canvasInner').getBoundingClientRect()));
+    if (typeof wireObstacleBoxes === 'function'){
+      const _wob = wireObstacleBoxes;
+      wireObstacleBoxes = function(excludeEls){
+        if (!G) return _wob(excludeEls);
+        if (!G.boxes){
+          const ir = innerRect(); G.boxes = [];
+          document.querySelectorAll('.placed-component').forEach(el => {
+            if (el.classList.contains('comp-breadboard')) return;
+            const r = el.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            G.boxes.push({ el, box: { x1: (r.left - ir.left) / canvasZoom, y1: (r.top - ir.top) / canvasZoom, x2: (r.right - ir.left) / canvasZoom, y2: (r.bottom - ir.top) / canvasZoom } });
+          });
+        }
+        const ex = excludeEls || [];
+        return G.boxes.filter(b => !ex.includes(b.el)).map(b => b.box);
+      };
+    }
+    if (typeof wireObstaclePinCenters === 'function'){
+      const _wopc = wireObstaclePinCenters;
+      wireObstaclePinCenters = function(excludePins){
+        if (!G) return _wopc(excludePins);
+        if (!G.pins){
+          const ir = innerRect(); G.pins = [];
+          document.querySelectorAll('[data-pin]').forEach(el => {
+            const r = el.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            G.pins.push({ el, c: { x: (r.left + r.width / 2 - ir.left) / canvasZoom, y: (r.top + r.height / 2 - ir.top) / canvasZoom } });
+          });
+        }
+        const ex = excludePins || [];
+        return G.pins.filter(p => !ex.includes(p.el)).map(p => ({ x: p.c.x, y: p.c.y }));
+      };
+    }
+    if (typeof computeWireRoutedPoints === 'function'){
+      const _cwrp = computeWireRoutedPoints;
+      computeWireRoutedPoints = function(w){
+        if (!G) return _cwrp(w);
+        let r = G.routed.get(w);
+        if (!r){ r = _cwrp(w); G.routed.set(w, r); }
+        return r;
+      };
+    }
+    if (typeof updateAllWires === 'function') updateAllWires = batched(updateAllWires);
+    if (typeof updateWirePosition === 'function') updateWirePosition = batched(updateWirePosition);
+
+    /* ---------- 시뮬레이션 틱 동안 부품 목록 조회 캐시 ---------- */
+    const QSA = Document.prototype.querySelectorAll;
+    const CACHEABLE = /^\s*(\.(comp-[\w-]+|resistive-2pin|inductive-2pin)(\s*,\s*\.(comp-[\w-]+|resistive-2pin|inductive-2pin))*|\[data-bus="[^"\]]+"\])\s*$/;
+    let tickCache = null;
+    document.querySelectorAll = function(sel){
+      if (tickCache && typeof sel === 'string' && CACHEABLE.test(sel)){
+        let r = tickCache.get(sel);
+        if (!r){ r = Array.from(QSA.call(document, sel)); tickCache.set(sel, r); }
+        return r.slice();
+      }
+      return QSA.call(document, sel);
+    };
+    // 부품의 단자(핀) 찾기 el.querySelector('[data-pin$="_A"]') — 틱 하나에 같은 부품·같은 단자를
+    // 수만 번 다시 찾던 것을, 틱마다 한 번만 찾고 재사용합니다(단자 구성은 틱 도중 바뀌지 않음).
+    const EQS = Element.prototype.querySelector;
+    const PIN_SEL = /^\[data-pin\$="_[\w-]+"\]$/;
+    let pinCache = null;
+    Element.prototype.querySelector = function(sel){
+      if (pinCache && typeof sel === 'string' && PIN_SEL.test(sel)){
+        let m = pinCache.get(this);
+        if (!m){ m = new Map(); pinCache.set(this, m); }
+        if (m.has(sel)) return m.get(sel);
+        const r = EQS.call(this, sel);
+        m.set(sel, r);
+        return r;
+      }
+      return EQS.call(this, sel);
+    };
+    const _runTick = runTick;
+    runTick = function(){
+      tickCache = new Map(); pinCache = new Map();
+      try { return _runTick.apply(this, arguments); }
+      finally { tickCache = null; pinCache = null; }
+    };
+  }
+})();
+
+/* ==== [다중 선택] 빈 캔버스를 드래그해 부품·전선을 한꺼번에 선택 → 함께 이동 / 한 번에 삭제 ====
+   · 왼쪽→오른쪽으로 끌면(파란 실선 상자) 상자 안에 "완전히" 들어온 부품·전선만 선택
+   · 오른쪽→왼쪽으로 끌면(초록 점선 상자) 상자에 "조금이라도 걸친" 부품·전선까지 선택 (CAD 방식)
+   · Shift + 드래그 / Shift + 클릭 = 선택 추가·제외
+   · 선택된 부품(또는 전선)을 끌면 묶음 전체가 함께 이동 (양 끝이 묶음 안에 있는 전선의 꺾임점도 같이 이동)
+   · Delete/Backspace = 선택 항목 모두 삭제 · 방향키 = 묶음 이동(Shift = 1px) · Esc = 선택 해제 */
+(function(){
+  const inner = document.getElementById('canvasInner');
+  const area = document.getElementById('canvasArea');
+  if (!inner || !area) return;
+  const IS_PLC = (typeof plcUndo === 'function') && (typeof zoomLevel !== 'undefined');
+  const IS_EMB = !IS_PLC && (typeof captureUndoSnapshot === 'function') && (typeof canvasZoom !== 'undefined');
+  if (!IS_PLC && !IS_EMB) return;
+
+  const MS = { comps: new Set(), wires: new Set() };
+  const isTopComp = el => el && el.classList && el.classList.contains('placed-component') && inner.contains(el) && !(el.parentElement && el.parentElement.closest('.placed-component'));
+  const topComps = () => Array.from(inner.querySelectorAll('.placed-component')).filter(isTopComp);
+  const zoom = () => IS_PLC ? zoomLevel : canvasZoom;
+  const allWires = () => wires;
+  const wireVisible = w => IS_EMB ? !w.isPlugWire : true;
+
+  /* ---------- 앱별 어댑터 ---------- */
+  function wireElOf(w){
+    if (IS_EMB) return w.element || null;
+    const i = wires.indexOf(w);
+    return i >= 0 ? (document.querySelectorAll('#wireCanvas > path.wire-path')[i] || null) : null;
+  }
+  function wireOfEl(path){
+    if (!path || !path.classList || !path.classList.contains('wire-path')) return null;
+    if (IS_EMB) return wires.find(w => w.element === path) || null;
+    const i = Array.from(document.querySelectorAll('#wireCanvas > path.wire-path')).indexOf(path);
+    return i >= 0 ? (wires[i] || null) : null;
+  }
+  function wirePts(w){
+    try { return [pinCenter(w.from), ...(w.points || []), pinCenter(w.to)]; } catch(e){ return []; }
+  }
+  function clearSingleSelection(){
+    if (IS_PLC){
+      document.querySelectorAll('.placed-component.selected-comp').forEach(el => el.classList.remove('selected-comp'));
+      if (typeof selectedWire !== 'undefined' && selectedWire){ selectedWire = null; updateAllWires(); }
+    } else {
+      try { deselectComponent(); } catch(e){}
+      try { closeWireEditor(); } catch(e){}
+    }
+  }
+  function plcDeleteOne(sel){
+    for (let i = wires.length - 1; i >= 0; i--){
+      if (wires[i].from.closest('.placed-component') === sel || wires[i].to.closest('.placed-component') === sel) wires.splice(i, 1);
+    }
+    try {
+      delete PLC_MEM[sel.id]; delete PLC_PROG[sel.id];
+      delete HMI_STATE[sel.id]; delete COMM_LINKS[sel.id]; delete COMM_LOG[sel.id];
+      delete ROBOT_STATE[sel.id]; delete CONV_STATE[sel.id]; delete FORCE_STATE[sel.id]; delete TRIPPED_PSU[sel.id]; delete DEVICE_COMMENTS[sel.id];
+      if (window.__dataMonitorPlcId === sel.id) window.__dataMonitorPlcId = null;
+      if (window.__devCommentPlcId === sel.id){ window.__devCommentPlcId = null; closeDeviceCommentTable(); }
+      if (VC_STATE.plcId === sel.id){ VC_STATE.plcId = null; const vp = document.getElementById('vcBlPanel'); if (vp && !vp.hidden) renderVcPanel(); }
+      if (window.__ladderEditorOpenFor === sel.id){ window.__ladderEditorOpenFor = null; try { closeLadderEditor(); } catch(e){} }
+      if (window.__hmiEditorOpenFor === sel.id){ window.__hmiEditorOpenFor = null; try { closeHmiEditor(); } catch(e){} }
+      if (window.__commEditorOpenFor === sel.id){ window.__commEditorOpenFor = null; try { closeCommEditor(); } catch(e){} }
+      if (window.__robotEditorOpenFor === sel.id){ window.__robotEditorOpenFor = null; try { closeRobotEditor(); } catch(e){} }
+    } catch(e){ console.warn(e); }
+    sel.remove();
+  }
+  function deleteSelection(){
+    prune();
+    const comps = Array.from(MS.comps), ws = Array.from(MS.wires);
+    if (!comps.length && !ws.length) return;
+    if (IS_PLC){
+      try { clearTimeout(PLC_UNDO_TIMER); plcCheckpoint(); } catch(e){} // 지우기 직전 상태를 되돌리기 목록에 먼저 기록
+      ws.forEach(w => { const i = wires.indexOf(w); if (i >= 0) wires.splice(i, 1); });
+      comps.forEach(plcDeleteOne);
+      if (typeof selectedWire !== 'undefined' && selectedWire && !wires.includes(selectedWire)) selectedWire = null;
+      MS.comps.clear(); MS.wires.clear();
+      updateAllWires(); refreshLegend(); evaluateElectricalNets();
+      try { plcScheduleCheckpoint(); } catch(e){}
+    } else {
+      captureUndoSnapshot();
+      const prev = suppressUndoCapture; suppressUndoCapture = true;
+      try {
+        comps.forEach(el => { if (el.isConnected) deleteComponent(el); });
+        ws.forEach(w => { if (wires.includes(w)) deleteWire(w); });
+      } finally { suppressUndoCapture = prev; }
+      try { deselectComponent(); } catch(e){}
+      MS.comps.clear(); MS.wires.clear();
+      updateAllWires(); try { updateLegend(); } catch(e){}
+    }
+    if (typeof showToast === 'function') showToast(`🗑 부품 ${comps.length}개 · 전선 ${ws.length}개 삭제됨 (Ctrl+Z로 되돌리기)`);
+    paint();
+  }
+
+  /* ---------- 선택 상태 / 화면 표시 ---------- */
+  function prune(){
+    MS.comps.forEach(el => { if (!el.isConnected) MS.comps.delete(el); });
+    MS.wires.forEach(w => { if (!wires.includes(w)) MS.wires.delete(w); });
+  }
+  function count(){ prune(); return MS.comps.size + MS.wires.size; }
+  function paint(){
+    document.querySelectorAll('.placed-component.ms-selected').forEach(el => { if (!MS.comps.has(el)) el.classList.remove('ms-selected'); });
+    MS.comps.forEach(el => el.classList.add('ms-selected'));
+    document.querySelectorAll('#wireCanvas .ms-wire-sel').forEach(p => p.classList.remove('ms-wire-sel'));
+    MS.wires.forEach(w => { const p = wireElOf(w); if (p) p.classList.add('ms-wire-sel'); });
+    renderBar();
+  }
+  function clearMS(){
+    if (!MS.comps.size && !MS.wires.size) return;
+    MS.comps.clear(); MS.wires.clear(); paint();
+  }
+  window.msClearSelection = clearMS;
+  window.msDeleteSelection = deleteSelection;
+
+  // 선택 막대(화면 아래쪽 가운데) — 선택 개수와 삭제/해제 버튼
+  const bar = document.createElement('div');
+  bar.className = 'ms-bar'; bar.hidden = true;
+  document.body.appendChild(bar);
+  ['mousedown','click'].forEach(ev => bar.addEventListener(ev, e => e.stopPropagation()));
+  function renderBar(){
+    prune();
+    const n = MS.comps.size, m = MS.wires.size;
+    bar.hidden = !(n || m);
+    if (bar.hidden) return;
+    const ar = area.getBoundingClientRect();
+    bar.style.top = Math.max(4, ar.top + 10) + 'px';
+    bar.style.left = (ar.left + ar.width / 2) + 'px';
+    bar.innerHTML = `<b>☑ 선택: 부품 ${n}개 · 전선 ${m}개</b><span class="ms-bar-hint">끌어서 함께 이동 · 방향키 미세 이동 · Shift+클릭 추가/제외</span>`
+      + `<button type="button" class="ms-bar-del">🗑 모두 삭제 (Del)</button><button type="button" class="ms-bar-clear">✕ 선택 해제 (Esc)</button>`;
+    bar.querySelector('.ms-bar-del').onclick = deleteSelection;
+    bar.querySelector('.ms-bar-clear').onclick = clearMS;
+  }
+
+  // 전선은 다시 그릴 때(PLC: 매번 path를 새로 만듦) 선택 표시가 사라지므로 다시 칠해 줍니다.
+  if (typeof updateAllWires === 'function'){
+    const _uaw = updateAllWires;
+    updateAllWires = function(){ const r = _uaw.apply(this, arguments); if (MS.wires.size){ MS.wires.forEach(w => { const p = wireElOf(w); if (p) p.classList.add('ms-wire-sel'); }); } return r; };
+  }
+  // 실행 취소/불러오기 등으로 캔버스가 통째로 다시 만들어지면 예전 선택은 무효 → 해제
+  ['plcApplyState','restoreProjectState','clearCanvasAll','clearCanvas'].forEach(fn => {
+    if (typeof window[fn] === 'function'){
+      const orig = window[fn];
+      window[fn] = function(){ MS.comps.clear(); MS.wires.clear(); try { paint(); } catch(e){} return orig.apply(this, arguments); };
+    }
+  });
+
+  /* ---------- 사각형(러버밴드) 선택 ---------- */
+  const box = document.createElement('div');
+  box.className = 'ms-marquee'; box.hidden = true;
+  document.body.appendChild(box);
+
+  function segHitsRect(a, b, r){
+    // Liang–Barsky: 선분 a-b가 사각형 r과 겹치는지
+    let t0 = 0, t1 = 1; const dx = b.x - a.x, dy = b.y - a.y;
+    const p = [-dx, dx, -dy, dy], q = [a.x - r.x1, r.x2 - a.x, a.y - r.y1, r.y2 - a.y];
+    for (let i = 0; i < 4; i++){
+      if (p[i] === 0){ if (q[i] < 0) return false; }
+      else { const t = q[i] / p[i]; if (p[i] < 0){ if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; } }
+    }
+    return true;
+  }
+  function selectInRect(cr, crossing, additive){
+    if (!additive){ MS.comps.clear(); MS.wires.clear(); }
+    topComps().forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const inside = r.left >= cr.x1 && r.right <= cr.x2 && r.top >= cr.y1 && r.bottom <= cr.y2;
+      const touch = r.right >= cr.x1 && r.left <= cr.x2 && r.bottom >= cr.y1 && r.top <= cr.y2;
+      if (crossing ? touch : inside) MS.comps.add(el);
+    });
+    const ir = inner.getBoundingClientRect(), z = zoom();
+    allWires().forEach(w => {
+      if (!wireVisible(w)) return;
+      const pts = wirePts(w).map(p => ({ x: ir.left + p.x * z, y: ir.top + p.y * z }));
+      if (pts.length < 2) return;
+      const inside = pts.every(p => p.x >= cr.x1 && p.x <= cr.x2 && p.y >= cr.y1 && p.y <= cr.y2);
+      let hit = inside;
+      if (!hit && crossing){ for (let i = 0; i < pts.length - 1 && !hit; i++) hit = segHitsRect(pts[i], pts[i+1], cr); }
+      if (hit) MS.wires.add(w);
+    });
+    paint();
+  }
+
+  let suppressNextClick = false;
+  area.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    if (!(e.target === inner || e.target === area)) return;
+    const sx = e.clientX, sy = e.clientY;
+    let started = false;
+    const additive = e.shiftKey;
+    function onMove(ev){
+      const dx = ev.clientX - sx, dy = ev.clientY - sy;
+      if (!started){
+        if (Math.hypot(dx, dy) < 5) return;
+        started = true; box.hidden = false;
+        if (!additive) clearSingleSelection();
+        document.body.classList.add('ms-marqueeing');
+      }
+      const crossing = ev.clientX < sx;
+      box.classList.toggle('crossing', crossing);
+      box.style.left = Math.min(sx, ev.clientX) + 'px';
+      box.style.top = Math.min(sy, ev.clientY) + 'px';
+      box.style.width = Math.abs(dx) + 'px';
+      box.style.height = Math.abs(dy) + 'px';
+      ev.preventDefault();
+    }
+    function onUp(ev){
+      document.removeEventListener('mousemove', onMove, true);
+      document.removeEventListener('mouseup', onUp, true);
+      document.body.classList.remove('ms-marqueeing');
+      if (!started){ if (!additive) clearMS(); return; }
+      box.hidden = true;
+      const cr = { x1: Math.min(sx, ev.clientX), x2: Math.max(sx, ev.clientX), y1: Math.min(sy, ev.clientY), y2: Math.max(sy, ev.clientY) };
+      selectInRect(cr, ev.clientX < sx, additive);
+      suppressNextClick = true; setTimeout(() => { suppressNextClick = false; }, 0);
+    }
+    document.addEventListener('mousemove', onMove, true);
+    document.addEventListener('mouseup', onUp, true);
+  });
+
+  /* ---------- 묶음 이동 ---------- */
+  const NO_DRAG = '.pin, .pin-mini, input, select, textarea, button, .comp-help-btn, .tft-screen, .comp-scope canvas, .scope-zoom-handle, .scope-measure-handle, .dock-toggle-btn, .wire-point-handle';
+  function startGroupDrag(e){
+    prune();
+    const sx = e.clientX, sy = e.clientY;
+    const group = new Set(MS.comps);
+    let state = null;
+    function begin(){
+      const pinInGroup = pin => { const c = pin && pin.closest && pin.closest('.placed-component'); return !!(c && group.has(c)); };
+      const toSync = [];
+      if (IS_PLC){ try { clearTimeout(PLC_UNDO_TIMER); plcCheckpoint(); } catch(e){} }
+      if (IS_EMB){
+        captureUndoSnapshot();
+        // 선택된 브레드보드에 꽂힌 부품도 함께 이동
+        Array.from(group).forEach(el => { if (el.classList.contains('comp-breadboard') && typeof breadboardChildren === 'function') breadboardChildren(el).forEach(k => group.add(k)); });
+        group.forEach(el => {
+          if (el.classList.contains('board') || el.classList.contains('comp-breadboard')) return;
+          // 묶음 밖 브레드보드에 꽂혀 있던 부품은 뽑았다가, 놓을 때 다시 가까운 구멍에 꽂습니다
+          const plugged = wires.filter(w => w.isPlugWire && (el.contains(w.from) || el.contains(w.to)));
+          const outside = plugged.some(w => { const h = el.contains(w.from) ? w.to : w.from; const bb = h && h.closest('.placed-component'); return bb && !group.has(bb); });
+          if (outside) detachFromBreadboard(el);
+          toSync.push(el);
+        });
+      }
+      const moveWires = new Set(MS.wires);
+      wires.forEach(w => { if (wireVisible(w) && w.points && w.points.length && pinInGroup(w.from) && pinInGroup(w.to)) moveWires.add(w); });
+      state = {
+        items: Array.from(group).map(el => ({ el, x: parseFloat(el.style.left) || 0, y: parseFloat(el.style.top) || 0 })),
+        wires: Array.from(moveWires).filter(w => w.points).map(w => ({ w, pts: w.points.map(p => ({ x: p.x, y: p.y })) })),
+        toSync
+      };
+      state.minX = Math.min(...state.items.map(i => i.x), Infinity);
+      state.minY = Math.min(...state.items.map(i => i.y), Infinity);
+      state.items.forEach(i => i.el.classList.add('dragging'));
+      document.body.classList.add('ms-group-dragging');
+    }
+    function apply(dx, dy){
+      if (isFinite(state.minX)) dx = Math.max(dx, -state.minX);
+      if (isFinite(state.minY)) dy = Math.max(dy, -state.minY);
+      state.items.forEach(i => { i.el.style.left = (i.x + dx) + 'px'; i.el.style.top = (i.y + dy) + 'px'; });
+      state.wires.forEach(o => { o.w.points = o.pts.map(p => ({ x: p.x + dx, y: p.y + dy })); });
+      updateAllWires();
+    }
+    function onMove(ev){
+      if (!state){ if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 4) return; begin(); }
+      ev.preventDefault();
+      const z = zoom();
+      apply((ev.clientX - sx) / z, (ev.clientY - sy) / z);
+    }
+    function onUp(){
+      document.removeEventListener('mousemove', onMove, true);
+      document.removeEventListener('mouseup', onUp, true);
+      suppressNextClick = true; setTimeout(() => { suppressNextClick = false; }, 0);
+      if (!state) return;
+      state.items.forEach(i => i.el.classList.remove('dragging'));
+      document.body.classList.remove('ms-group-dragging');
+      if (IS_EMB){
+        state.wires.forEach(o => { if (o.w.pointEls) o.w.pointEls.forEach((el, i) => { el.__idx = i; }); });
+        state.toSync.forEach(el => { if (el.isConnected) try { syncBreadboardPlugs(el); } catch(e){} });
+        try { updateLegend(); } catch(e){}
+      } else {
+        try { evaluateElectricalNets(); } catch(e){}
+        try { plcScheduleCheckpoint(); } catch(e){}
+      }
+      updateAllWires(); paint();
+    }
+    document.addEventListener('mousemove', onMove, true);
+    document.addEventListener('mouseup', onUp, true);
+  }
+
+  // 캡처 단계에서 먼저 받아, 선택 묶음이면 기존 단일 부품 드래그 대신 묶음 이동을 시작합니다.
+  inner.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    const path = e.target.closest && e.target.closest('path.wire-path');
+    const wireHit = path ? wireOfEl(path) : null;
+    const comp = !path && e.target.closest ? e.target.closest('.placed-component') : null;
+    const topComp = comp ? (function(c){ while (c && !isTopComp(c)) c = c.parentElement && c.parentElement.closest('.placed-component'); return c; })(comp) : null;
+    if (!topComp && !wireHit) return;
+    if (topComp && e.target.closest(NO_DRAG)) return; // 핀·버튼·입력칸은 원래 동작 그대로
+    if (e.shiftKey){
+      // Shift + 클릭 = 선택에 추가/제외
+      if (topComp){ MS.comps.has(topComp) ? MS.comps.delete(topComp) : MS.comps.add(topComp); }
+      else if (wireHit){ MS.wires.has(wireHit) ? MS.wires.delete(wireHit) : MS.wires.add(wireHit); }
+      clearSingleSelection();
+      paint();
+      e.stopPropagation(); e.preventDefault();
+      suppressNextClick = true; setTimeout(() => { suppressNextClick = false; }, 400);
+      return;
+    }
+    const inSel = topComp ? MS.comps.has(topComp) : MS.wires.has(wireHit);
+    if (inSel && count() >= 2){
+      e.stopPropagation(); e.preventDefault();
+      startGroupDrag(e);
+      return;
+    }
+    if (count()) clearMS(); // 선택 밖을 누르면 기존처럼 단일 선택/이동
+  }, true);
+  inner.addEventListener('click', (e) => {
+    if (suppressNextClick){ suppressNextClick = false; e.stopPropagation(); e.preventDefault(); }
+  }, true);
+  inner.addEventListener('dblclick', (e) => {
+    if (e.shiftKey){ e.stopPropagation(); e.preventDefault(); }
+  }, true);
+  // 캔버스 밖(메뉴/에디터 등)을 누르면 선택 해제 — 코드 에디터에서 Delete를 눌러 부품이 지워지는 사고 방지
+  document.addEventListener('mousedown', (e) => {
+    if (!count()) return;
+    if (area.contains(e.target) || bar.contains(e.target)) return;
+    clearMS();
+  }, true);
+
+  /* ---------- 키보드 ---------- */
+  function typingTarget(){
+    const a = document.activeElement;
+    if (!a || a === document.body) return false;
+    if (a.closest && a.closest('input, textarea, select, [contenteditable="true"], .side-drawer, .code-editor-popup, #editorDock, .injectionDiv, .blocklyWidgetDiv')) return true;
+    return !!a.isContentEditable;
+  }
+  let nudgeAt = 0;
+  window.addEventListener('keydown', (e) => {
+    if (!count() || typingTarget()) return;
+    if (e.key === 'Escape'){ clearMS(); return; }
+    if ((e.key === 'Delete' || e.key === 'Backspace') && !e.ctrlKey && !e.metaKey && !e.altKey){
+      e.preventDefault(); e.stopImmediatePropagation();
+      deleteSelection();
+      return;
+    }
+    const d = { ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1] }[e.key];
+    if (d && !e.ctrlKey && !e.metaKey && !e.altKey){
+      e.preventDefault(); e.stopImmediatePropagation();
+      const step = e.shiftKey ? 1 : 5;
+      if (IS_EMB && Date.now() - nudgeAt > 700) captureUndoSnapshot();
+      nudgeAt = Date.now();
+      const group = new Set(MS.comps);
+      if (IS_EMB) Array.from(group).forEach(el => { if (el.classList.contains('comp-breadboard') && typeof breadboardChildren === 'function') breadboardChildren(el).forEach(k => group.add(k)); });
+      let dx = d[0] * step, dy = d[1] * step;
+      group.forEach(el => { dx = Math.max(dx, -(parseFloat(el.style.left) || 0)); dy = Math.max(dy, -(parseFloat(el.style.top) || 0)); });
+      const pinIn = pin => { const c = pin && pin.closest && pin.closest('.placed-component'); return !!(c && group.has(c)); };
+      const mw = new Set(MS.wires);
+      wires.forEach(w => { if (wireVisible(w) && pinIn(w.from) && pinIn(w.to)) mw.add(w); });
+      group.forEach(el => { el.style.left = ((parseFloat(el.style.left) || 0) + dx) + 'px'; el.style.top = ((parseFloat(el.style.top) || 0) + dy) + 'px'; });
+      mw.forEach(w => { if (w.points) w.points = w.points.map(p => ({ x: p.x + dx, y: p.y + dy })); });
+      updateAllWires(); paint();
+    }
+  }, true);
+})();
+
+/* ==== [메뉴 접기/펼치기] 상단 메뉴 · 코드 에디터 · 래더 편집기 윗부분을 한 줄로 최소화 ====
+   해상도가 낮거나 창이 좁으면 버튼이 여러 줄로 감겨 작업 화면을 많이 가리므로,
+   ▴ 버튼으로 꼭 필요한 버튼만 남기고 접을 수 있게 합니다(상태는 브라우저에 기억). */
+(function(){
+  const APP = (document.querySelector('header .brand-mark') || {}).textContent || 'app';
+  const KEY = 'kSimUiMin_' + APP.trim();
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e){ return {}; } };
+  const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} };
+  const st = load();
+  const kick = () => { try { window.dispatchEvent(new Event('resize')); } catch(e){} try { if (typeof updateAllWires === 'function') updateAllWires(); } catch(e){} };
+
+  /* ---- 1) 메인 상단 메뉴 ---- */
+  const header = document.querySelector('body > header');
+  if (header){
+    // 접힌 상태에서도 남겨 둘 핵심 버튼(실행/정지, 실행 취소, 전원, 코드 에디터 등)
+    ['#btnRun', '#btnSim', '#btnUndo', '#btnRedo', '#btnPause', '#btnStep', '.power-switch-label', '.scan-badge', '.toolbar > .btn.primary']
+      .forEach(sel => header.querySelectorAll(sel).forEach(el => el.classList.add('hdr-keep')));
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'hdr-min-btn';
+    const brand = header.querySelector('.brand');
+    if (brand && brand.nextSibling) header.insertBefore(btn, brand.nextSibling); else header.appendChild(btn);
+    const sync = () => {
+      const on = document.body.classList.contains('hdr-min');
+      btn.textContent = on ? '▾ 메뉴 펼치기' : '▴ 메뉴 접기';
+      btn.title = on ? '숨긴 상단 메뉴를 모두 펼칩니다' : '상단 메뉴를 한 줄로 접어 작업 화면을 넓힙니다 (실행·실행 취소 등 핵심 버튼만 남김)';
+    };
+    btn.onclick = () => { document.body.classList.toggle('hdr-min'); st.header = document.body.classList.contains('hdr-min'); save(st); sync(); kick(); };
+    if (st.header) document.body.classList.add('hdr-min');
+    sync();
+  }
+
+  /* ---- 2) 코드 에디터(아두이노) / 래더 편집기(PLC) 윗부분 ---- */
+  function addBtn(head, bodyClass, label, beforeSel){
+    if (!head || head.dataset.minBtn) return;
+    head.dataset.minBtn = '1';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn ghost ed-min-btn';
+    const sync = () => {
+      const on = document.body.classList.contains(bodyClass);
+      b.textContent = on ? '▾ 메뉴 펼치기' : '▴ 메뉴 접기';
+      b.title = on ? label + ' 윗부분 메뉴/설명을 다시 펼칩니다' : label + ' 윗부분 메뉴/설명을 접어 편집 영역을 넓힙니다';
+    };
+    b.onclick = (e) => {
+      e.stopPropagation();
+      document.body.classList.toggle(bodyClass);
+      st[bodyClass] = document.body.classList.contains(bodyClass); save(st);
+      document.querySelectorAll('.ed-min-btn').forEach(x => x.__sync && x.__sync());
+      kick();
+    };
+    b.__sync = sync;
+    const before = beforeSel && head.querySelector(beforeSel);
+    if (before) head.insertBefore(b, before); else head.appendChild(b);
+    sync();
+  }
+  if (st['ce-top-min']) document.body.classList.add('ce-top-min');
+  if (st['ladder-top-min']) document.body.classList.add('ladder-top-min');
+  function scan(){
+    document.querySelectorAll('.code-editor-popup .popup-head').forEach(h => addBtn(h, 'ce-top-min', '코드 에디터', '.popup-max-btn'));
+    const lh = document.getElementById('ladderDrawerHead');
+    if (lh) addBtn(lh, 'ladder-top-min', '래더 편집기', '#ladderCollapseBtn');
+  }
+  scan();
+  // 새로 열리는 에디터 창에 버튼을 붙이기 위한 가벼운 주기 확인(시뮬레이션 중 DOM 변경 감시 부담 없음)
+  setInterval(scan, 700);
+})();
+
+</script>
 </body>
 </html>
