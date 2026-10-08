@@ -2125,6 +2125,256 @@
   body.ladder-top-min .ladder-drawer .ladder-toolbar > *, body.ladder-top-min .ladder-drawer .program-tabs > *{flex:0 0 auto; white-space:nowrap;}
   body.ladder-top-min .ladder-drawer .ladder-toolbar{margin-bottom:6px; padding:5px 10px;}
   body.ladder-top-min .ladder-drawer .program-tabs{margin-bottom:6px;}
+
+  /* ==== [시퀀스회로 실습] EZT ST-1801 실습장치 부품 ==== */
+  .sq{position:relative; padding:6px 7px 4px; border-radius:6px; font-family:'IBM Plex Sans',system-ui,sans-serif; color:#e8edf3; background:#22272e; border:1px solid #3b4450; box-shadow:0 3px 8px rgba(0,0,0,.45);}
+  .sq.sq-light{background:linear-gradient(180deg,#f4f5f2,#dfe1dc); color:#1d2126; border-color:#a7aba3;}
+  .sq .sq-row{display:flex; gap:3px; justify-content:center; align-items:flex-start;}
+  .sq .sq-row-tight{margin-top:2px;}
+  .sq-t{display:flex; flex-direction:column; align-items:center; gap:1px; min-width:22px;}
+  .sq-t-blank{visibility:hidden;}
+  .sq .pin-mini{width:11px; height:11px;}
+  .sq-tc{font:600 9px/1.05 'IBM Plex Mono',monospace; color:#d6dde6; white-space:nowrap;}
+  .sq-light .sq-tc{color:#20252b;}
+  .sq-t.sq-coilt .sq-tc{color:#ff9f43;}
+  .sq-light .sq-t.sq-coilt .sq-tc{color:#b4570b;}
+  .sq-label.comp-label{color:#c8d1db; margin-top:3px;}
+  .sq-light .sq-label.comp-label{color:#30363d;}
+  .sq-note{font:500 8px/1.2 'IBM Plex Mono',monospace; color:#aab4c0; text-align:center; margin-top:2px;}
+  .sq-note-dark{color:#3a414a;}
+  .sq-mini-btn{font:600 9px/1 'IBM Plex Sans',sans-serif; padding:3px 6px; border-radius:4px; border:1px solid #5b6672; background:#2b323b; color:#fff; cursor:pointer;}
+  .sq-mini-btn:hover{border-color:var(--teal);}
+  .sq-mini-btn.on{background:#c0392b; border-color:#ff6b5b;}
+  .sq-btn-red{background:#7a1f1a;}
+  .sq-dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:#3a3f45; margin:0 3px 0 6px; vertical-align:middle;}
+  .sq-dot.on{background:#3ddc84; box-shadow:0 0 6px #3ddc84;}
+  .sq-dot-out.on, .sq-dot-red.on{background:#ff453a; box-shadow:0 0 6px #ff453a;}
+  .sq-tripped{box-shadow:0 0 0 2px #ff453a, 0 3px 8px rgba(0,0,0,.45);}
+
+  /* 전원 인입 */
+  .sq-power{width:150px; text-align:center; background:#1b1f25;}
+  .sq-power-plug{font-size:22px;}
+  .sq-power-title{font:600 10px/1.25 'IBM Plex Sans',system-ui,sans-serif; margin:2px 0 6px;}
+  .sq-power-title small{font-weight:500; color:#9aa6b2;}
+
+  /* 차단기 */
+  .sq-brk{width:118px;}
+  .sq-brk2{width:84px;}
+  .sq-brk-body{margin:5px 0; padding:8px 4px; background:#fff; border:1px solid #b5b9b2; border-radius:4px; text-align:center;}
+  .sq-brk-brand{font:800 11px 'IBM Plex Sans',system-ui,sans-serif; color:#0d5ab5;}
+  .sq-brk-lever{display:block; margin:6px auto; width:30px; height:46px; border-radius:5px; border:1px solid #6b7078; background:#2d3238; cursor:pointer; position:relative;}
+  .sq-lever-knob{position:absolute; left:4px; right:4px; height:18px; bottom:4px; background:#e8e8e8; border-radius:3px; transition:bottom .15s;}
+  .sq-brk-lever.on .sq-lever-knob{bottom:24px; background:#ff3b30;}
+  .sq-brk-state{font:700 10px 'IBM Plex Mono',ui-monospace,monospace; color:#555;}
+  .sq-brk-lever.on + .sq-brk-state{color:#c0392b;}
+  .sq-tripped .sq-brk-state{color:#ff3b30;}
+  .sq-brk-spec{font:500 8px 'IBM Plex Mono',ui-monospace,monospace; color:#666;}
+
+  /* 퓨즈 */
+  .sq-fuse{width:84px;}
+  .sq-fuse-body{display:flex; gap:6px; justify-content:center; margin:6px 0; padding:8px 0; background:#e9eae6; border-radius:4px;}
+  .sq-fuse-cart{width:24px; height:56px; border-radius:4px; border:1px solid #888; background:rgba(255,255,255,.4); font:700 8px 'IBM Plex Mono',ui-monospace,monospace; color:#555; cursor:pointer; writing-mode:vertical-rl;}
+  .sq-fuse-cart.on{background:linear-gradient(90deg,#d9e7f2,#fff,#d9e7f2); color:#0b4a7a; border-color:#5d8bb0;}
+
+  /* SMPS */
+  .sq-smps{width:112px; background:linear-gradient(180deg,#2a2e33,#16191c);}
+  .sq-smps-body{margin:6px 0; height:150px; border-radius:4px; background:#121417; border:1px solid #333a42; text-align:center; position:relative; padding-top:8px;}
+  .sq-smps-led{display:inline-block; width:8px; height:8px; border-radius:50%; background:#2c3a2e; vertical-align:middle;}
+  .sq-smps-led.on{background:#3ddc84; box-shadow:0 0 6px #3ddc84;}
+  .sq-smps-ok{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#9aa6b2; margin-left:3px;}
+  .sq-smps-name{font:700 10px/1.3 'IBM Plex Sans',system-ui,sans-serif; color:#e8edf3; margin:12px 0 8px;}
+  .sq-smps-vent{position:absolute; left:10px; right:10px; bottom:8px; height:34px; background:repeating-linear-gradient(90deg,#2a2f35 0 3px,transparent 3px 6px);}
+  .sq-ocp .sq-smps-name{color:#ff6b5b;}
+
+  /* 릴레이 */
+  .sq-relay{background:linear-gradient(180deg,#2a3038,#1a1e23);}
+  .sq-relay8{width:104px;}
+  .sq-relay14{width:132px;}
+  .sq-relay-body{margin:5px 0; padding:6px; background:#11161b; border-radius:4px; text-align:center;}
+  .sq-relay-cap{position:relative; height:52px; margin:0 auto; width:70%; border-radius:4px; background:linear-gradient(135deg,rgba(220,235,255,.35),rgba(150,170,200,.15)); border:1px solid rgba(200,220,255,.45);}
+  .sq-relay-coil{position:absolute; left:20%; right:20%; top:12px; bottom:10px; border-radius:3px; background:repeating-linear-gradient(0deg,#b87333 0 2px,#8a5525 2px 4px); opacity:.85;}
+  .sq-relay-led{position:absolute; right:4px; top:4px; width:7px; height:7px; border-radius:50%; background:#3a2020;}
+  .sq-on .sq-relay-led{background:#ff453a; box-shadow:0 0 6px #ff453a;}
+  .sq-relay-name{font:600 8px/1.2 'IBM Plex Mono',ui-monospace,monospace; color:#9aa6b2; margin-top:4px;}
+
+  /* 타이머 */
+  .sq-timer{width:150px;}
+  .sq-timer-face{margin:5px 0; padding:6px; background:#f7f7f2; border:1px solid #b9bcb3; border-radius:4px; text-align:center;}
+  .sq-timer-top{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#333; display:flex; justify-content:center; align-items:center;}
+  .sq-timer-dial{position:relative; width:64px; height:64px; margin:6px auto; border-radius:50%; background:radial-gradient(circle,#fff 55%,#e3e5e0 56%); border:2px solid #9aa09a; display:flex; align-items:flex-end; justify-content:center; font:700 10px 'IBM Plex Mono',ui-monospace,monospace; color:#0b4a7a; padding-bottom:6px; box-sizing:border-box;}
+  .sq-timer-needle{position:absolute; left:50%; top:8px; width:2px; height:24px; margin-left:-1px; background:#c0392b; transform-origin:50% 24px; transform:rotate(-135deg);}
+  .sq-timer-set{display:flex; flex-direction:column; gap:3px; align-items:center; font:600 9px 'IBM Plex Sans',system-ui,sans-serif; color:#333;}
+  .sq-timer-set select, .sq-timer-set input, .sq-timesw-set select, .sq-timesw-set input, .sq-eocr-set input, .sq-vfd-set input, .sq-vfd-set select, .sq-motor select{font:600 9px 'IBM Plex Sans',system-ui,sans-serif; padding:1px 2px; border-radius:3px; border:1px solid #9aa0a6; background:#fff; color:#111;}
+  .sq-timer-set input{width:44px;}
+  .sq-timer-brand{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#666; margin-top:3px;}
+
+  /* 타임스위치 */
+  .sq-timesw{width:176px;}
+  .sq-timesw-face{margin-bottom:5px; padding:6px; background:#f4f3ee; border:1px solid #b9bcb3; border-radius:4px; text-align:center;}
+  .sq-timesw-top{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#333;}
+  .sq-timesw-dial{position:relative; width:96px; height:96px; margin:5px auto; border-radius:50%; background:#fff; border:3px solid #c9ccc4; display:flex; align-items:center; justify-content:center;}
+  .sq-timesw-ring{position:absolute; inset:4px; border-radius:50%; opacity:.75; -webkit-mask:radial-gradient(circle, transparent 62%, #000 63%); mask:radial-gradient(circle, transparent 62%, #000 63%);}
+  .sq-timesw-hand{position:absolute; left:50%; top:8px; width:3px; height:40px; margin-left:-1.5px; background:#2c3e50; transform-origin:50% 40px; border-radius:2px;}
+  .sq-timesw-clock{position:relative; font:700 12px 'IBM Plex Mono',ui-monospace,monospace; color:#0b4a7a; background:rgba(255,255,255,.85); padding:1px 3px; border-radius:3px; margin-top:34px;}
+  .sq-timesw-set{display:flex; flex-wrap:wrap; gap:3px; justify-content:center; font:600 9px 'IBM Plex Sans',system-ui,sans-serif; color:#333;}
+  .sq-timesw-set input{width:34px;}
+  .sq-timesw.sq-on .sq-timesw-dial{border-color:#f2a53d;}
+
+  /* PLC XBC-DR32H */
+  .sq-plc{width:470px; padding:4px 6px; background:linear-gradient(180deg,#cfd3d6,#b3b8bc); border-color:#8d949a; color:#111;}
+  .sq-plc .sq-tc{color:#15191d; font-size:8.5px;}
+  .sq-plc-strip{background:#2b2f33; border-radius:3px; padding:3px 4px; display:flex; flex-direction:column; gap:1px;}
+  .sq-plc-row{display:flex; gap:0;}
+  .sq-plc-row .sq-plc-t{width:36px; min-width:36px;}
+  .sq-plc-even{padding-left:18px;}
+  .sq-plc-strip .sq-tc{color:#e7ecf1;}
+  .sq-plc-face{display:flex; gap:6px; margin:4px 0; padding:6px; background:linear-gradient(180deg,#e9ecee,#d4d8db); border-radius:3px; border:1px solid #9aa1a7;}
+  .sq-plc-left{width:96px;}
+  .sq-plc-xgb{display:inline-block; background:#c8102e; color:#fff; font:800 11px 'IBM Plex Sans',system-ui,sans-serif; padding:1px 6px; border-radius:2px;}
+  .sq-plc-model{font:700 10px 'IBM Plex Mono',ui-monospace,monospace; color:#222; margin:3px 0;}
+  .sq-plc-st{display:flex; flex-direction:column; gap:2px; font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#333;}
+  .sq-plc-st i{display:inline-block; width:7px; height:7px; border-radius:50%; background:#5a5f64; margin-right:4px; vertical-align:middle;}
+  .sq-plc-st i.on{background:#3ddc84; box-shadow:0 0 5px #3ddc84;}
+  .sq-plc-st span:nth-child(3) i.on{background:#ff453a; box-shadow:0 0 5px #ff453a;}
+  .sq-plc-logo{font:800 9px 'IBM Plex Sans',system-ui,sans-serif; color:#0d5ab5; margin-top:5px;}
+  .sq-plc-center{flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center;}
+  .sq-plc-ledrow{display:flex; align-items:center; gap:1px; background:#1d2125; border-radius:3px; padding:3px 4px;}
+  .sq-plc-ledrow em{font:700 8px 'IBM Plex Mono',ui-monospace,monospace; color:#9aa6b2; font-style:normal; width:22px;}
+  .sq-plc-led{display:flex; flex-direction:column; align-items:center; width:15px;}
+  .sq-plc-led i{width:7px; height:5px; background:#3d2a14; border-radius:1px;}
+  .sq-plc-led i.on{background:#ffb020; box-shadow:0 0 5px #ffb020;}
+  .sq-plc-led b{font:600 6.5px 'IBM Plex Mono',ui-monospace,monospace; color:#9aa6b2;}
+  .sq-plc-right{width:42px; display:flex; flex-direction:column; gap:4px;}
+  .sq-plc-cover{flex:1; background:linear-gradient(180deg,#bfc4c8,#a7adb2); border-radius:2px; border:1px solid #8d949a;}
+
+  /* MC */
+  .sq-mc{width:172px;}
+  .sq-mc-body{display:flex; align-items:center; gap:6px; margin:5px 0; padding:6px; background:#f6f6f1; border:1px solid #bfc2ba; border-radius:4px;}
+  .sq-mc-window{width:34px; height:46px; background:#2b2f33; border-radius:3px; position:relative; overflow:hidden;}
+  .sq-mc-flag{position:absolute; left:6px; right:6px; height:16px; top:4px; background:#ff8c1a; border-radius:2px; transition:top .12s;}
+  .sq-mc.sq-on .sq-mc-flag{top:26px;}
+  .sq-mc-brand{flex:1; font:600 8.5px/1.3 'IBM Plex Sans',system-ui,sans-serif; color:#333;}
+  .sq-mc-brand b{color:#0d5ab5;}
+  .sq-mc-aux{display:flex; flex-direction:column; gap:2px;}
+  .sq-mc-aux > div{display:flex; gap:2px;}
+  .sq-mc.sq-on{box-shadow:0 0 0 2px #ff8c1a, 0 3px 8px rgba(0,0,0,.45);}
+
+  /* EOCR */
+  .sq-eocr{width:156px; background:linear-gradient(180deg,#26292d,#141619);}
+  .sq-eocr-body{margin:5px 0; padding:5px; background:#0f1113; border:1px solid #333a42; border-radius:4px; text-align:center;}
+  .sq-eocr-ct{display:flex; gap:10px; justify-content:center;}
+  .sq-eocr-ct i{width:22px; height:22px; border-radius:50%; background:#000; border:3px solid #3a3f45;}
+  .sq-eocr-brand{font:700 10px 'IBM Plex Sans',system-ui,sans-serif; color:#7fd1ff; margin:3px 0;}
+  .sq-eocr-leds{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#bbb;}
+  .sq-eocr-set{display:flex; flex-direction:column; gap:2px; font:600 8px 'IBM Plex Sans',system-ui,sans-serif; color:#ccc; margin:4px 0;}
+  .sq-eocr-set input{width:38px;}
+  .sq-eocr-btns{display:flex; gap:4px; justify-content:center;}
+
+  /* 인버터 */
+  .sq-vfd{width:190px; background:linear-gradient(180deg,#2d3a52,#1e2635); border-color:#46597a;}
+  .sq-vfd-head{font:700 12px 'IBM Plex Sans',system-ui,sans-serif; color:#fff;}
+  .sq-vfd-head small{display:block; font:500 8px 'IBM Plex Mono',ui-monospace,monospace; color:#9fb3d1;}
+  .sq-vfd-ls{background:#fff; color:#0d5ab5; padding:0 4px; border-radius:2px; font-weight:800;}
+  .sq-vfd-disp{margin:6px 0 2px; background:#0a0f0a; color:#ff3b30; font:700 22px 'IBM Plex Mono',ui-monospace,monospace; text-align:right; padding:4px 8px; border-radius:3px; letter-spacing:2px; min-height:32px; text-shadow:0 0 6px rgba(255,59,48,.6);}
+  .sq-vfd-stat{display:flex; gap:6px; justify-content:flex-end; font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#56627a;}
+  .sq-vfd-stat .on{color:#3ddc84;}
+  .sq-vfd-keys{display:flex; gap:4px; margin:6px 0;}
+  .sq-vfd-key{flex:1; font:700 9px/1.1 'IBM Plex Sans',system-ui,sans-serif; padding:5px 2px; border-radius:4px; border:1px solid #6b7c99; background:#344361; color:#fff; cursor:pointer;}
+  .sq-key-run{background:#1f6f43;}
+  .sq-key-stop{background:#7a1f1a;}
+  .sq-vfd-set{display:flex; flex-direction:column; gap:3px; padding:5px; margin-bottom:5px; background:#141a24; border-radius:4px; font:600 8.5px 'IBM Plex Sans',system-ui,sans-serif; color:#cfd8e6;}
+  .sq-vfd-set[hidden]{display:none;}
+  .sq-vfd-set label{display:flex; justify-content:space-between; align-items:center; gap:4px;}
+  .sq-vfd-st{display:grid; grid-template-columns:1fr 1fr; gap:2px 6px;}
+  .sq-vfd-ctl{padding:4px 0; background:#121822; border-radius:3px;}
+  .sq-vfd-body{height:150px; margin:4px 0; border-radius:4px; background:repeating-linear-gradient(90deg,#1a2130 0 4px,#232c3e 4px 8px);}
+
+  /* 전동기 */
+  .sq-motor{width:212px; background:linear-gradient(180deg,#2a2f35,#1b1f24);}
+  .sq-motor-body{display:flex; align-items:center; gap:6px; justify-content:center;}
+  .sq-motor-can{width:92px; height:92px; border-radius:50%; background:radial-gradient(circle,#30353b 30%,#121417 70%); border:3px solid #444b53; display:flex; align-items:center; justify-content:center;}
+  .sq-motor-fan{width:70px; height:70px; position:relative; animation:sq-spin 1s linear infinite; animation-play-state:paused;}
+  .sq-motor-fan i{position:absolute; left:50%; top:50%; width:32px; height:10px; margin:-5px 0 0 0; background:#9aa6b2; border-radius:0 6px 6px 0; transform-origin:0 50%;}
+  .sq-motor-fan i:nth-child(2){transform:rotate(120deg);} .sq-motor-fan i:nth-child(3){transform:rotate(240deg);}
+  @keyframes sq-spin{ to{ transform:rotate(360deg); } }
+  .sq-motor-plate{font:600 9px/1.3 'IBM Plex Mono',ui-monospace,monospace; color:#7fd1ff; background:#0f1d2b; padding:4px; border-radius:3px; text-align:center;}
+  .sq-motor-box{width:34px; height:50px; background:#e3e5e0; border-radius:3px;}
+  .sq-motor-stat{font:700 10px 'IBM Plex Sans',system-ui,sans-serif; text-align:center; margin:5px 0; color:#9aa6b2;}
+  .sq-motor.sq-on .sq-motor-stat{color:#3ddc84;}
+  .sq-motor.sq-ol .sq-motor-stat{color:#ff453a;}
+  .sq-motor .sq-row{flex-wrap:wrap; gap:4px; margin-bottom:4px;}
+
+  /* 단자대 */
+  .sq-tb{padding:5px 8px; background:#1a1d21;}
+  .sq-tb-row .sq-t{min-width:21px; width:21px;}
+  .sq-tb-body{display:flex; gap:3px; margin:3px 0; justify-content:center;}
+  .sq-tb-body i{width:21px; height:30px; background:linear-gradient(180deg,#3a3f45,#24282d); border-radius:2px; border:1px solid #4a525b;}
+
+  /* 입출력 명판 */
+  .sq-iopanel{width:252px; padding:8px 10px; background:linear-gradient(180deg,#d9dcdf,#c3c7cb); border-color:#8f969c; color:#1d2126;}
+  .sq-io-head{display:flex; flex-direction:column; align-items:center; font:600 9px 'IBM Plex Mono',ui-monospace,monospace; color:#333; margin-bottom:6px; position:relative;}
+  .sq-io-head b{font-size:11px;}
+  .sq-sound-btn{position:absolute; right:0; top:0; border:none; background:none; cursor:pointer; font-size:13px;}
+  .sq-io-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 8px;}
+  .sq-dev{display:flex; flex-direction:column; align-items:center; gap:3px; padding:5px 2px; background:rgba(255,255,255,.35); border-radius:6px; min-height:108px;}
+  .sq-dev-name{font:700 9px 'IBM Plex Mono',ui-monospace,monospace; color:#222;}
+  .sq-dev-name small{color:#b4570b;}
+  .sq-dev-terms{display:flex; gap:2px; flex-wrap:wrap; justify-content:center;}
+  .sq-dev .sq-tc{color:#20252b;}
+  .sq-pb-btn{width:44px; height:44px; border-radius:50%; border:4px solid #b8bec4; background:radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--pb) 70%, #fff), var(--pb) 60%, color-mix(in srgb, var(--pb) 60%, #000)); cursor:pointer; box-shadow:0 3px 0 #7b8288, 0 4px 8px rgba(0,0,0,.35); transition:transform .05s, box-shadow .05s;}
+  .sq-pb-btn.pressed{transform:translateY(3px); box-shadow:0 0 0 #7b8288, 0 1px 3px rgba(0,0,0,.35);}
+  .sq-pl-lens{width:42px; height:42px; border-radius:50%; border:4px solid #c9ced3; background:radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--pl) 30%, #fff), color-mix(in srgb, var(--pl) 35%, #333) 70%); box-shadow:inset 0 0 6px rgba(0,0,0,.4);}
+  .sq-pl-lens.lit{background:radial-gradient(circle at 45% 40%, #fff, var(--pl) 45%, color-mix(in srgb, var(--pl) 70%, #000)); box-shadow:0 0 14px 4px var(--pl), inset 0 0 4px rgba(255,255,255,.6);}
+  .sq-bz-face{width:42px; height:42px; border-radius:50%; background:radial-gradient(circle,#444 20%,#1a1a1a 22% 40%,#555 42%); border:4px solid #b8bec4; position:relative;}
+  .sq-bz-face.sounding{animation:sq-buzz .12s linear infinite; box-shadow:0 0 12px 3px #ffd60a;}
+  @keyframes sq-buzz{ 0%{transform:translate(0,0);} 50%{transform:translate(1px,-1px);} 100%{transform:translate(-1px,1px);} }
+  .sq-ss-knob{width:44px; height:44px; border-radius:50%; border:4px solid #b8bec4; background:#1a1a1a; cursor:pointer; position:relative;}
+  .sq-ss-knob i{position:absolute; left:50%; top:6px; bottom:6px; width:10px; margin-left:-5px; background:#444; border-radius:4px; transform:rotate(-40deg); transition:transform .15s;}
+  .sq-ss-knob.on i{transform:rotate(40deg);}
+  .sq-emg-btn{width:50px; height:50px; border-radius:50%; border:5px solid #ffcc00; background:radial-gradient(circle at 40% 35%,#ff6b5b,#d0021b 60%,#7a0010); cursor:pointer; box-shadow:0 4px 0 #8a6d00, 0 5px 8px rgba(0,0,0,.4);}
+  .sq-emg-btn.on{transform:translateY(4px); box-shadow:0 0 0 #8a6d00, 0 1px 3px rgba(0,0,0,.4); filter:brightness(.85);}
+  .sq-dev-spare{justify-content:center;}
+  .sq-spare-hole{width:40px; height:40px; border-radius:50%; background:#111; border:3px solid #9aa0a6;}
+  .sq-single{background:linear-gradient(180deg,#d9dcdf,#c3c7cb); color:#1d2126; border-color:#8f969c; width:118px;}
+  .sq-single .sq-dev{background:none;}
+
+  /* 실습장치 프레임 */
+  .placed-component[data-type="sq-board"]{z-index:1 !important; pointer-events:none;}
+  .placed-component[data-type="sq-board"] > .comp-rename-btn{display:none;}
+  .sq-board{position:relative; width:1740px; height:1210px; border-radius:10px; background:#c9cdd1; border:8px solid #e4e7ea; box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 0 0 1px #9aa1a7;}
+  .sq-board-handle{pointer-events:auto; position:absolute; left:14px; top:-34px; font:700 12px 'IBM Plex Sans',system-ui,sans-serif; color:#fff; background:#0d5ab5; border:none; border-radius:6px 6px 0 0; padding:6px 14px; cursor:grab;}
+  .sq-board-handle:active{cursor:grabbing;}
+  .sq-board-work{position:absolute; left:10px; top:10px; width:1430px; bottom:10px; border-radius:4px;
+    background-color:#b9bec3; background-image:radial-gradient(circle,#8e959b 2.2px,transparent 2.6px); background-size:12px 12px;}
+  .sq-duct{position:absolute; left:0; right:0; height:26px; background:repeating-linear-gradient(90deg,#eef0f1 0 10px,#d3d7da 10px 14px); border-top:1px solid #a7adb2; border-bottom:1px solid #a7adb2;}
+  .sq-duct-top{top:0;} .sq-duct-bot{bottom:0;}
+  .sq-rail{position:absolute; left:20px; right:20px; height:18px; background:linear-gradient(180deg,#e9ecee,#aab0b5 50%,#e9ecee); border:1px solid #8d949a; border-radius:2px;}
+  .sq-board-cap{position:absolute; left:12px; bottom:32px; font:600 10px 'IBM Plex Mono',ui-monospace,monospace; color:#555d65;}
+  .sq-board-plate{position:absolute; right:10px; top:10px; bottom:10px; width:276px; border-radius:4px; background:linear-gradient(180deg,#d2d6da,#bfc4c8); border:2px solid #a1a8ae;}
+  .sq-hinge{position:absolute; left:-10px; width:16px; height:60px; background:linear-gradient(90deg,#9aa1a7,#e4e7ea,#9aa1a7); border-radius:3px;}
+
+  /* 알림 배너 */
+  .sq-banner{position:fixed; left:50%; top:76px; transform:translateX(-50%); z-index:99999; max-width:min(760px,92vw); background:#2a1414; color:#ffd7d2; border:1px solid #ff6b5b; border-radius:10px; padding:10px 16px; font:600 13px/1.5 'IBM Plex Sans',sans-serif; box-shadow:0 10px 30px rgba(0,0,0,.5); cursor:pointer;}
+  .sq-banner[hidden]{display:none;}
+
+  /* 팔레트: 시퀀스회로 실습 */
+  .sq-pgroup > .palette-group-header{background:linear-gradient(90deg,rgba(13,90,181,.35),transparent); border-radius:6px;}
+  .sq-trainer-card{display:flex; gap:9px; align-items:center; padding:9px; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,#0d5ab5,#0a3f7e); color:#fff; border:1px solid #3f8ae0; box-shadow:0 3px 10px rgba(0,0,0,.35);}
+  .sq-trainer-card:hover{filter:brightness(1.12);}
+  .sq-trainer-card b{display:block; font-size:.86rem;}
+  .sq-trainer-card span{display:block; font-size:.66rem; color:#cfe3ff; margin-top:2px; line-height:1.3;}
+  .sq-tc-mini{flex:0 0 auto; width:46px; height:36px; border-radius:4px; background:#c9cdd1; border:2px solid #e4e7ea; position:relative;}
+  .sq-tc-mini i{position:absolute; left:3px; width:28px; height:5px; background:#7d858c; border-radius:1px;}
+  .sq-tc-mini i:nth-child(1){top:4px;} .sq-tc-mini i:nth-child(2){top:13px;} .sq-tc-mini i:nth-child(3){top:22px;}
+  .sq-tc-mini b{position:absolute; right:3px; top:3px; bottom:3px; width:9px; background:#9aa1a7; border-radius:1px;}
+
+  /* LS XBC-DR32H 래더 편집기 색상(기존 LS와 동일) */
+  .vendor-lsh .ladder-canvas{ --ladder-bg:#eef2f7; }
+  .vendor-lsh .rail{background:#0d5ab5;}
+  .vendor-lsh .contact-sym svg *{stroke:#12305c;}
+  .vendor-lsh .coil-sym-box{border-radius:2px;}
+  .vendor-lsh .coil-sym-box::before{content:'[';margin-right:2px;}
+  .vendor-lsh .coil-sym-box::after{content:']';margin-left:2px;}
 </style>
 </head>
 <body>
@@ -6000,7 +6250,7 @@ function deployToMCU(board, rawCode) {
       // serialRxBuffer['${board}']에서 꺼내 씁니다.
       const Serial = {
         begin: function() {},
-        print: function(v, opt) { const s = __fmtPrint(v, opt); logSerial(s, '${board}'); __serialTransmit('${board}', s); },
+        print: function(v, opt) { const s = __fmtPrint(v, opt); logSerial(s, '${board}', false); __serialTransmit('${board}', s); },
         println: function(v, opt) { const s = (v !== undefined) ? __fmtPrint(v, opt) : ''; logSerial(s, '${board}'); __serialTransmit('${board}', s + '\\n'); },
         write: function(v) { const s = (typeof v === 'number') ? String.fromCharCode(v) : String(v); __serialTransmit('${board}', s); },
         available: function() { return (serialRxBuffer['${board}'] || '').length; },
@@ -18536,10 +18786,10 @@ function rosLaunchStart(){
 function rosLaunchStop(){ rosStopLaunch(); }
 
 const serialBuf = {};
-function logSerial(msg, target = 'r4'){
+function logSerial(msg, target = 'r4', nl = true){
   const tgt = target === 'both' ? Object.keys(boardInstances) : [target];
   tgt.forEach(b => {
-    serialBuf[b] = (serialBuf[b] || '') + msg + '\n';
+    serialBuf[b] = (serialBuf[b] || '') + msg + (nl ? '\n' : '');
     serialBuf[b] = serialBuf[b].split('\n').slice(-250).join('\n');
     const el = document.getElementById(`serialLogs${b.toUpperCase()}`);
     if (el) { el.textContent = serialBuf[b]; el.scrollTop = el.scrollHeight; }
@@ -23689,6 +23939,66 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
+/* ==== [코드 자동 정리] 복사·붙여넣기로 딸려 온 "보이지 않는 특수문자" 정리 ====
+   웹페이지·카카오톡·한글(HWP)·AI 답변 등에서 코드를 복사하면 눈에 안 보이는 제로폭 공백(U+200B),
+   BOM(U+FEFF), 줄바꿈 없는 공백(NBSP), 전각 공백, 둥근 따옴표(“ ”), 전각 기호(；（）) 등이 섞여
+   들어와 "[Runtime Compile Error] Invalid or unexpected token"이 납니다. 컴파일 직전에 코드 부분만
+   안전하게 정리하고(문자열 "..." 안의 글자는 그대로 둠), 몇 개를 고쳤는지 콘솔에 알려 줍니다. */
+(function(){
+  if (typeof executeCompilerPipeline !== 'function') return;
+  const ZERO_WIDTH = /[​-‏‪-‮⁠-⁤﻿­]/;
+  const SPACE_LIKE = /[  -   　]/;
+  function cleanCode(src){
+    let out = '', fixed = 0, st = 'code';
+    for (let i = 0; i < src.length; i++){
+      let ch = src[i];
+      if (ZERO_WIDTH.test(ch)){ fixed++; continue; }                 // 어디에 있든 제거
+      if (st === 'code'){
+        if (SPACE_LIKE.test(ch)){ ch = ' '; fixed++; }
+        else if (ch === '“' || ch === '”' || ch === '„' || ch === '″' || ch === '＂'){ ch = '"'; fixed++; }
+        else if (ch === '‘' || ch === '’' || ch === '‚' || ch === '′' || ch === '＇'){ ch = "'"; fixed++; }
+        else if (ch === '–' || ch === '—' || ch === '−'){ ch = '-'; fixed++; }
+        else { const c = ch.charCodeAt(0); if (c >= 0xFF01 && c <= 0xFF5E){ ch = String.fromCharCode(c - 0xFEE0); fixed++; } }
+        // 상태 전환
+        if (ch === '/' && src[i+1] === '/'){ st = 'line'; }
+        else if (ch === '/' && src[i+1] === '*'){ st = 'block'; }
+        else if (ch === '"'){ st = 'str'; }
+        else if (ch === "'"){ st = 'chr'; }
+        out += ch;
+      } else if (st === 'line'){
+        if (SPACE_LIKE.test(ch)){ ch = ' '; fixed++; }
+        out += ch; if (ch === '\n') st = 'code';
+      } else if (st === 'block'){
+        out += ch; if (ch === '/' && src[i-1] === '*') st = 'code';
+      } else { // 문자열/문자 상수 — 내용은 그대로, 닫는 따옴표만 확인(둥근 따옴표로 닫힌 경우도 처리)
+        const q = st === 'str' ? '"' : "'";
+        if (ch === '\\'){ out += ch + (src[i+1] || ''); i++; continue; }
+        if (ch === '\n'){ st = 'code'; out += ch; continue; }
+        const isCloseFancy = st === 'str' ? (ch === '“' || ch === '”') : (ch === '‘' || ch === '’');
+        if (isCloseFancy){ ch = q; fixed++; }
+        out += ch; if (ch === q) st = 'code';
+      }
+    }
+    return { code: out, fixed };
+  }
+  window.__cleanSketchCode = cleanCode;
+  const _ecp = executeCompilerPipeline;
+  executeCompilerPipeline = function(board){
+    try {
+      const editor = document.getElementById(`codeEditor${String(board).toUpperCase()}`);
+      if (editor){
+        const r = cleanCode(editor.value);
+        if (r.fixed){
+          editor.value = r.code;
+          editor.dispatchEvent(new Event('input', { bubbles: true }));
+          setTimeout(() => logSerial(`[자동 정리] 복사·붙여넣기로 섞여 들어온 보이지 않는 특수문자(제로폭 공백·특수 공백·둥근 따옴표·전각 기호 등) ${r.fixed}개를 정리했습니다.`, board), 0);
+        }
+      }
+    } catch(e){ console.warn(e); }
+    return _ecp.apply(this, arguments);
+  };
+})();
+
 /* ==== [성능 개선] 부품이 많을 때 버벅임 줄이기 ====
    동작(계산 결과)은 그대로 두고, "같은 순간에 여러 번 반복하던 똑같은 조회"만 한 번으로 줄입니다.
    1) 시뮬레이션 1틱 동안: 부품 종류별 목록(document.querySelectorAll('.comp-…'))을 틱마다 한 번만 조회
