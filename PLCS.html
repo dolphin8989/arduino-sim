@@ -923,6 +923,256 @@
   body.ladder-top-min .ladder-drawer .ladder-toolbar > *, body.ladder-top-min .ladder-drawer .program-tabs > *{flex:0 0 auto; white-space:nowrap;}
   body.ladder-top-min .ladder-drawer .ladder-toolbar{margin-bottom:6px; padding:5px 10px;}
   body.ladder-top-min .ladder-drawer .program-tabs{margin-bottom:6px;}
+
+  /* ==== [시퀀스회로 실습] EZT ST-1801 실습장치 부품 ==== */
+  .sq{position:relative; padding:6px 7px 4px; border-radius:6px; font-family:'IBM Plex Sans',system-ui,sans-serif; color:#e8edf3; background:#22272e; border:1px solid #3b4450; box-shadow:0 3px 8px rgba(0,0,0,.45);}
+  .sq.sq-light{background:linear-gradient(180deg,#f4f5f2,#dfe1dc); color:#1d2126; border-color:#a7aba3;}
+  .sq .sq-row{display:flex; gap:3px; justify-content:center; align-items:flex-start;}
+  .sq .sq-row-tight{margin-top:2px;}
+  .sq-t{display:flex; flex-direction:column; align-items:center; gap:1px; min-width:22px;}
+  .sq-t-blank{visibility:hidden;}
+  .sq .pin-mini{width:11px; height:11px;}
+  .sq-tc{font:600 9px/1.05 'IBM Plex Mono',monospace; color:#d6dde6; white-space:nowrap;}
+  .sq-light .sq-tc{color:#20252b;}
+  .sq-t.sq-coilt .sq-tc{color:#ff9f43;}
+  .sq-light .sq-t.sq-coilt .sq-tc{color:#b4570b;}
+  .sq-label.comp-label{color:#c8d1db; margin-top:3px;}
+  .sq-light .sq-label.comp-label{color:#30363d;}
+  .sq-note{font:500 8px/1.2 'IBM Plex Mono',monospace; color:#aab4c0; text-align:center; margin-top:2px;}
+  .sq-note-dark{color:#3a414a;}
+  .sq-mini-btn{font:600 9px/1 'IBM Plex Sans',sans-serif; padding:3px 6px; border-radius:4px; border:1px solid #5b6672; background:#2b323b; color:#fff; cursor:pointer;}
+  .sq-mini-btn:hover{border-color:var(--teal);}
+  .sq-mini-btn.on{background:#c0392b; border-color:#ff6b5b;}
+  .sq-btn-red{background:#7a1f1a;}
+  .sq-dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:#3a3f45; margin:0 3px 0 6px; vertical-align:middle;}
+  .sq-dot.on{background:#3ddc84; box-shadow:0 0 6px #3ddc84;}
+  .sq-dot-out.on, .sq-dot-red.on{background:#ff453a; box-shadow:0 0 6px #ff453a;}
+  .sq-tripped{box-shadow:0 0 0 2px #ff453a, 0 3px 8px rgba(0,0,0,.45);}
+
+  /* 전원 인입 */
+  .sq-power{width:150px; text-align:center; background:#1b1f25;}
+  .sq-power-plug{font-size:22px;}
+  .sq-power-title{font:600 10px/1.25 'IBM Plex Sans',system-ui,sans-serif; margin:2px 0 6px;}
+  .sq-power-title small{font-weight:500; color:#9aa6b2;}
+
+  /* 차단기 */
+  .sq-brk{width:118px;}
+  .sq-brk2{width:84px;}
+  .sq-brk-body{margin:5px 0; padding:8px 4px; background:#fff; border:1px solid #b5b9b2; border-radius:4px; text-align:center;}
+  .sq-brk-brand{font:800 11px 'IBM Plex Sans',system-ui,sans-serif; color:#0d5ab5;}
+  .sq-brk-lever{display:block; margin:6px auto; width:30px; height:46px; border-radius:5px; border:1px solid #6b7078; background:#2d3238; cursor:pointer; position:relative;}
+  .sq-lever-knob{position:absolute; left:4px; right:4px; height:18px; bottom:4px; background:#e8e8e8; border-radius:3px; transition:bottom .15s;}
+  .sq-brk-lever.on .sq-lever-knob{bottom:24px; background:#ff3b30;}
+  .sq-brk-state{font:700 10px 'IBM Plex Mono',ui-monospace,monospace; color:#555;}
+  .sq-brk-lever.on + .sq-brk-state{color:#c0392b;}
+  .sq-tripped .sq-brk-state{color:#ff3b30;}
+  .sq-brk-spec{font:500 8px 'IBM Plex Mono',ui-monospace,monospace; color:#666;}
+
+  /* 퓨즈 */
+  .sq-fuse{width:84px;}
+  .sq-fuse-body{display:flex; gap:6px; justify-content:center; margin:6px 0; padding:8px 0; background:#e9eae6; border-radius:4px;}
+  .sq-fuse-cart{width:24px; height:56px; border-radius:4px; border:1px solid #888; background:rgba(255,255,255,.4); font:700 8px 'IBM Plex Mono',ui-monospace,monospace; color:#555; cursor:pointer; writing-mode:vertical-rl;}
+  .sq-fuse-cart.on{background:linear-gradient(90deg,#d9e7f2,#fff,#d9e7f2); color:#0b4a7a; border-color:#5d8bb0;}
+
+  /* SMPS */
+  .sq-smps{width:112px; background:linear-gradient(180deg,#2a2e33,#16191c);}
+  .sq-smps-body{margin:6px 0; height:150px; border-radius:4px; background:#121417; border:1px solid #333a42; text-align:center; position:relative; padding-top:8px;}
+  .sq-smps-led{display:inline-block; width:8px; height:8px; border-radius:50%; background:#2c3a2e; vertical-align:middle;}
+  .sq-smps-led.on{background:#3ddc84; box-shadow:0 0 6px #3ddc84;}
+  .sq-smps-ok{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#9aa6b2; margin-left:3px;}
+  .sq-smps-name{font:700 10px/1.3 'IBM Plex Sans',system-ui,sans-serif; color:#e8edf3; margin:12px 0 8px;}
+  .sq-smps-vent{position:absolute; left:10px; right:10px; bottom:8px; height:34px; background:repeating-linear-gradient(90deg,#2a2f35 0 3px,transparent 3px 6px);}
+  .sq-ocp .sq-smps-name{color:#ff6b5b;}
+
+  /* 릴레이 */
+  .sq-relay{background:linear-gradient(180deg,#2a3038,#1a1e23);}
+  .sq-relay8{width:104px;}
+  .sq-relay14{width:132px;}
+  .sq-relay-body{margin:5px 0; padding:6px; background:#11161b; border-radius:4px; text-align:center;}
+  .sq-relay-cap{position:relative; height:52px; margin:0 auto; width:70%; border-radius:4px; background:linear-gradient(135deg,rgba(220,235,255,.35),rgba(150,170,200,.15)); border:1px solid rgba(200,220,255,.45);}
+  .sq-relay-coil{position:absolute; left:20%; right:20%; top:12px; bottom:10px; border-radius:3px; background:repeating-linear-gradient(0deg,#b87333 0 2px,#8a5525 2px 4px); opacity:.85;}
+  .sq-relay-led{position:absolute; right:4px; top:4px; width:7px; height:7px; border-radius:50%; background:#3a2020;}
+  .sq-on .sq-relay-led{background:#ff453a; box-shadow:0 0 6px #ff453a;}
+  .sq-relay-name{font:600 8px/1.2 'IBM Plex Mono',ui-monospace,monospace; color:#9aa6b2; margin-top:4px;}
+
+  /* 타이머 */
+  .sq-timer{width:150px;}
+  .sq-timer-face{margin:5px 0; padding:6px; background:#f7f7f2; border:1px solid #b9bcb3; border-radius:4px; text-align:center;}
+  .sq-timer-top{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#333; display:flex; justify-content:center; align-items:center;}
+  .sq-timer-dial{position:relative; width:64px; height:64px; margin:6px auto; border-radius:50%; background:radial-gradient(circle,#fff 55%,#e3e5e0 56%); border:2px solid #9aa09a; display:flex; align-items:flex-end; justify-content:center; font:700 10px 'IBM Plex Mono',ui-monospace,monospace; color:#0b4a7a; padding-bottom:6px; box-sizing:border-box;}
+  .sq-timer-needle{position:absolute; left:50%; top:8px; width:2px; height:24px; margin-left:-1px; background:#c0392b; transform-origin:50% 24px; transform:rotate(-135deg);}
+  .sq-timer-set{display:flex; flex-direction:column; gap:3px; align-items:center; font:600 9px 'IBM Plex Sans',system-ui,sans-serif; color:#333;}
+  .sq-timer-set select, .sq-timer-set input, .sq-timesw-set select, .sq-timesw-set input, .sq-eocr-set input, .sq-vfd-set input, .sq-vfd-set select, .sq-motor select{font:600 9px 'IBM Plex Sans',system-ui,sans-serif; padding:1px 2px; border-radius:3px; border:1px solid #9aa0a6; background:#fff; color:#111;}
+  .sq-timer-set input{width:44px;}
+  .sq-timer-brand{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#666; margin-top:3px;}
+
+  /* 타임스위치 */
+  .sq-timesw{width:176px;}
+  .sq-timesw-face{margin-bottom:5px; padding:6px; background:#f4f3ee; border:1px solid #b9bcb3; border-radius:4px; text-align:center;}
+  .sq-timesw-top{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#333;}
+  .sq-timesw-dial{position:relative; width:96px; height:96px; margin:5px auto; border-radius:50%; background:#fff; border:3px solid #c9ccc4; display:flex; align-items:center; justify-content:center;}
+  .sq-timesw-ring{position:absolute; inset:4px; border-radius:50%; opacity:.75; -webkit-mask:radial-gradient(circle, transparent 62%, #000 63%); mask:radial-gradient(circle, transparent 62%, #000 63%);}
+  .sq-timesw-hand{position:absolute; left:50%; top:8px; width:3px; height:40px; margin-left:-1.5px; background:#2c3e50; transform-origin:50% 40px; border-radius:2px;}
+  .sq-timesw-clock{position:relative; font:700 12px 'IBM Plex Mono',ui-monospace,monospace; color:#0b4a7a; background:rgba(255,255,255,.85); padding:1px 3px; border-radius:3px; margin-top:34px;}
+  .sq-timesw-set{display:flex; flex-wrap:wrap; gap:3px; justify-content:center; font:600 9px 'IBM Plex Sans',system-ui,sans-serif; color:#333;}
+  .sq-timesw-set input{width:34px;}
+  .sq-timesw.sq-on .sq-timesw-dial{border-color:#f2a53d;}
+
+  /* PLC XBC-DR32H */
+  .sq-plc{width:470px; padding:4px 6px; background:linear-gradient(180deg,#cfd3d6,#b3b8bc); border-color:#8d949a; color:#111;}
+  .sq-plc .sq-tc{color:#15191d; font-size:8.5px;}
+  .sq-plc-strip{background:#2b2f33; border-radius:3px; padding:3px 4px; display:flex; flex-direction:column; gap:1px;}
+  .sq-plc-row{display:flex; gap:0;}
+  .sq-plc-row .sq-plc-t{width:36px; min-width:36px;}
+  .sq-plc-even{padding-left:18px;}
+  .sq-plc-strip .sq-tc{color:#e7ecf1;}
+  .sq-plc-face{display:flex; gap:6px; margin:4px 0; padding:6px; background:linear-gradient(180deg,#e9ecee,#d4d8db); border-radius:3px; border:1px solid #9aa1a7;}
+  .sq-plc-left{width:96px;}
+  .sq-plc-xgb{display:inline-block; background:#c8102e; color:#fff; font:800 11px 'IBM Plex Sans',system-ui,sans-serif; padding:1px 6px; border-radius:2px;}
+  .sq-plc-model{font:700 10px 'IBM Plex Mono',ui-monospace,monospace; color:#222; margin:3px 0;}
+  .sq-plc-st{display:flex; flex-direction:column; gap:2px; font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#333;}
+  .sq-plc-st i{display:inline-block; width:7px; height:7px; border-radius:50%; background:#5a5f64; margin-right:4px; vertical-align:middle;}
+  .sq-plc-st i.on{background:#3ddc84; box-shadow:0 0 5px #3ddc84;}
+  .sq-plc-st span:nth-child(3) i.on{background:#ff453a; box-shadow:0 0 5px #ff453a;}
+  .sq-plc-logo{font:800 9px 'IBM Plex Sans',system-ui,sans-serif; color:#0d5ab5; margin-top:5px;}
+  .sq-plc-center{flex:1; display:flex; flex-direction:column; gap:4px; justify-content:center;}
+  .sq-plc-ledrow{display:flex; align-items:center; gap:1px; background:#1d2125; border-radius:3px; padding:3px 4px;}
+  .sq-plc-ledrow em{font:700 8px 'IBM Plex Mono',ui-monospace,monospace; color:#9aa6b2; font-style:normal; width:22px;}
+  .sq-plc-led{display:flex; flex-direction:column; align-items:center; width:15px;}
+  .sq-plc-led i{width:7px; height:5px; background:#3d2a14; border-radius:1px;}
+  .sq-plc-led i.on{background:#ffb020; box-shadow:0 0 5px #ffb020;}
+  .sq-plc-led b{font:600 6.5px 'IBM Plex Mono',ui-monospace,monospace; color:#9aa6b2;}
+  .sq-plc-right{width:42px; display:flex; flex-direction:column; gap:4px;}
+  .sq-plc-cover{flex:1; background:linear-gradient(180deg,#bfc4c8,#a7adb2); border-radius:2px; border:1px solid #8d949a;}
+
+  /* MC */
+  .sq-mc{width:172px;}
+  .sq-mc-body{display:flex; align-items:center; gap:6px; margin:5px 0; padding:6px; background:#f6f6f1; border:1px solid #bfc2ba; border-radius:4px;}
+  .sq-mc-window{width:34px; height:46px; background:#2b2f33; border-radius:3px; position:relative; overflow:hidden;}
+  .sq-mc-flag{position:absolute; left:6px; right:6px; height:16px; top:4px; background:#ff8c1a; border-radius:2px; transition:top .12s;}
+  .sq-mc.sq-on .sq-mc-flag{top:26px;}
+  .sq-mc-brand{flex:1; font:600 8.5px/1.3 'IBM Plex Sans',system-ui,sans-serif; color:#333;}
+  .sq-mc-brand b{color:#0d5ab5;}
+  .sq-mc-aux{display:flex; flex-direction:column; gap:2px;}
+  .sq-mc-aux > div{display:flex; gap:2px;}
+  .sq-mc.sq-on{box-shadow:0 0 0 2px #ff8c1a, 0 3px 8px rgba(0,0,0,.45);}
+
+  /* EOCR */
+  .sq-eocr{width:156px; background:linear-gradient(180deg,#26292d,#141619);}
+  .sq-eocr-body{margin:5px 0; padding:5px; background:#0f1113; border:1px solid #333a42; border-radius:4px; text-align:center;}
+  .sq-eocr-ct{display:flex; gap:10px; justify-content:center;}
+  .sq-eocr-ct i{width:22px; height:22px; border-radius:50%; background:#000; border:3px solid #3a3f45;}
+  .sq-eocr-brand{font:700 10px 'IBM Plex Sans',system-ui,sans-serif; color:#7fd1ff; margin:3px 0;}
+  .sq-eocr-leds{font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#bbb;}
+  .sq-eocr-set{display:flex; flex-direction:column; gap:2px; font:600 8px 'IBM Plex Sans',system-ui,sans-serif; color:#ccc; margin:4px 0;}
+  .sq-eocr-set input{width:38px;}
+  .sq-eocr-btns{display:flex; gap:4px; justify-content:center;}
+
+  /* 인버터 */
+  .sq-vfd{width:190px; background:linear-gradient(180deg,#2d3a52,#1e2635); border-color:#46597a;}
+  .sq-vfd-head{font:700 12px 'IBM Plex Sans',system-ui,sans-serif; color:#fff;}
+  .sq-vfd-head small{display:block; font:500 8px 'IBM Plex Mono',ui-monospace,monospace; color:#9fb3d1;}
+  .sq-vfd-ls{background:#fff; color:#0d5ab5; padding:0 4px; border-radius:2px; font-weight:800;}
+  .sq-vfd-disp{margin:6px 0 2px; background:#0a0f0a; color:#ff3b30; font:700 22px 'IBM Plex Mono',ui-monospace,monospace; text-align:right; padding:4px 8px; border-radius:3px; letter-spacing:2px; min-height:32px; text-shadow:0 0 6px rgba(255,59,48,.6);}
+  .sq-vfd-stat{display:flex; gap:6px; justify-content:flex-end; font:600 8px 'IBM Plex Mono',ui-monospace,monospace; color:#56627a;}
+  .sq-vfd-stat .on{color:#3ddc84;}
+  .sq-vfd-keys{display:flex; gap:4px; margin:6px 0;}
+  .sq-vfd-key{flex:1; font:700 9px/1.1 'IBM Plex Sans',system-ui,sans-serif; padding:5px 2px; border-radius:4px; border:1px solid #6b7c99; background:#344361; color:#fff; cursor:pointer;}
+  .sq-key-run{background:#1f6f43;}
+  .sq-key-stop{background:#7a1f1a;}
+  .sq-vfd-set{display:flex; flex-direction:column; gap:3px; padding:5px; margin-bottom:5px; background:#141a24; border-radius:4px; font:600 8.5px 'IBM Plex Sans',system-ui,sans-serif; color:#cfd8e6;}
+  .sq-vfd-set[hidden]{display:none;}
+  .sq-vfd-set label{display:flex; justify-content:space-between; align-items:center; gap:4px;}
+  .sq-vfd-st{display:grid; grid-template-columns:1fr 1fr; gap:2px 6px;}
+  .sq-vfd-ctl{padding:4px 0; background:#121822; border-radius:3px;}
+  .sq-vfd-body{height:150px; margin:4px 0; border-radius:4px; background:repeating-linear-gradient(90deg,#1a2130 0 4px,#232c3e 4px 8px);}
+
+  /* 전동기 */
+  .sq-motor{width:212px; background:linear-gradient(180deg,#2a2f35,#1b1f24);}
+  .sq-motor-body{display:flex; align-items:center; gap:6px; justify-content:center;}
+  .sq-motor-can{width:92px; height:92px; border-radius:50%; background:radial-gradient(circle,#30353b 30%,#121417 70%); border:3px solid #444b53; display:flex; align-items:center; justify-content:center;}
+  .sq-motor-fan{width:70px; height:70px; position:relative; animation:sq-spin 1s linear infinite; animation-play-state:paused;}
+  .sq-motor-fan i{position:absolute; left:50%; top:50%; width:32px; height:10px; margin:-5px 0 0 0; background:#9aa6b2; border-radius:0 6px 6px 0; transform-origin:0 50%;}
+  .sq-motor-fan i:nth-child(2){transform:rotate(120deg);} .sq-motor-fan i:nth-child(3){transform:rotate(240deg);}
+  @keyframes sq-spin{ to{ transform:rotate(360deg); } }
+  .sq-motor-plate{font:600 9px/1.3 'IBM Plex Mono',ui-monospace,monospace; color:#7fd1ff; background:#0f1d2b; padding:4px; border-radius:3px; text-align:center;}
+  .sq-motor-box{width:34px; height:50px; background:#e3e5e0; border-radius:3px;}
+  .sq-motor-stat{font:700 10px 'IBM Plex Sans',system-ui,sans-serif; text-align:center; margin:5px 0; color:#9aa6b2;}
+  .sq-motor.sq-on .sq-motor-stat{color:#3ddc84;}
+  .sq-motor.sq-ol .sq-motor-stat{color:#ff453a;}
+  .sq-motor .sq-row{flex-wrap:wrap; gap:4px; margin-bottom:4px;}
+
+  /* 단자대 */
+  .sq-tb{padding:5px 8px; background:#1a1d21;}
+  .sq-tb-row .sq-t{min-width:21px; width:21px;}
+  .sq-tb-body{display:flex; gap:3px; margin:3px 0; justify-content:center;}
+  .sq-tb-body i{width:21px; height:30px; background:linear-gradient(180deg,#3a3f45,#24282d); border-radius:2px; border:1px solid #4a525b;}
+
+  /* 입출력 명판 */
+  .sq-iopanel{width:252px; padding:8px 10px; background:linear-gradient(180deg,#d9dcdf,#c3c7cb); border-color:#8f969c; color:#1d2126;}
+  .sq-io-head{display:flex; flex-direction:column; align-items:center; font:600 9px 'IBM Plex Mono',ui-monospace,monospace; color:#333; margin-bottom:6px; position:relative;}
+  .sq-io-head b{font-size:11px;}
+  .sq-sound-btn{position:absolute; right:0; top:0; border:none; background:none; cursor:pointer; font-size:13px;}
+  .sq-io-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 8px;}
+  .sq-dev{display:flex; flex-direction:column; align-items:center; gap:3px; padding:5px 2px; background:rgba(255,255,255,.35); border-radius:6px; min-height:108px;}
+  .sq-dev-name{font:700 9px 'IBM Plex Mono',ui-monospace,monospace; color:#222;}
+  .sq-dev-name small{color:#b4570b;}
+  .sq-dev-terms{display:flex; gap:2px; flex-wrap:wrap; justify-content:center;}
+  .sq-dev .sq-tc{color:#20252b;}
+  .sq-pb-btn{width:44px; height:44px; border-radius:50%; border:4px solid #b8bec4; background:radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--pb) 70%, #fff), var(--pb) 60%, color-mix(in srgb, var(--pb) 60%, #000)); cursor:pointer; box-shadow:0 3px 0 #7b8288, 0 4px 8px rgba(0,0,0,.35); transition:transform .05s, box-shadow .05s;}
+  .sq-pb-btn.pressed{transform:translateY(3px); box-shadow:0 0 0 #7b8288, 0 1px 3px rgba(0,0,0,.35);}
+  .sq-pl-lens{width:42px; height:42px; border-radius:50%; border:4px solid #c9ced3; background:radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--pl) 30%, #fff), color-mix(in srgb, var(--pl) 35%, #333) 70%); box-shadow:inset 0 0 6px rgba(0,0,0,.4);}
+  .sq-pl-lens.lit{background:radial-gradient(circle at 45% 40%, #fff, var(--pl) 45%, color-mix(in srgb, var(--pl) 70%, #000)); box-shadow:0 0 14px 4px var(--pl), inset 0 0 4px rgba(255,255,255,.6);}
+  .sq-bz-face{width:42px; height:42px; border-radius:50%; background:radial-gradient(circle,#444 20%,#1a1a1a 22% 40%,#555 42%); border:4px solid #b8bec4; position:relative;}
+  .sq-bz-face.sounding{animation:sq-buzz .12s linear infinite; box-shadow:0 0 12px 3px #ffd60a;}
+  @keyframes sq-buzz{ 0%{transform:translate(0,0);} 50%{transform:translate(1px,-1px);} 100%{transform:translate(-1px,1px);} }
+  .sq-ss-knob{width:44px; height:44px; border-radius:50%; border:4px solid #b8bec4; background:#1a1a1a; cursor:pointer; position:relative;}
+  .sq-ss-knob i{position:absolute; left:50%; top:6px; bottom:6px; width:10px; margin-left:-5px; background:#444; border-radius:4px; transform:rotate(-40deg); transition:transform .15s;}
+  .sq-ss-knob.on i{transform:rotate(40deg);}
+  .sq-emg-btn{width:50px; height:50px; border-radius:50%; border:5px solid #ffcc00; background:radial-gradient(circle at 40% 35%,#ff6b5b,#d0021b 60%,#7a0010); cursor:pointer; box-shadow:0 4px 0 #8a6d00, 0 5px 8px rgba(0,0,0,.4);}
+  .sq-emg-btn.on{transform:translateY(4px); box-shadow:0 0 0 #8a6d00, 0 1px 3px rgba(0,0,0,.4); filter:brightness(.85);}
+  .sq-dev-spare{justify-content:center;}
+  .sq-spare-hole{width:40px; height:40px; border-radius:50%; background:#111; border:3px solid #9aa0a6;}
+  .sq-single{background:linear-gradient(180deg,#d9dcdf,#c3c7cb); color:#1d2126; border-color:#8f969c; width:118px;}
+  .sq-single .sq-dev{background:none;}
+
+  /* 실습장치 프레임 */
+  .placed-component[data-type="sq-board"]{z-index:1 !important; pointer-events:none;}
+  .placed-component[data-type="sq-board"] > .comp-rename-btn{display:none;}
+  .sq-board{position:relative; width:1740px; height:1210px; border-radius:10px; background:#c9cdd1; border:8px solid #e4e7ea; box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 0 0 1px #9aa1a7;}
+  .sq-board-handle{pointer-events:auto; position:absolute; left:14px; top:-34px; font:700 12px 'IBM Plex Sans',system-ui,sans-serif; color:#fff; background:#0d5ab5; border:none; border-radius:6px 6px 0 0; padding:6px 14px; cursor:grab;}
+  .sq-board-handle:active{cursor:grabbing;}
+  .sq-board-work{position:absolute; left:10px; top:10px; width:1430px; bottom:10px; border-radius:4px;
+    background-color:#b9bec3; background-image:radial-gradient(circle,#8e959b 2.2px,transparent 2.6px); background-size:12px 12px;}
+  .sq-duct{position:absolute; left:0; right:0; height:26px; background:repeating-linear-gradient(90deg,#eef0f1 0 10px,#d3d7da 10px 14px); border-top:1px solid #a7adb2; border-bottom:1px solid #a7adb2;}
+  .sq-duct-top{top:0;} .sq-duct-bot{bottom:0;}
+  .sq-rail{position:absolute; left:20px; right:20px; height:18px; background:linear-gradient(180deg,#e9ecee,#aab0b5 50%,#e9ecee); border:1px solid #8d949a; border-radius:2px;}
+  .sq-board-cap{position:absolute; left:12px; bottom:32px; font:600 10px 'IBM Plex Mono',ui-monospace,monospace; color:#555d65;}
+  .sq-board-plate{position:absolute; right:10px; top:10px; bottom:10px; width:276px; border-radius:4px; background:linear-gradient(180deg,#d2d6da,#bfc4c8); border:2px solid #a1a8ae;}
+  .sq-hinge{position:absolute; left:-10px; width:16px; height:60px; background:linear-gradient(90deg,#9aa1a7,#e4e7ea,#9aa1a7); border-radius:3px;}
+
+  /* 알림 배너 */
+  .sq-banner{position:fixed; left:50%; top:76px; transform:translateX(-50%); z-index:99999; max-width:min(760px,92vw); background:#2a1414; color:#ffd7d2; border:1px solid #ff6b5b; border-radius:10px; padding:10px 16px; font:600 13px/1.5 'IBM Plex Sans',sans-serif; box-shadow:0 10px 30px rgba(0,0,0,.5); cursor:pointer;}
+  .sq-banner[hidden]{display:none;}
+
+  /* 팔레트: 시퀀스회로 실습 */
+  .sq-pgroup > .palette-group-header{background:linear-gradient(90deg,rgba(13,90,181,.35),transparent); border-radius:6px;}
+  .sq-trainer-card{display:flex; gap:9px; align-items:center; padding:9px; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,#0d5ab5,#0a3f7e); color:#fff; border:1px solid #3f8ae0; box-shadow:0 3px 10px rgba(0,0,0,.35);}
+  .sq-trainer-card:hover{filter:brightness(1.12);}
+  .sq-trainer-card b{display:block; font-size:.86rem;}
+  .sq-trainer-card span{display:block; font-size:.66rem; color:#cfe3ff; margin-top:2px; line-height:1.3;}
+  .sq-tc-mini{flex:0 0 auto; width:46px; height:36px; border-radius:4px; background:#c9cdd1; border:2px solid #e4e7ea; position:relative;}
+  .sq-tc-mini i{position:absolute; left:3px; width:28px; height:5px; background:#7d858c; border-radius:1px;}
+  .sq-tc-mini i:nth-child(1){top:4px;} .sq-tc-mini i:nth-child(2){top:13px;} .sq-tc-mini i:nth-child(3){top:22px;}
+  .sq-tc-mini b{position:absolute; right:3px; top:3px; bottom:3px; width:9px; background:#9aa1a7; border-radius:1px;}
+
+  /* LS XBC-DR32H 래더 편집기 색상(기존 LS와 동일) */
+  .vendor-lsh .ladder-canvas{ --ladder-bg:#eef2f7; }
+  .vendor-lsh .rail{background:#0d5ab5;}
+  .vendor-lsh .contact-sym svg *{stroke:#12305c;}
+  .vendor-lsh .coil-sym-box{border-radius:2px;}
+  .vendor-lsh .coil-sym-box::before{content:'[';margin-right:2px;}
+  .vendor-lsh .coil-sym-box::after{content:']';margin-left:2px;}
 </style>
 </head>
 <body>
@@ -10355,6 +10605,1025 @@ init();
   scan();
   // 새로 열리는 에디터 창에 버튼을 붙이기 위한 가벼운 주기 확인(시뮬레이션 중 DOM 변경 감시 부담 없음)
   setInterval(scan, 700);
+})();
+
+</script>
+<script>
+/* =====================================================================
+   [시퀀스회로 실습] EZT ST-1801 시퀀스 실습장치 — 부품 + "실습장치 판" 자동 배치
+   교재(전기시퀀스 실습장비) 단자 번호 그대로:
+     · 8핀 릴레이: 코일 2-7, a접점 1-3 · 8-6, b접점 1-4 · 8-5
+     · 14핀 릴레이(MY4): 코일 13-14, a 9-5·10-6·11-7·12-8, b 9-1·10-2·11-3·12-4
+     · 타이머(AT8N 8핀): 전원 2-7, 순시 1-3(a)·1-4(b), 한시 8-6(a)·8-5(b) — 모드 ON/OFF딜레이·플리커·인터벌
+     · 전자접촉기(MC-22b): 코일 A1-A2, 주접점 1/L1·3/L2·5/L3 → 2/T1·4/T2·6/T3, 보조 13-14·43-44(a), 21-22·31-32(b)
+     · EOCR: 전원 A1-A2, 95-96(b), 97-98(a), 주회로 관통(L→T)
+     · 타임스위치: U1-U2 전원, COM-NO / COM-NC
+     · PLC LS XGB XBC-DR32H: 입력 P00~P0F(COM, 24V/24G 서비스전원), 릴레이 출력 P20~P2F(COM0~COM3), AC100~240V
+     · 인버터 LS G100C: R/S/T → U/V/W, P1(정)·P2(역)·P3~P5(다단속)·CM
+   ===================================================================== */
+(function(){
+  if (typeof COMPONENT_DEFS === 'undefined' || typeof VENDOR_META === 'undefined') return;
+
+  /* ---------------- 공통 도우미 ---------------- */
+  const PIN = (id, suf) => document.getElementById(id + '_' + suf);
+  const nowMs = () => performance.now();
+  const RT = {}; // 부품별 실행 상태(타이머 경과 등 — 저장하지 않는 값)
+  const rt = (id) => (RT[id] || (RT[id] = {}));
+  function T(id, suf, cap, role, extra){
+    return `<div class="sq-t ${extra||''}" title="${cap}"><div class="pin-mini role-${role||'sig'}" data-pin="${id}_${suf}" id="${id}_${suf}"></div><span class="sq-tc">${cap}</span></div>`;
+  }
+  function TT(id, suf, cap, role, extra){ // 이름표가 단자 위
+    return `<div class="sq-t sq-t-up ${extra||''}" title="${cap}"><span class="sq-tc">${cap}</span><div class="pin-mini role-${role||'sig'}" data-pin="${id}_${suf}" id="${id}_${suf}"></div></div>`;
+  }
+  function PAIR(id, a, b, key, closed){
+    return `<div class="contact-pair" data-closed="${closed?1:0}" data-pin-a="${id}_${a}" data-pin-b="${id}_${b}" id="${id}_cp_${key}" hidden></div>`;
+  }
+  function setPair(id, key, on){ const el = document.getElementById(id + '_cp_' + key); if (el) el.dataset.closed = on ? '1' : '0'; }
+  const HELP = (type) => `<button class="comp-help-btn" onclick="showCompHelp(this,'${type}')">?</button>`;
+  const LABEL = (def) => `<div class="comp-label sq-label">${labelOf(def)}</div>`;
+  const PHASES = ['acr','acs','act','acl','acn'];
+  function phasesOf(st){ return st ? PHASES.filter(p => st.ac && st.ac.has(p)) : []; }
+  // 두 단자 사이에 전압이 걸려 있는가? → 'ac' | 'dc' | null
+  function VOLT(a, b, nets, stateOf, netOfPin){
+    if (!a || !b) return null;
+    const na = netOfPin(a, nets), nb = netOfPin(b, nets);
+    if (na === nb) return null;
+    const A = stateOf(na), B = stateOf(nb);
+    if ((A.dc24p && B.dc24n) || (A.dc24n && B.dc24p)) return 'dc';
+    const pa = phasesOf(A), pb = phasesOf(B);
+    if (pa.length && pb.length && pa.some(x => pb.some(y => y !== x))) return 'ac';
+    return null;
+  }
+  const sameNet = (a, b, nets, netOfPin) => !!(a && b && netOfPin(a, nets) === netOfPin(b, nets));
+  function kick(){ try { evaluateElectricalNets(); } catch(e){} }
+
+  /* ---------------- 알림 배너(단락 등) ---------------- */
+  let bannerTimer = null;
+  function sqBanner(msg){
+    let el = document.getElementById('sqBanner');
+    if (!el){ el = document.createElement('div'); el.id = 'sqBanner'; el.className = 'sq-banner'; document.body.appendChild(el); el.onclick = () => { el.hidden = true; }; }
+    el.textContent = msg; el.hidden = false;
+    clearTimeout(bannerTimer); bannerTimer = setTimeout(() => { el.hidden = true; }, 7000);
+  }
+
+  /* ======================= 전원 인입 ======================= */
+  function powerRender(id, def){
+    return `<div class="comp-box sq sq-power">${HELP(def.type)}
+      <div class="sq-power-plug">🔌</div>
+      <div class="sq-power-title">AC 3φ 220V 60Hz<br><small>전원 인입(전원 코드)</small></div>
+      <div class="sq-row">${T(id,'R','R','acr')}${T(id,'S','S','acs')}${T(id,'T','T','act')}${T(id,'E','E','pe')}</div>
+      ${LABEL(def)}</div>`;
+  }
+  function powerSource(comp, nets, stateOf, netOfPin){
+    if (!powerOn) return;
+    [['R','acr'],['S','acs'],['T','act'],['E','pe']].forEach(([s, role]) => { const p = PIN(comp.id, s); if (p) stateOf(netOfPin(p, nets)).ac.add(role); });
+  }
+
+  /* ======================= 차단기(MCCB 3P / CP 2P) ======================= */
+  function breakerRender(poles){
+    return function(id, def){
+      const L = poles === 3 ? [['1','1/L1','acr'],['3','3/L2','acs'],['5','5/L3','act']] : [['1','1','acr'],['3','3','act']];
+      const O = poles === 3 ? [['2','2/T1','acr'],['4','4/T2','acs'],['6','6/T3','act']] : [['2','2','acr'],['4','4','act']];
+      return `<div class="comp-box sq sq-light sq-brk sq-brk${poles}">${HELP(def.type)}
+        <div class="sq-row">${L.map(x => TT(id,'L'+x[0],x[1],x[2])).join('')}</div>
+        <div class="sq-brk-body">
+          <div class="sq-brk-brand">${poles===3?'LS':'CP'}</div>
+          <button type="button" class="sq-brk-lever" data-persist="on" data-on="0" onclick="sqBreakerToggle('${id}')"><span class="sq-lever-knob"></span></button>
+          <div class="sq-brk-state" id="${id}_state">OFF</div>
+          <div class="sq-brk-spec">${poles===3?'ABS33c 30A':'CP 2P 5A'}</div>
+        </div>
+        <div class="sq-row">${O.map(x => T(id,'O'+x[0],x[1],x[2])).join('')}</div>
+        ${L.map((x,i) => PAIR(id,'L'+x[0],'O'+O[i][0],'p'+i,false)).join('')}
+        ${LABEL(def)}</div>`;
+    };
+  }
+  window.sqBreakerToggle = function(id){
+    const comp = document.getElementById(id); if (!comp) return;
+    const lev = comp.querySelector('.sq-brk-lever');
+    const on = lev.dataset.on !== '1';
+    lev.dataset.on = on ? '1' : '0'; lev.classList.toggle('on', on);
+    comp.dataset.tripped = '0';
+    breakerSync(comp); kick();
+  };
+  function breakerSync(comp){
+    const lev = comp.querySelector('.sq-brk-lever'); if (!lev) return;
+    const on = lev.dataset.on === '1';
+    lev.classList.toggle('on', on);
+    comp.querySelectorAll('.contact-pair').forEach(p => { p.dataset.closed = on ? '1' : '0'; });
+    const st = document.getElementById(comp.id + '_state');
+    if (st) st.textContent = comp.dataset.tripped === '1' ? 'TRIP' : (on ? 'ON' : 'OFF');
+    comp.classList.toggle('sq-tripped', comp.dataset.tripped === '1');
+  }
+  function breakerTrip(comp){
+    const lev = comp.querySelector('.sq-brk-lever'); if (!lev) return;
+    lev.dataset.on = '0'; comp.dataset.tripped = '1'; breakerSync(comp);
+  }
+
+  /* ======================= 퓨즈 홀더 2P ======================= */
+  function fuseRender(id, def){
+    return `<div class="comp-box sq sq-light sq-fuse">${HELP(def.type)}
+      <div class="sq-row">${TT(id,'F1A','1','sig')}${TT(id,'F2A','3','sig')}</div>
+      <div class="sq-fuse-body">
+        <button type="button" class="sq-fuse-cart on" data-persist="f1" data-on="1" onclick="sqFuseToggle('${id}',this)">F1</button>
+        <button type="button" class="sq-fuse-cart on" data-persist="f2" data-on="1" onclick="sqFuseToggle('${id}',this)">F2</button>
+      </div>
+      <div class="sq-row">${T(id,'F1B','2','sig')}${T(id,'F2B','4','sig')}</div>
+      ${PAIR(id,'F1A','F1B','f1',true)}${PAIR(id,'F2A','F2B','f2',true)}
+      ${LABEL(def)}</div>`;
+  }
+  window.sqFuseToggle = function(id, btn){
+    const on = btn.dataset.on !== '1'; btn.dataset.on = on ? '1' : '0'; btn.classList.toggle('on', on);
+    fuseSync(document.getElementById(id)); kick();
+  };
+  function fuseSync(comp){
+    if (!comp) return;
+    comp.querySelectorAll('.sq-fuse-cart').forEach(b => { b.classList.toggle('on', b.dataset.on === '1'); setPair(comp.id, b.dataset.persist, b.dataset.on === '1'); });
+  }
+
+  /* ======================= SMPS 24V ======================= */
+  function smpsRender(id, def){
+    return `<div class="comp-box sq sq-smps">${HELP(def.type)}
+      <div class="sq-row">${TT(id,'VP1','+V','dc24p')}${TT(id,'VP2','+V','dc24p')}${TT(id,'VN1','-V','dc24n')}${TT(id,'VN2','-V','dc24n')}</div>
+      <div class="sq-smps-body">
+        <div class="sq-smps-led" id="${id}_dcok"></div><span class="sq-smps-ok">DC OK</span>
+        <div class="sq-smps-name">SMPS<br>DC 24V 2.5A</div>
+        <button type="button" class="sq-mini-btn" onclick="sqSmpsReset('${id}')" title="과전류 보호 해제">RESET</button>
+        <div class="sq-smps-vent"></div>
+      </div>
+      <div class="sq-row">${T(id,'L','L','acl')}${T(id,'N','N','acn')}${T(id,'FG','⏚','pe')}</div>
+      ${PAIR(id,'VP1','VP2','p',true)}${PAIR(id,'VN1','VN2','n',true)}
+      ${LABEL(def)}</div>`;
+  }
+  window.sqSmpsReset = function(id){ const c = document.getElementById(id); if (c){ c.dataset.ocp = '0'; kick(); } };
+  function smpsSource(comp, nets, stateOf, netOfPin){
+    if (comp.dataset.pw !== '1' || comp.dataset.ocp === '1') return;
+    ['VP1','VP2'].forEach(s => { const p = PIN(comp.id, s); if (p) stateOf(netOfPin(p, nets)).dc24p = true; });
+    ['VN1','VN2'].forEach(s => { const p = PIN(comp.id, s); if (p) stateOf(netOfPin(p, nets)).dc24n = true; });
+  }
+  function smpsLoad(comp, nets, stateOf, netOfPin){
+    const pw = !!VOLT(PIN(comp.id,'L'), PIN(comp.id,'N'), nets, stateOf, netOfPin);
+    if (!pw) comp.dataset.ocp = '0'; // 입력 전원을 내리면 보호 해제
+    comp.dataset.pw = pw ? '1' : '0';
+  }
+  function smpsVisual(comp){
+    const led = document.getElementById(comp.id + '_dcok');
+    if (led) led.classList.toggle('on', comp.dataset.pw === '1' && comp.dataset.ocp !== '1');
+    comp.classList.toggle('sq-ocp', comp.dataset.ocp === '1');
+  }
+
+  /* ======================= 릴레이 (8핀 / 14핀) ======================= */
+  function relay8Render(id, def){
+    // 교재 기구 배치도: 위 ⑥⑤④③ / 아래 ⑦⑧①②
+    return `<div class="comp-box sq sq-relay sq-relay8">${HELP(def.type)}
+      <div class="sq-row">${TT(id,'6','6')}${TT(id,'5','5')}${TT(id,'4','4')}${TT(id,'3','3')}</div>
+      <div class="sq-relay-body"><div class="sq-relay-cap"><div class="sq-relay-coil"></div><div class="sq-relay-led" id="${id}_led"></div></div><div class="sq-relay-name">8P RELAY<br>AC220V</div></div>
+      <div class="sq-row">${T(id,'7','7')}${T(id,'8','8')}${T(id,'1','1')}${T(id,'2','2')}</div>
+      ${PAIR(id,'1','3','a1',false)}${PAIR(id,'1','4','b1',true)}${PAIR(id,'8','6','a2',false)}${PAIR(id,'8','5','b2',true)}
+      <div class="sq-note">코일 2-7 · a 1-3, 8-6 · b 1-4, 8-5</div>
+      ${LABEL(def)}</div>`;
+  }
+  function relay8Load(comp, nets, stateOf, netOfPin){
+    const e = !!VOLT(PIN(comp.id,'2'), PIN(comp.id,'7'), nets, stateOf, netOfPin);
+    comp.classList.toggle('sq-on', e);
+    setPair(comp.id,'a1',e); setPair(comp.id,'a2',e); setPair(comp.id,'b1',!e); setPair(comp.id,'b2',!e);
+  }
+  function relay14Render(id, def){
+    return `<div class="comp-box sq sq-relay sq-relay14">${HELP(def.type)}
+      <div class="sq-row">${TT(id,'9','9')}${TT(id,'10','10')}${TT(id,'11','11')}${TT(id,'12','12')}${TT(id,'13','13','sig','sq-coilt')}</div>
+      <div class="sq-relay-body"><div class="sq-relay-cap"><div class="sq-relay-coil"></div><div class="sq-relay-led" id="${id}_led"></div></div><div class="sq-relay-name">MY4 14P<br>AC220V</div></div>
+      <div class="sq-row">${T(id,'5','5')}${T(id,'6','6')}${T(id,'7','7')}${T(id,'8','8')}<div class="sq-t sq-t-blank"></div></div>
+      <div class="sq-row">${T(id,'1','1')}${T(id,'2','2')}${T(id,'3','3')}${T(id,'4','4')}${T(id,'14','14','sig','sq-coilt')}</div>
+      ${[9,10,11,12].map((c,i) => PAIR(id,String(c),String(5+i),'a'+i,false) + PAIR(id,String(c),String(1+i),'b'+i,true)).join('')}
+      <div class="sq-note">코일 13-14 · a 9-5…12-8 · b 9-1…12-4</div>
+      ${LABEL(def)}</div>`;
+  }
+  function relay14Load(comp, nets, stateOf, netOfPin){
+    const e = !!VOLT(PIN(comp.id,'13'), PIN(comp.id,'14'), nets, stateOf, netOfPin);
+    comp.classList.toggle('sq-on', e);
+    for (let i = 0; i < 4; i++){ setPair(comp.id,'a'+i,e); setPair(comp.id,'b'+i,!e); }
+  }
+
+  /* ======================= 타이머 (AT8N 8핀, 멀티모드) ======================= */
+  function timerRender(id, def){
+    return `<div class="comp-box sq sq-light sq-timer">${HELP(def.type)}
+      <div class="sq-row">${TT(id,'6','6')}${TT(id,'5','5')}${TT(id,'4','4')}${TT(id,'3','3')}</div>
+      <div class="sq-timer-face">
+        <div class="sq-timer-top"><span class="sq-dot" id="${id}_pwr"></span>POWER<span class="sq-dot sq-dot-out" id="${id}_out"></span>OUT</div>
+        <div class="sq-timer-dial" id="${id}_dial"><div class="sq-timer-needle" id="${id}_needle"></div><span id="${id}_rem">0.0</span></div>
+        <div class="sq-timer-set">
+          <select data-persist="mode" title="동작 모드" onchange="sqTimerReset('${id}')">
+            <option value="on">A: ON 딜레이</option><option value="off">OFF 딜레이</option><option value="fk">F: 플리커</option><option value="iv">I: 인터벌</option>
+          </select>
+          <label>설정 <input type="number" data-persist="sp" value="3" min="0.1" max="999" step="0.1" onchange="sqTimerReset('${id}')">초</label>
+        </div>
+        <div class="sq-timer-brand">Autonics AT8N</div>
+      </div>
+      <div class="sq-row">${T(id,'7','7')}${T(id,'8','8')}${T(id,'1','1')}${T(id,'2','2')}</div>
+      ${PAIR(id,'1','3','ia',false)}${PAIR(id,'1','4','ib',true)}${PAIR(id,'8','6','ta',false)}${PAIR(id,'8','5','tb',true)}
+      <div class="sq-note sq-note-dark">전원 2-7 · 순시 1-3(a) 1-4(b) · 한시 8-6(a) 8-5(b)</div>
+      ${LABEL(def)}</div>`;
+  }
+  window.sqTimerReset = function(id){ RT[id] = {}; kick(); };
+  function timerLoad(comp, nets, stateOf, netOfPin){
+    const id = comp.id, s = rt(id);
+    const e = !!VOLT(PIN(id,'2'), PIN(id,'7'), nets, stateOf, netOfPin);
+    const mode = comp.querySelector('[data-persist="mode"]')?.value || 'on';
+    const sp = Math.max(0.1, parseFloat(comp.querySelector('[data-persist="sp"]')?.value) || 3) * 1000;
+    const t = nowMs();
+    let timed = false, rem = 0, frac = 0;
+    if (e && !s.on){ s.on = true; s.t0 = t; s.off0 = null; }
+    if (!e && s.on){ s.on = false; s.off0 = t; }
+    if (mode === 'on'){
+      if (e){ const el = t - s.t0; timed = el >= sp; rem = Math.max(0, sp - el); frac = Math.min(1, el / sp); }
+    } else if (mode === 'off'){
+      if (e){ timed = true; frac = 0; rem = sp; }
+      else if (s.off0 != null){ const el = t - s.off0; timed = el < sp; rem = Math.max(0, sp - el); frac = Math.min(1, el / sp); if (!timed) s.off0 = null; }
+    } else if (mode === 'fk'){
+      if (e){ const el = t - s.t0; const k = Math.floor(el / sp); timed = (k % 2) === 0; rem = sp - (el % sp); frac = (el % sp) / sp; }
+    } else { // 인터벌
+      if (e){ const el = t - s.t0; timed = el < sp; rem = Math.max(0, sp - el); frac = Math.min(1, el / sp); }
+    }
+    setPair(id,'ia',e); setPair(id,'ib',!e); setPair(id,'ta',timed); setPair(id,'tb',!timed);
+    s.view = { e, timed, rem, frac };
+  }
+  function timerVisual(comp){
+    const s = RT[comp.id]; const v = (s && s.view) || { e:false, timed:false, rem:0, frac:0 };
+    const pw = document.getElementById(comp.id + '_pwr'), out = document.getElementById(comp.id + '_out');
+    if (pw) pw.classList.toggle('on', v.e || v.timed);
+    if (out) out.classList.toggle('on', v.timed);
+    const r = document.getElementById(comp.id + '_rem'); if (r) r.textContent = (v.rem / 1000).toFixed(1);
+    const n = document.getElementById(comp.id + '_needle'); if (n) n.style.transform = `rotate(${-135 + 270 * v.frac}deg)`;
+  }
+
+  /* ======================= 24시간 타임스위치 ======================= */
+  function timeswRender(id, def){
+    return `<div class="comp-box sq sq-light sq-timesw">${HELP(def.type)}
+      <div class="sq-timesw-face">
+        <div class="sq-timesw-top"><span class="sq-dot" id="${id}_pwr"></span>POWER</div>
+        <div class="sq-timesw-dial"><div class="sq-timesw-ring" id="${id}_ring"></div><div class="sq-timesw-hand" id="${id}_hand"></div><span class="sq-timesw-clock" id="${id}_clk">--:--</span></div>
+        <div class="sq-timesw-set">
+          <select data-persist="mode" title="절환 스위치" onchange="sqTsKick()"><option value="auto">AUTO(설정 시간)</option><option value="on">상시 ON</option></select>
+          <label>ON <input type="number" data-persist="onh" value="18" min="0" max="23" step="1" onchange="sqTsKick()">시</label>
+          <label>OFF <input type="number" data-persist="offh" value="6" min="0" max="23" step="1" onchange="sqTsKick()">시</label>
+          <select data-persist="spd" title="시뮬레이션 시계 속도"><option value="1">실제 시간</option><option value="60">×60 (1분=1초)</option><option value="600">×600</option><option value="3600">×3600 (1시간=1초)</option></select>
+          <button type="button" class="sq-mini-btn" onclick="sqTsSet('${id}')">시각 설정</button>
+        </div>
+      </div>
+      <div class="sq-row">${T(id,'U1','U1')}${T(id,'U2','U2')}${T(id,'COM','COM')}${T(id,'NO','NO')}${T(id,'NC','NC')}</div>
+      ${PAIR(id,'COM','NO','no',false)}${PAIR(id,'COM','NC','nc',true)}
+      ${LABEL(def)}</div>`;
+  }
+  window.sqTsKick = kick;
+  window.sqTsSet = function(id){
+    const s = rt(id); const cur = s.min != null ? s.min : nowMinutes();
+    const v = prompt('타임스위치 현재 시각을 입력하세요 (예: 17:58)', fmtHM(cur));
+    if (!v) return; const m = /^(\d{1,2}):(\d{2})$/.exec(v.trim()); if (!m) return;
+    s.min = (parseInt(m[1],10) % 24) * 60 + (parseInt(m[2],10) % 60); kick();
+  };
+  function nowMinutes(){ const d = new Date(); return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60; }
+  function fmtHM(min){ min = ((min % 1440) + 1440) % 1440; const h = Math.floor(min / 60), m = Math.floor(min % 60); return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0'); }
+  function timeswLoad(comp, nets, stateOf, netOfPin){
+    const id = comp.id, s = rt(id), t = nowMs();
+    if (s.min == null) s.min = nowMinutes();
+    const pw = !!VOLT(PIN(id,'U1'), PIN(id,'U2'), nets, stateOf, netOfPin);
+    const spd = parseFloat(comp.querySelector('[data-persist="spd"]')?.value) || 1;
+    if (pw && s.lt != null) s.min = (s.min + (t - s.lt) / 60000 * spd) % 1440;
+    s.lt = t; s.pw = pw;
+    const mode = comp.querySelector('[data-persist="mode"]')?.value || 'auto';
+    const onh = (parseInt(comp.querySelector('[data-persist="onh"]')?.value,10) || 0) % 24;
+    const offh = (parseInt(comp.querySelector('[data-persist="offh"]')?.value,10) || 0) % 24;
+    const h = s.min / 60;
+    const inWin = onh === offh ? false : (onh < offh ? (h >= onh && h < offh) : (h >= onh || h < offh));
+    const on = mode === 'on' || inWin;
+    s.on = on;
+    setPair(id,'no',on); setPair(id,'nc',!on);
+  }
+  function timeswVisual(comp){
+    const s = RT[comp.id] || {};
+    const c = document.getElementById(comp.id + '_clk'); if (c) c.textContent = fmtHM(s.min != null ? s.min : nowMinutes());
+    const hand = document.getElementById(comp.id + '_hand'); if (hand) hand.style.transform = `rotate(${((s.min||0) / 1440) * 360}deg)`;
+    const pw = document.getElementById(comp.id + '_pwr'); if (pw) pw.classList.toggle('on', !!s.pw);
+    const onh = (parseInt(comp.querySelector('[data-persist="onh"]')?.value,10) || 0) % 24;
+    const offh = (parseInt(comp.querySelector('[data-persist="offh"]')?.value,10) || 0) % 24;
+    const ring = document.getElementById(comp.id + '_ring');
+    if (ring){
+      const a = onh / 24 * 360, b = offh / 24 * 360;
+      ring.style.background = a <= b
+        ? `conic-gradient(transparent 0 ${a}deg, #f2a53d ${a}deg ${b}deg, transparent ${b}deg)`
+        : `conic-gradient(#f2a53d 0 ${b}deg, transparent ${b}deg ${a}deg, #f2a53d ${a}deg 360deg)`;
+    }
+    comp.classList.toggle('sq-on', !!s.on);
+  }
+
+  /* ======================= 전자접촉기 MC (Metasol MC-22b, 2a2b) ======================= */
+  function mcRender2(id, def){
+    return `<div class="comp-box sq sq-light sq-mc">${HELP(def.type)}
+      <div class="sq-row">${TT(id,'A1','A1')}${TT(id,'L1','1/L1','acr')}${TT(id,'L2','3/L2','acs')}${TT(id,'L3','5/L3','act')}${TT(id,'13','13')}${TT(id,'21','21')}</div>
+      <div class="sq-mc-body">
+        <div class="sq-mc-window"><div class="sq-mc-flag" id="${id}_flag"></div></div>
+        <div class="sq-mc-brand">LS <b>Metasol</b><br>MC-22b · AC220V</div>
+        <div class="sq-mc-aux"><div>${TT(id,'43','43')}${TT(id,'31','31')}</div><div>${T(id,'44','44')}${T(id,'32','32')}</div></div>
+      </div>
+      <div class="sq-row">${T(id,'A2','A2')}${T(id,'T1','2/T1','acr')}${T(id,'T2','4/T2','acs')}${T(id,'T3','6/T3','act')}${T(id,'14','14')}${T(id,'22','22')}</div>
+      ${PAIR(id,'L1','T1','m1',false)}${PAIR(id,'L2','T2','m2',false)}${PAIR(id,'L3','T3','m3',false)}
+      ${PAIR(id,'13','14','a1',false)}${PAIR(id,'43','44','a2',false)}${PAIR(id,'21','22','b1',true)}${PAIR(id,'31','32','b2',true)}
+      <div class="sq-note sq-note-dark">a: 13-14, 43-44 · b: 21-22, 31-32</div>
+      ${LABEL(def)}</div>`;
+  }
+  function mcLoad2(comp, nets, stateOf, netOfPin){
+    const e = !!VOLT(PIN(comp.id,'A1'), PIN(comp.id,'A2'), nets, stateOf, netOfPin);
+    comp.classList.toggle('sq-on', e);
+    ['m1','m2','m3','a1','a2'].forEach(k => setPair(comp.id, k, e));
+    ['b1','b2'].forEach(k => setPair(comp.id, k, !e));
+  }
+
+  /* ======================= EOCR (전자식 과전류 계전기) ======================= */
+  function eocrRender(id, def){
+    return `<div class="comp-box sq sq-eocr">${HELP(def.type)}
+      <div class="sq-row">${TT(id,'L1','L1','acr')}${TT(id,'L2','L2','acs')}${TT(id,'L3','L3','act')}</div>
+      <div class="sq-eocr-body">
+        <div class="sq-eocr-ct"><i></i><i></i></div>
+        <div class="sq-eocr-brand">EOCR-SS</div>
+        <div class="sq-eocr-leds"><span class="sq-dot" id="${id}_pwr"></span>PWR <span class="sq-dot sq-dot-red" id="${id}_trip"></span>TRIP</div>
+        <div class="sq-eocr-set">
+          <label>LOAD <input type="number" data-persist="load" value="1.5" min="0.5" max="6" step="0.1">A</label>
+          <label>O-TIME <input type="number" data-persist="otime" value="3" min="0.2" max="30" step="0.1">s</label>
+        </div>
+        <div class="sq-eocr-btns">
+          <button type="button" class="sq-mini-btn sq-btn-red" onclick="sqEocrTest('${id}')" title="TEST: 즉시 트립">TEST</button>
+          <button type="button" class="sq-mini-btn" onclick="sqEocrReset('${id}')" title="RESET: 트립 해제">RESET</button>
+        </div>
+        <button type="button" hidden data-persist="trip" data-on="0" class="sq-eocr-tripflag"></button>
+      </div>
+      <div class="sq-row">${T(id,'A1','A1')}${T(id,'A2','A2')}${T(id,'95','95')}${T(id,'96','96')}${T(id,'97','97')}${T(id,'98','98')}</div>
+      <div class="sq-row sq-row-tight">${T(id,'T1','T1','acr')}${T(id,'T2','T2','acs')}${T(id,'T3','T3','act')}</div>
+      ${PAIR(id,'L1','T1','m1',true)}${PAIR(id,'L2','T2','m2',true)}${PAIR(id,'L3','T3','m3',true)}
+      ${PAIR(id,'95','96','b',false)}${PAIR(id,'97','98','a',false)}
+      <div class="sq-note">95-96 b(정상 시 닫힘) · 97-98 a(트립 시 닫힘)</div>
+      ${LABEL(def)}</div>`;
+  }
+  const eocrTripped = (comp) => comp.querySelector('.sq-eocr-tripflag')?.dataset.on === '1';
+  function eocrSetTrip(comp, on){ const f = comp.querySelector('.sq-eocr-tripflag'); if (f) f.dataset.on = on ? '1' : '0'; }
+  window.sqEocrTest = function(id){ const c = document.getElementById(id); if (!c) return; eocrSetTrip(c, true); rt(id).olT = null; kick(); };
+  window.sqEocrReset = function(id){ const c = document.getElementById(id); if (!c) return; eocrSetTrip(c, false); rt(id).olT = null; kick(); };
+  function eocrLoad(comp, nets, stateOf, netOfPin){
+    const id = comp.id, s = rt(id);
+    const pw = !!VOLT(PIN(id,'A1'), PIN(id,'A2'), nets, stateOf, netOfPin);
+    // 과부하(모터 구속) 감지: 이 EOCR의 T단자 net이 "과부하 걸린 채 회전 중인" 모터 단자와 같은 net이면 O-TIME 후 트립
+    let over = false;
+    if (pw){
+      const tNets = ['T1','T2','T3','L1','L2','L3'].map(k => PIN(id,k)).filter(Boolean).map(p => netOfPin(p, nets));
+      document.querySelectorAll('.placed-component[data-type="sq-motor"]').forEach(m => {
+        if (m.dataset.run !== '1' || m.querySelector('[data-persist="ol"]')?.dataset.on !== '1') return;
+        ['U','V','W'].forEach(k => { const p = PIN(m.id,k); if (p && tNets.includes(netOfPin(p, nets))) over = true; });
+      });
+    }
+    const ot = Math.max(0.2, parseFloat(comp.querySelector('[data-persist="otime"]')?.value) || 3) * 1000;
+    if (over){ if (s.olT == null) s.olT = nowMs(); else if (nowMs() - s.olT >= ot) eocrSetTrip(comp, true); }
+    else s.olT = null;
+    const tr = eocrTripped(comp);
+    setPair(id,'b', pw && !tr); setPair(id,'a', pw && tr);
+    s.pw = pw; s.tr = tr;
+  }
+  function eocrVisual(comp){
+    const s = RT[comp.id] || {};
+    const p = document.getElementById(comp.id + '_pwr'); if (p) p.classList.toggle('on', !!s.pw);
+    const t = document.getElementById(comp.id + '_trip'); if (t) t.classList.toggle('on', eocrTripped(comp) && (!!s.pw || Math.floor(nowMs()/400)%2===0));
+    comp.classList.toggle('sq-tripped', eocrTripped(comp));
+  }
+
+  /* ======================= 인버터 LS G100C ======================= */
+  const VFD_DEF = { drv:'1', f0:'60', acc:'5', dec:'5', st1:'10', st2:'30', st3:'20', st4:'50', st5:'40', st6:'45', st7:'55' };
+  function vfdInput(key, label, w){ return `<label>${label}<input type="number" data-persist="${key}" value="${VFD_DEF[key]}" step="0.1" min="0" max="${key==='acc'||key==='dec'?600:400}" style="width:${w||46}px"></label>`; }
+  function vfdRender2(id, def){
+    return `<div class="comp-box sq sq-vfd">${HELP(def.type)}
+      <div class="sq-vfd-head"><span class="sq-vfd-ls">LS</span> <b>G100</b><small>LSLV0008G100C</small></div>
+      <div class="sq-vfd-disp" id="${id}_disp">0.00</div>
+      <div class="sq-vfd-stat"><span id="${id}_fx">FWD</span><span id="${id}_rx">REV</span><span id="${id}_hzu">Hz</span></div>
+      <div class="sq-vfd-keys">
+        <button type="button" class="sq-vfd-key sq-key-run" onclick="sqVfdKey('${id}','run')">RUN</button>
+        <button type="button" class="sq-vfd-key sq-key-stop" onclick="sqVfdKey('${id}','stop')">STOP<br>RESET</button>
+        <button type="button" class="sq-vfd-key" onclick="sqVfdToggleSet('${id}')">⚙ 설정</button>
+      </div>
+      <div class="sq-vfd-set" id="${id}_set" hidden>
+        <label>운전지령 drv<select data-persist="drv"><option value="0">0: 키패드</option><option value="1" selected>1: 단자대(P1 정/P2 역)</option></select></label>
+        ${vfdInput('f0','주파수(키패드) Hz')}${vfdInput('acc','ACC s')}${vfdInput('dec','dEC s')}
+        <div class="sq-vfd-st">${vfdInput('st1','St1(P3)')}${vfdInput('st2','St2(P4)')}${vfdInput('st3','St3(P3+P4)')}${vfdInput('st4','St4(P5)')}${vfdInput('st5','St5(P3+P5)')}${vfdInput('st6','St6(P4+P5)')}${vfdInput('st7','St7(P3~P5)')}</div>
+      </div>
+      <div class="sq-row sq-vfd-ctl">${TT(id,'P1','P1')}${TT(id,'P2','P2')}${TT(id,'P3','P3')}${TT(id,'P4','P4')}${TT(id,'P5','P5')}${TT(id,'CM','CM')}</div>
+      <div class="sq-vfd-body"></div>
+      <div class="sq-row">${T(id,'R','R/L1','acr')}${T(id,'S','S/L2','acs')}${T(id,'T','T/L3','act')}${T(id,'U','U','acr')}${T(id,'V','V','acs')}${T(id,'W','W','act')}</div>
+      ${LABEL(def)}</div>`;
+  }
+  window.sqVfdToggleSet = function(id){ const s = document.getElementById(id + '_set'); if (s) s.hidden = !s.hidden; };
+  window.sqVfdKey = function(id, k){ const s = rt(id); if (k === 'run') s.kRun = true; else { s.kRun = false; } kick(); };
+  function vfdParam(comp, key){ const v = parseFloat(comp.querySelector(`[data-persist="${key}"]`)?.value); return isFinite(v) ? v : parseFloat(VFD_DEF[key]); }
+  function vfdLoad2(comp, nets, stateOf, netOfPin){
+    const id = comp.id, s = rt(id), t = nowMs();
+    const R = PIN(id,'R'), S = PIN(id,'S'), Tt = PIN(id,'T');
+    const pw = !!(VOLT(R,S,nets,stateOf,netOfPin) || VOLT(S,Tt,nets,stateOf,netOfPin) || VOLT(R,Tt,nets,stateOf,netOfPin));
+    const drv = comp.querySelector('[data-persist="drv"]')?.value || '1';
+    const cm = PIN(id,'CM');
+    const on = (k) => pw && sameNet(PIN(id,k), cm, nets, netOfPin);
+    let fx = false, rx = false;
+    if (drv === '0'){ fx = !!s.kRun && pw; }
+    else { fx = on('P1'); rx = on('P2'); if (fx && rx){ fx = rx = false; } }
+    const idx = (on('P3')?1:0) + (on('P4')?2:0) + (on('P5')?4:0);
+    const target = (fx || rx) ? (idx ? vfdParam(comp, 'st' + idx) : vfdParam(comp, 'f0')) : 0;
+    const dir = rx ? -1 : (fx ? 1 : (s.dir || 1));
+    if (!pw){ s.hz = 0; }
+    const dt = s.lt != null ? Math.min(0.2, (t - s.lt) / 1000) : 0; s.lt = t;
+    let hz = s.hz || 0;
+    // 방향이 바뀌면 먼저 0Hz까지 감속 후 반대 방향으로 가속
+    const wantDir = (fx || rx) ? dir : (s.dir || 1);
+    let tgt = target;
+    if ((s.dir || 1) !== wantDir && hz > 0.01) tgt = 0;
+    const accRate = 60 / Math.max(0.1, vfdParam(comp,'acc')), decRate = 60 / Math.max(0.1, vfdParam(comp,'dec'));
+    if (hz < tgt) hz = Math.min(tgt, hz + accRate * dt); else if (hz > tgt) hz = Math.max(tgt, hz - decRate * dt);
+    if (hz <= 0.01 && (s.dir || 1) !== wantDir) s.dir = wantDir;
+    if (!s.dir) s.dir = wantDir;
+    s.hz = hz; s.pw = pw; s.cmd = fx || rx;
+    if (pw && hz > 0.05){
+      const roles = s.dir === -1 ? ['acr','act','acs'] : ['acr','acs','act'];
+      ['U','V','W'].forEach((k, i) => { const p = PIN(id,k); if (p){ const st = stateOf(netOfPin(p, nets)); st.ac.add(roles[i]); st.vfdHz = hz; } });
+    }
+  }
+  function vfdVisual(comp){
+    const s = RT[comp.id] || {};
+    const d = document.getElementById(comp.id + '_disp'); if (d) d.textContent = s.pw ? (s.hz || 0).toFixed(2) : '';
+    const fx = document.getElementById(comp.id + '_fx'), rx = document.getElementById(comp.id + '_rx');
+    if (fx) fx.classList.toggle('on', !!s.pw && (s.hz||0) > 0.05 && s.dir !== -1);
+    if (rx) rx.classList.toggle('on', !!s.pw && (s.hz||0) > 0.05 && s.dir === -1);
+    comp.classList.toggle('sq-powered', !!s.pw);
+  }
+
+  /* ======================= 유도전동기 (GGM 소형) ======================= */
+  function motorRender2(id, def){
+    return `<div class="comp-box sq sq-motor">${HELP(def.type)}
+      <div class="sq-motor-body">
+        <div class="sq-motor-can"><div class="sq-motor-fan" id="${id}_fan"><i></i><i></i><i></i></div></div>
+        <div class="sq-motor-plate">GGM K9I<br><span id="${id}_kind">3φ 220V 60Hz</span></div>
+        <div class="sq-motor-box"></div>
+      </div>
+      <div class="sq-motor-stat" id="${id}_stat">정지</div>
+      <div class="sq-row">
+        <select data-persist="kind" onchange="sqKick()" title="전동기 종류"><option value="3">3상 유도전동기</option><option value="1">단상(콘덴서 기동) — U-V 정, U-W 역</option></select>
+        <button type="button" class="sq-mini-btn" data-persist="ol" data-on="0" onclick="this.dataset.on=this.dataset.on==='1'?'0':'1';this.classList.toggle('on',this.dataset.on==='1');sqKick()" title="축을 구속해 과부하를 걸어 봅니다 (EOCR 트립 실습)">과부하</button>
+      </div>
+      <div class="sq-row">${T(id,'U','U','acr')}${T(id,'V','V','acs')}${T(id,'W','W','act')}${T(id,'E','E','pe')}</div>
+      ${LABEL(def)}</div>`;
+  }
+  window.sqKick = kick;
+  function motorVisual2(comp, nets, stateOf, netOfPin){
+    const id = comp.id;
+    const st = (k) => { const p = PIN(id,k); return p ? stateOf(netOfPin(p, nets)) : null; };
+    const U = st('U'), V = st('V'), W = st('W');
+    const pick = (s) => { const ph = phasesOf(s); return ph.length === 1 ? ph[0] : (ph.length ? 'X' : null); };
+    const pu = pick(U), pv = pick(V), pw = pick(W);
+    const kind = comp.querySelector('[data-persist="kind"]')?.value || '3';
+    let run = false, dir = 1, msg = '정지', hz = 60;
+    if (kind === '3'){
+      const set = [pu, pv, pw];
+      const ok = set.every(x => x && x !== 'X') && new Set(set).size === 3;
+      if (ok){
+        const order = { acr:0, acs:1, act:2, acl:0, acn:1 };
+        const a = order[pu], b = order[pv];
+        dir = ((b - a + 3) % 3) === 1 ? 1 : -1;
+        run = true;
+      } else if ([pu,pv,pw].filter(Boolean).length >= 2 && new Set([pu,pv,pw].filter(Boolean)).size >= 2) msg = '⚠ 결상(단상 운전) — 기동 불가';
+      hz = (U && U.vfdHz) || 60;
+    } else {
+      if (VOLT(PIN(id,'U'), PIN(id,'V'), nets, stateOf, netOfPin)){ run = true; dir = 1; }
+      else if (VOLT(PIN(id,'U'), PIN(id,'W'), nets, stateOf, netOfPin)){ run = true; dir = -1; }
+      hz = (U && U.vfdHz) || 60;
+    }
+    const ol = comp.querySelector('[data-persist="ol"]')?.dataset.on === '1';
+    comp.dataset.run = run ? '1' : '0';
+    const fan = document.getElementById(id + '_fan');
+    if (fan){
+      const spin = run && !ol;
+      fan.style.animationPlayState = spin ? 'running' : 'paused';
+      fan.style.animationDuration = (spin ? Math.max(0.15, 1.2 * 60 / Math.max(1, hz)) : 1) + 's';
+      fan.style.animationDirection = dir === -1 ? 'reverse' : 'normal';
+    }
+    const k = document.getElementById(id + '_kind'); if (k) k.textContent = kind === '3' ? '3φ 220V 60Hz' : '1φ 220V 60Hz';
+    const s = document.getElementById(id + '_stat');
+    if (s) s.textContent = run ? (ol ? '⚠ 과부하(구속) — 과전류' : `${dir === 1 ? '⟳ 정회전' : '⟲ 역회전'} · ${Math.round(hz * 30 * 0.96)} rpm`) : msg;
+    comp.classList.toggle('sq-on', run);
+    comp.classList.toggle('sq-ol', run && ol);
+  }
+
+  /* ======================= 단자대 (TB) ======================= */
+  const TB_N = 30;
+  function tbRender(id, def){
+    let top = '', bot = '', pairs = '';
+    for (let i = 1; i <= TB_N; i++){
+      top += TT(id, 'A' + i, String(i));
+      bot += T(id, 'B' + i, String(i));
+      pairs += PAIR(id, 'A' + i, 'B' + i, 't' + i, true);
+    }
+    return `<div class="comp-box sq sq-tb">${HELP(def.type)}
+      <div class="sq-row sq-tb-row">${top}</div>
+      <div class="sq-tb-body">${'<i></i>'.repeat(TB_N)}</div>
+      <div class="sq-row sq-tb-row">${bot}</div>
+      ${pairs}
+      ${LABEL(def)}</div>`;
+  }
+
+  /* ======================= 입출력 명판(조작/표시 기기) ======================= */
+  const LAMP_COLORS = { red:'#ff3b30', orange:'#ff9500', yellow:'#ffd60a', green:'#30d158', white:'#f2f2f7', blue:'#3a8bff' };
+  function pbBlock(id, key, color, name){
+    return `<div class="sq-dev sq-dev-pb" data-dev="pb" data-key="${key}">
+      <button type="button" class="sq-pb-btn" style="--pb:${LAMP_COLORS[color]||color}" onpointerdown="sqPb('${id}','${key}',true,event)" onpointerup="sqPb('${id}','${key}',false,event)" onpointerleave="sqPb('${id}','${key}',false,event)"></button>
+      <div class="sq-dev-name">${name}</div>
+      <div class="sq-dev-terms">${T(id,key+'_13','13')}${T(id,key+'_14','14')}${T(id,key+'_21','21')}${T(id,key+'_22','22')}</div>
+      ${PAIR(id,key+'_13',key+'_14',key+'a',false)}${PAIR(id,key+'_21',key+'_22',key+'b',true)}
+    </div>`;
+  }
+  function lampBlock(id, key, color, name){
+    return `<div class="sq-dev sq-dev-pl" data-dev="pl" data-key="${key}">
+      <div class="sq-pl-lens" id="${id}_${key}_lens" style="--pl:${LAMP_COLORS[color]||color}"></div>
+      <div class="sq-dev-name">${name}</div>
+      <div class="sq-dev-terms">${T(id,key+'_X1','X1')}${T(id,key+'_X2','X2')}</div>
+    </div>`;
+  }
+  function bzBlock(id, key){
+    return `<div class="sq-dev sq-dev-bz" data-dev="bz" data-key="${key}">
+      <div class="sq-bz-face" id="${id}_${key}_bz"><i></i></div>
+      <div class="sq-dev-name">BUZZER</div>
+      <div class="sq-dev-terms">${T(id,key+'_1','1')}${T(id,key+'_2','2')}</div>
+    </div>`;
+  }
+  function ssBlock(id, key){
+    return `<div class="sq-dev sq-dev-ss" data-dev="ss" data-key="${key}">
+      <button type="button" class="sq-ss-knob" data-persist="${key}_pos" data-on="0" onclick="sqSs('${id}','${key}',this)" title="클릭: MANU(A) ↔ AUTO(B)"><i></i></button>
+      <div class="sq-dev-name">S/S <small id="${id}_${key}_txt">MANU</small></div>
+      <div class="sq-dev-terms">${T(id,key+'_COM','COM')}${T(id,key+'_A','A')}${T(id,key+'_B','B')}</div>
+      ${PAIR(id,key+'_COM',key+'_A',key+'a',true)}${PAIR(id,key+'_COM',key+'_B',key+'b',false)}
+    </div>`;
+  }
+  function emgBlock(id, key){
+    return `<div class="sq-dev sq-dev-emg" data-dev="emg" data-key="${key}">
+      <button type="button" class="sq-emg-btn" data-persist="${key}_lat" data-on="0" onclick="sqEmg('${id}','${key}',this)" title="클릭: 눌러서 잠금 / 다시 클릭: 돌려서 해제"></button>
+      <div class="sq-dev-name">EMG.</div>
+      <div class="sq-dev-terms">${T(id,key+'_13','13')}${T(id,key+'_14','14')}${T(id,key+'_21','21')}${T(id,key+'_22','22')}</div>
+      ${PAIR(id,key+'_13',key+'_14',key+'a',false)}${PAIR(id,key+'_21',key+'_22',key+'b',true)}
+    </div>`;
+  }
+  const spareBlock = () => `<div class="sq-dev sq-dev-spare"><div class="sq-spare-hole"></div><div class="sq-dev-name">SPARE</div></div>`;
+  window.sqPb = function(id, key, down, ev){
+    const comp = document.getElementById(id); if (!comp) return;
+    if (ev && ev.type === 'pointerdown' && ev.button !== 0) return;
+    const btn = comp.querySelector(`.sq-dev[data-key="${key}"] .sq-pb-btn`);
+    if (!down && !(btn && btn.classList.contains('pressed'))) return;
+    if (btn) btn.classList.toggle('pressed', down);
+    setPair(id, key + 'a', down); setPair(id, key + 'b', !down);
+    if (down && btn){ try { btn.setPointerCapture(ev.pointerId); } catch(e){} }
+    kick();
+  };
+  document.addEventListener('pointerup', () => {
+    document.querySelectorAll('.sq-pb-btn.pressed').forEach(b => {
+      const comp = b.closest('.placed-component'); const key = b.closest('.sq-dev')?.dataset.key;
+      if (comp && key) window.sqPb(comp.id, key, false);
+    });
+  });
+  window.sqSs = function(id, key, btn){
+    const on = btn.dataset.on !== '1'; btn.dataset.on = on ? '1' : '0';
+    ssSync(document.getElementById(id), key); kick();
+  };
+  function ssSync(comp, key){
+    if (!comp) return;
+    const btn = comp.querySelector(`[data-persist="${key}_pos"]`); if (!btn) return;
+    const auto = btn.dataset.on === '1';
+    btn.classList.toggle('on', auto);
+    setPair(comp.id, key + 'a', !auto); setPair(comp.id, key + 'b', auto);
+    const t = document.getElementById(comp.id + '_' + key + '_txt'); if (t) t.textContent = auto ? 'AUTO' : 'MANU';
+  }
+  window.sqEmg = function(id, key, btn){
+    const on = btn.dataset.on !== '1'; btn.dataset.on = on ? '1' : '0';
+    emgSync(document.getElementById(id), key); kick();
+  };
+  function emgSync(comp, key){
+    if (!comp) return;
+    const btn = comp.querySelector(`[data-persist="${key}_lat"]`); if (!btn) return;
+    const lat = btn.dataset.on === '1';
+    btn.classList.toggle('on', lat);
+    setPair(comp.id, key + 'a', lat); setPair(comp.id, key + 'b', !lat);
+  }
+  function devSyncAll(comp){
+    comp.querySelectorAll('.sq-dev[data-dev="ss"]').forEach(d => ssSync(comp, d.dataset.key));
+    comp.querySelectorAll('.sq-dev[data-dev="emg"]').forEach(d => emgSync(comp, d.dataset.key));
+  }
+  let audioCtx = null, buzzOsc = null, buzzGain = null;
+  function buzzerSound(on){
+    if (!SQ_SOUND.on) on = false;
+    try {
+      if (on && !audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      if (!audioCtx) return;
+      if (on && !buzzOsc){
+        buzzOsc = audioCtx.createOscillator(); buzzGain = audioCtx.createGain();
+        buzzOsc.type = 'square'; buzzOsc.frequency.value = 2400; buzzGain.gain.value = 0.025;
+        buzzOsc.connect(buzzGain).connect(audioCtx.destination); buzzOsc.start();
+      } else if (!on && buzzOsc){ buzzOsc.stop(); buzzOsc.disconnect(); buzzOsc = null; }
+    } catch(e){}
+  }
+  const SQ_SOUND = { on: true };
+  window.sqToggleSound = function(btn){ SQ_SOUND.on = !SQ_SOUND.on; if (btn) btn.textContent = SQ_SOUND.on ? '🔊' : '🔇'; if (!SQ_SOUND.on) buzzerSound(false); };
+  let anyBuzz = false;
+  function devVisual(comp, nets, stateOf, netOfPin){
+    const id = comp.id;
+    comp.querySelectorAll('.sq-dev[data-dev="pl"]').forEach(d => {
+      const k = d.dataset.key; const lit = !!VOLT(PIN(id,k+'_X1'), PIN(id,k+'_X2'), nets, stateOf, netOfPin);
+      const lens = document.getElementById(id + '_' + k + '_lens'); if (lens) lens.classList.toggle('lit', lit);
+    });
+    comp.querySelectorAll('.sq-dev[data-dev="bz"]').forEach(d => {
+      const k = d.dataset.key; const on = !!VOLT(PIN(id,k+'_1'), PIN(id,k+'_2'), nets, stateOf, netOfPin);
+      const f = document.getElementById(id + '_' + k + '_bz'); if (f) f.classList.toggle('sounding', on);
+      if (on) anyBuzz = true;
+    });
+  }
+  function ioPanelRender(id, def){
+    return `<div class="comp-box sq sq-iopanel">${HELP(def.type)}
+      <div class="sq-io-head"><b>EZT ST-1801</b><span>SEQUENCE TRAINER</span><button type="button" class="sq-sound-btn" onclick="sqToggleSound(this)" title="부저 소리 켜기/끄기">🔊</button></div>
+      <div class="sq-io-grid">
+        ${bzBlock(id,'BZ')}${ssBlock(id,'SS')}
+        ${lampBlock(id,'PL1','red','PL1')}${pbBlock(id,'PB1','green','PB1')}
+        ${lampBlock(id,'PL2','orange','PL2')}${pbBlock(id,'PB2','green','PB2')}
+        ${lampBlock(id,'PL3','green','PL3')}${pbBlock(id,'PB3','red','PB3')}
+        ${lampBlock(id,'PL4','white','PL4')}${pbBlock(id,'PB4','red','PB4')}
+        ${spareBlock()}${emgBlock(id,'EMG')}
+        ${spareBlock()}${spareBlock()}
+      </div>
+      ${LABEL(def)}</div>`;
+  }
+  // 낱개 조작/표시 기기(명판 밖에서도 자유롭게 쓰도록)
+  function singlePbRender(id, def){ return `<div class="comp-box sq sq-single">${HELP(def.type)}${pbBlock(id,'PB', def.color, def.short)}${LABEL(def)}</div>`; }
+  function singleLampRender(id, def){ return `<div class="comp-box sq sq-single">${HELP(def.type)}${lampBlock(id,'PL', def.color, def.short)}${LABEL(def)}</div>`; }
+  function singleBzRender(id, def){ return `<div class="comp-box sq sq-single">${HELP(def.type)}${bzBlock(id,'BZ')}${LABEL(def)}</div>`; }
+  function singleSsRender(id, def){ return `<div class="comp-box sq sq-single">${HELP(def.type)}${ssBlock(id,'SS')}${LABEL(def)}</div>`; }
+  function singleEmgRender(id, def){ return `<div class="comp-box sq sq-single">${HELP(def.type)}${emgBlock(id,'EMG')}${LABEL(def)}</div>`; }
+
+  /* ======================= PLC  LS XGB XBC-DR32H ======================= */
+  const HX = (i) => i.toString(16).toUpperCase();
+  function plcT(id, suf, cap, role, tb, up){
+    const inner = `<div class="pin-mini role-${role||'sig'}" data-pin="${id}_${suf}" id="${id}_${suf}"></div>`;
+    const c = `<span class="sq-tc">${cap}</span>`;
+    return `<div class="sq-t sq-plc-t" title="${tb} : ${cap}">${up ? c + inner : inner + c}</div>`;
+  }
+  function plcDR32HRender(id, def){
+    // 입력 단자대(위): 홀수 TB 윗줄, 짝수 TB 아랫줄 — 교재 그림과 같은 지그재그 배치
+    const inOdd = [['RX','RX'],['TX','TX'],['SG','SG']].map((x,i)=>[x[0],x[1],'TB'+(1+2*i)]);
+    for (let b = 1; b < 16; b += 2) inOdd.push(['X'+b, 'P0'+HX(b), 'TB'+(7+(b-1))]);
+    inOdd.push(['G24','24G','TB23']);
+    const inEven = [['R485P','485+','TB2'],['R485N','485-','TB4']];
+    for (let b = 0; b < 16; b += 2) inEven.push(['X'+b, 'P0'+HX(b), 'TB'+(6+b)]);
+    inEven.push(['COM','COM','TB22'],['V24','24V','TB24']);
+    // 출력 단자대(아래)
+    const outOdd = [['L','AC~L','TB1'],['N','AC~N','TB3'],['Y0','P20','TB5'],['Y2','P22','TB7'],['COM0','COM0','TB9'],['Y5','P25','TB11'],['Y7','P27','TB13'],['Y8','P28','TB15'],['Y10','P2A','TB17'],['COM2','COM2','TB19'],['Y13','P2D','TB21'],['Y15','P2F','TB23']];
+    const outEven = [['PE','PE','TB2'],['NC','NC','TB4'],['Y1','P21','TB6'],['Y3','P23','TB8'],['Y4','P24','TB10'],['Y6','P26','TB12'],['COM1','COM1','TB14'],['Y9','P29','TB16'],['Y11','P2B','TB18'],['Y12','P2C','TB20'],['Y14','P2E','TB22'],['COM3','COM3','TB24']];
+    const role = (s) => s==='V24'?'dc24p':s==='G24'?'dc24n':s==='L'?'acl':s==='N'?'acn':s==='PE'?'pe':'sig';
+    const row = (arr, up) => arr.map(x => plcT(id, x[0], x[1], role(x[0]), x[2], up)).join('');
+    const leds = (pre, base) => { let h=''; for (let i=0;i<16;i++) h += `<span class="sq-plc-led"><i id="${id}_${pre}${i}_led"></i><b>${base}${HX(i)}</b></span>`; return h; };
+    let pairs = '';
+    for (let i = 0; i < 16; i++) pairs += PAIR(id, 'Y' + i, 'COM' + Math.floor(i / 4), 'y' + i, false);
+    return `<div class="comp-box sq sq-plc vendor-lsh" ondblclick="openLadderEditor('${id}')">${HELP(def.type)}
+      <div class="sq-plc-strip sq-plc-in"><div class="sq-plc-row">${row(inOdd, true)}</div><div class="sq-plc-row sq-plc-even">${row(inEven, false)}</div></div>
+      <div class="sq-plc-face">
+        <div class="sq-plc-left"><div class="sq-plc-xgb">XGB</div><div class="sq-plc-model">XBC-DR32H</div>
+          <div class="sq-plc-st"><span><i id="${id}_pwrled"></i>PWR</span><span><i id="${id}_runled"></i>RUN</span><span><i id="${id}_errled"></i>ERR</span></div>
+          <div class="sq-plc-logo">LS ELECTRIC</div></div>
+        <div class="sq-plc-center"><div class="sq-plc-ledrow"><em>IN</em>${leds('X','0')}</div><div class="sq-plc-ledrow"><em>OUT</em>${leds('Y','2')}</div></div>
+        <div class="sq-plc-right"><div class="sq-plc-cover"></div><div class="sq-plc-cover"></div></div>
+      </div>
+      <div class="sq-plc-strip sq-plc-out"><div class="sq-plc-row">${row(outOdd, false)}</div><div class="sq-plc-row sq-plc-even">${row(outEven, false)}</div></div>
+      ${pairs}
+      <div class="comp-label sq-label">${labelOf(def)} <span class="ladder-hint">(더블클릭: 래더 편집)</span></div></div>`;
+  }
+  function plcSource(comp, nets, stateOf, netOfPin){
+    if (comp.dataset.pw !== '1' || comp.dataset.ocp === '1') return;
+    const p = PIN(comp.id,'V24'), n = PIN(comp.id,'G24');
+    if (p) stateOf(netOfPin(p, nets)).dc24p = true;
+    if (n) stateOf(netOfPin(n, nets)).dc24n = true;
+  }
+  function plcLoad(comp, nets, stateOf, netOfPin){
+    const pw = !!VOLT(PIN(comp.id,'L'), PIN(comp.id,'N'), nets, stateOf, netOfPin);
+    if (!pw) comp.dataset.ocp = '0';
+    comp.dataset.pw = pw ? '1' : '0';
+    const mem = getPlcMem(comp.id);
+    for (let i = 0; i < 16; i++) setPair(comp.id, 'y' + i, !!(isRunning && pw && mem.Y[i]));
+    if (!(isRunning && pw)){ /* STOP 상태에서도 입력 LED는 실제 배선 기준 */ }
+    const xs = [];
+    for (let i = 0; i < 16; i++) xs.push(pw && VOLT(PIN(comp.id,'X'+i), PIN(comp.id,'COM'), nets, stateOf, netOfPin) === 'dc');
+    rt(comp.id).xs = xs;
+  }
+  function plcVisual(comp){
+    const pw = comp.dataset.pw === '1';
+    const mem = getPlcMem(comp.id);
+    const s = RT[comp.id] || {};
+    const set = (k, on) => { const el = document.getElementById(comp.id + '_' + k); if (el) el.classList.toggle('on', !!on); };
+    set('pwrled', pw); set('runled', pw && isRunning);
+    const prog = getPlcProg(comp.id); set('errled', !!(prog.warnings && prog.warnings.length) || comp.dataset.ocp === '1');
+    for (let i = 0; i < 16; i++){ set('X' + i + '_led', s.xs ? s.xs[i] : false); set('Y' + i + '_led', pw && isRunning && mem.Y[i]); }
+    comp.classList.toggle('plc-powered', pw);
+  }
+  // 스캔: 원래 스캐너는 24P/24N 전원 단자가 없는 이 PLC를 건너뛰므로, 여기서 따로 돌립니다.
+  if (typeof runPlcScanForAllPlcs === 'function'){
+    const _scan = runPlcScanForAllPlcs;
+    runPlcScanForAllPlcs = function(nets, stateOf, netOfPin){
+      _scan.apply(this, arguments);
+      document.querySelectorAll('.placed-component[data-type="sq-plc"]').forEach(comp => {
+        const pw = !!VOLT(PIN(comp.id,'L'), PIN(comp.id,'N'), nets, stateOf, netOfPin);
+        if (!pw) return;
+        const mem = getPlcMem(comp.id);
+        for (let i = 0; i < 16; i++) mem.X[i] = VOLT(PIN(comp.id,'X'+i), PIN(comp.id,'COM'), nets, stateOf, netOfPin) === 'dc';
+        applyForceToMem(comp.id, mem, 'X');
+        CURRENT_SCAN_PLC_ID = comp.id;
+        evalLadderProgram(mem, getPlcProg(comp.id), scanCycleMs);
+        applyForceToMem(comp.id, mem, 'Y'); applyForceToMem(comp.id, mem, 'M'); applyForceToMem(comp.id, mem, 'D');
+        scanCount++;
+        const b = document.getElementById('scanBadgeText'); if (b) b.textContent = tr('toolbar.running') + ' #' + scanCount;
+        if (window.__ladderEditorOpenFor === comp.id) refreshLadderHighlight(comp.id);
+        if (window.__hmiEditorOpenFor) refreshHmiRuntime();
+        if (window.__dataMonitorPlcId === comp.id) refreshDataMonitorLive(comp.id);
+      });
+    };
+  }
+  // 래더 주소 표기: 입력 P00000~P0000F, 출력 P00020~P0002F (교재 XBC-DR32H 그대로)
+  VENDOR_META['sq-plc'] = { vendorClass:'vendor-lsh', name:'LS ELECTRIC XGB (XBC-DR32H)', shortName:'XG5000', color:'#0d5ab5', badge:'LS' };
+  if (typeof vendorAddrToDisplay === 'function'){
+    const _toD = vendorAddrToDisplay, _fromD = vendorAddrFromDisplay;
+    vendorAddrToDisplay = function(vc, addr){
+      if (vc !== 'vendor-lsh') return _toD(vc, addr);
+      const m = /^([A-Z]+)(\d+)$/.exec(addr || ''); if (!m) return addr;
+      const a = m[1], i = parseInt(m[2], 10);
+      if (a === 'X') return 'P0000' + HX(i);
+      if (a === 'Y') return 'P0002' + HX(i);
+      if (a === 'M') return 'M' + String(i).padStart(5, '0');
+      if (a === 'T') return 'T' + String(i).padStart(4, '0');
+      if (a === 'C') return 'C' + String(i).padStart(4, '0');
+      if (a === 'D') return 'D' + String(i).padStart(5, '0');
+      return addr;
+    };
+    vendorAddrFromDisplay = function(vc, disp){
+      if (vc !== 'vendor-lsh') return _fromD(vc, disp);
+      if (!disp) return disp;
+      const d = String(disp).trim().toUpperCase();
+      let m = /^P(\d{3,4})([0-9A-F])$/.exec(d);
+      if (m){ const w = parseInt(m[1], 10), b = parseInt(m[2], 16); if (w === 0) return 'X' + b; if (w === 2) return 'Y' + b; }
+      m = /^P([02])([0-9A-F])$/.exec(d); if (m) return (m[1] === '0' ? 'X' : 'Y') + parseInt(m[2], 16);
+      m = /^M(\d{1,5})$/.exec(d); if (m) return 'M' + parseInt(m[1], 10);
+      m = /^T(\d{1,4})$/.exec(d); if (m) return 'T' + parseInt(m[1], 10);
+      m = /^C(\d{1,4})$/.exec(d); if (m) return 'C' + parseInt(m[1], 10);
+      m = /^D(\d{1,5})$/.exec(d); if (m) return 'D' + parseInt(m[1], 10);
+      if (/^[XYMTCD]\d+$/.test(d)) return d;
+      return d;
+    };
+  }
+  try { if (typeof ST_STARTER_TEMPLATES !== 'undefined' && ST_STARTER_TEMPLATES['vendor-ls']) ST_STARTER_TEMPLATES['vendor-lsh'] = ST_STARTER_TEMPLATES['vendor-ls']; } catch(e){}
+  try { if (STRINGS['ladder.stCheatsheet.vendor-ls']) STRINGS['ladder.stCheatsheet.vendor-lsh'] = STRINGS['ladder.stCheatsheet.vendor-ls']; } catch(e){}
+
+  /* ======================= 실습장치 판(프레임) ======================= */
+  const BOARD_W = 1740, BOARD_H = 1210;
+  function boardRender(id, def){
+    return `<div class="sq-board">
+      <button type="button" class="sq-board-handle" title="끌어서 실습장치 전체(올려진 부품·배선 포함)를 함께 옮깁니다">⠿ EZT ST-1801 시퀀스 실습장치 — 여기를 끌어 전체 이동</button>
+      <div class="sq-board-work">
+        <div class="sq-duct sq-duct-top"></div>
+        <div class="sq-rail" style="top:150px"></div><div class="sq-duct" style="top:372px"></div>
+        <div class="sq-rail" style="top:560px"></div><div class="sq-duct" style="top:792px"></div>
+        <div class="sq-rail" style="top:990px"></div><div class="sq-duct sq-duct-bot"></div>
+        <div class="sq-board-cap">워킹보드 (DIN-RAIL 35mm · WIRING DUCT)</div>
+      </div>
+      <div class="sq-board-plate"><div class="sq-hinge" style="top:120px"></div><div class="sq-hinge" style="top:980px"></div></div>
+    </div>`;
+  }
+  // 판 손잡이로 끌면 판 위의 부품과 배선 꺾임점도 함께 이동
+  document.addEventListener('mousedown', (e) => {
+    const h = e.target.closest && e.target.closest('.sq-board-handle');
+    if (!h || e.button !== 0) return;
+    const board = h.closest('.placed-component'); if (!board) return;
+    e.preventDefault(); e.stopPropagation();
+    const bx = parseFloat(board.style.left) || 0, by = parseFloat(board.style.top) || 0;
+    const inside = (x, y) => x >= bx && x <= bx + BOARD_W && y >= by && y <= by + BOARD_H;
+    const items = [board];
+    document.querySelectorAll('#canvasInner > .placed-component').forEach(c => {
+      if (c === board) return;
+      const x = parseFloat(c.style.left) || 0, y = parseFloat(c.style.top) || 0;
+      if (inside(x + 20, y + 20)) items.push(c);
+    });
+    const start = items.map(c => ({ c, x: parseFloat(c.style.left) || 0, y: parseFloat(c.style.top) || 0 }));
+    const wpts = wires.map(w => (w.points || []).map(p => ({ p, x: p.x, y: p.y, move: inside(p.x, p.y) })));
+    const sx = e.clientX, sy = e.clientY;
+    function mv(ev){
+      let dx = (ev.clientX - sx) / zoomLevel, dy = (ev.clientY - sy) / zoomLevel;
+      dx = Math.max(dx, -bx); dy = Math.max(dy, -by);
+      start.forEach(s => { s.c.style.left = (s.x + dx) + 'px'; s.c.style.top = (s.y + dy) + 'px'; });
+      wires.forEach((w, i) => (wpts[i] || []).forEach((o, j) => { if (o.move && w.points[j]){ w.points[j] = { x: o.x + dx, y: o.y + dy }; } }));
+      updateAllWires();
+    }
+    function up(){
+      document.removeEventListener('mousemove', mv, true); document.removeEventListener('mouseup', up, true);
+      try { plcScheduleCheckpoint(); } catch(e){}
+    }
+    document.addEventListener('mousemove', mv, true); document.addEventListener('mouseup', up, true);
+  }, true);
+
+  /* ======================= 부품 등록 ======================= */
+  const D = (type, icon, ko, en, render, extra) => Object.assign({ type, cat:'seq', icon, label:{ ko, en }, render }, extra || {});
+  const defs = {
+    'sq-board':   D('sq-board','🧰','시퀀스 실습장치 판(프레임)','Sequence trainer frame', boardRender),
+    'sq-power':   D('sq-power','🔌','전원 인입 AC 3φ 220V','Power inlet 3φ 220V', powerRender, { contributeSource: powerSource }),
+    'sq-mccb3':   D('sq-mccb3','🔲','배선용 차단기 MCCB 3P','MCCB 3P', breakerRender(3)),
+    'sq-cp2':     D('sq-cp2','🔳','회로 보호기 CP 2P','Circuit protector 2P', breakerRender(2)),
+    'sq-fuse2':   D('sq-fuse2','🧯','퓨즈 홀더 2P','Fuse holder 2P', fuseRender),
+    'sq-smps':    D('sq-smps','🔋','SMPS DC24V','SMPS DC24V', smpsRender, { contributeSource: smpsSource, contributeLoad: smpsLoad, updateVisual: smpsVisual }),
+    'sq-relay14': D('sq-relay14','🟦','릴레이 14핀(MY4)','Relay 14-pin (MY4)', relay14Render, { contributeLoad: relay14Load }),
+    'sq-relay8':  D('sq-relay8','🟪','릴레이 8핀','Relay 8-pin', relay8Render, { contributeLoad: relay8Load }),
+    'sq-timer':   D('sq-timer','⏱️','타이머 AT8N(ON/OFF딜레이·플리커)','Timer AT8N', timerRender, { contributeLoad: timerLoad, updateVisual: timerVisual }),
+    'sq-timesw':  D('sq-timesw','🕒','24시간 타임스위치','24h time switch', timeswRender, { contributeLoad: timeswLoad, updateVisual: timeswVisual }),
+    'sq-plc':     D('sq-plc','🖥️','PLC LS XGB XBC-DR32H','PLC LS XGB XBC-DR32H', plcDR32HRender, { contributeSource: plcSource, contributeLoad: plcLoad, updateVisual: plcVisual }),
+    'sq-mc':      D('sq-mc','🧷','전자접촉기 MC-22b(2a2b)','Magnetic contactor MC-22b', mcRender2, { contributeLoad: mcLoad2 }),
+    'sq-eocr':    D('sq-eocr','🛡️','EOCR 전자식 과전류계전기','EOCR', eocrRender, { contributeLoad: eocrLoad, updateVisual: eocrVisual }),
+    'sq-vfd':     D('sq-vfd','🎛️','인버터 LS G100C','Inverter LS G100C', vfdRender2, { contributeLoad: vfdLoad2, updateVisual: vfdVisual }),
+    'sq-motor':   D('sq-motor','⚙️','유도전동기(GGM 소형)','Induction motor (GGM)', motorRender2, { updateVisual: motorVisual2 }),
+    'sq-tb':      D('sq-tb','🔩','단자대 TB 30P','Terminal block 30P', tbRender),
+    'sq-iopanel': D('sq-iopanel','🎚️','입출력 명판(BZ·S/S·PL1~4·PB1~4·EMG)','I/O nameplate', ioPanelRender, { updateVisual: devVisual }),
+    'sq-pb-g':    D('sq-pb-g','🟢','푸시버튼 녹색(1a1b)','Pushbutton green 1a1b', singlePbRender, { color:'green', short:'PB' }),
+    'sq-pb-r':    D('sq-pb-r','🔴','푸시버튼 적색(1a1b)','Pushbutton red 1a1b', singlePbRender, { color:'red', short:'PB' }),
+    'sq-pl-r':    D('sq-pl-r','🔴','표시등 적색 RL','Pilot lamp red', singleLampRender, { color:'red', short:'RL', updateVisual: devVisual }),
+    'sq-pl-g':    D('sq-pl-g','🟢','표시등 녹색 GL','Pilot lamp green', singleLampRender, { color:'green', short:'GL', updateVisual: devVisual }),
+    'sq-pl-y':    D('sq-pl-y','🟡','표시등 황색 YL','Pilot lamp yellow', singleLampRender, { color:'yellow', short:'YL', updateVisual: devVisual }),
+    'sq-pl-w':    D('sq-pl-w','⚪','표시등 백색 WL','Pilot lamp white', singleLampRender, { color:'white', short:'WL', updateVisual: devVisual }),
+    'sq-bz':      D('sq-bz','📢','부저 BZ','Buzzer', singleBzRender, { updateVisual: devVisual }),
+    'sq-ss':      D('sq-ss','🎚️','셀렉터 스위치 S/S(COM·A·B)','Selector switch', singleSsRender),
+    'sq-emg':     D('sq-emg','🍄','비상정지 EMG(1a1b)','Emergency stop', singleEmgRender),
+  };
+  Object.assign(COMPONENT_DEFS, defs);
+
+  // 저장/불러오기·실행 취소 후에도 레버/스위치 상태가 접점에 바로 반영되도록 동기화
+  function syncComp(comp){
+    const t = comp.dataset.type;
+    if (t === 'sq-mccb3' || t === 'sq-cp2') breakerSync(comp);
+    else if (t === 'sq-fuse2') fuseSync(comp);
+    devSyncAll(comp);
+  }
+  if (typeof applyPersist === 'function'){
+    const _ap = applyPersist;
+    applyPersist = function(comp, persist){ const r = _ap.apply(this, arguments); try { if (comp && comp.dataset.type && comp.dataset.type.startsWith('sq-')) syncComp(comp); } catch(e){} return r; };
+  }
+
+  /* ---------------- 도움말 ---------------- */
+  Object.assign(COMP_HELP_BLURB, {
+    'sq-board': { ko:'EZT ST-1801 시퀀스 실습장치의 프레임(워킹보드 + 입출력 명판)입니다. 위쪽 손잡이를 끌면 판 위의 모든 부품과 배선이 함께 움직입니다.' },
+    'sq-power': { ko:'실습장치의 전원 코드(AC 3상 220V 60Hz)입니다. 상단 "⚡ 전력 투입"을 켜야 R·S·T에 전기가 들어옵니다. 실습장치를 배치하면 MCCB 1차측(1/L1·3/L2·5/L3)에 미리 연결되어 있습니다.' },
+    'sq-mccb3': { ko:'배선용 차단기(MCCB 3P). 레버를 눌러 ON/OFF 합니다. 2차측(2/T1·4/T2·6/T3)에서 R·S·T를 꺼내 씁니다. 상(R-S-T)끼리 직접 닿는 단락이 생기면 자동으로 TRIP 됩니다.' },
+    'sq-cp2': { ko:'회로 보호기(CP 2P) — 제어회로(CR·CT)용 차단기입니다. 1·3 입력, 2·4 출력. 단락 시 TRIP.' },
+    'sq-fuse2': { ko:'퓨즈 홀더 2P. 1→2, 3→4가 퓨즈를 통해 연결됩니다. 퓨즈를 클릭하면 빼기/끼우기.' },
+    'sq-smps': { ko:'SMPS. L·N에 AC220V를 넣으면 +V/-V로 DC 24V를 냅니다(+V 2개, -V 2개는 내부 연결). 출력 단락 시 보호 동작(입력 전원을 내리거나 RESET).' },
+    'sq-relay8': { ko:'8핀 릴레이(교재 번호). 코일 2-7, a접점 1-3 · 8-6, b접점 1-4 · 8-5. 코일에 AC220V(또는 DC24V)가 걸리면 동작합니다.' },
+    'sq-relay14': { ko:'14핀 릴레이(MY4). 코일 13-14. 공통 9·10·11·12 → a접점 5·6·7·8, b접점 1·2·3·4.' },
+    'sq-timer': { ko:'타이머(Autonics AT8N, 8핀). 전원 2-7, 순시접점 1-3(a)·1-4(b), 한시접점 8-6(a)·8-5(b). 모드: ON 딜레이 / OFF 딜레이 / 플리커 / 인터벌. 설정 시간은 초 단위.' },
+    'sq-timesw': { ko:'24시간 타임스위치. U1-U2에 전원, 설정한 ON~OFF 시각 사이에는 COM-NO, 그 외에는 COM-NC가 닫힙니다. 수업용으로 시계를 ×60~×3600 빠르게 돌릴 수 있습니다.' },
+    'sq-plc': { ko:'LS XGB XBC-DR32H(교재 PLC). TB1·TB3에 AC220V(L·N). 입력 P00~P0F는 COM 기준 DC24V(서비스 전원 24V·24G 사용 가능, 싱크/소스 모두 가능). 출력 P20~P2F는 릴레이 접점(P20~P23↔COM0, P24~P27↔COM1, P28~P2B↔COM2, P2C~P2F↔COM3). 래더 주소: 입력 P00000~, 출력 P00020~. 더블클릭: 래더 편집.' },
+    'sq-mc': { ko:'전자접촉기(LS Metasol MC-22b, 2a2b). 코일 A1-A2, 주접점 1/L1-2/T1 · 3/L2-4/T2 · 5/L3-6/T3, 보조 a접점 13-14·43-44, b접점 21-22·31-32.' },
+    'sq-eocr': { ko:'EOCR(전자식 과전류 계전기). A1-A2에 전원을 넣어야 95-96(b)이 닫힙니다. 트립 시 95-96 열림, 97-98(a) 닫힘. 주회로는 L1·L2·L3 → T1·T2·T3로 관통. TEST로 즉시 트립, RESET으로 복귀. 전동기의 "과부하" 버튼을 켜면 O-TIME 후 자동 트립합니다.' },
+    'sq-vfd': { ko:'인버터 LS G100C. R/S/T(단상은 R·T) 입력 → U/V/W 출력. drv=1(단자대): P1-CM 정회전, P2-CM 역회전, P3·P4·P5 조합으로 다단속(St1~St7). drv=0: RUN/STOP 키. ⚙에서 주파수·가감속 시간 설정.' },
+    'sq-motor': { ko:'소형 유도전동기. 3상: U·V·W에 서로 다른 세 상이 들어오면 회전(두 상을 바꾸면 역회전). 단상 선택 시 U-V 정회전, U-W 역회전. "과부하"로 축 구속을 흉내 내 EOCR 트립 실습을 할 수 있습니다.' },
+    'sq-tb': { ko:'단자대 30P. 같은 번호의 위·아래 단자는 내부에서 연결되어 있습니다.' },
+    'sq-iopanel': { ko:'입출력 명판(사진과 같은 배치). 부저(1-2), 셀렉터 S/S(COM-A: MANU, COM-B: AUTO), 표시등 PL1 적·PL2 주황·PL3 녹·PL4 백(X1-X2), 푸시버튼 PB1~PB4(a 13-14, b 21-22, 누르는 동안만), 비상정지 EMG(눌러서 잠금, 다시 클릭 해제).' },
+    'sq-pb-g': { ko:'푸시버튼(1a1b). a 13-14, b 21-22. 누르고 있는 동안만 동작.' },
+    'sq-pb-r': { ko:'푸시버튼(1a1b). a 13-14, b 21-22. 누르고 있는 동안만 동작.' },
+    'sq-pl-r': { ko:'표시등(X1-X2). AC220V 또는 DC24V가 걸리면 점등.' },
+    'sq-pl-g': { ko:'표시등(X1-X2). AC220V 또는 DC24V가 걸리면 점등.' },
+    'sq-pl-y': { ko:'표시등(X1-X2). AC220V 또는 DC24V가 걸리면 점등.' },
+    'sq-pl-w': { ko:'표시등(X1-X2). AC220V 또는 DC24V가 걸리면 점등.' },
+    'sq-bz': { ko:'부저(1-2). 전압이 걸리면 울립니다(명판의 🔊로 소리 끄기).' },
+    'sq-ss': { ko:'셀렉터 스위치. 클릭할 때마다 MANU(COM-A 닫힘) ↔ AUTO(COM-B 닫힘).' },
+    'sq-emg': { ko:'비상정지 버튼(1a1b). 클릭하면 눌린 채 잠기고(b 21-22 열림), 다시 클릭하면 해제됩니다.' },
+  });
+
+  /* ======================= 실습장치 자동 배치 ======================= */
+  // 사진(EZT ST-1801) 배치 그대로 — 판 원점 기준 상대 좌표
+  const LAYOUT = [
+    // 1단(위 레일): MCCB · CP · 퓨즈 · SMPS · 14핀 릴레이×2 · 8핀 릴레이×2 · 타이머 · 타임스위치
+    ['sq-mccb3', 40, 70, 'MCCB'], ['sq-cp2', 185, 70, 'CP'], ['sq-fuse2', 305, 70, 'F'],
+    ['sq-smps', 415, 50, 'SMPS'],
+    ['sq-relay14', 555, 70, 'X1'], ['sq-relay14', 690, 70, 'X2'],
+    ['sq-relay8', 825, 70, 'X3'], ['sq-relay8', 940, 70, 'X4'],
+    ['sq-timer', 1055, 50, 'T'], ['sq-timesw', 1215, 40, '24H'],
+    // 2단(가운데 레일): PLC · MC×3 · EOCR · 인버터
+    ['sq-plc', 30, 455, 'PLC'],
+    ['sq-mc', 530, 465, 'MC1'], ['sq-mc', 712, 465, 'MC2'], ['sq-mc', 894, 465, 'MC3'],
+    ['sq-eocr', 1076, 455, 'EOCR1'],
+    ['sq-vfd', 1242, 322, 'INV'],
+    // 3단(아래 레일): 단자대 · EOCR(추가) · 전동기
+    ['sq-tb', 30, 905, 'TB'],
+    ['sq-eocr', 820, 860, 'EOCR2'],
+    ['sq-motor', 1050, 845, 'M'],
+    // 입출력 명판
+    ['sq-iopanel', 1468, 60, '입출력 명판'],
+  ];
+  function spawnAt(type, x, y, label){
+    const id = spawnComponent(type, x, y);
+    const el = id && document.getElementById(id);
+    if (el && label){ el.dataset.label = label; refreshComponentLabel(id); }
+    return el;
+  }
+  window.sqPlaceTrainer = function(){
+    const hasParts = !!document.querySelector('#canvasInner > .placed-component');
+    if (hasParts && !confirm('캔버스를 비우고 시퀀스 실습장치(EZT ST-1801)를 사진과 같은 구성으로 배치할까요?\n(지금 작업은 Ctrl+Z로 되돌릴 수 있습니다)')) return;
+    try { plcCheckpoint(); } catch(e){}
+    if (isRunning) toggleRun();
+    clearCanvas();
+    const ox = 320, oy = 70;
+    spawnAt('sq-board', ox, oy, '');
+    const placed = {};
+    LAYOUT.forEach(([type, x, y, label]) => { const el = spawnAt(type, ox + x, oy + y, label); if (el) placed[label] = el; });
+    const pwr = spawnAt('sq-power', 40, oy + 90, '전원 코드');
+    // 공장 배선: 전원 코드 → MCCB 1차측
+    const mccb = placed['MCCB'];
+    if (pwr && mccb){
+      [['R','L1'],['S','L3'],['T','L5']].forEach(([a, b]) => { const pa = PIN(pwr.id, a), pb = PIN(mccb.id, b); if (pa && pb) createWire(pa, pb); });
+    }
+    bindPinEvents();
+    // 화면에 맞게 확대/축소하고 판이 보이도록 스크롤
+    const area = document.getElementById('canvasArea');
+    const fit = Math.min(1, Math.max(0.4, Math.min((area.clientWidth - 30) / (ox + BOARD_W + 20), (area.clientHeight - 20) / (oy + BOARD_H + 20))));
+    zoomLevel = fit; applyZoom();
+    area.scrollLeft = 0; area.scrollTop = 0;
+    updateAllWires(); refreshLegend(); evaluateElectricalNets();
+    try { plcScheduleCheckpoint(); } catch(e){}
+    sqBanner('🧰 시퀀스 실습장치를 배치했습니다 — ⚡ 전력 투입 → MCCB·CP 레버 ON 후 교재 회로대로 배선해 보세요.');
+  };
+
+  /* ======================= 팔레트: "시퀀스회로 실습" ======================= */
+  const SEQ_TYPES = ['sq-iopanel','sq-power','sq-mccb3','sq-cp2','sq-fuse2','sq-smps','sq-relay8','sq-relay14','sq-timer','sq-timesw','sq-plc','sq-mc','sq-eocr','sq-vfd','sq-motor','sq-tb','sq-pb-g','sq-pb-r','sq-pl-r','sq-pl-g','sq-pl-y','sq-pl-w','sq-bz','sq-ss','sq-emg','sq-board'];
+  if (Array.isArray(PALETTE_CATEGORIES) && !PALETTE_CATEGORIES.some(c => c.key === 'seq')){
+    PALETTE_CATEGORIES.unshift({ key:'seq', titleKo:'🧰 시퀀스회로 실습', titleEn:'🧰 Sequence Circuit Practice', types: SEQ_TYPES });
+  }
+  function decoratePalette(){
+    const root = document.getElementById('paletteItems'); if (!root) return;
+    const group = root.querySelector('.palette-group'); if (!group) return;
+    group.classList.add('sq-pgroup'); group.classList.remove('collapsed');
+    const body = group.querySelector('.palette-group-body'); if (!body || body.querySelector('.sq-trainer-card')) return;
+    const card = document.createElement('div');
+    card.className = 'sq-trainer-card';
+    card.innerHTML = `<div class="sq-tc-mini"><i></i><i></i><i></i><b></b></div><div><b>실습장치 판 배치</b><span>EZT ST-1801 — 사진과 같은 구성으로 자동 배치</span></div>`;
+    card.title = '클릭하면 시퀀스 실습장치 전체(PLC·MC·EOCR×2·인버터·릴레이·타이머·명판…)가 사진과 같은 위치에 배치됩니다.';
+    card.onclick = () => window.sqPlaceTrainer();
+    body.insertBefore(card, body.firstChild);
+  }
+  if (typeof buildPalette === 'function'){
+    const _bp = buildPalette;
+    buildPalette = function(){ const r = _bp.apply(this, arguments); try { decoratePalette(); } catch(e){} return r; };
+    buildPalette();
+  }
+
+  /* ======================= 평가 후처리: 단락 감지 + 상시 틱 ======================= */
+  if (typeof evaluateElectricalNets === 'function'){
+    const _eval = evaluateElectricalNets;
+    let inPost = false;
+    evaluateElectricalNets = function(){
+      anyBuzz = false;
+      const r = _eval.apply(this, arguments);
+      if (inPost || !r || !r.netState) { buzzerSound(anyBuzz); return r; }
+      if (!document.querySelector('#canvasInner > .placed-component[data-type^="sq-"]')){ buzzerSound(false); return r; }
+      buzzerSound(anyBuzz);
+      // AC 단락: 한 net에 서로 다른 상이 2개 이상 → 그 net에 걸린 차단기(MCCB/CP) 트립
+      let shorted = [];
+      r.netState.forEach((st, net) => { if (phasesOf(st).length >= 2) shorted.push(net); });
+      let msg = '';
+      if (shorted.length){
+        const brks = Array.from(document.querySelectorAll('.placed-component[data-type="sq-mccb3"], .placed-component[data-type="sq-cp2"]'))
+          .filter(b => b.querySelector('.sq-brk-lever')?.dataset.on === '1');
+        // 하류(부하 쪽) 차단기부터: 단락 net에 출력단이 물린 차단기를 트립
+        let tripped = brks.filter(b => Array.from(b.querySelectorAll('.pin-mini')).some(p => shorted.some(n => n.has(p))));
+        const cp = tripped.filter(b => b.dataset.type === 'sq-cp2');
+        if (cp.length) tripped = cp;
+        tripped.forEach(breakerTrip);
+        if (tripped.length) msg = `⚡ 단락(쇼트)! 서로 다른 상(R·S·T)이 직접 연결되었습니다 → ${tripped.map(b => b.dataset.label || b.dataset.type).join(', ')} TRIP. 배선을 고친 뒤 레버를 다시 올리세요.`;
+        else if (powerOn){ powerOn = false; const sw = document.getElementById('powerSwitch'); if (sw) sw.checked = false; msg = '⚡ 단락(쇼트)! 차단기 없이 전원끼리 직접 연결되어 전력 투입을 차단했습니다.'; }
+      }
+      // DC 단락: SMPS / PLC 서비스 전원 +와 -가 한 net
+      document.querySelectorAll('.placed-component[data-type="sq-smps"], .placed-component[data-type="sq-plc"]').forEach(c => {
+        if (c.dataset.pw !== '1' || c.dataset.ocp === '1') return;
+        const p = PIN(c.id, c.dataset.type === 'sq-smps' ? 'VP1' : 'V24');
+        if (!p) return;
+        const net = r.nets.find(n => n.has(p)); const st = net && r.netState.get(net);
+        if (st && st.dc24p && st.dc24n){ c.dataset.ocp = '1'; msg = msg || `⚡ DC 24V 단락! ${c.dataset.label || ''} 출력 +와 -가 직접 연결되어 보호 동작했습니다.`; }
+      });
+      if (msg){ sqBanner(msg); inPost = true; try { _eval.apply(this, arguments); } finally { inPost = false; } }
+      return r;
+    };
+  }
+  // 전력 투입 중(RUN이 아니어도) 릴레이·타이머·인버터가 계속 동작하도록 상시 평가
+  setInterval(() => {
+    if (!powerOn || isRunning) return;
+    if (!document.querySelector('#canvasInner > .placed-component[data-type^="sq-"]')) return;
+    try { evaluateElectricalNets(); } catch(e){}
+  }, 50);
+  // RUN 중에는 기존 스캔 루프가 평가하지만, 전원이 꺼져 있으면 부저 끄기
+  setInterval(() => { if (!powerOn) buzzerSound(false); }, 500);
 })();
 
 </script>
