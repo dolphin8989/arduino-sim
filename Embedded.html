@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver1.04</title>
+<title>K군의 아두이노 시뮬레이터 Ver1.05</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -2426,7 +2426,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver1.04</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver1.05</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -3721,7 +3721,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver1.04", en: "K's Simulator Ver1.04" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver1.05", en: "K's Simulator Ver1.05" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -4673,7 +4673,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.04", en: "K's Arduino Simulator Ver1.04" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.05", en: "K's Arduino Simulator Ver1.05" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -4721,7 +4721,7 @@ const STRINGS = {
   "schematic.closeBtn": { ko: "닫기", en: "Close" },
   "schematic.empty": { ko: "배선된 보드나 부품이 없습니다. 먼저 회로를 구성해 주세요.", en: "No wired boards or components found. Build a circuit first." },
   "schematic.popupBlocked": { ko: "팝업이 차단되었습니다. 이 사이트의 팝업을 허용해 주세요.", en: "The popup was blocked. Please allow popups for this site." },
-  "schematic.editHint": { ko: "부품 드래그로 이동 · 클릭 후 R키로 회전 · 전선을 끌어서 선 이동 · 전선 클릭 후 위 선 스타일로 색상/굵기/종류 변경 · 전선 더블클릭으로 꺾임점 추가 · 점 더블클릭으로 삭제 · 부품/전선 클릭 후 Delete(또는 Backspace)로 삭제", en: "Drag to move · click then press R to rotate · drag a wire to move it · double-click a wire to add a bend point · double-click a point to remove it · click a part/wire then press Delete (or Backspace) to remove it" },
+  "schematic.editHint": { ko: "부품 드래그로 이동 · 클릭 후 R키로 회전 · 전선을 끌어서 선 이동 · 전선 클릭 후 위 선 스타일로 색상/굵기/종류 변경 · 전선 더블클릭으로 꺾임점 추가 · 점 더블클릭으로 삭제 · 부품/전선 클릭 후 Delete(또는 Backspace)로 삭제 · 핀(점)을 끌어 다른 핀에 놓으면 새 선 · 부품 클릭 후 포트 위치 선택(P키) · Ctrl+Z 실행 취소 / Ctrl+Y 다시 실행", en: "Drag to move · click then press R to rotate · drag a wire to move it · double-click a wire to add a bend point · double-click a point to remove it · click a part/wire then press Delete (or Backspace) to remove it" },
   "toolbar.clearConsole": { ko: "콘솔 지우기", en: "Clear Console" },
   "toolbar.editor": { ko: "코드 에디터 &amp; 컴파일러", en: "Code Editor &amp; Compiler" },
   "toolbar.gallery": { ko: "🗂 예제 갤러리", en: "🗂 Example Gallery" },
@@ -7951,6 +7951,7 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver1.05', ko: ['회로도 그리기: 실행 취소 · 다시 실행(Ctrl+Z / Ctrl+Y) 추가', '회로도 그리기: 지운 선 다시 그리기(핀 → 핀) 추가', '회로도 그리기: 부품 포트 위치 변경(하단 · 좌우 · 4면 등) 추가', '드래그로 여러 부품 · 전선 한꺼번에 선택 · 이동 · 삭제', '상단 메뉴 · 코드 편집 메뉴 접기/펼치기', '부품이 많을 때 속도 개선', '붙여넣은 코드의 보이지 않는 특수문자 자동 정리', 'Serial.print 줄바꿈 오류 수정 · if/else · do-while 실행 오류 수정', 'L298N 2채널 실제 핀 배치로 변경', 'USB 포트(아두이노 · 라즈베리파이) · USB 허브 · USB 라이다 부품 추가'] },
   { ver: 'Ver1.04', ko: ['브레드보드에 꽂힌 부품 함께 이동 기능 추가', '배선 브레드보드 위로 그리기 수정'] },
   { ver: 'Ver1.03', ko: ['부품 검색 기능 추가', '코드 창 높이 조절(위아래 드래그) 기능 추가', '코드 에디터 전체화면 기능 추가'] },
   { ver: 'Ver1.02', ko: ['상단 직각 보조 ON/OFF 버튼 추가', '3핀 슬라이드 스위치(SPDT) 부품 추가 — 브레드보드 장착 가능'] },
@@ -21110,6 +21111,23 @@ function applySavedSchematicLayout(model){
     if (sw.width) match.width = sw.width;
     if (sw.dash) match.dash = sw.dash;
   });
+  // [Ver1.05] 회로도에서 바꾼 포트(핀) 위치와, 지우거나 새로 그린 선도 그대로 복원
+  // (회로 구성 — 노드 종류/이름/핀 — 이 그때와 완전히 같을 때만)
+  const sn = saved.nodes || [];
+  const sameNodes = sn.length === model.nodes.length && model.nodes.every((n, i) => n.kind === sn[i].kind && n.label === sn[i].label
+    && (sn[i].pins || []).length === n.pins.length && n.pins.every((p, k) => p.name === sn[i].pins[k].name));
+  if (sameNodes){
+    model.nodes.forEach((n, i) => {
+      const s = sn[i];
+      if (!s.portMode && !(s.pins || []).some(p => p.side && p.side !== 'B')) return;
+      n.portMode = s.portMode; n.w = s.w; n.h = s.h;
+      n.pins = s.pins.map(p => ({ name: p.name, lx: p.lx, ly: p.ly, side: p.side }));
+    });
+    if (saved.wiresEdited && Array.isArray(saved.wires)){
+      model.wires = JSON.parse(JSON.stringify(saved.wires));
+      model.wiresEdited = true;
+    }
+  }
   return model;
 }
 function buildSchematicModel(){
@@ -21755,6 +21773,7 @@ function schematicPopupScriptSource(){
     "});",
     "renderAll();",
     "syncToOpener();",
+    "// ==== [Ver1.05] 회로도 그리기 확장: 실행 취소/다시 실행 · 선 다시 그리기 · 포트(핀) 위치 변경 ====\n(function(){\n  var PIN_STUB = 7;\n  // ---------- 실행 취소 / 다시 실행 ----------\n  function schState(){ return JSON.stringify({ nodes: MODEL.nodes, wires: MODEL.wires, we: !!MODEL.wiresEdited }); }\n  var past = [], future = [], lastState = schState(), lastT = 0, coalesce = false;\n  var _sync = syncToOpener;\n  function schCommit(){\n    var cur = schState();\n    if (cur === lastState) return;\n    var now = Date.now();\n    if (!(coalesce && now - lastT < 700 && past.length)) { past.push(lastState); if (past.length > 200) past.shift(); }\n    coalesce = false; lastT = now;\n    lastState = cur; future = [];\n    schUndoUI();\n  }\n  syncToOpener = function(){ schCommit(); _sync(); };\n  function schApplyState(s){\n    var o = JSON.parse(s);\n    MODEL.nodes = o.nodes; MODEL.wires = o.wires; MODEL.wiresEdited = o.we;\n    if (selectedNodeIdx >= MODEL.nodes.length) selectedNodeIdx = -1;\n    selectedWireIdx = -1; pending = null;\n    renderAll(); schSyncStyleControls(); schSyncPortUI(); schUndoUI(); _sync();\n  }\n  function schUndo(){ if (!past.length) return; future.push(lastState); lastState = past.pop(); schApplyState(lastState); }\n  function schRedo(){ if (!future.length) return; past.push(lastState); lastState = future.pop(); schApplyState(lastState); }\n  function schUndoUI(){\n    var u = document.getElementById('schUndo'), r = document.getElementById('schRedo');\n    if (u) u.disabled = !past.length; if (r) r.disabled = !future.length;\n  }\n  window.schUndo = schUndo; window.schRedo = schRedo;\n  var _style = schApplyStyle;\n  schApplyStyle = function(field){ coalesce = (field === 'sColor'); return _style.apply(this, arguments); };\n\n  // ---------- 포트(핀) 위치 ----------\n  function sideOf(p){ return p.side || 'B'; }\n  function hasCustomSides(node){ return node.kind === 'box' && node.pins.some(function(p){ return sideOf(p) !== 'B'; }); }\n  function schLayoutPins(node){\n    var groups = { B: [], T: [], L: [], R: [] };\n    node.pins.forEach(function(p){ groups[sideOf(p)].push(p); });\n    var oldW = node.w, oldH = node.h;\n    var w = Math.max(65, Math.max(groups.B.length, groups.T.length) * 17 + 13);\n    var h = Math.max(33, Math.max(groups.L.length, groups.R.length) * 15 + 10);\n    groups.B.forEach(function(p, i){ var n = groups.B.length; p.lx = n === 1 ? w / 2 : (i + 0.5) * (w / n); p.ly = h + PIN_STUB; });\n    groups.T.forEach(function(p, i){ var n = groups.T.length; p.lx = n === 1 ? w / 2 : (i + 0.5) * (w / n); p.ly = -PIN_STUB; });\n    groups.L.forEach(function(p, i){ var n = groups.L.length; p.ly = n === 1 ? h / 2 : (i + 0.5) * (h / n); p.lx = -PIN_STUB; });\n    groups.R.forEach(function(p, i){ var n = groups.R.length; p.ly = n === 1 ? h / 2 : (i + 0.5) * (h / n); p.lx = w + PIN_STUB; });\n    node.w = w; node.h = h;\n    node.x += (oldW - w) / 2; node.y += (oldH - h) / 2; // 중심 유지\n    // 핀이 옮겨졌으므로 이 부품에 연결된 선은 꺾임점을 지우고 새 위치 기준 자동 경로로 다시 그림\n    var ni = MODEL.nodes.indexOf(node);\n    MODEL.wires.forEach(function(wr){ if (wr.a.n === ni || wr.b.n === ni) wr.bends = []; });\n  }\n  function schSetPortMode(node, mode){\n    if (!node || node.kind !== 'box') return;\n    var n = node.pins.length, sides = [];\n    if (mode === 'B' || mode === 'T' || mode === 'L' || mode === 'R'){ for (var i = 0; i < n; i++) sides.push(mode); }\n    else if (mode === 'LR' || mode === 'TB'){\n      var a = mode === 'LR' ? 'L' : 'T', b = mode === 'LR' ? 'R' : 'B', half = Math.ceil(n / 2);\n      for (var j = 0; j < n; j++) sides.push(j < half ? a : b);\n    } else if (mode === '4'){\n      var order = ['L', 'T', 'R', 'B'], base = Math.floor(n / 4), extra = n % 4, k = 0;\n      order.forEach(function(s, si){ var c = base + (si < extra ? 1 : 0); for (var q = 0; q < c; q++){ sides[k++] = s; } });\n    } else return;\n    node.pins.forEach(function(p, i){ p.side = sides[i]; });\n    node.portMode = mode;\n    schLayoutPins(node);\n  }\n  function schCyclePin(node, pIdx){\n    if (!node || node.kind !== 'box') return;\n    var nx = { B: 'R', R: 'T', T: 'L', L: 'B' };\n    var p = node.pins[pIdx]; p.side = nx[sideOf(p)];\n    node.portMode = 'custom';\n    schLayoutPins(node);\n  }\n  window.schSetPortMode = schSetPortMode;\n  var _sym = nodeSymbolLocalSVG;\n  nodeSymbolLocalSVG = function(node){\n    if (!hasCustomSides(node)) return _sym(node);\n    var w = node.w, h = node.h, rot = node.rot || 0, cx = w / 2, cy = h / 2;\n    var body = '<rect x=\"0\" y=\"0\" width=\"' + w + '\" height=\"' + h + '\" rx=\"3\" fill=\"#1b2129\" stroke=\"#4a5a6a\" stroke-width=\"1.3\"/>';\n    var hasTop = false;\n    node.pins.forEach(function(p){\n      var s = sideOf(p), ex = p.lx, ey = p.ly, tx, ty, an = 'middle';\n      if (s === 'B'){ ey = h; tx = p.lx; ty = p.ly + 7; }\n      else if (s === 'T'){ ey = 0; tx = p.lx; ty = p.ly - 3; hasTop = true; }\n      else if (s === 'L'){ ex = 0; tx = p.lx - 2.5; ty = p.ly + 2; an = 'end'; }\n      else { ex = w; tx = p.lx + 2.5; ty = p.ly + 2; an = 'start'; }\n      body += '<line x1=\"' + ex + '\" y1=\"' + ey + '\" x2=\"' + p.lx + '\" y2=\"' + p.ly + '\" stroke=\"#8b93a1\" stroke-width=\"1.2\"/>'\n        + '<circle cx=\"' + p.lx + '\" cy=\"' + p.ly + '\" r=\"1.6\" fill=\"#5ad0e6\"/>'\n        + txt(tx, ty, 6, '#9fb0c0', an, svgEscP(p.name), rot);\n    });\n    if (hasTop){\n      body += txt(cx, node.value ? cy - 1 : cy + 3, 8, '#e8ecf1', 'middle', svgEscP(node.label), rot);\n      if (node.value) body += txt(cx, cy + 10, 7, '#5ad0e6', 'middle', svgEscP(node.value), rot);\n    } else {\n      var vertRot = (Math.round((((rot % 360) + 360) % 360) / 90) % 2) === 1;\n      var labelX = vertRot ? -5 : cx, labelY = vertRot ? cy : -5;\n      var valueX = vertRot ? -17 : cx, valueY = vertRot ? cy : -17;\n      body += txt(labelX, labelY, 8, '#e8ecf1', 'middle', svgEscP(node.label), rot);\n      if (node.value) body += txt(valueX, valueY, 7, '#5ad0e6', 'middle', svgEscP(node.value), rot);\n    }\n    return body;\n  };\n  // 옆/위로 나온 핀은 기본 자동 경로가 부품을 가로지르지 않도록 바깥으로 한 칸 빼서 시작\n  function pinOut(node, pIdx){\n    var p = node.pins[pIdx], s = sideOf(p);\n    if (node.kind !== 'box' || s === 'B') return null;\n    var d = { T: [0, -10], L: [-10, 0], R: [10, 0] }[s];\n    var rp = rotatePt(p.lx + d[0], p.ly + d[1], node.w / 2, node.h / 2, node.rot || 0);\n    return { x: node.x + rp.x, y: node.y + rp.y };\n  }\n  var _wpp = wirePathPoints;\n  wirePathPoints = function(w, wi){\n    if (w.bends && w.bends.length) return _wpp(w, wi);\n    var an = MODEL.nodes[w.a.n], bn = MODEL.nodes[w.b.n];\n    if (!an || !bn) return _wpp(w, wi);\n    var ao = pinOut(an, w.a.p), bo = pinOut(bn, w.b.p);\n    if (!ao && !bo) return _wpp(w, wi);\n    var a = pinAbs(an, w.a.p), b = pinAbs(bn, w.b.p);\n    var A = ao || a, B = bo || b;\n    var lane = (typeof wi === 'number') ? (wi % 5) - 2 : 0;\n    var midY = (A.y + B.y) / 2 + lane * 11;\n    var pts = [a];\n    if (ao) pts.push(ao);\n    pts.push({ x: A.x, y: midY }); pts.push({ x: B.x, y: midY });\n    if (bo) pts.push(bo);\n    pts.push(b);\n    return pts;\n  };\n\n  // ---------- 선 다시 그리기 (핀 → 핀) ----------\n  var drawWire = null, pending = null, drawMode = false;\n  var _render = renderAll;\n  renderAll = function(){\n    _render();\n    MODEL.nodes.forEach(function(node, ni){\n      node.pins.forEach(function(p, pi){\n        var q = pinAbs(node, pi);\n        var isPend = pending && pending.n === ni && pending.p === pi;\n        svgRoot.appendChild(el('circle', { cx: q.x, cy: q.y, r: isPend ? 5 : 4.5, class: 'sch-pin' + (isPend ? ' pending' : ''), 'data-node-idx': ni, 'data-pin-idx': pi }));\n      });\n    });\n    svgRoot.classList.toggle('sch-pins-on', !!(drawMode || pending || drawWire));\n  };\n  function pinOfTarget(t){\n    var c = t && t.closest ? t.closest('.sch-pin') : null;\n    if (!c) return null;\n    return { n: parseInt(c.getAttribute('data-node-idx'), 10), p: parseInt(c.getAttribute('data-pin-idx'), 10) };\n  }\n  var rubber = null;\n  function showRubber(from, pt){\n    if (!rubber || !rubber.parentNode){ rubber = el('line', { stroke: '#ffd23f', 'stroke-width': 1.6, 'stroke-dasharray': '4,3', 'pointer-events': 'none' }); svgRoot.appendChild(rubber); }\n    var a = pinAbs(MODEL.nodes[from.n], from.p);\n    rubber.setAttribute('x1', a.x); rubber.setAttribute('y1', a.y); rubber.setAttribute('x2', pt.x); rubber.setAttribute('y2', pt.y);\n  }\n  function hideRubber(){ if (rubber && rubber.parentNode) rubber.parentNode.removeChild(rubber); rubber = null; }\n  function addWire(a, b){\n    if (!a || !b || (a.n === b.n && a.p === b.p)) return false;\n    var dup = MODEL.wires.some(function(w){ return (w.a.n === a.n && w.a.p === a.p && w.b.n === b.n && w.b.p === b.p) || (w.a.n === b.n && w.a.p === b.p && w.b.n === a.n && w.b.p === a.p); });\n    if (dup) return false;\n    var col = (document.getElementById('schWColor') || {}).value || '#5ad0e6';\n    MODEL.wires.push({ a: { n: a.n, p: a.p }, b: { n: b.n, p: b.p }, color: col, bends: [] });\n    MODEL.wiresEdited = true;\n    selectedWireIdx = MODEL.wires.length - 1; selectedNodeIdx = -1;\n    renderAll(); schSyncStyleControls(); schSyncPortUI();\n    syncToOpener();\n    return true;\n  }\n  window.schAddWire = addWire;\n  svgRoot.addEventListener('mousedown', function(e){\n    var pin = pinOfTarget(e.target);\n    if (!pin) return;\n    e.stopPropagation(); e.preventDefault();\n    if (e.shiftKey){\n      var nd = MODEL.nodes[pin.n];\n      if (nd && nd.kind === 'box'){ schCyclePin(nd, pin.p); selectedNodeIdx = pin.n; selectedWireIdx = -1; renderAll(); schSyncPortUI(); syncToOpener(); }\n      return;\n    }\n    if (pending){\n      var from = pending; pending = null; hideRubber();\n      if (!(from.n === pin.n && from.p === pin.p)) addWire(from, pin); else renderAll();\n      return;\n    }\n    drawWire = { from: pin, moved: false, sx: e.clientX, sy: e.clientY };\n  }, true);\n  svgRoot.addEventListener('click', function(e){\n    if (pinOfTarget(e.target)){ e.stopPropagation(); return; }\n    if (pending){ pending = null; hideRubber(); }\n  }, true);\n  document.addEventListener('mousemove', function(e){\n    if (drawWire){\n      if (Math.abs(e.clientX - drawWire.sx) + Math.abs(e.clientY - drawWire.sy) > 4) drawWire.moved = true;\n      svgRoot.classList.add('sch-pins-on');\n      showRubber(drawWire.from, getSvgPoint(e));\n    } else if (pending){\n      showRubber(pending, getSvgPoint(e));\n    }\n  });\n  document.addEventListener('mouseup', function(e){\n    if (!drawWire) return;\n    var d = drawWire; drawWire = null;\n    var target = pinOfTarget(e.target) || pinOfTarget(document.elementFromPoint(e.clientX, e.clientY));\n    hideRubber();\n    if (target && !(target.n === d.from.n && target.p === d.from.p)){ addWire(d.from, target); return; }\n    if (!d.moved){ pending = d.from; renderAll(); return; } // 클릭만 했으면: 다음에 클릭하는 핀까지 선을 잇습니다\n    renderAll();\n  });\n  // 선을 지운 경우에도 \"다시 그렸다\"는 표시를 남겨 저장/복원에 반영\n  var _delW = deleteWire;\n  deleteWire = function(idx){ MODEL.wiresEdited = true; return _delW(idx); };\n  var _delN = deleteNode;\n  deleteNode = function(idx){ MODEL.wiresEdited = true; return _delN(idx); };\n\n  // ---------- 선택 ↔ 포트 위치 UI ----------\n  function schSyncPortUI(){\n    var sel = document.getElementById('schPortMode'), lab = document.getElementById('schPortTarget');\n    if (!sel) return;\n    var node = selectedNodeIdx >= 0 ? MODEL.nodes[selectedNodeIdx] : null;\n    var ok = !!(node && node.kind === 'box');\n    sel.disabled = !ok;\n    if (lab) lab.textContent = node ? (ok ? node.label : node.label + ' — 2단자 부품은 R키로 회전') : '부품을 클릭하세요';\n    sel.value = ok ? (node.portMode || (hasCustomSides(node) ? 'custom' : 'B')) : 'B';\n  }\n  window.schSyncPortUI = schSyncPortUI;\n  ['selectNode', 'selectWire', 'clearSelection'].forEach(function(fn){\n    var orig = window[fn];\n    window[fn] = function(){ var r = orig.apply(this, arguments); schSyncPortUI(); return r; };\n  });\n  (function(){\n    var sel = document.getElementById('schPortMode');\n    if (sel) sel.addEventListener('change', function(){\n      var node = MODEL.nodes[selectedNodeIdx];\n      if (!node || sel.value === 'custom') return;\n      schSetPortMode(node, sel.value);\n      renderAll(); syncToOpener(); sel.blur();\n    });\n    var u = document.getElementById('schUndo'), r = document.getElementById('schRedo'), dw = document.getElementById('schDrawBtn');\n    if (u) u.onclick = schUndo;\n    if (r) r.onclick = schRedo;\n    if (dw) dw.onclick = function(){ drawMode = !drawMode; dw.classList.toggle('on', drawMode); renderAll(); };\n  })();\n  var MODES = ['B', 'LR', '4', 'T', 'L', 'R', 'TB'];\n  document.addEventListener('keydown', function(e){\n    var active = document.activeElement;\n    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;\n    var k = e.key.toLowerCase();\n    if ((e.ctrlKey || e.metaKey) && !e.altKey){\n      if (k === 'z' && !e.shiftKey){ e.preventDefault(); schUndo(); return; }\n      if (k === 'y' || (k === 'z' && e.shiftKey)){ e.preventDefault(); schRedo(); return; }\n      return;\n    }\n    if (e.key === 'Escape' && (pending || drawWire)){ pending = null; drawWire = null; hideRubber(); renderAll(); return; }\n    if (k === 'p' && !e.altKey && selectedNodeIdx >= 0){\n      var node = MODEL.nodes[selectedNodeIdx];\n      if (!node || node.kind !== 'box') return;\n      e.preventDefault();\n      var cur = MODES.indexOf(node.portMode || 'B');\n      schSetPortMode(node, MODES[(cur + 1) % MODES.length]);\n      renderAll(); schSyncPortUI(); syncToOpener();\n    }\n  });\n  renderAll(); schSyncPortUI(); schUndoUI();\n})();\n",
   ].join('\n');
 }
 
@@ -21799,6 +21818,13 @@ function openSchematicView(){
   .sch-bend:hover{fill:#fff;}
   .sch-bend:active{cursor:grabbing;}
   .sch-wire{cursor:pointer;}
+  .sch-pin{fill:transparent;cursor:crosshair;}
+  .sch-pin:hover{fill:rgba(255,210,63,.75);}
+  .sch-pins-on .sch-pin{fill:rgba(90,208,230,.28);stroke:#5ad0e6;stroke-width:.6;}
+  .sch-pins-on .sch-pin:hover{fill:rgba(255,210,63,.85);}
+  .sch-pin.pending{fill:#ffd23f !important;stroke:#fff;stroke-width:1;}
+  .schematic-toolbar button:disabled{opacity:.4;cursor:default;}
+  .schematic-toolbar button.on{background:#c58a12;}
   .sch-wire-tools{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:6px 10px; border:1px solid #2a323c; border-radius:6px; background:#10151b; font-size:.9rem; color:#fff;}
   .sch-wire-tools select{background:#0e1116; color:#fff; border:1px solid #3a3f47; border-radius:4px; padding:5px 6px; font-family:inherit; font-size:.85rem;}
   .sch-wire-tools input[type=color]{width:38px; height:30px; border:1px solid #3a3f47; border-radius:4px; background:#0e1116; padding:1px; cursor:pointer;}
@@ -21812,6 +21838,16 @@ function openSchematicView(){
     <button id="schSaveBtn">${svgEsc(tr('schematic.saveBtn'))}</button>
     <button id="schCloseBtn">${svgEsc(tr('schematic.closeBtn'))}</button>
     <button id="schZoomOut" title="축소 (Ctrl+휠)">🔍−</button><span id="schZoomLabel" style="font-size:1rem;color:#fff;min-width:52px;text-align:center;">180%</span><button id="schZoomIn" title="확대 (Ctrl+휠)">🔍+</button>
+    <button id="schUndo" title="실행 취소 (Ctrl+Z)" disabled>↶ 실행 취소</button><button id="schRedo" title="다시 실행 (Ctrl+Y / Ctrl+Shift+Z)" disabled>↷ 다시 실행</button>
+    <button id="schDrawBtn" title="핀(점)을 끌어 다른 핀에 놓거나, 핀을 클릭한 뒤 다른 핀을 클릭하면 새 선이 그려집니다 (지운 선 다시 그리기)">✏ 선 그리기</button>
+    <span class="sch-wire-tools">
+      <b>포트 위치</b> (<span id="schPortTarget">부품을 클릭하세요</span>)
+      <select id="schPortMode" disabled title="선택한 부품의 핀(포트)을 어느 면에 둘지 (P키로 순환 · 핀 Shift+클릭으로 그 핀만 다른 면으로)">
+        <option value="B">하단</option><option value="LR">좌 · 우 (양쪽)</option><option value="4">4면</option>
+        <option value="T">상단</option><option value="L">좌측</option><option value="R">우측</option><option value="TB">상 · 하</option>
+        <option value="custom" disabled>사용자 지정</option>
+      </select>
+    </span>
     <span class="sch-wire-tools">
       <b>선 스타일</b> (<span id="schWTarget">전체 선</span>)
       <input type="color" id="schWColor" value="#5ad0e6" title="선 색상">
