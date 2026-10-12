@@ -2092,6 +2092,19 @@
   .l298-jumper{width:14px; height:10px; padding:0; font-size:7px; line-height:1; border:1px dashed #ffd0d0; background:transparent; color:transparent; border-radius:2px; cursor:pointer;}
   .l298-jumper.on{background:#111; border:1px solid #000; color:#111;}
   .l298-hint{margin-top:5px; font-size:.5rem; line-height:1.35; color:#ffe1e1; text-align:center;}
+
+  /* [USB 단자 — 연결 표시용] */
+  .board > .board-usb-port{position:absolute; left:-36px; top:96px; z-index:6; display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 4px; background:linear-gradient(180deg,#c9ced4,#8f969e); border:1px solid #4d545c; border-radius:4px; box-shadow:0 2px 6px rgba(0,0,0,.45);}
+  .board > .board-usb-port .pin-cap{font-size:.52rem; font-weight:700; color:#1d2228;}
+  .board:not(.board-r3):not(.board-mega):not(.board-esp32) > .board-usb-port{top:136px;}
+  .board.board-esp32 > .board-usb-port{top:120px;}
+  .comp-rpi .rpi-ports{gap:10px !important;}
+  .comp-rpi .rpi-ports .pin-col{min-width:30px;}
+  .comp-diagramdeco.comp-usbhub{width:190px;}
+  .usbhub-body{display:flex; align-items:center; gap:8px; margin:4px auto 6px; padding:6px 8px; width:150px; background:linear-gradient(160deg,#2b313b,#14171e); border:1px solid #5a6475; border-radius:6px;}
+  .usbhub-led{width:7px; height:7px; border-radius:50%; background:#3a8bff; box-shadow:0 0 5px #3a8bff;}
+  .usbhub-slots{display:flex; gap:6px;}
+  .usbhub-slots i{width:18px; height:8px; background:#0a0c10; border:1px solid #7a8496; border-radius:1px;}
 </style>
 <style>/* [다중 선택 · 메뉴 접기] */
   /* ==== [다중 선택] 러버밴드 상자 · 선택 표시 · 선택 막대 ==== */
@@ -3152,6 +3165,10 @@
           <div class="palette-item" onclick="spawnComponent('usbsound')">
             <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(160deg,#232833,#14171e);border:1px solid #4a5468;"></div></div>
             <span data-i18n="palette.usbsound">USB 사운드 모듈<br>(회로도 전용)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('usbhub')">
+            <div class="swatch"><div style="width:24px;height:12px;border-radius:3px;background:linear-gradient(160deg,#2b313b,#14171e);border:1px solid #5a6475;"></div></div>
+            <span>USB 허브 (4포트)<br>(회로도 전용)</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('speaker')">
             <div class="swatch"><div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(160deg,#232833,#14171e);border:1px solid #4a5468;"></div></div>
@@ -9414,6 +9431,8 @@ function spawnComponent(type, dropX, dropY){
       <div class="rpi-ports">
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_HDMI" data-i18n-title="comp.rpi.hdmiTitle" title="HDMI OUT (더블클릭한 HDMI 모니터 부품의 팝업에서 화면 확인)"></div><span class="pin-cap cap-sig">HDMI</span></div>
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_CAM" data-i18n-title="comp.rpi.camTitle" title="CAM (CSI 카메라 포트) → 카메라 모듈의 CAM 핀과 연결"></div><span class="pin-cap cap-sig">CAM</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_USB1" title="USB 포트 1 (연결 표시용)"></div><span class="pin-cap cap-sig">USB1</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_USB2" title="USB 포트 2 (연결 표시용)"></div><span class="pin-cap cap-sig">USB2</span></div>
       </div>
       <div class="rpi-header">${rowsHtml}</div>`;
   } else if (type === 'hdmimonitor'){
@@ -9447,6 +9466,19 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_L" title="Line Out L"></div><span class="pin-cap cap-sig">L</span></div>
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_R" title="Line Out R"></div><span class="pin-cap cap-sig">R</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+      </div>`;
+  } else if (type === 'usbhub'){
+    // [회로도 전용] USB 허브 — 연결 관계를 보여주기 위한 부품(별도 동작 없음). IN(업스트림) 1개 + 포트 4개.
+    div.classList.add('comp-diagramdeco', 'comp-usbhub');
+    div.innerHTML = `
+      <div class="deco-title">USB 허브 (4포트)</div>
+      <div class="usbhub-body"><span class="usbhub-led"></span><div class="usbhub-slots"><i></i><i></i><i></i><i></i></div></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN" title="USB IN (업스트림 — PC·아두이노·라즈베리파이 쪽)"></div><span class="pin-cap cap-sig">IN</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_U1" title="USB 포트 1"></div><span class="pin-cap cap-sig">USB1</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_U2" title="USB 포트 2"></div><span class="pin-cap cap-sig">USB2</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_U3" title="USB 포트 3"></div><span class="pin-cap cap-sig">USB3</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_U4" title="USB 포트 4"></div><span class="pin-cap cap-sig">USB4</span></div>
       </div>`;
   } else if (type === 'speaker'){
     div.classList.add('comp-diagramdeco', 'comp-speaker');
@@ -20871,7 +20903,7 @@ function BOM_LABELS_FN(){ return {
   rgbled: tr('bom.rgbled'), psu: tr('comp.psu.title'), breadboard: tr('bom.breadboard'),
   btmodule: tr('bom.btmodule'), wifiap: tr('bom.wifiap'), dac: tr('comp.dac.title').replace(/<br>.*/,'').trim(),
   ultrasonic: tr('bom.ultrasonic'), lidar: tr('comp.lidar.label'), gyro: tr('bom.gyro'), accel: tr('bom.accel'), servo: tr('comp.servo.label'), rs485servo: tr('comp.rs485servo.label'), canmodule: tr('comp.canmodule.title'), canfdmodule: tr('comp.canfdmodule.title'), 'rs485module': tr('comp.rs485module.title'), pmsensor: tr('comp.pmsensor.title'), dcmotor: tr('comp.dcmotor.label'), fan: tr('comp.fan.label'),
-  rpi3: 'Raspberry Pi 3', rpi4: 'Raspberry Pi 4', rpi5: 'Raspberry Pi 5', hdmimonitor: tr('comp.hdmimonitor.title'), camera: tr('comp.camera.title'), usbsound: tr('comp.usbsound.title'), speaker: tr('comp.speaker.title'), custom: tr('comp.custom.defaultName'),
+  usbhub: 'USB 허브(4포트)', rpi3: 'Raspberry Pi 3', rpi4: 'Raspberry Pi 4', rpi5: 'Raspberry Pi 5', hdmimonitor: tr('comp.hdmimonitor.title'), camera: tr('comp.camera.title'), usbsound: tr('comp.usbsound.title'), speaker: tr('comp.speaker.title'), custom: tr('comp.custom.defaultName'),
   motordriver: tr('bom.motordriver'), motordriver2: tr('bom.motordriver2'), motordriverenc: tr('bom.motordriverenc'), 'motordriver-bts7960': tr('bom.mdbts'), 'motordriver-7a2ch': tr('bom.md7a'), 'imu-mpu6050': tr('bom.imumpu6050'), 'sensor-ldr': tr('sensor.ldr'), 'sensor-temp': tr('sensor.temp'), 'sensor-humid': tr('sensor.humid'),
   lcd: tr('bom.lcd'), oled: tr('bom.oled'),
   resistor: tr('bom.resistor'), powercable: tr('bom.powercable'), motor3ph: tr('comp.motor3ph.label'),
@@ -23998,6 +24030,30 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 
+
+<script>
+/* [USB 단자 — 연결 표시용] 아두이노/ESP32 보드 왼쪽에 USB 포트(단자 1개)를 붙입니다. 별도 동작은 없고
+   USB 허브·라즈베리파이 USB와 선을 그어 "USB로 연결됨"을 보여주는 용도입니다. */
+(function(){
+  if (typeof spawnBoard !== 'function') return;
+  function addUsbPorts(){
+    let added = false;
+    document.querySelectorAll('#canvasInner > .board').forEach(b => {
+      if (b.querySelector(':scope > .board-usb-port')) return;
+      const port = document.createElement('div');
+      port.className = 'board-usb-port';
+      port.title = 'USB (데이터 전송·전원 — 연결 표시용)';
+      port.innerHTML = '<div class="pin-mini role-sig" data-pin="USB" title="USB 포트 (연결 표시용)"></div><span class="pin-cap">USB</span>';
+      b.appendChild(port);
+      added = true;
+    });
+    if (added && typeof bindPinEvents === 'function') bindPinEvents();
+  }
+  const _sb = spawnBoard;
+  spawnBoard = function(){ const r = _sb.apply(this, arguments); try { addUsbPorts(); } catch(e){} return r; };
+  addUsbPorts();
+})();
+</script>
 <script>
 /* ==== [코드 자동 정리] 복사·붙여넣기로 딸려 온 "보이지 않는 특수문자" 정리 ====
    웹페이지·카카오톡·한글(HWP)·AI 답변 등에서 코드를 복사하면 눈에 안 보이는 제로폭 공백(U+200B),
