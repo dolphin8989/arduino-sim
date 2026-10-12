@@ -177,6 +177,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
 .doctabs button{display:flex;align-items:center;gap:6px;height:28px;padding:0 12px;border:1px solid var(--border);border-bottom:0;background:var(--bg-panel-2);border-radius:6px 6px 0 0;white-space:nowrap;cursor:pointer;color:var(--text-dim)}
 .doctabs button:hover{color:var(--text)}
 .doctabs button.on{background:var(--bg-panel-3);color:var(--text);font-weight:600;box-shadow:inset 0 2px 0 var(--teal)}
+.doctabs button .tx{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin:0 -6px 0 2px;border-radius:4px;font-size:14px;line-height:1;color:var(--text-dim);opacity:0}
+.doctabs button:hover .tx,.doctabs button.on .tx{opacity:.75}
+.doctabs button .tx:hover{opacity:1;background:rgba(255,95,86,.22);color:#FF7A70}
 .doctabs button.add{font-weight:700;padding:0 10px;color:var(--teal-strong)}
 .status{display:flex;gap:6px;flex:none;height:26px;align-items:stretch;background:var(--bg-panel);border-top:1px solid var(--border);padding:3px 8px;overflow:hidden;font-size:12px}
 .status span{display:flex;align-items:center;padding:0 8px;border-radius:4px;background:var(--bg-panel-2);white-space:nowrap;overflow:hidden;font-variant-numeric:tabular-nums;color:var(--text-dim)}
@@ -2086,6 +2089,12 @@ const Geo = (() => {
           }
         }
       }
+      // revolved arcs are tori: register them so fillet-like rounds show their tangent edges
+      { const A0 = toW(pl, a0), Ad = v3.norm(v3.sub(toW(pl, a1), A0));
+        for (const e of ents) if (!e.cl && (e.t === 'arc' || e.t === 'circle') && e.c && e.r > 0) {
+          const w = v3.sub(toW(pl, e.c), A0), z = v3.dot(w, Ad), R = v3.len(v3.sub(w, v3.mul(Ad, z)));
+          cyl.push({ kind: 'torus', p: A0, d: Ad, R, z, r: e.r });
+        } }
       polys = piece.reduce((acc, b2) => acc ? CSG.union(acc, b2) : b2, null) || [];
       return { polys, cyl };
     }
@@ -2245,7 +2254,7 @@ const Geo = (() => {
         if (t2 >= 0) {
           const dt = n[0] * N[t2 * 3] + n[1] * N[t2 * 3 + 1] + n[2] * N[t2 * 3 + 2];
           pairs.push(t, t2, dt > 0.99999 ? 1 : 0);
-          if (dt < 0.99999) { const k = ekey(p, q); if (!sKeys.has(k)) { sKeys.add(k); smooth.push({ a: p, b: q, n1: n, n2: [N[t2 * 3], N[t2 * 3 + 1], N[t2 * 3 + 2]] }); } }
+          if (dt < 0.99999) { const k = ekey(p, q); if (!sKeys.has(k)) { sKeys.add(k); smooth.push({ a: p, b: q, n1: n, n2: [N[t2 * 3], N[t2 * 3 + 1], N[t2 * 3 + 2]], t, t2 }); } }
         } else {
           const k = ekey(p, q); if (!eKeys.has(k)) { eKeys.add(k); edges.push(p, q); }
         }
@@ -2313,6 +2322,9 @@ const Geo = (() => {
         f.kind = 'cyl'; f.axis = { p: c.p, d, r: c.r, tmin, tmax }; break;
       }
     }
+    // tangent edges: smooth joins between two different faces (fillet ↔ plane, fillet ↔ cylinder …)
+    const tangent = [];
+    for (const e of smooth) { if (faceOf[e.t] !== faceOf[e.t2]) tangent.push(...e.a, ...e.b); delete e.t; delete e.t2; }
     // creased normals: average within the same face at shared positions
     const acc = new Map(), normals = new Float32Array(pos.length);
     const vk = (i, fid) => Math.round(pos[i] * 1e4) + ',' + Math.round(pos[i + 1] * 1e4) + ',' + Math.round(pos[i + 2] * 1e4) + '|' + fid;
@@ -2333,7 +2345,7 @@ const Geo = (() => {
       cx += dv * (a[0] + b[0] + c[0]) / 4; cy += dv * (a[1] + b[1] + c[1]) / 4; cz += dv * (a[2] + b[2] + c[2]) / 4; sa += A[t];
     }
     const com = Math.abs(vol) > 1e-9 ? [cx / vol, cy / vol, cz / vol] : [0, 0, 0];
-    return { faceOf, faces, edges: new Float32Array(edges.flat()), smooth, normals, triN: N, bbox: { mn, mx }, diag, vol, area: sa, com, nt };
+    return { faceOf, faces, edges: new Float32Array(edges.flat()), tangent: new Float32Array(tangent), smooth, normals, triN: N, bbox: { mn, mx }, diag, vol, area: sa, com, nt };
   }
   return { importXf, applyOp, f32ToB64, b64ToF32, STD, PLANE_NAME, sketchPlane, faceBasis, toW, toUV, arcSweep, arcEnds, arcPts, closedPts, entPolylines, profile, regions, buildPart, polysToTris, analyze, revolveAxis };
 })();
@@ -4223,8 +4235,9 @@ const View = (() => {
 const Meshes = (() => {
   const edgeMat = new THREE.LineBasicMaterial({ color: 0x0b0e12 });
   const edgeMatHidden = new THREE.LineDashedMaterial({ color: 0x8a8a8a, dashSize: 1.5, gapSize: 1.2, depthTest: true });
-  function solidMat(color) {
-    return new THREE.MeshPhongMaterial({ color: new THREE.Color(color), shininess: 45, specular: 0x262626, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1, side: THREE.DoubleSide });
+  function solidMat(color, opacity = 1) {
+    const t = opacity < 0.999;
+    return new THREE.MeshPhongMaterial({ color: new THREE.Color(color), shininess: 45, specular: 0x262626, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1, side: t ? THREE.FrontSide : THREE.DoubleSide, transparent: t, opacity: t ? opacity : 1, depthWrite: !t });
   }
   function makeGeoms(build) {
     const g = new THREE.BufferGeometry();
@@ -4232,7 +4245,8 @@ const Meshes = (() => {
     g.setAttribute('normal', new THREE.BufferAttribute(build.topo.normals, 3));
     g.computeBoundingBox(); g.computeBoundingSphere();
     const e = new THREE.BufferGeometry(); e.setAttribute('position', new THREE.BufferAttribute(build.topo.edges, 3));
-    return { g, e };
+    const t = new THREE.BufferGeometry(); t.setAttribute('position', new THREE.BufferAttribute(build.topo.tangent || new Float32Array(0), 3));
+    return { g, e, t };
   }
   function faceGeom(build, fid) {
     build.faceGeo = build.faceGeo || {};
@@ -4302,9 +4316,9 @@ function getBuild(part) {
   const r = Geo.buildPart(part);
   const tris = Geo.polysToTris(r.polys);
   const topo = Geo.analyze(tris, r.cyl);
-  if (b) { b.geo.dispose(); b.egeo.dispose(); if (b.faceGeo) Object.values(b.faceGeo).forEach(g => g.dispose()); if (b.surf) { b.surf.geo.dispose(); b.surf.egeo.dispose(); } }
+  if (b) { b.geo.dispose(); b.egeo.dispose(); if (b.tgeo) b.tgeo.dispose(); if (b.faceGeo) Object.values(b.faceGeo).forEach(g => g.dispose()); if (b.surf) { b.surf.geo.dispose(); b.surf.egeo.dispose(); } }
   b = { rev: part.rev, tris, topo, cyl: r.cyl, polys: r.polys, planes: r.planes || [], cache: r.cache || {}, curves: r.curves || [] };
-  const gg = Meshes.makeGeoms(b); b.geo = gg.g; b.egeo = gg.e; b.sil = Sil.pack(topo);
+  const gg = Meshes.makeGeoms(b); b.geo = gg.g; b.egeo = gg.e; b.tgeo = gg.t; b.sil = Sil.pack(topo);
   if (r.surfs && r.surfs.length) {
     const n = r.surfs.reduce((t, a) => t + a.length, 0), st = new Float32Array(n); let o = 0; for (const a of r.surfs) { st.set(a, o); o += a.length; }
     const s = { tris: st, topo: Geo.analyze(st, []), surf: true }; const sg = Meshes.makeGeoms(s); s.geo = sg.g; s.egeo = sg.e; b.surf = s;
@@ -4314,7 +4328,7 @@ function getBuild(part) {
   App.builds.set(part.id, b);
   return b;
 }
-function matFor(color) { let m = App.matCache.get(color); if (!m) { m = Meshes.solidMat(color); App.matCache.set(color, m); } return m; }
+function matFor(color, opacity = 1) { const op = Math.round(clamp(+opacity || 1, 0.05, 1) * 100) / 100, k = color + '|' + op; let m = App.matCache.get(k); if (!m) { m = Meshes.solidMat(color, op); App.matCache.set(k, m); } return m; }
 const hiddenFill = new THREE.MeshBasicMaterial({ color: 0x1c222b, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1, side: THREE.DoubleSide });
 const selEdgeMat = new THREE.LineBasicMaterial({ color: 0x3FD0D6 });
 const lightEdgeMat = new THREE.LineBasicMaterial({ color: 0xCFD8E3 });
@@ -4429,18 +4443,18 @@ function refresh3d() {
   const W = View.world; while (W.children.length) W.remove(W.children[0]);
   Sil.clear();
   const box = new THREE.Box3();
-  const addBody = (b, color, matrix, comp) => {
+  const addBody = (b, color, matrix, comp, opacity = 1) => {
     const grp = new THREE.Group();
     if (matrix) { grp.matrixAutoUpdate = false; grp.matrix.fromArray(matrix); }
     const sel = comp && App.sel && App.sel.kind === 'comp' && App.sel.id === comp.id;
     if (App.display !== 'wire') {
-      const mesh = new THREE.Mesh(b.geo, App.sketch ? sketchDimMat : App.display === 'hidden' ? hiddenFill : matFor(color));
-      mesh.userData = { comp, build: b }; grp.add(mesh);
+      const mesh = new THREE.Mesh(b.geo, App.sketch ? sketchDimMat : App.display === 'hidden' ? hiddenFill : matFor(color, opacity));
+      mesh.userData = { comp, build: b }; if (opacity < 0.999) mesh.renderOrder = 2; grp.add(mesh);
     }
     const emat = App.sketch ? dimEdgeMat : sel ? selEdgeMat : (App.display === 'wire' || App.display === 'hidden') ? lightEdgeMat : Meshes.edgeMat;
     // 음영(렌더링) 모드: 모서리·실루엣 선 없이 면만 보여 줌 (선택한 부품과 스케치 중에는 선 유지)
     const lines = App.display !== 'shade' || App.sketch || sel;
-    if (lines) { grp.add(new THREE.LineSegments(b.egeo, emat)); if (App.showSil !== false) Sil.make(b.sil, grp, emat); }
+    if (lines) { grp.add(new THREE.LineSegments(b.egeo, emat)); if (App.showTan !== false && b.tgeo) grp.add(new THREE.LineSegments(b.tgeo, emat)); if (App.showSil !== false) Sil.make(b.sil, grp, emat); }
     if (b.surf && App.display !== 'wire') {
       const sm = new THREE.Mesh(b.surf.geo, App.sketch ? sketchDimMat : surfMat); sm.userData = { comp, build: b.surf, body: 'surf' }; grp.add(sm);
     }
@@ -4450,7 +4464,7 @@ function refresh3d() {
     for (const t of [b.topo, b.surf && b.surf.topo]) if (t && t.nt) { const bb = new THREE.Box3(new THREE.Vector3(...t.bbox.mn), new THREE.Vector3(...t.bbox.mx)); if (matrix) bb.applyMatrix4(grp.matrix); box.union(bb); }
   };
   if (doc.type === 'part') {
-    const b = getBuild(doc); addBody(b, doc.color);
+    const b = getBuild(doc); addBody(b, doc.color, null, null, doc.opacity ?? 1);
     // feature preview: the new feature's own body, tinted (amber = adds material, red = removes)
     const pid = App.pm && App.pm.previewId; const pc = pid && !App.sketch && b.cache[pid];
     if (pc && pc.polys && pc.polys.length) {
@@ -4461,7 +4475,7 @@ function refresh3d() {
       mesh.userData.preview = true; W.add(mesh, lines);
     }
   } else {
-    for (const c of doc.comps) { const p = docById(c.part); if (!p) continue; addBody(getBuild(p), p.color, compMatrix(doc, c).toArray(), c); }
+    for (const c of doc.comps) { const p = docById(c.part); if (!p) continue; addBody(getBuild(p), p.color, compMatrix(doc, c).toArray(), c, c.opacity ?? p.opacity ?? 1); }
   }
   App._box = box;
   const s = box.isEmpty() ? 100 : Math.max(60, box.getSize(new THREE.Vector3()).length() * 0.75);
@@ -4848,9 +4862,34 @@ function renderTaskPane() { }
 function renderDocTabs() {
   for (const id of ['#swTabs', '#acTabs', '#mgTabs']) {
     const el = $(id); if (!el) continue; el.innerHTML = '';
-    for (const d of App.ws.docs) el.append(h('button', { class: d === App.doc ? 'on' : '', onclick: () => activate(d), html: ic(d.type, 16) }, h('span', null, d.name)));
+    for (const d of App.ws.docs) {
+      const x = h('span', { class: 'tx', title: L('이 문서 닫기(삭제)', 'Close (delete) this document'), onclick: e => { e.stopPropagation(); closeDocConfirm(d); } }, '×');
+      const b = h('button', { class: d === App.doc ? 'on' : '', title: L('오른쪽 클릭: 이름 바꾸기·닫기 · 가운데 클릭: 닫기', 'Right-click: rename/close · middle-click: close'), onclick: () => activate(d), html: ic(d.type, 16) }, h('span', null, d.name), x);
+      b.addEventListener('auxclick', e => { if (e.button === 1) { e.preventDefault(); closeDocConfirm(d); } });
+      b.addEventListener('dblclick', () => renameDialog(d, () => { renderDocTabs(); save(); }));
+      b.addEventListener('contextmenu', e => { e.preventDefault(); popMenu(e.clientX, e.clientY, docTabMenu(d), { classic: d.type === 'dwg' }); });
+      el.append(b);
+    }
     el.append(h('button', { class: 'add', title: '새 문서', onclick: newDocDialog }, '+'));
   }
+}
+function docTabMenu(d) {
+  const others = App.ws.docs.filter(x => x !== d);
+  return [
+    { label: L('열기', 'Open'), run: () => activate(d) },
+    { label: L('이름 바꾸기...', 'Rename...'), run: () => renameDialog(d, () => { renderDocTabs(); if (d === App.doc && d.type === 'dwg') activate(d); save(); }) },
+    '-',
+    { label: L('이 문서 닫기(삭제)', 'Close (delete) this document'), icon: 'del', run: () => closeDocConfirm(d) },
+    { label: L('다른 문서 모두 닫기', 'Close all other documents'), disabled: !others.length, run: () => closeOthersConfirm(d) },
+  ];
+}
+function closeOthersConfirm(keep) {
+  const others = App.ws.docs.filter(x => x !== keep); if (!others.length) return;
+  confirmDlg(L('다른 문서 모두 닫기', 'Close other documents'), L(`"${keep.name}"만 남기고 ${others.length}개 문서(${others.map(x => x.name).join(', ')})를 작업에서 삭제합니다. 필요한 문서는 먼저 저장하세요.`, `Removes ${others.length} documents (${others.map(x => x.name).join(', ')}) and keeps only "${keep.name}". Save anything you need first.`), () => {
+    const gone = new Set(others.map(x => x.id)); App.ws.docs = [keep];
+    if (keep.type === 'asm') { const ids = new Set(keep.comps.filter(c => gone.has(c.part)).map(c => c.id)); keep.comps = keep.comps.filter(c => !ids.has(c.id)); keep.mates = keep.mates.filter(m => !ids.has(m.a.comp) && !ids.has(m.b.comp)); keep.rev++; }
+    activate(keep); save();
+  }, keep.type === 'dwg');
 }
 function windowMenuItems() { return App.ws.docs.map(d => ({ label: `${d.name} (${DOC_LABEL[d.type]})`, icon: d.type, check: d === App.doc, run: () => activate(d) })); }
 
@@ -5090,6 +5129,9 @@ function swMenus() {
       { label: '은선 제거', check: App.display === 'hidden', run: () => setDisplay('hidden') },
       { label: '와이어프레임', check: App.display === 'wire', run: () => setDisplay('wire') },
       '-',
+      { label: L('스케치 모눈 시트 (흰 종이)', 'Sketch grid sheet (white paper)'), check: App.sheet !== false, run: () => { App.sheet = App.sheet === false; View.req(); } },
+      { label: L('접선 모서리 표시 (필렛 경계)', 'Tangent edges (fillet boundaries)'), check: App.showTan !== false, run: () => { App.showTan = App.showTan === false; refresh3d(); } },
+      { label: L('곡면 외곽선 표시 (실루엣)', 'Silhouette edges'), check: App.showSil !== false, run: () => { App.showSil = App.showSil === false; refresh3d(); } },
       { label: '참조 평면', check: App.showPlanes, run: () => { App.showPlanes = !App.showPlanes; renderStdBar(); updatePlanes(); } },
     ] },
     { label: '삽입(I)', items: () => isPart ? Part.insertMenu() : Asm.insertMenu() },
@@ -5103,11 +5145,11 @@ function confirmDlg(title, msg, yes, classic) {
 }
 function closeDocConfirm(d) {
   const users = App.ws.docs.filter(a => a.type === 'asm' && a.comps.some(c => c.part === d.id));
-  confirmDlg('문서 닫기', `"${d.name}" 문서를 작업에서 삭제합니다.` + (users.length ? ` 이 부품을 쓰는 어셈블리(${users.map(u => u.name).join(', ')})에서 구성 요소도 사라집니다.` : ''), () => {
+  confirmDlg(L('문서 닫기', 'Close document'), L(`"${d.name}" 문서를 작업에서 삭제합니다. 필요하면 먼저 저장하세요.`, `Removes "${d.name}" from the workspace. Save it first if you need it.`) + (users.length ? L(` 이 부품을 쓰는 어셈블리(${users.map(u => u.name).join(', ')})에서 구성 요소도 사라집니다.`, ` Its components are also removed from ${users.map(u => u.name).join(', ')}.`) : ''), () => {
     App.ws.docs = App.ws.docs.filter(x => x !== d);
     for (const a of users) { const ids = new Set(a.comps.filter(c => c.part === d.id).map(c => c.id)); a.comps = a.comps.filter(c => !ids.has(c.id)); a.mates = a.mates.filter(m => !ids.has(m.a.comp) && !ids.has(m.b.comp)); a.rev++; }
     if (!App.ws.docs.length) App.ws.docs.push(newPartDoc());
-    activate(App.ws.docs[0]);
+    activate(App.ws.docs.includes(App.doc) ? App.doc : App.ws.docs[0]); save();
   }, d.type === 'dwg');
 }
 function helpDialog() {
@@ -5144,7 +5186,45 @@ function aboutDialog() {
 /* ================= constraint-based sketcher ================= */
 const Sk = (() => {
   const O = 'O';
-  const COL = { under: '#4DA3FF', full: '#E8EDF3', over: '#FF5F56', sel: '#3FD0D6', hov: '#F2A53D', con: '#12A4AB', dim: '#E8EDF3', driven: '#8B96A5', origin: '#FF5F56', pre: '#F2A53D', cl: '#8B96A5' };
+  // dark-background colours, and the colours used on the white graph-paper sheet (SolidWorks-like: blue = under defined, black = fully defined)
+  const COL_D = { under: '#4DA3FF', full: '#E8EDF3', over: '#FF5F56', sel: '#3FD0D6', hov: '#F2A53D', con: '#12A4AB', dim: '#E8EDF3', driven: '#8B96A5', origin: '#FF5F56', pre: '#F2A53D', cl: '#8B96A5', box: 'rgba(11,14,18,.82)', cross: '#E8EDF3' };
+  const COL_S = { under: '#1764D8', full: '#11161D', over: '#D9302A', sel: '#0A97A0', hov: '#D97400', con: '#0B7F86', dim: '#11161D', driven: '#66707C', origin: '#D9302A', pre: '#D97400', cl: '#66707C', box: 'rgba(255,255,255,.93)', cross: '#26303B' };
+  const COL = Object.assign({}, COL_D);
+  const sheetOn = () => App.sheet !== false;
+  function theme() { Object.assign(COL, sheetOn() ? COL_S : COL_D); }
+  /* white, semi-transparent graph-paper sheet lying on the sketch plane */
+  function drawSheet(ctx) {
+    if (!sheetOn()) return;
+    const sk = SK(), pl = S().pl; const px = View.pxSize();
+    let mn = [-40, -40], mx = [40, 40];
+    const grow = q => { if (!q || !isFinite(q[0]) || !isFinite(q[1])) return; mn = [Math.min(mn[0], q[0]), Math.min(mn[1], q[1])]; mx = [Math.max(mx[0], q[0]), Math.max(mx[1], q[1])]; };
+    try { for (const p of sk.pts || []) grow([p.x, p.y]); for (const e of flatA(sk)) { if (e.c && e.r) { grow([e.c[0] - e.r, e.c[1] - e.r]); grow([e.c[0] + e.r, e.c[1] + e.r]); } } } catch (e) { /* ignore */ }
+    const bx = App._box; if (bx && !bx.isEmpty()) for (const x of [bx.min.x, bx.max.x]) for (const y of [bx.min.y, bx.max.y]) for (const z of [bx.min.z, bx.max.z]) grow(Geo.toUV(pl, [x, y, z]));
+    const pad = Math.max(20, 0.25 * Math.max(mx[0] - mn[0], mx[1] - mn[1]));
+    mn = [mn[0] - pad, mn[1] - pad]; mx = [mx[0] + pad, mx[1] + pad];
+    const g = niceStep(Math.max(0.05, px * 12)), major = g * Math.max(2, Math.round(niceStep(g * 4.5) / g));
+    mn = [Math.floor(mn[0] / major) * major, Math.floor(mn[1] / major) * major]; mx = [Math.ceil(mx[0] / major) * major, Math.ceil(mx[1] / major) * major];
+    const C = [[mn[0], mn[1]], [mx[0], mn[1]], [mx[0], mx[1]], [mn[0], mx[1]]].map(scr);
+    ctx.save();
+    ctx.beginPath(); C.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath();
+    ctx.fillStyle = 'rgba(250,252,255,0.80)'; ctx.fill(); ctx.clip();
+    const lines = (step, color, w) => {
+      if ((mx[0] - mn[0]) / step + (mx[1] - mn[1]) / step > 1600) return;
+      ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath();
+      for (let u = mn[0]; u <= mx[0] + 1e-9; u += step) { const a = scr([u, mn[1]]), b = scr([u, mx[1]]); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); }
+      for (let v = mn[1]; v <= mx[1] + 1e-9; v += step) { const a = scr([mn[0], v]), b = scr([mx[0], v]); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); }
+      ctx.stroke();
+    };
+    lines(g, 'rgba(40,120,190,0.16)', 1); lines(major, 'rgba(40,120,190,0.36)', 1);
+    // axes through the sketch origin
+    ctx.strokeStyle = 'rgba(217,48,42,0.35)'; ctx.lineWidth = 1; ctx.setLineDash([8, 4]); ctx.beginPath();
+    let a = scr([mn[0], 0]), b = scr([mx[0], 0]); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); a = scr([0, mn[1]]); b = scr([0, mx[1]]); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(40,120,190,0.55)'; ctx.lineWidth = 1.2; ctx.beginPath(); C.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath(); ctx.stroke();
+    // grid size note
+    ctx.font = '11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(30,60,90,.75)';
+    const lab = scr([mn[0], mn[1]]); ctx.fillText(L(`눈금 ${fmt(g, 3)} mm · 굵은 선 ${fmt(major, 3)} mm`, `grid ${fmt(g, 3)} mm · major ${fmt(major, 3)} mm`), lab[0] + 6, lab[1] - 6);
+  }
   const CON_NAME = { horizontal: '수평', vertical: '수직', parallel: '평행', perpendicular: '직각', collinear: '동일선상', equal: '동등', coincident: '일치', midpoint: '중간점', tangent: '탄젠트', concentric: '동심', fix: '고정' };
   const DIM_NAME = { len: '길이', dist: '거리', hdist: '수평 거리', vdist: '수직 거리', pldist: '점-선 거리', diam: '지름', rad: '반지름', angle: '각도' };
 
@@ -5739,7 +5819,7 @@ const Sk = (() => {
     ctx.font = '600 12px "IBM Plex Mono", Consolas, monospace';
     const w = ctx.measureText(txt).width + 8, hh = 17;
     const x = Ls[0] - w / 2, y = Ls[1] - hh / 2;
-    ctx.fillStyle = 'rgba(11,14,18,.82)'; ctx.fillRect(x, y, w, hh);
+    ctx.fillStyle = COL.box; ctx.fillRect(x, y, w, hh);
     ctx.strokeStyle = color; ctx.globalAlpha = 0.5; ctx.strokeRect(x + .5, y + .5, w - 1, hh - 1); ctx.globalAlpha = 1;
     ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.fillText(txt, Ls[0], Ls[1] + 4.2); ctx.textAlign = 'left';
     boxes.push({ id: d.id, x, y, w, h: hh });
@@ -5780,6 +5860,7 @@ const Sk = (() => {
   }
   function draw(ctx) {
     const s = S(); if (!s) return; const sk = SK();
+    theme(); drawSheet(ctx);
     const an = sk._an || analyze(sk);
     const colorEnt = e => an.status === 'conflict' || an.status === 'over' ? COL.over : an.entDefined(e) ? COL.full : COL.under;
     // origin
@@ -5864,7 +5945,7 @@ const Sk = (() => {
     if (s.inf && (s.inf.pid || s.inf.mid || s.inf.on)) { ctx.strokeStyle = COL.pre; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(q[0], q[1], 6, 0, 7); ctx.stroke(); tag(ctx, q[0] + 12, q[1] + 18, s.inf.label); }
     if (s.hv) tag(ctx, q[0] + 12, q[1] - 16, s.hv === 'H' ? '수평' : '수직', '#12A4AB', '#03191B');
     if (tip && s.sx != null) tag(ctx, s.sx + 18, s.sy + 34, tip, 'rgba(28,34,43,.95)', '#E8EDF3');
-    if (!['select', 'sdim', 'trim', 'convert', 'sfillet'].includes(s.tool)) { ctx.strokeStyle = '#E8EDF3'; ctx.lineWidth = 1; seg(ctx, [q[0] - 8, q[1]], [q[0] + 8, q[1]]); seg(ctx, [q[0], q[1] - 8], [q[0], q[1] + 8]); }
+    if (!['select', 'sdim', 'trim', 'convert', 'sfillet'].includes(s.tool)) { ctx.strokeStyle = COL.cross; ctx.lineWidth = 1; seg(ctx, [q[0] - 8, q[1]], [q[0] + 8, q[1]]); seg(ctx, [q[0], q[1] - 8], [q[0], q[1] + 8]); }
   }
 
   /* ---------- sketch fillet ---------- */
@@ -6993,10 +7074,20 @@ const Part = (() => {
   function appearanceDialog() {
     const d = P(); if (!d || d.type !== 'part') return;
     const col = h('input', { type: 'color', value: d.color, class: 'colorin' });
-    const mat = selectInput(Object.entries(MATERIALS).map(([k, m]) => [k, `${m.name} (${m.rho} g/cm³)`]), d.material, v => { col.value = MATERIALS[v].color; });
+    const mat = selectInput(Object.entries(MATERIALS).map(([k, m]) => [k, `${m.name} (${m.rho} g/cm³)`]), d.material, v => { col.value = MATERIALS[v].color; preview(); });
+    const old = { color: d.color, opacity: d.opacity }; let ok = false;
+    const tr0 = Math.round((1 - (d.opacity ?? 1)) * 100);
+    const rng = h('input', { type: 'range', min: 0, max: 90, step: 5, value: tr0, style: 'flex:1' });
+    const val = h('b', { style: 'min-width:42px;text-align:right' }, tr0 + ' %');
+    const preview = () => { d.color = col.value; const t = +rng.value; val.textContent = t + ' %'; d.opacity = t ? 1 - t / 100 : undefined; refresh3d(); };
+    rng.addEventListener('input', preview); col.addEventListener('input', preview);
+    const quick = h('div', { class: 'seg' }, [[0, L('불투명', 'Opaque')], [30, '30 %'], [50, '50 %'], [75, '75 %']].map(([v, l]) => h('button', { onclick: () => { rng.value = v; preview(); } }, l)));
     dialog({
-      title: `재질과 색상 - ${d.name}`, width: 360, body: h('div', { class: 'col' }, field('재질', mat), field('색상', col)),
-      buttons: [{ label: '확인', primary: true, onClick() { d.material = mat.value; d.color = col.value; save(); refresh3d(); } }, { label: '취소' }]
+      title: L(`재질과 색상 - ${d.name}`, `Material and colour - ${d.name}`), width: 380, body: h('div', { class: 'col' }, field(L('재질', 'Material'), mat), field(L('색상', 'Colour'), col),
+        field(L('투명도', 'Transparency'), h('div', { style: 'display:flex;gap:8px;align-items:center' }, rng, val)), quick,
+        h('div', { class: 'hint' }, L('투명도는 보기용입니다. 질량·해석 결과에는 영향이 없습니다. 어셈블리에서는 부품마다 따로(오른쪽 클릭 → 투명도) 바꿀 수도 있습니다.', 'Transparency is for display only; mass and analysis are unchanged. In an assembly each component can also be set separately (right-click → Transparency).'))),
+      buttons: [{ label: L('확인', 'OK'), primary: true, onClick() { ok = true; d.material = mat.value; d.color = col.value; save(); refresh3d(); } }, { label: L('취소', 'Cancel') }],
+      onClose() { if (!ok) { d.color = old.color; d.opacity = old.opacity; refresh3d(); } }
     });
   }
   return { treeNodes, cmButtons, insertMenu, toolsMenu, selectMode, startSketchCmd, exitSketch, featureCmd, deleteFeature, massDialog, measureCmd, appearanceDialog, editSketch, editFeature, faceWorld, featIcon, importSTLInto };
@@ -7192,6 +7283,8 @@ const Asm = (() => {
       { label: '부품 열기', icon: 'part', disabled: !p, run: () => activate(p) },
       { label: c.fixed ? '유동' : '고정', icon: 'fix', run: () => { snapshot(A()); c.fixed = !c.fixed; afterChange(A()); renderCM(); } },
       { label: c.hidden ? '구성부품 보이기' : '구성부품 숨기기', icon: 'eye', run: () => { c.hidden = !c.hidden; afterChange(A()); } },
+      { label: c.opacity != null && c.opacity < 1 ? L('투명도 해제', 'Make opaque') : L('투명도 변경 (반투명)', 'Change transparency'), icon: 'eye', run: () => { if (c.opacity != null && c.opacity < 1) delete c.opacity; else c.opacity = 0.35; afterChange(A()); } },
+      { label: L('부품 회전 (원점 기준)...', 'Rotate component (about its origin)...'), icon: 'rotc', disabled: c.fixed, run: () => { App.sel = { kind: 'comp', id: c.id }; moveCmd('rot'); } },
       { label: '선형 부품 패턴...', icon: 'clpattern', run: () => { App.sel = { kind: 'comp', id: c.id }; compPatternCmd(); } },
       '-', { label: '삭제', key: 'Del', icon: 'del', run: () => deleteItem({ kind: 'comp', id: c.id }) }];
   }
@@ -7238,7 +7331,7 @@ const Asm = (() => {
         const c = compById(p.comp); if (!c) return false;
         if (exploded()) { if (kind !== 'select') status('분해 상태에서는 부품을 옮길 수 없습니다. 분해도를 축소하세요.'); return false; }
         if (c.fixed) { if (kind !== 'select') status(`${c.name}은(는) 고정(f)되어 있습니다. 오른쪽 클릭 → 유동으로 바꾸면 움직일 수 있습니다.`); return false; }
-        dragging = { c, snap: false, center: compCenter(c) };
+        dragging = { c, snap: false, center: kind === 'rot' && App.rotPivot !== 'center' ? compOrigin(c) : compCenter(c) };
         return true;
       },
       drag(sx, sy, dx, dy, e) {
@@ -7262,7 +7355,7 @@ const Asm = (() => {
         if (p && p.kind === 'face' && p.comp) { App.sel = { kind: 'comp', id: p.comp }; const c = compById(p.comp); status(`${c.name} 선택됨${c.fixed ? ' (고정)' : ' — 끌어서 이동, Shift+끌기로 회전'}`); const pp = docById(c.part); showCtxBar(sx, sy, [{ icon: 'mate', label: '메이트', run: () => mateCmd() }, { icon: 'part', label: '부품 열기', run: () => pp && activate(pp) }, { icon: 'fix', label: c.fixed ? '유동' : '고정', run: () => { snapshot(A()); c.fixed = !c.fixed; afterChange(A()); renderCM(); } }, { icon: 'eye', label: '숨기기', run: () => { c.hidden = true; afterChange(A()); renderCM(); } }]); }
         else if (p && p.kind === 'plane') App.sel = { kind: 'plane', which: p.which };
         else { App.sel = null; status('준비'); }
-        refresh3d(); renderCM();
+        refresh3d(); renderCM(); if (kind === 'rot' && App.pm) renderPM();
       },
       context(sx, sy) {
         const p = pickAt(sx, sy, { planes: false }); const r = View.ov.getBoundingClientRect();
@@ -7273,11 +7366,52 @@ const Asm = (() => {
     };
   }
   const selectMode = dragMode('select');
+  // the part's own origin (0,0,0 of the part document) in assembly space
+  function compOrigin(c) { return new THREE.Vector3(0, 0, 0).applyMatrix4(M4(c)); }
+  // rotate a component about one of its own axes (x / y / z of the part) through the chosen pivot
+  function rotateComp(c, axis, deg) {
+    if (!c || c.fixed) return false;
+    snapshot(A());
+    const M = M4(c), piv = App.rotPivot === 'center' ? compCenter(c) : compOrigin(c);
+    const ax = App.rotFrame === 'world' ? new THREE.Vector3(...{ x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] }[axis]) : new THREE.Vector3(...{ x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] }[axis]).transformDirection(M);
+    const R = new THREE.Matrix4().makeRotationAxis(ax.normalize(), deg * Math.PI / 180);
+    c.m = new THREE.Matrix4().makeTranslation(piv.x, piv.y, piv.z).multiply(R).multiply(new THREE.Matrix4().makeTranslation(-piv.x, -piv.y, -piv.z)).multiply(M).toArray();
+    if (A().mates.length) solveAll(A()); afterChange(A());
+    return true;
+  }
+  function resetRot(c) {
+    if (!c || c.fixed) return; snapshot(A());
+    const o = compOrigin(c); c.m = new THREE.Matrix4().makeTranslation(o.x, o.y, o.z).toArray();
+    if (A().mates.length) solveAll(A()); afterChange(A());
+  }
   function moveCmd(kind) {
     App.mode = dragMode(kind); renderCM();
+    if (kind !== 'rot') {
+      openPM({ title: '부품 이동', icon: 'move', msg: '고정되지 않은 부품을 끌어서 화면과 나란히 이동합니다. 메이트가 있으면 놓을 때 다시 맞춰집니다.', onClose() { App.mode = selectMode; renderCM(); } });
+      return;
+    }
+    App.rotPivot = App.rotPivot || 'origin'; App.rotFrame = App.rotFrame || 'part';
+    let ang = App.rotAng || 90;
+    const cur = () => { const c = App.sel && App.sel.kind === 'comp' ? compById(App.sel.id) : null; return c; };
     openPM({
-      title: kind === 'rot' ? '부품 회전' : '부품 이동', icon: kind === 'rot' ? 'rotc' : 'move',
-      msg: kind === 'rot' ? '고정되지 않은 부품을 끌어서 회전합니다. 메이트가 있으면 놓을 때 다시 맞춰집니다.' : '고정되지 않은 부품을 끌어서 화면과 나란히 이동합니다. 메이트가 있으면 놓을 때 다시 맞춰집니다.',
+      title: L('부품 회전', 'Rotate component'), icon: 'rotc',
+      msg: L('부품을 클릭해 고른 뒤 축과 각도로 돌리거나, 끌어서 자유롭게 돌리세요. 첫 번째로 넣은 부품은 고정(f)이라 돌지 않습니다.', 'Click a component, then turn it by axis and angle, or drag to rotate freely. The first inserted component is fixed (f).'),
+      groups() {
+        const c = cur();
+        const segBtn = (key, v, label) => h('button', { class: App[key] === v ? 'on' : '', onclick: () => { App[key] = v; renderPM(); } }, label);
+        const g = [];
+        g.push({ title: L('회전할 부품', 'Component'), icon: 'comp', body: c ? h('div', { class: 'relrow' }, icEl('comp', 16), h('span', { class: 'rl' }, c.name + (c.fixed ? L(' — 고정됨 (오른쪽 클릭 → 유동)', ' — fixed (right-click → float)') : ''))) : h('div', { class: 'hint' }, L('그래픽 영역에서 부품을 클릭하세요', 'Click a component in the graphics area')) });
+        g.push({ title: L('회전 중심', 'Pivot'), icon: 'origin', body: [h('div', { class: 'seg' }, segBtn('rotPivot', 'origin', L('부품 원점', 'Part origin')), segBtn('rotPivot', 'center', L('부품 중심', 'Part centre'))),
+          h('div', { class: 'seg' }, segBtn('rotFrame', 'part', L('부품 자신의 축', "Part's own axes")), segBtn('rotFrame', 'world', L('어셈블리 축', 'Assembly axes')))] });
+        const axBtn = (ax, sign) => h('button', { class: 'pbtn', disabled: !c || c.fixed, onclick: () => { rotateComp(cur(), ax, sign * ang); renderPM(); } }, `${ax.toUpperCase()} ${sign > 0 ? '+' : '−'}${fmt(ang, 2)}°`);
+        g.push({ title: L('축과 각도', 'Axis and angle'), icon: 'rotc', body: [
+          field(L('각도 (°)', 'Angle (°)'), numInput(ang, v => { ang = App.rotAng = v; renderPM(); }, { step: 15 })),
+          h('div', { class: 'seg wrap' }, [15, 45, 90, 180].map(v => h('button', { class: ang === v ? 'on' : '', onclick: () => { ang = App.rotAng = v; renderPM(); } }, v + '°'))),
+          h('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:4px' }, axBtn('x', 1), axBtn('x', -1), axBtn('y', 1), axBtn('y', -1), axBtn('z', 1), axBtn('z', -1)),
+          h('button', { class: 'pbtn wide', disabled: !c || c.fixed, onclick: () => { resetRot(cur()); renderPM(); } }, L('회전 초기화 (위치는 그대로)', 'Reset rotation (keep position)')),
+          h('div', { class: 'hint' }, L('끌어서 돌릴 때도 위에서 고른 회전 중심을 씁니다. 메이트가 있으면 회전 뒤 다시 맞춰집니다.', 'Dragging also turns about the chosen pivot. Mates are re-solved after each turn.'))] });
+        return g;
+      },
       onClose() { App.mode = selectMode; renderCM(); },
     });
   }
@@ -7643,7 +7777,7 @@ const Asm = (() => {
       ctx.setLineDash([]);
     }
   }
-  return { treeNodes, cmButtons, insertMenu, toolsMenu, selectMode, drawOverlay, deleteItem, solveAll, applyMate, insertCmd, mateCmd, addComp };
+  return { treeNodes, cmButtons, insertMenu, toolsMenu, selectMode, drawOverlay, deleteItem, solveAll, applyMate, insertCmd, mateCmd, addComp, rotateComp, compOrigin, moveCmd };
 })();
 /* ================= UI for loft, sweep, fillet/chamfer, reference planes, surfaces ================= */
 const F2UI = (() => {
