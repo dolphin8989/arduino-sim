@@ -104,6 +104,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
 .pmbtns button{width:38px;height:30px;display:grid;place-items:center;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-panel-2);padding:0;cursor:pointer}
 .pmbtns button:hover{border-color:var(--teal);background:var(--bg-panel-3)}
 .pmmsg{margin:8px 10px;padding:8px 10px;background:rgba(242,165,61,.1);border:1px solid rgba(242,165,61,.45);border-radius:6px;font-size:12px;line-height:1.5}
+.skctx{position:absolute;z-index:30;display:flex;gap:2px;padding:3px;background:var(--bg-panel);border:1px solid var(--teal);border-radius:7px;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.skctx button{width:30px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:5px;background:transparent;cursor:pointer;color:var(--text)}
+.skctx button:hover{background:var(--bg-panel-3);border-color:var(--teal)}
+.skctx button.close{width:20px;color:var(--text-dim);font-size:14px}
+.errguide{margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,95,86,.4);display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.5}
+.errguide b{color:#FF8A80;margin-right:4px}
 .pmmsg.err{background:rgba(255,95,86,.1);border-color:rgba(255,95,86,.5)}
 .ro{margin:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-panel-2);overflow:hidden}
 .ro>.cap{display:flex;align-items:center;gap:7px;padding:7px 10px;font-weight:600;font-size:12px;letter-spacing:.2px;border-bottom:1px solid var(--border);background:var(--bg-panel-3)}
@@ -262,6 +268,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
 .rcol:hover{color:var(--teal-strong);border-color:var(--teal)}
 .rsec{font:600 10px var(--mono);letter-spacing:1px;color:var(--text-faint);padding:6px 0 3px;text-align:center;border-top:1px solid var(--border);margin-top:4px}
 .rail .rcol+.rsec{border-top:0;margin-top:0}
+.rail .rspace{flex:1 0 8px}
+.relbtn2{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px;margin-top:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-panel-2);color:var(--text-dim);cursor:pointer;font-size:10px;line-height:1.2}
+.relbtn2 b{font:600 11px var(--mono);color:var(--teal-strong)}
+.relbtn2:hover{border-color:var(--teal);color:var(--text)}
+.rail.compact .relbtn2 span{display:none}
+.relbtn3{height:20px;padding:0 8px;margin-right:6px;font:600 11px var(--mono);cursor:pointer}
+.relnotes{max-height:62vh;overflow:auto;display:flex;flex-direction:column;gap:12px;padding-right:4px}
+.relnote .rnh{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:4px}
+.relnote .rnh b{font:700 14px var(--mono);color:var(--teal-strong);white-space:nowrap}
+.relnote .rnh span{font-weight:600}
+.relnote .rnh small{margin-left:auto;color:var(--text-faint);font:11px var(--mono)}
+.relnote ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px;line-height:1.5}
+.relnote.plan .rnh b{color:var(--text-dim)}
 .rsec{cursor:pointer;user-select:none}.rsec:hover{color:var(--teal-strong)}.rsec.closed{color:var(--text-dim)}
 .rsep{height:1px;background:var(--border);margin:3px 8px}
 .rb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px 4px;border:1px solid transparent;border-radius:8px;background:none;cursor:pointer;font-size:11px;line-height:1.2;text-align:center;color:var(--text);word-break:keep-all}
@@ -330,7 +349,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 
 <div id="app">
 <section id="sw" class="win" aria-label="3D 모델러">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.62</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.70</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
   <div class="menubar" id="swMenu"></div>
   <div class="swmain">
     <nav class="rail" id="railL" aria-label="피처 · 어셈블리 명령"></nav>
@@ -356,7 +375,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 </section>
 
 <section id="ac" class="win" hidden aria-label="2D 도면">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.62</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="mode">DRAWING</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.70</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="mode">DRAWING</span></div>
   <div class="menubar" id="acMenu"></div>
   <div class="acrow" id="acStd"></div>
   <div class="acrow" id="acProps"></div>
@@ -650,7 +669,7 @@ const I18N_DICT = {
 "F3 객체 스냅 · F7 모눈 · F8 직교 · F9 스냅": "F3 object snap · F7 grid · F8 ortho · F9 snap",
 "FeatureManager 디자인 트리": "FeatureManager design tree",
 "K-CAD 작업": "K-CAD workspace",
-"K군의 CAD v0.62": "K-CAD v0.62",
+"K군의 CAD v0.70": "K-CAD v0.70",
 "K군의 CAD 정보": "About K-CAD",
 "K군의 CAD 파일이 아닙니다": "Not a K-CAD file",
 "L 선 · C 원 · A 호 · REC 사각형 · POL 다각형 · DT 문자": "L line · C circle · A arc · REC rectangle · POL polygon · DT text",
@@ -1292,7 +1311,7 @@ const I18N_DICT = {
 "DXF로 내보내기": "Export to DXF",
 "DXF로 내보냅니다. 치수는 선과 문자로 분해되어 저장됩니다.": "Exports to DXF. Dimensions are exploded into lines and text.",
 "KS 제도 관례: 외형선 굵은 실선(0.5), 숨은선 파선(0.35), 중심선 1점 쇄선(0.25). 행을 두 번 클릭하면 현재 도면층이 됩니다.": "KS drafting practice: visible lines thick solid (0.5), hidden lines dashed (0.35), centerlines chain (0.25). Double-click a row to make it current.",
-"K군의 CAD v0.62 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.62 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
+"K군의 CAD v0.70 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.70 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
 "{0}   도면층: \"{1}\"": "{0}   Layer: \"{1}\"",
 "{0} (객체 선택됨)": "{0} (objects selected)",
 "{0} 가로 ({1}×{2})": "{0} landscape ({1}×{2})",
@@ -1733,6 +1752,96 @@ const ICONS = (() => {
 function ic(name, size = 16) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 }
+/* ================= release notes (bottom-left button, Help menu) ================= */
+const APP_VER = 'v0.70';
+const RELEASES = [
+  { v: 'v0.70', date: '2026-10-12', title: ['검토 의견 반영 · 연동·편의성 강화', 'Review feedback · associativity and usability'], items: [
+    ['2D 도면 투상도가 3D 모델과 연결됩니다. 부품·어셈블리를 고치면 도면을 열 때 투상도가 자동으로 다시 그려집니다 (수동: UV / 삽입 → 투상도 업데이트).', '2D drawing views are linked to the 3D model and redraw automatically when it changes (manual: UV / Insert → Update views).'],
+    ['스케치 요소를 고르면 마우스 옆에 넣을 수 있는 구속조건(수평·수직·평행·직각·탄젠트·동등…) 아이콘이 바로 뜹니다.', 'Selecting sketch entities pops up the applicable relations (horizontal, vertical, parallel, perpendicular, tangent, equal…) next to the cursor.'],
+    ['모델 면에 그린 스케치가 그 면을 따라갑니다. 앞 피처의 치수가 바뀌어 면이 움직여도 스케치가 새 위치로 옮겨집니다 (토폴로지 네이밍 문제 대응).', 'Sketches on a model face follow that face when earlier dimensions move it (topological naming defence).'],
+    ['오류 안내: 피처 오류에 원인과 고치는 방법을 함께 보여 줍니다 (속성 창, 트리 툴팁, 재생성 오류 창).', 'Errors now show the cause and how to fix it (PropertyManager, tree tooltip, rebuild-errors window).'],
+    ['태블릿 터치: 한 손가락 회전, 두 손가락 이동·핀치 확대, 세 손가락 회전 (3D), 2D 도면은 두 손가락 이동·확대.', 'Touch: one-finger orbit, two-finger pan and pinch zoom, three-finger orbit (3D); two-finger pan/zoom in 2D.'],
+    ['이 릴리즈 노트 창 (왼쪽 아래 버튼, 도움말 메뉴).', 'This release-notes window (bottom-left button, Help menu).'],
+  ] },
+  { v: 'v0.62', date: '2026-10-12', title: ['피처 관리 · 헬릭스 · 곡면 · STL · DXF', 'Feature management · helix · surfaces · STL · DXF'], items: [
+    ['피처 관리: 롤백 막대, 트리에서 끌어서 순서 바꾸기, 종속 피처까지 억제, 복제, 부모/자식 보기, 스케치 평면 변경.', 'Feature management: rollback bar, drag to reorder, suppress with dependents, duplicate, parent/child, change sketch plane.'],
+    ['패턴: 선형 2방향·인스턴스 건너뛰기, 원형(축 선택), 스케치 기반, 곡선 기반, 바디 이동/복사.', 'Patterns: 2-direction linear with skip, circular about a chosen axis, sketch- and curve-driven, move/copy body.'],
+    ['헬릭스와 [스프링 만들기]·[나사산 만들기] (ISO 60° 나사산, 암나사 선택).', 'Helix with quick [Spring] and [Thread] (ISO 60°, internal option).'],
+    ['곡면: 오프셋, 두껍게(보스·컷), 붙이기(솔리드화), 자르기, 채우기, 룰드 곡면.', 'Surfaces: offset, thicken (boss/cut), knit to solid, trim, fill, ruled.'],
+    ['STL 열기 (단위 환산 ×25.4·×10·×1000, 열린 메시는 곡면으로).', 'STL open with unit scaling; open meshes come in as surfaces.'],
+    ['2D: DXF 열기·삽입·저장 (한글 문자 포함). DWG는 ODA File Converter로 변환하도록 안내.', '2D: DXF open, insert and save (Korean text). DWG is converted with ODA File Converter.'],
+    ['보기: 원통·곡면 외곽선(실루엣), 필렛 경계선(접선 모서리), 음영 모드는 선 없이 면만.', 'View: silhouette edges, tangent (fillet boundary) edges, shaded mode without lines.'],
+    ['스케치 중 흰색 모눈 시트와 흰 바탕용 색 (완전 정의 검정, 미정의 파랑).', 'White grid sheet while sketching with paper colours (black = fully defined, blue = under defined).'],
+    ['부품 투명도(재질 창, 어셈블리 부품별), 어셈블리 부품을 자신의 원점·축 기준으로 각도 회전.', 'Part transparency (material dialog, per component); rotate components about their own origin and axes.'],
+    ['하단 문서 탭 닫기(×, 오른쪽 클릭, 가운데 클릭), 탭 더블클릭으로 이름 바꾸기.', 'Close document tabs (×, right-click, middle-click); double-click to rename.'],
+  ] },
+  { v: 'v0.61', date: '', title: ['화면 개편', 'Layout revamp'], items: [
+    ['빠른 실행 막대, 왼쪽 피처·오른쪽 스케치 명령 레일(아이콘만 보기), 숨기기/보이기 되는 구속조건 창.', 'Quick-access bar, feature rail on the left and sketch rail on the right (icon-only mode), hideable constraints window.'],
+    ['한국어 / English 전환 (제목줄 오른쪽).', 'Korean / English switch (title bar).'],
+  ] },
+  { v: 'v0.52 – v0.60', date: '', title: ['모델링·해석 기능 확장', 'Modelling and analysis features'], items: [
+    ['스윕·로프트(보스/컷, 구멍 있는 단면), 회전 각도(중간 평면·반대 방향), 대칭 복사(피처·바디).', 'Sweep and loft (boss/cut, profiles with holes), revolve angle options, mirror (feature/body).'],
+    ['필렛·모따기 (접선으로 이어진 모서리 함께 선택, 치수가 바뀌어도 모서리를 다시 찾아 따라감).', 'Fillet and chamfer with tangent propagation; edges are re-found when dimensions change.'],
+    ['기준면(오프셋·각도·세 점·원통 접함), 곡면(돌출·회전·스윕·로프트·평면), 요소 변환, 스케치 필렛, 단면 보기.', 'Reference planes, surfaces, convert entities, sketch fillet, section view.'],
+    ['구조 해석(정적·고유진동·주파수 응답·과도 응답)과 모터 자기장 2D 해석.', 'Structural FEM (static, modal, frequency response, transient) and 2-D motor magnetics.'],
+    ['2D 도면: 3D 모델에서 투상도 배치(VIEWBASE), 도면 양식(TITLEBLOCK), DXF 저장.', '2D: views from the 3D model (VIEWBASE), title block, DXF export.'],
+  ] },
+  { v: 'v0.51', date: '', title: ['첫 공개', 'First release'], items: [
+    ['솔리드웍스 풍 3D 부품 모델링: 구속조건 스케치, 돌출·회전(보스/컷), 트리 편집.', 'SolidWorks-style part modelling: constrained sketches, extrude/revolve (boss/cut), feature tree.'],
+    ['어셈블리: 부품 삽입(첫 부품 고정), 메이트(일치·동심 등), 분해도, 간섭 탐지.', 'Assembly: insert components (first one fixed), mates, exploded view, interference check.'],
+    ['오토캐드 풍 2D 도면: 명령줄(L, C, REC, DLI …), 도면층, 객체 스냅.', 'AutoCAD-style 2D drawing: command line, layers, object snaps.'],
+    ['JSON 저장/열기, STL 내보내기, 예제 작업(플랜지·핀·조립품·도면).', 'JSON save/open, STL export, sample workspace.'],
+  ] },
+];
+const PLANNED = [
+  ['정밀 B-Rep 커널(OpenCASCADE WebAssembly)과 STEP/IGES 입출력 — 엔진 파일만 수십 MB라 단일 HTML·오프라인 사용과 맞지 않아, 서버(라즈베리파이) 배포판에서 별도 모듈로 검토합니다.', 'Exact B-Rep kernel (OpenCASCADE WebAssembly) with STEP/IGES — the engine alone is tens of MB, which conflicts with the single offline HTML file; planned as an optional module for the server edition.'],
+  ['3D 재생성을 Web Worker로 분리 — 지금은 구조 해석·자기장 해석만 백그라운드에서 돌고, 형상 재생성은 화면 스레드에서 합니다.', 'Moving 3D rebuilds to a Web Worker — FEM and magnetics already run in the background; geometry rebuilds still run on the UI thread.'],
+  ['도면 치수의 3D 연동(연관 치수) — 지금은 투상도만 자동으로 다시 그려집니다.', 'Associative drawing dimensions — currently only the views are redrawn.'],
+];
+function releaseNotesDialog() {
+  const classic = App.doc && App.doc.type === 'dwg';
+  const sec = r => h('div', { class: 'relnote' },
+    h('div', { class: 'rnh' }, h('b', null, r.v), h('span', null, L(r.title[0], r.title[1])), r.date ? h('small', null, r.date) : null),
+    h('ul', null, r.items.map(it => h('li', null, L(it[0], it[1])))));
+  dialog({
+    title: L(`릴리즈 노트 — K군의 CAD ${APP_VER}`, `Release notes — K-CAD ${APP_VER}`), width: 620, classic,
+    body: h('div', { class: 'relnotes' }, RELEASES.map(sec),
+      h('div', { class: 'relnote plan' }, h('div', { class: 'rnh' }, h('b', null, L('다음 과제', 'Planned')), h('span', null, L('검토 의견 중 아직 반영하지 않은 것', 'Review items not yet done'))), h('ul', null, PLANNED.map(it => h('li', null, L(it[0], it[1]))))),
+      h('div', { class: 'hint', style: 'margin-top:8px' }, L('개발: Kim,JongUk', 'Developer: Kim,JongUk'))),
+    buttons: [{ label: L('닫기', 'Close'), primary: true }]
+  });
+}
+
+/* ================= error guide: cause + how to fix ================= */
+const ERR_GUIDE = [
+  [/열린 프로파일|선이 닫혀 있지 않음|not closed|open profile/i, ['스케치 선이 끝점끼리 이어지지 않아 닫힌 영역이 없습니다.', 'The sketch lines do not meet end to end, so there is no closed region.'], ['스케치를 편집해 벌어진 끝점을 끌어 다른 끝점에 붙이세요(일치 구속). 겹친 짧은 선은 지우세요.', 'Edit the sketch and drag the open end onto the other end point (coincident). Delete short overlapping lines.']],
+  [/스케치가 비어 있음|경로가 비어 있음|empty/i, ['스케치에 그려진 요소가 없습니다.', 'The sketch has nothing in it.'], ['스케치를 열어 윤곽을 그리거나, 다른 스케치를 고르세요.', 'Open the sketch and draw a profile, or pick another sketch.']],
+  [/스케치를 찾을 수 없음|경로 스케치를 찾을 수 없음|not found/i, ['이 피처가 쓰던 스케치(또는 참조)가 지워졌거나 이 피처보다 뒤에 있습니다.', 'The sketch or reference this feature used was deleted or now comes after it.'], ['피처를 두 번 클릭해 새 스케치를 고르거나, 트리에서 스케치를 피처 위로 끌어 올리세요.', 'Double-click the feature and pick a new sketch, or drag the sketch above the feature in the tree.']],
+  [/회전축을 가로지름|crosses the axis/i, ['회전 프로파일이 회전축(중심선) 양쪽에 걸쳐 있어 회전체가 스스로 겹칩니다.', 'The revolve profile lies on both sides of the axis, so the body would intersect itself.'], ['프로파일을 중심선 한쪽에만 그리세요. 축 위의 선은 중심선(가는 쇄선)으로 바꾸세요.', 'Keep the profile on one side of the centreline; make the axis line a centreline.']],
+  [/크기가 원의 반지름보다 큼|반지름이 0 이하|크기는 0보다/i, ['필렛·모따기 크기가 모서리 주변 형상보다 큽니다.', 'The fillet/chamfer size is larger than the geometry around the edge.'], ['크기(R·C)를 줄이세요. 얇은 판이면 두께의 절반보다 작게 하세요.', 'Reduce the size; on a thin plate keep it under half the thickness.']],
+  [/평행한 면 사이 모서리/i, ['선택한 모서리 양쪽 면이 평행해서 필렛을 만들 수 없습니다.', 'The faces on both sides of this edge are parallel, so no fillet fits.'], ['다른 모서리를 고르세요 (빨간색으로 표시되는 모서리는 지원하지 않습니다).', 'Pick another edge (edges shown in red are not supported).']],
+  [/단면이 경로의 굽힘 반지름보다 큼|너무 복잡|스스로 겹칩니다/i, ['스윕 단면이 경로가 꺾이는 반지름보다 커서 형상이 스스로 겹칩니다.', 'The sweep profile is larger than the path bend radius, so the shape folds onto itself.'], ['경로의 모서리에 더 큰 R(스케치 필렛)을 주거나 단면을 작게 하세요. 단면은 경로 시작점에 수직으로 그리세요.', 'Give the path corners a larger radius or make the profile smaller; draw it perpendicular to the path at its start.']],
+  [/경로는 끊기지 않은 한 줄|경로가 너무 짧음|경로 스케치를 고르세요/i, ['스윕 경로가 하나로 이어지지 않았거나 너무 짧습니다.', 'The sweep path is broken or too short.'], ['경로 스케치의 선·호 끝점을 모두 이어 한 줄로 만드세요.', 'Join all lines and arcs of the path end to end into one chain.']],
+  [/윤곽 스케치가 두 개 이상|닫힌 영역 수가 같아야|구멍 수가 같아야/i, ['로프트 윤곽의 개수나 모양 구성이 맞지 않습니다.', 'The loft profiles do not match in number or structure.'], ['서로 다른 평면에 닫힌 윤곽을 두 개 이상 그리고, 구멍 수도 같게 하세요(관 → 관).', 'Use two or more closed profiles on different planes with the same number of holes.']],
+  [/잘라낼 바디가 없음|적용할 바디가 없음|아직 바디가 없음|옮길 바디가 없음|대칭 복사할 바디가 없음/i, ['이 피처보다 앞에 솔리드 몸체가 없습니다.', 'There is no solid body before this feature.'], ['먼저 돌출 보스 등으로 몸체를 만들거나, 롤백 막대가 이 피처 위에 있는지 확인하세요.', 'Create a body first (e.g. extruded boss) or check where the rollback bar is.']],
+  [/억제됨|suppressed/i, ['참조하는 피처가 억제되어 있거나 이 피처보다 뒤에 있습니다.', 'A referenced feature is suppressed or comes after this one.'], ['참조 피처를 억제 해제하거나 트리에서 이 피처 위로 옮기세요.', 'Unsuppress the referenced feature or move it above this one.']],
+  [/기준면을 찾을 수 없음|대칭 기준면|기준 평면을 고르세요/i, ['사용하던 기준면이 없어졌거나 이 피처보다 뒤에 있습니다.', 'The reference plane is gone or comes after this feature.'], ['피처를 편집해 다른 평면을 고르거나 기준면을 위로 옮기세요.', 'Edit the feature and pick another plane, or move the plane up.']],
+  [/고른 면을 찾을 수 없음|형상이 바뀜/i, ['앞 피처가 바뀌어 예전에 고른 면이 사라졌습니다.', 'An earlier change removed the face picked before.'], ['피처를 두 번 클릭해 면을 다시 고르세요.', 'Double-click the feature and pick the face again.']],
+  [/곡면이 닫혀 있지 않음|세 장 이상의 곡면/i, ['곡면들이 빈틈없이 만나지 않아 솔리드가 되지 않습니다.', 'The surfaces do not meet without gaps, so no solid can be formed.'], ['곡면 끝을 서로 맞닿게 하거나, 빈 곳을 [채우기] 곡면으로 막은 뒤 다시 붙이세요.', 'Make the surface edges meet, or close gaps with Fill, then knit again.']],
+  [/원이 없음|기준 원이 있는 스케치/i, ['헬릭스의 지름을 정할 원이 스케치에 없습니다.', 'The sketch has no circle to set the helix diameter.'], ['스케치에 원을 하나 그리세요. 원의 중심이 헬릭스 축이 됩니다.', 'Draw one circle; its centre becomes the helix axis.']],
+  [/피치|회전수|테이퍼/i, ['헬릭스 값이 맞지 않습니다.', 'A helix value is out of range.'], ['피치·높이·회전수는 0보다 크게, 테이퍼는 반지름이 0이 되지 않게 줄이세요.', 'Use pitch, height and revolutions above 0; reduce the taper.']],
+  [/점이 없음|점이 있는 스케치|점 세 개|세 점이 한 직선/i, ['필요한 점이 부족하거나 한 직선 위에 있습니다.', 'There are too few points, or they lie on one line.'], ['스케치에 점을 그리거나 한 직선 위에 있지 않은 점 세 개를 고르세요.', 'Add points, or pick three points that are not in a line.']],
+];
+function errGuide(msg) {
+  if (!msg) return null;
+  for (const [re, cause, fix] of ERR_GUIDE) if (re.test(msg)) return { cause: L(cause[0], cause[1]), fix: L(fix[0], fix[1]) };
+  return { cause: L('형상을 계산하다 실패했습니다.', 'The geometry could not be computed.'), fix: L('방금 바꾼 값을 되돌려 보세요(Ctrl+Z). 앞 피처를 고친 뒤 생겼다면 롤백 막대를 위로 끌어 어느 피처부터 깨지는지 찾으세요.', 'Undo the last change (Ctrl+Z). If it appeared after editing an earlier feature, drag the rollback bar up to find where it breaks.') };
+}
+function errGuideEl(msg) {
+  const g = errGuide(msg); if (!g) return null;
+  return h('div', { class: 'errguide' }, h('div', null, h('b', null, L('원인 ', 'Cause ')), g.cause), h('div', null, h('b', null, L('해결 ', 'Fix ')), g.fix));
+}
+const errGuideText = msg => { const g = errGuide(msg); return g ? `${msg}\n${L('원인', 'Cause')}: ${g.cause}\n${L('해결', 'Fix')}: ${g.fix}` : msg; };
 /* ================= CSG (BSP-tree boolean ops, after Evan Wallace's csg.js; iterative) ================= */
 const CSG = (() => {
   const EPS = 1e-5;
@@ -2115,6 +2224,24 @@ const Geo = (() => {
     if (op === 'cut') { if (!solid || !solid.length) throw new Error('잘라낼 바디가 없음'); return CSG.subtract(solid, polys); }
     return solid && solid.length ? CSG.union(solid, polys) : polys;
   }
+  function followFace(pl, polys) {
+    const A = pl.face, n = pl.n; if (!A || !A.p) return;
+    const pd = v3.dot(n, A.p); const hits = [];
+    for (const P of polys) {
+      const pn = P.plane; if (!pn) continue;
+      if (pn.n.x * n[0] + pn.n.y * n[1] + pn.n.z * n[2] < 0.99999) continue;
+      const w = pn.w; const q = v3.sub(A.p, v3.mul(n, pd - w));
+      // point in polygon, in the sketch plane's (u, v)
+      const uv = P.v.map(V => [V.x * pl.u[0] + V.y * pl.u[1] + V.z * pl.u[2], V.x * pl.v[0] + V.y * pl.v[1] + V.z * pl.v[2]]);
+      const x = v3.dot(q, pl.u), y = v3.dot(q, pl.v); let inside = false;
+      for (let i = 0, j = uv.length - 1; i < uv.length; j = i++) { const a = uv[i], b = uv[j]; if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) inside = !inside; }
+      if (inside) hits.push(w);
+    }
+    if (!hits.length) return; // face gone: keep the last known position
+    let w = hits[0]; for (const h of hits) if (Math.abs(h - A.c) < Math.abs(w - A.c)) w = h;
+    if (Math.abs(w - A.c) < 1e-7) return;
+    A.p = v3.add(A.p, v3.mul(n, w - A.c)); A.c = w; pl.o = v3.mul(n, w);
+  }
   function buildPart(part, uptoIndex) {
     let solid = null; const cyl = []; const cache = {}; const surfs = [], planes = [], surfIds = [], hiddenSurf = new Set(), surfMap = {}, curves = [];
     const feats = part.features;
@@ -2123,6 +2250,8 @@ const Geo = (() => {
       const f = feats[i]; f.err = null;
       // a sketch drawn on a reference plane follows that plane when the plane is edited
       if (f.type === 'sketch' && f.plane && f.plane.ref) { const r = planes.find(x => x.id === f.plane.ref); if (r) Object.assign(f.plane, { o: r.pl.o, n: r.pl.n, u: r.pl.u, v: r.pl.v }); }
+      // a sketch drawn on a model face follows that face when earlier features move it
+      else if (f.type === 'sketch' && f.plane && f.plane.face && solid && !f.sup) followFace(f.plane, solid);
       if (f.sup || f.type === 'sketch') continue;
       try {
         if (f.type === 'extrude' || f.type === 'revolve') {
@@ -4557,7 +4686,18 @@ function faceWorldPlane(ref) {
     const M = new THREE.Matrix4().fromArray(bm.m);
     p = new THREE.Vector3(...p).applyMatrix4(M).toArray(); n = new THREE.Vector3(...n).transformDirection(M).toArray();
   }
-  return { n, p };
+  // an anchor point well inside the face (centroid of its largest triangle) for face-following sketches
+  let a = null, best = -1; const T = bm.b.tris;
+  for (const t of f.tris) { const o = t * 9; const P = [0, 1, 2].map(k => [T[o + k * 3], T[o + k * 3 + 1], T[o + k * 3 + 2]]); const ar = v3.len(v3.cross(v3.sub(P[1], P[0]), v3.sub(P[2], P[0]))); if (ar > best) { best = ar; a = [(P[0][0] + P[1][0] + P[2][0]) / 3, (P[0][1] + P[1][1] + P[2][1]) / 3, (P[0][2] + P[1][2] + P[2][2]) / 3]; } }
+  if (a && bm.m) a = new THREE.Vector3(...a).applyMatrix4(new THREE.Matrix4().fromArray(bm.m)).toArray();
+  return { n, p, a, solidFace: ref.body !== 'surf' && !bm.m };
+}
+// sketch plane on a model face, remembering the face so the sketch can follow it when earlier features change
+function faceSketchPlane(ref) {
+  const wp = faceWorldPlane(ref); if (!wp) return null;
+  const pl = Geo.faceBasis(wp.n, wp.p);
+  if (wp.solidFace && wp.a) pl.face = { p: wp.a, c: v3.dot(pl.n, wp.p) };
+  return pl;
 }
 
 /* ---- status bar ---- */
@@ -4571,7 +4711,8 @@ function renderStatus() {
 /* ---- pointer plumbing on the 3D overlay ---- */
 (() => {
   const ov = View.ov;
-  let drag = null; const touches = new Map(); let pinch = null;
+  let drag = null; const touches = new Map(); let pinch = null, tri = null;
+  const centroid = () => { let x = 0, y = 0; for (const q of touches.values()) { x += q[0]; y += q[1]; } return [x / touches.size, y / touches.size]; };
   const pos = e => { const r = ov.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
   ov.addEventListener('contextmenu', e => e.preventDefault());
   ov.addEventListener('pointerdown', e => {
@@ -4580,8 +4721,9 @@ function renderStatus() {
     if (e.pointerType === 'touch') {
       touches.set(e.pointerId, [sx, sy]);
       if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), m: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] }; drag = null; return; }
+      if (touches.size >= 3) { pinch = null; drag = null; tri = centroid(); return; }
     }
-    ov.setPointerCapture(e.pointerId);
+    (() => { try { ov.setPointerCapture(e.pointerId); } catch (_) { } })();
     const nav = e.button === 1 ? (e.ctrlKey ? 'pan' : e.shiftKey ? 'zoom' : 'orbit') : e.button === 2 ? 'pan' : null;
     drag = { sx, sy, lx: sx, ly: sy, btn: e.button, nav, moved: false, cap: false };
     if (e.button === 0 && App.mode && App.mode.down) drag.cap = !!App.mode.down(sx, sy, e);
@@ -4591,6 +4733,7 @@ function renderStatus() {
     const [sx, sy] = pos(e);
     if (e.pointerType === 'touch' && touches.has(e.pointerId)) {
       touches.set(e.pointerId, [sx, sy]);
+      if (tri && touches.size >= 3) { const c = centroid(); View.orbit(c[0] - tri[0], c[1] - tri[1]); tri = c; return; }
       if (pinch && touches.size === 2) {
         const [a, b] = [...touches.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]), m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
         View.pan(m[0] - pinch.m[0], m[1] - pinch.m[1]); View.zoomAt(m[0], m[1], pinch.d / Math.max(1, d)); pinch = { d, m }; return;
@@ -4615,7 +4758,7 @@ function renderStatus() {
     App.mode && App.mode.move && App.mode.move(sx, sy, e);
   });
   const end = e => {
-    if (e.pointerType === 'touch') { touches.delete(e.pointerId); if (touches.size < 2) pinch = null; }
+    if (e.pointerType === 'touch') { touches.delete(e.pointerId); if (touches.size < 2) pinch = null; if (touches.size < 3) tri = null; if (touches.size && !drag) return; }
     if (!drag) return;
     const [sx, sy] = pos(e); const d = drag; drag = null;
     if (d.btn === 0) {
@@ -4699,7 +4842,7 @@ function renderPM() {
   el.append(h('div', { class: 'pmbtns' },
     h('button', { title: '확인 (Enter)', html: ic('ok', 20), onclick: () => closePM(true) }),
     h('button', { title: '취소 (Esc)', html: ic('cancel', 18), onclick: () => closePM(false) })));
-  if (cfg.msg) el.append(h('div', { class: 'pmmsg' + (cfg.err ? ' err' : '') }, cfg.msg));
+  if (cfg.msg) el.append(h('div', { class: 'pmmsg' + (cfg.err ? ' err' : '') }, cfg.msg, cfg.err ? errGuideEl(String(cfg.msg).replace(/^(오류|Error):\s*/, '')) : null));
   for (const g of (cfg.groups ? cfg.groups() : [])) {
     if (!g) continue;
     el.append(h('div', { class: 'ro' }, h('div', { class: 'cap' }, g.icon ? icEl(g.icon, 18) : null, g.title), h('div', { class: 'bd' }, g.body)));
@@ -4839,6 +4982,8 @@ function renderCM() {
     R.hidden = true;
   }
   toggle(L, 'L'); toggle(R, 'R');
+  // release notes at the bottom-left corner
+  L.append(h('div', { class: 'rspace' }), h('button', { class: 'relbtn2', title: LANG === 'en' ? 'What has changed so far' : '지금까지 개선된 내용 보기', onclick: releaseNotesDialog }, h('b', null, APP_VER), h('span', null, LANG === 'en' ? 'Release notes' : '릴리즈 노트')));
 }
 function renderStdBar() {
   const bar = $('#swQAT'); bar.innerHTML = '';
@@ -5028,7 +5173,7 @@ async function saveFile(filename, data, mime) {
 }
 function docExport(d) {
   const strip = (k, v) => (k[0] === '_' ? undefined : v);
-  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.62', doc: JSON.parse(JSON.stringify(d, strip)) };
+  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.70', doc: JSON.parse(JSON.stringify(d, strip)) };
   if (d.type === 'asm') o.parts = [...new Set(d.comps.map(c => c.part))].map(docById).filter(Boolean).map(p => JSON.parse(JSON.stringify(p, strip)));
   return JSON.stringify(o, null, 1);
 }
@@ -5129,6 +5274,7 @@ function swMenus() {
       { label: '은선 제거', check: App.display === 'hidden', run: () => setDisplay('hidden') },
       { label: '와이어프레임', check: App.display === 'wire', run: () => setDisplay('wire') },
       '-',
+      { label: L('스케치 구속조건 팝업 (커서 옆)', 'Sketch relation pop-up (next to cursor)'), check: App.ctxRel !== false, run: () => { App.ctxRel = App.ctxRel === false; } },
       { label: L('스케치 모눈 시트 (흰 종이)', 'Sketch grid sheet (white paper)'), check: App.sheet !== false, run: () => { App.sheet = App.sheet === false; View.req(); } },
       { label: L('접선 모서리 표시 (필렛 경계)', 'Tangent edges (fillet boundaries)'), check: App.showTan !== false, run: () => { App.showTan = App.showTan === false; refresh3d(); } },
       { label: L('곡면 외곽선 표시 (실루엣)', 'Silhouette edges'), check: App.showSil !== false, run: () => { App.showSil = App.showSil === false; refresh3d(); } },
@@ -5137,7 +5283,7 @@ function swMenus() {
     { label: '삽입(I)', items: () => isPart ? Part.insertMenu() : Asm.insertMenu() },
     { label: '도구(T)', items: () => isPart ? Part.toolsMenu() : Asm.toolsMenu() },
     { label: '창(W)', items: windowMenuItems },
-    { label: '도움말(H)', items: () => [{ label: '사용법과 단축키', icon: 'help', run: helpDialog }, { label: 'K군의 CAD 정보', run: aboutDialog }, '-', { label: '한국어', check: LANG === 'ko', run: () => setLang('ko') }, { label: 'English', check: LANG === 'en', run: () => setLang('en') }] },
+    { label: '도움말(H)', items: () => [{ label: '사용법과 단축키', icon: 'help', run: helpDialog }, { label: L(`릴리즈 노트 (${APP_VER})`, `Release notes (${APP_VER})`), icon: 'new', run: releaseNotesDialog }, { label: 'K군의 CAD 정보', run: aboutDialog }, '-', { label: '한국어', check: LANG === 'ko', run: () => setLang('ko') }, { label: 'English', check: LANG === 'en', run: () => setLang('en') }] },
   ];
 }
 function confirmDlg(title, msg, yes, classic) {
@@ -5179,7 +5325,7 @@ function helpDialog() {
 function aboutDialog() {
   dialog({
     title: 'K군의 CAD 정보', width: 360, classic: App.doc && App.doc.type === 'dwg', body: h('div', { style: 'display:flex;gap:12px;align-items:flex-start' }, icEl('part', 40),
-      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.62'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
+      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.70'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
     buttons: [{ label: '확인' }]
   });
 }
@@ -6066,6 +6212,7 @@ const Sk = (() => {
     convert: '모델 모서리에 커서를 대면 주황색으로 표시됩니다. 클릭하면 스케치 평면에 투영되어 고정된 선·원·호가 생깁니다. 면 안쪽을 클릭하면 그 면의 테두리 전체를 가져옵니다.',
   };
   function setTool(t) {
+    hideCtxRel();
     const s = S(); if (!s) return;
     s.tool = t; s.st = {}; s.inf = null; s.hv = null;
     $('#dimIn').hidden = true;
@@ -6095,6 +6242,7 @@ const Sk = (() => {
       View.req();
     },
     down(sx, sy, e) {
+      hideCtxRel();
       const s = S(); if (s.tool !== 'select') return false;
       const h = hit(sx, sy); const sk = SK();
       if (!h) { s.box = [[sx, sy], [sx, sy]]; s.drag = { kind: 'box' }; return true; }
@@ -6138,10 +6286,10 @@ const Sk = (() => {
           sk.ents.forEach((en, i) => { if (!fl[i]) return; const pls = Geo.entPolylines(fl[i]); if (pls.length && pls.every(pl => pl.every(inside))) s.sel.push({ k: 'ent', id: en.id }); });
           for (const p of sk.pts) if (p.id !== O && inside([p.x, p.y])) s.sel.push({ k: 'pt', id: p.id });
         } else if (!e.shiftKey) s.sel = [];
-        renderPM(); View.req(); return;
+        renderPM(); View.req(); showCtxRel(sx, sy); return;
       }
-      if (D && D.pushed) changed();
-      else renderPM();
+      if (D && D.pushed) { changed(); hideCtxRel(); }
+      else { renderPM(); showCtxRel(sx, sy); }
     },
     click(sx, sy, e) {
       const s = S(), st = s.st, sk = SK();
@@ -6410,8 +6558,25 @@ const Sk = (() => {
     row.addEventListener('pointerenter', () => { s.hoverCon = c; View.req(); }); row.addEventListener('pointerleave', () => { s.hoverCon = null; View.req(); });
     return row;
   }
+  /* context toolbar: the relations that fit the current selection, right next to the cursor */
+  function hideCtxRel() { const el = $('#skctx'); if (el) el.remove(); }
+  function showCtxRel(sx, sy) {
+    hideCtxRel();
+    const s = S(); if (!s || s.tool !== 'select' || App.ctxRel === false) return;
+    const sel = s.sel.filter(i => i.k === 'ent' || i.k === 'pt'); if (!sel.length) return;
+    let opts = []; try { opts = relationOptions(sel); } catch (e) { opts = []; }
+    if (!opts.length) return;
+    const gfx = $('#gfx'); const W = gfx.clientWidth, H = gfx.clientHeight;
+    const el = h('div', { id: 'skctx', class: 'skctx', role: 'toolbar', 'aria-label': L('구속조건 부가', 'Add relation') },
+      opts.map(o => h('button', { title: o.label, 'aria-label': o.label, onclick: e => { e.stopPropagation(); o.run(); hideCtxRel(); } }, relIcon(o.type))),
+      h('button', { class: 'close', title: L('닫기 (보기 메뉴에서 끌 수 있음)', 'Close (can be turned off in the View menu)'), onclick: e => { e.stopPropagation(); hideCtxRel(); } }, '×'));
+    gfx.append(el);
+    const w = el.offsetWidth || 200, hh = el.offsetHeight || 34;
+    el.style.left = clamp(sx + 16, 4, W - w - 4) + 'px'; el.style.top = clamp(sy + 16, 4, H - hh - 4) + 'px';
+  }
   function renderRelWin() {
     const w = $('#relwin'); const s = S();
+    if (!s || !s.sel.length) hideCtxRel();
     if (!s || App.relWin === false) { w.hidden = true; renderCM(); return; }
     w.hidden = false; w.innerHTML = '';
     const sk = SK(); const an = sk._an || analyze(sk);
@@ -6537,7 +6702,7 @@ const Part = (() => {
         onDbl: () => f.type === 'sketch' ? editSketch(f) : editFeature(f),
         onCtx: e => popMenu(e.clientX, e.clientY, featMenu(f)),
       });
-      if (!fly && !App.pm && !App.sketch) { row.dataset.fid = f.id; row.draggable = true; row.title = f.err ? f.err : L('끌어서 순서를 바꿀 수 있습니다', 'Drag to reorder'); }
+      if (!fly && !App.pm && !App.sketch) { row.dataset.fid = f.id; row.draggable = true; row.title = f.err ? errGuideText(f.err) : L('끌어서 순서를 바꿀 수 있습니다', 'Drag to reorder'); }
       out.push(row);
       if (f._open) for (const sk of kids) out.push(treeNode({
         icon: 'sketch', label: sketchState(sk) + sk.name + (sk.id === f.path ? ' (경로)' : ''), depth: 2, sel: isSel('feat', sk.id), cls: sketchVisible(sk) ? '' : 'sup', eye: { on: sketchVisible(sk), toggle: () => toggleSketch(sk) },
@@ -6583,7 +6748,7 @@ const Part = (() => {
       ...(f.sketch ? [{ label: '스케치 편집', icon: 'sketch', run: () => editSketch(byId(f.sketch)) }] : []),
       ...(f.sup ? [{ label: L('억제 해제', 'Unsuppress'), run: () => FT.suppress(P(), f, false, false) }, { label: L('종속 포함 억제 해제', 'Unsuppress with dependents'), run: () => FT.suppress(P(), f, false, true) }]
         : [{ label: L('억제 (종속 피처 포함)', 'Suppress (with dependents)'), run: () => FT.suppress(P(), f, true) }]),
-      ...(f.err ? [{ label: L('오류 정보...', 'What\'s wrong...'), icon: 'del', run: () => dialog({ title: f.name, body: h('div', null, f.err), buttons: [{ label: L('닫기', 'Close'), primary: true }] }) }] : []),
+      ...(f.err ? [{ label: L('오류 정보...', 'What\'s wrong...'), icon: 'del', run: () => dialog({ title: f.name, body: h('div', null, h('div', null, f.err), errGuideEl(f.err)), buttons: [{ label: L('닫기', 'Close'), primary: true }] }) }] : []),
       ...mgmtItems(f),
       '-', { label: '이름 바꾸기...', run: () => renameDialog(f, () => { renderTree(); save(); }) }, { label: '삭제', key: 'Del', icon: 'del', run: () => deleteFeature(f.id) }];
   }
@@ -6605,7 +6770,7 @@ const Part = (() => {
       if (!p) return null;
       if (p.kind === 'plane') return { kind: 'std', which: p.which };
       if (p.kind === 'refplane') { const r = refPlaneById(p.id); return r ? Object.assign({}, r.pl, { ref: p.id }) : null; }
-      if (p.kind === 'face' && p.face && p.face.kind === 'plane') { const wp = faceWorldPlane(refOf(p)); return wp ? Geo.faceBasis(wp.n, wp.p) : null; }
+      if (p.kind === 'face' && p.face && p.face.kind === 'plane') return faceSketchPlane(refOf(p));
       return null;
     };
     App.mode = { name: 'pickplane', wantPlanes: true, move: selectMode.move, click(sx, sy) { const pl = fromPick(pickAt(sx, sy)); if (pl) apply(pl); else status(L('평면이나 평평한 면을 클릭하세요', 'Click a plane or a flat face')); }, highlights: () => [] };
@@ -6829,7 +6994,7 @@ const Part = (() => {
     if (App.sketch) { Sk.setTool(tool); return; }
     const s = App.sel;
     if (s && s.kind === 'plane') { enterSketch(newSketch({ kind: 'std', which: s.which }), true, tool); return; }
-    if (s && s.kind === 'face') { const wp = faceWorldPlane(s); if (wp) { enterSketch(newSketch(Geo.faceBasis(wp.n, wp.p)), true, tool); return; } }
+    if (s && s.kind === 'face') { const fp = faceSketchPlane(s); if (fp) { enterSketch(newSketch(fp), true, tool); return; } }
     if (s && s.kind === 'refplane') { const r = refPlaneById(s.id); if (r) { enterSketch(newSketch(Object.assign({}, r.pl, { ref: s.id })), true, tool); return; } }
     if (s && s.kind === 'feat') { const f = byId(s.id); if (f && f.type === 'sketch') { editSketch(f, tool); return; } }
     App.mode = {
@@ -6839,7 +7004,7 @@ const Part = (() => {
         const p = pickAt(sx, sy); if (!p) return;
         if (p.kind === 'plane') { closePM(true); enterSketch(newSketch({ kind: 'std', which: p.which }), true, tool); }
         else if (p.kind === 'refplane') { const r = refPlaneById(p.id); if (r) { closePM(true); enterSketch(newSketch(Object.assign({}, r.pl, { ref: p.id })), true, tool); } }
-        else if (p.face.kind === 'plane') { const wp = faceWorldPlane(refOf(p)); closePM(true); enterSketch(newSketch(Geo.faceBasis(wp.n, wp.p)), true, tool); }
+        else if (p.face.kind === 'plane') { const fp = faceSketchPlane(refOf(p)); closePM(true); enterSketch(newSketch(fp), true, tool); }
         else status('곡면에는 스케치할 수 없습니다. 평면 면을 선택하세요.');
       },
       highlights: () => [],
@@ -6855,7 +7020,7 @@ const Part = (() => {
     if (!P().features.some(f => f.type !== 'sketch')) View.stdView('iso');
   }
   function newSketch(plane) {
-    const pl = plane.kind === 'std' ? plane : { kind: 'face', o: plane.o, n: plane.n, u: plane.u, v: plane.v, ref: plane.ref };
+    const pl = plane.kind === 'std' ? plane : { kind: 'face', o: plane.o, n: plane.n, u: plane.u, v: plane.v, ref: plane.ref, face: plane.face };
     return Sk.blank(pl, nextName(P(), 'sk', '스케치'));
   }
   function editSketch(f, tool) { if (!f) return; enterSketch(f, false, tool || 'select'); }
@@ -6875,7 +7040,7 @@ const Part = (() => {
   }
   function exitSketch(commit) {
     const S = App.sketch; if (!S) return;
-    App.sketch = null; App.pm = null; $('#pm').innerHTML = ''; setLeftTab('tree'); $('#dimIn').hidden = true; $('#relwin').hidden = true;
+    App.sketch = null; App.pm = null; $('#pm').innerHTML = ''; { const cx = $('#skctx'); if (cx) cx.remove(); } setLeftTab('tree'); $('#dimIn').hidden = true; $('#relwin').hidden = true;
     const d = P();
     if (!commit) {
       if (S.isNew) d.features = d.features.filter(f => f !== S.feat); else Object.assign(S.feat, JSON.parse(S.backup));
@@ -7191,7 +7356,7 @@ const FT = (() => {
   }
   function errorsDialog(d) {
     const E = all(d).filter(f => f.err);
-    dialog({ title: L('재생성 오류', 'Rebuild errors'), width: 460, body: E.length ? h('div', null, E.map(f => h('div', { class: 'relrow' }, icEl('del', 16), h('span', { class: 'rl' }, h('b', null, f.name), ': ' + f.err)))) : h('div', null, L('오류가 없습니다.', 'No errors.')), buttons: [{ label: L('닫기', 'Close'), primary: true }] });
+    dialog({ title: L('재생성 오류', 'Rebuild errors'), width: 460, body: E.length ? h('div', null, E.map(f => h('div', { style: 'margin-bottom:10px' }, h('div', { class: 'relrow' }, icEl('del', 16), h('span', { class: 'rl' }, h('b', null, f.name), ': ' + f.err)), errGuideEl(f.err)))) : h('div', null, L('오류가 없습니다.', 'No errors.')), buttons: [{ label: L('닫기', 'Close'), primary: true }] });
   }
   /* ---------- drag & drop in the tree ---------- */
   let dragId = null;
@@ -8868,7 +9033,7 @@ const MagUI = (() => {
       { label: L('파일(F)', 'File(F)'), items: () => [{ label: L('새 문서...', 'New...'), icon: 'new', run: newDocDialog }, { label: L('저장...', 'Save...'), icon: 'save', run: saveDialog }, { label: L('작업 파일 열기...', 'Open workspace...'), icon: 'open', run: openWorkspaceFile }] },
       { label: L('해석(A)', 'Analysis(A)'), items: () => [{ label: L('자기장 해석', 'Field solution'), run: runField }, { label: L('무부하 역기전력', 'No-load back-EMF'), run: runNoLoad }, { label: L('코깅 토크', 'Cogging torque'), run: runCogging }, { label: L('토크-전류각', 'Torque vs angle'), run: runTorqueAngle }, { label: L('부하 토크 리플', 'Load torque ripple'), run: runRipple }] },
       { label: L('창(W)', 'Window(W)'), items: () => windowMenuItems() },
-      { label: L('도움말(H)', 'Help(H)'), items: () => [{ label: L('이 해석에 대하여', 'About this analysis'), icon: 'help', run: helpMag }, '-', { label: '한국어', check: LANG === 'ko', run: () => setLang('ko') }, { label: 'English', check: LANG === 'en', run: () => setLang('en') }] },
+      { label: L('도움말(H)', 'Help(H)'), items: () => [{ label: L('이 해석에 대하여', 'About this analysis'), icon: 'help', run: helpMag }, { label: L(`릴리즈 노트 (${APP_VER})`, `Release notes (${APP_VER})`), run: releaseNotesDialog }, '-', { label: '한국어', check: LANG === 'ko', run: () => setLang('ko') }, { label: 'English', check: LANG === 'en', run: () => setLang('en') }] },
     ];
   }
   function helpMag() {
@@ -9303,7 +9468,7 @@ const Dwg = (() => {
     SC: 'SCALE', SCALE: 'SCALE', O: 'OFFSET', OFFSET: 'OFFSET', TR: 'TRIM', TRIM: 'TRIM', EX: 'EXTEND', EXTEND: 'EXTEND', F: 'FILLET', FILLET: 'FILLET', MA: 'MATCHPROP', MATCHPROP: 'MATCHPROP',
     Z: 'ZOOM', ZOOM: 'ZOOM', P: 'PAN', PAN: 'PAN', LA: 'LAYER', LAYER: 'LAYER', U: 'UNDO', UNDO: 'UNDO', REDO: 'REDO', DI: 'DIST', DIST: 'DIST', LI: 'LIST', LIST: 'LIST', ID: 'ID',
     RE: 'REGEN', REGEN: 'REGEN', OS: 'OSNAP', OSNAP: 'OSNAP', LTS: 'LTSCALE', LTSCALE: 'LTSCALE', DIMLFAC: 'DIMLFAC', DIMTXT: 'DIMTXT',
-    VB: 'VIEWBASE', VIEWBASE: 'VIEWBASE', TB: 'TITLEBLOCK', TITLEBLOCK: 'TITLEBLOCK', DXFOUT: 'DXFOUT', DXFIN: 'DXFIN', IMPORT: 'DXFIN', DWGOUT: 'DWGOUT', DWGIN: 'DWGIN', SAVE: 'SAVE', QSAVE: 'SAVE', HELP: 'HELP', NEW: 'NEW', ORTHO: 'ORTHO', GRID: 'GRID', SNAP: 'SNAP', CLOSE: 'CLOSE',
+    VB: 'VIEWBASE', VIEWBASE: 'VIEWBASE', UV: 'UPDATEVIEWS', UPDATEVIEWS: 'UPDATEVIEWS', VIEWUPDATE: 'UPDATEVIEWS', TB: 'TITLEBLOCK', TITLEBLOCK: 'TITLEBLOCK', DXFOUT: 'DXFOUT', DXFIN: 'DXFIN', IMPORT: 'DXFIN', DWGOUT: 'DWGOUT', DWGIN: 'DWGIN', SAVE: 'SAVE', QSAVE: 'SAVE', HELP: 'HELP', NEW: 'NEW', ORTHO: 'ORTHO', GRID: 'GRID', SNAP: 'SNAP', CLOSE: 'CLOSE',
   };
   const NAMES_KR = { LINE: '선', CIRCLE: '원', ARC: '호', RECTANG: '직사각형', POLYGON: '폴리곤', TEXT: '단일 행 문자', DIMLINEAR: '선형 치수', DIMALIGNED: '정렬 치수', DIMRADIUS: '반지름 치수', DIMDIAMETER: '지름 치수', ERASE: '지우기', MOVE: '이동', COPY: '복사', ROTATE: '회전', MIRROR: '대칭', SCALE: '축척', OFFSET: '간격띄우기', TRIM: '자르기', EXTEND: '연장', FILLET: '모깎기', MATCHPROP: '특성 일치' };
   function exec(text) {
@@ -9417,6 +9582,7 @@ const Dwg = (() => {
     const t = await getPoint('두 번째 점 지정 또는 <첫 번째 점을 변위로 사용>:', { base: b, rubber: true, dragSel: s, allowEnter: true });
     const d = t === null ? b : [t[0] - b[0], t[1] - b[1]];
     s.forEach(e => xform(e, p => [p[0] + d[0], p[1] + d[1]])); touchMod();
+    for (const v of doc.views || []) { const g = doc.ents.filter(e => e.vg === v.id); if (g.length && g.every(e => s.includes(e))) v.at = [v.at[0] + d[0], v.at[1] + d[1]]; }
   });
   CMD.COPY = () => run('COPY', async () => {
     const s = await getSel(); if (!s.length) return;
@@ -9425,7 +9591,7 @@ const Dwg = (() => {
       const t = await getPoint('두 번째 점 지정 또는 <종료>:', { base: b, rubber: true, dragSel: s, allowEnter: true });
       if (t === null) break;
       const d = [t[0] - b[0], t[1] - b[1]];
-      s.forEach(e => { const c = clone(e); delete c.id; addEnt(xform(c, p => [p[0] + d[0], p[1] + d[1]])); });
+      s.forEach(e => { const c = clone(e); delete c.id; delete c.vg; addEnt(xform(c, p => [p[0] + d[0], p[1] + d[1]])); });
     }
   });
   const rotP = (c, a) => p => { const x = p[0] - c[0], y = p[1] - c[1], co = Math.cos(a), si = Math.sin(a); return [c[0] + x * co - y * si, c[1] + x * si + y * co]; };
@@ -9450,7 +9616,7 @@ const Dwg = (() => {
     const b = await getPoint('대칭선의 두 번째 점 지정:', { base: a, rubber: true, preview: p => dist(a, p) > 1e-9 ? s.map(e => xform(clone(e), mf(p), 0, 1, true)) : [] });
     const yn = await getKw('원본 객체를 지우시겠습니까? [예(Y)/아니오(N)] <N>:', ['Y', 'N'], 'N');
     const f = mf(b);
-    s.forEach(e => { const c = clone(e); delete c.id; const m = xform(c, f, 0, 1, true); if (m.t === 'text') { m.rot = (e.rot || 0); m.p = f(e.p); } addEnt(m); });
+    s.forEach(e => { const c = clone(e); delete c.id; delete c.vg; const m = xform(c, f, 0, 1, true); if (m.t === 'text') { m.rot = (e.rot || 0); m.p = f(e.p); } addEnt(m); });
     if (yn === 'Y') s.forEach(removeEnt);
   });
   let offDist = 10;
@@ -9637,13 +9803,23 @@ const Dwg = (() => {
   /* ---------- mouse ---------- */
   const mpos = ev => { const r = cv.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; };
   cv.addEventListener('contextmenu', e => e.preventDefault());
+  // touch: two fingers pan and pinch-zoom (one finger works like the mouse)
+  const tps = new Map(); let tpinch = null;
+  const tmid = () => { const v = [...tps.values()]; return { m: [(v[0][0] + v[1][0]) / 2, (v[0][1] + v[1][1]) / 2], d: Math.hypot(v[0][0] - v[1][0], v[0][1] - v[1][1]) }; };
+  cv.addEventListener('pointerdown', ev => { if (ev.pointerType !== 'touch') return; tps.set(ev.pointerId, mpos(ev)); if (tps.size === 2) { tpinch = tmid(); winStart = null; ev.stopImmediatePropagation(); } }, true);
+  cv.addEventListener('pointermove', ev => {
+    if (ev.pointerType !== 'touch' || !tps.has(ev.pointerId)) return; tps.set(ev.pointerId, mpos(ev));
+    if (tpinch && tps.size === 2) { const q = tmid(); doc.view.cx -= (q.m[0] - tpinch.m[0]) / doc.view.s; doc.view.cy += (q.m[1] - tpinch.m[1]) / doc.view.s; if (tpinch.d > 10) zoomAt(q.m[0], q.m[1], q.d / tpinch.d); tpinch = q; redraw(); ev.stopImmediatePropagation(); }
+  }, true);
+  const tend = ev => { if (ev.pointerType !== 'touch') return; tps.delete(ev.pointerId); if (tps.size < 2) { if (tpinch) { tpinch = null; save(); ev.stopImmediatePropagation(); } } };
+  cv.addEventListener('pointerup', tend, true); cv.addEventListener('pointercancel', tend, true);
   cv.addEventListener('pointerdown', ev => {
     closePop(); cin.focus({ preventScroll: true });
     const [x, y] = mpos(ev); mouse.x = x; mouse.y = y;
-    if (ev.button === 1 || (R.req && R.req.kind === 'pan' && ev.button === 0)) { dragPan = { x, y }; cv.setPointerCapture(ev.pointerId); ev.preventDefault(); return; }
+    if (ev.button === 1 || (R.req && R.req.kind === 'pan' && ev.button === 0)) { dragPan = { x, y }; (() => { try { cv.setPointerCapture(ev.pointerId); } catch (_) { } })(); ev.preventDefault(); return; }
     if (ev.button === 2) { submit(''); return; }
     if (ev.button !== 0) return;
-    cv.setPointerCapture(ev.pointerId);
+    (() => { try { cv.setPointerCapture(ev.pointerId); } catch (_) { } })();
     R.downAt = [x, y];
     R.lastClick = [x, y];
     const q = R.req && R.req.kind !== 'idle' ? R.req : null;
@@ -9914,11 +10090,43 @@ const Dwg = (() => {
       const pre = p => { const es = placeViews(views, p, opts); return es.filter((e, i) => i % 3 === 0 || es.length < 600); };
       const at = await getPoint('정면도의 위치 지정:', { preview: pre });
       const ents = placeViews(views, at, opts);
-      ents.forEach(addEnt);
+      const vid = uid('v'); ents.forEach(e => { e.vg = vid; addEnt(e); });
+      doc.views = doc.views || []; doc.views.push({ id: vid, src: src.id, opts: clone(opts), at: at.slice(), sig: srcSig(src) });
+      log(L('이 투상도는 3D 모델과 연결되었습니다. 모델을 고치면 도면을 열 때 자동으로 다시 그려집니다 (수동: UPDATEVIEWS).', 'These views are linked to the 3D model and are redrawn automatically when it changes (manual: UPDATEVIEWS).'));
       log(`${Object.keys(views).length}개 뷰, 객체 ${ents.length}개를 배치했습니다 (척도 ${opts.scale >= 1 ? opts.scale + ':1' : '1:' + Math.round(1 / opts.scale)}).`);
       if (opts.scale !== 1 && doc.dimlfac !== 1 / opts.scale) log(`참고: 치수를 실제 크기로 표시하려면 DIMLFAC을 ${fmt(1 / opts.scale, 4)}로 설정하세요.`);
     });
   }
+  /* ---------- associative views: redraw when the 3D source changes ---------- */
+  function srcSig(src) {
+    if (!src) return '';
+    if (src.type === 'part') return 'p' + (src.rev || 0);
+    return 'a' + (src.rev || 0) + ':' + (src.comps || []).map(c => { const p = docById(c.part); return p ? p.id + '@' + (p.rev || 0) : '-'; }).join(',');
+  }
+  function staleViews(d = doc) { return (d.views || []).filter(v => { const src = docById(v.src); return src && srcSig(src) !== v.sig; }); }
+  function syncViews(force, quiet) {
+    if (!doc || !doc.views || !doc.views.length) { if (force && !quiet) log(L('이 도면에는 3D 모델과 연결된 투상도가 없습니다. VIEWBASE로 배치하세요.', 'This drawing has no views linked to a 3D model. Place them with VIEWBASE.')); return 0; }
+    // forget views whose geometry the user erased completely
+    doc.views = doc.views.filter(v => doc.ents.some(e => e.vg === v.id));
+    const todo = doc.views.filter(v => { const src = docById(v.src); if (!src) return false; return force || srcSig(src) !== v.sig; });
+    if (!todo.length) { if (force && !quiet) log(L('투상도가 이미 최신입니다.', 'Views are already up to date.')); return 0; }
+    snapshot(doc); let n = 0;
+    for (const v of todo) {
+      const src = docById(v.src); let views;
+      try { views = buildViews(src, v.opts); } catch (e) { log(L('*오류* 투상도를 다시 만들지 못했습니다: ', '*Error* could not rebuild views: ') + e.message); continue; }
+      if (!Object.keys(views).length) continue;
+      doc.ents = doc.ents.filter(e => { if (e.vg === v.id) { sel.delete(e.id); return false; } return true; });
+      for (const e of placeViews(views, v.at, v.opts)) { e.vg = v.id; e.id = uid('e'); e.layer = e.layer || doc.cur; doc.ents.push(e); }
+      v.sig = srcSig(src); n++;
+    }
+    if (n) {
+      doc.rev++; save(); redraw(); renderProps();
+      const hasDims = doc.ents.some(e => e.t === 'dim');
+      if (!quiet || n) log(L(`3D 모델이 바뀌어 투상도 ${n}묶음을 다시 그렸습니다.`, `The 3D model changed: redrew ${n} view group(s).`) + (hasDims ? L(' 치수는 직접 기입한 것이라 자동으로 따라가지 않으니 위치를 확인하세요.', ' Dimensions are not associative: check their positions.') : ''));
+    }
+    return n;
+  }
+  CMD.UPDATEVIEWS = () => { cancelReq(); syncViews(true); };
   /* ---------- title block ---------- */
   const SHEETS = { A2: [594, 420], A3: [420, 297], A4: [297, 210] };
   function titleBlockEnts(o, size, info) {
@@ -10049,7 +10257,7 @@ const Dwg = (() => {
       cmdBtn('new', '새 문서', newDocDialog), cmdBtn('open', '열기 (Ctrl+O)', openWorkspaceFile), cmdBtn('save', '저장 — JSON · DXF (Ctrl+S)', saveDialog), h('span', { class: 'asep' }),
       cmdBtn('undo', '명령 취소 (U)', () => CMD.UNDO()), cmdBtn('redo', '명령 복구 (REDO)', () => CMD.REDO()), h('span', { class: 'asep' }),
       cmdBtn('aPan', '실시간 초점이동 (P)', () => CMD.PAN()), cmdBtn('zoomw', '줌 윈도우', () => { CMD.ZOOM(); setTimeout(() => submit('W'), 0); }), cmdBtn('aZoomE', '줌 범위 (Z → E)', () => { log('명령: ZOOM E'); zoomExtents(); }), h('span', { class: 'asep' }),
-      cmdBtn('aViews', '3D 모델에서 투상도 배치 (VIEWBASE)', () => CMD.VIEWBASE()), cmdBtn('aTitle', '도면 양식 삽입 (TITLEBLOCK)', () => CMD.TITLEBLOCK()), h('span', { class: 'asep' }),
+      cmdBtn('aViews', '3D 모델에서 투상도 배치 (VIEWBASE)', () => CMD.VIEWBASE()), cmdBtn('rebuild', L('투상도 업데이트 — 3D 모델 변경 반영 (UV)', 'Update views from the 3D model (UV)'), () => CMD.UPDATEVIEWS()), cmdBtn('aTitle', '도면 양식 삽입 (TITLEBLOCK)', () => CMD.TITLEBLOCK()), h('span', { class: 'asep' }),
       cmdBtn('aDist', '거리 (DIST)', () => CMD.DIST()), cmdBtn('aMatch', '특성 일치 (MA)', () => CMD.MATCHPROP()), h('span', { class: 'asep' }), cmdBtn('help', '도움말', () => CMD.HELP()));
     const dr = $('#acDraw'); dr.innerHTML = '';
     dr.append(cmdBtn('aLine', '선 (L)', CMD.LINE), cmdBtn('aPoly', '폴리곤 (POL)', CMD.POLYGON), cmdBtn('aRect', '직사각형 (REC)', CMD.RECTANG), cmdBtn('aArc', '호 (A)', CMD.ARC), cmdBtn('aCircle', '원 (C)', CMD.CIRCLE), cmdBtn('aText', '단일 행 문자 (DT)', CMD.TEXT),
@@ -10086,7 +10294,7 @@ const Dwg = (() => {
   function renderStatusBar() {
     if (!doc) return;
     const st = $('#acStatus'); st.innerHTML = '';
-    st.append(h('span', { class: 'coord', id: 'acCoord' }, '0.0000, 0.0000, 0.0000'));
+    st.append(h('button', { class: 'relbtn3', title: L('릴리즈 노트', 'Release notes'), onclick: releaseNotesDialog }, APP_VER), h('span', { class: 'coord', id: 'acCoord' }, '0.0000, 0.0000, 0.0000'));
     const B = (k, l, key) => h('button', { class: doc.tg[k] ? 'on' : '', title: key || '', onclick: () => { toggle(k); cin.focus(); } }, l);
     st.append(B('snap', '스냅', 'F9'), B('grid', '모눈', 'F7'), B('ortho', '직교', 'F8'), h('button', { class: '', title: '이 버전에서는 지원하지 않음', disabled: true }, '극좌표'), B('osnap', '객체 스냅', 'F3'), h('button', { disabled: true }, 'OTRACK'), B('lwt', '선가중치'), h('button', { class: 'on' }, '모형'), h('span', { class: 'fill' }));
   }
@@ -10096,14 +10304,14 @@ const Dwg = (() => {
       { label: '파일(F)', items: () => [c('새로 만들기...', newDocDialog, 'Ctrl+N'), c('열기... (JSON · STL · DXF · DWG)', openWorkspaceFile, 'Ctrl+O'), c('저장... (JSON · DXF)', saveDialog, 'Ctrl+S'), '-', c('DXF 가져오기 (현재 도면에 삽입)...', CMD.DXFIN, 'DXFIN'), c('DXF로 내보내기', CMD.DXFOUT, 'DXFOUT'), c('DWG 열기...', CMD.DWGIN, 'DWGIN'), c('DWG로 저장...', CMD.DWGOUT, 'DWGOUT'), '-', c('문서 이름 바꾸기...', () => renameDialog(doc, () => { renderDocTabs(); setTitle(); save(); })), c('이 문서 닫기(삭제)', () => closeDocConfirm(doc))] },
       { label: '편집(E)', items: () => [c('명령 취소', CMD.UNDO, 'Ctrl+Z'), c('명령 복구', CMD.REDO, 'Ctrl+Y'), '-', c('지우기', CMD.ERASE, 'Del'), c('모두 선택', () => { doc.ents.forEach(e => sel.add(e.id)); renderProps(); redraw(); }, 'Ctrl+A')] },
       { label: '보기(V)', items: () => [c('줌 > 범위', zoomExtents), c('줌 > 윈도우', () => { CMD.ZOOM(); setTimeout(() => submit('W'), 0); }), c('초점이동 > 실시간', CMD.PAN), c('재생성', CMD.REGEN), '-', { label: '선가중치 표시', check: doc.tg.lwt, run: () => toggle('lwt') }] },
-      { label: '삽입(I)', items: () => [c('3D 모델에서 투상도 배치 (VIEWBASE)...', CMD.VIEWBASE), c('도면 양식 (TITLEBLOCK)...', CMD.TITLEBLOCK)] },
+      { label: '삽입(I)', items: () => [c('3D 모델에서 투상도 배치 (VIEWBASE)...', CMD.VIEWBASE), c(L('투상도 업데이트 (3D 변경 반영)', 'Update views from 3D'), CMD.UPDATEVIEWS, 'UV'), c('도면 양식 (TITLEBLOCK)...', CMD.TITLEBLOCK)] },
       { label: '형식(O)', items: () => [c('도면층...', CMD.LAYER), c('선종류 축척 (LTSCALE)', CMD.LTSCALE), c('치수 문자 높이 (DIMTXT)', CMD.DIMTXT), c('치수 선형 축척 (DIMLFAC)', CMD.DIMLFAC)] },
       { label: '도구(T)', items: () => [c('조회 > 거리', CMD.DIST), c('조회 > ID 점', CMD.ID), c('조회 > 리스트', CMD.LIST), '-', c('제도 설정 (객체 스냅)...', CMD.OSNAP)] },
       { label: '그리기(D)', items: () => [c('선', CMD.LINE, 'L'), c('직사각형', CMD.RECTANG, 'REC'), c('폴리곤', CMD.POLYGON, 'POL'), c('호 (3점)', CMD.ARC, 'A'), c('원', CMD.CIRCLE, 'C'), c('문자 > 단일 행 문자', CMD.TEXT, 'DT')] },
       { label: '치수(N)', items: () => [c('선형', CMD.DIMLINEAR, 'DLI'), c('정렬', CMD.DIMALIGNED, 'DAL'), c('반지름', CMD.DIMRADIUS, 'DRA'), c('지름', CMD.DIMDIAMETER, 'DDI')] },
       { label: '수정(M)', items: () => [c('특성 일치', CMD.MATCHPROP, 'MA'), '-', c('지우기', CMD.ERASE, 'E'), c('복사', CMD.COPY, 'CO'), c('대칭', CMD.MIRROR, 'MI'), c('간격띄우기', CMD.OFFSET, 'O'), c('이동', CMD.MOVE, 'M'), c('회전', CMD.ROTATE, 'RO'), c('축척', CMD.SCALE, 'SC'), c('자르기', CMD.TRIM, 'TR'), c('연장', CMD.EXTEND, 'EX'), c('모깎기', CMD.FILLET, 'F')] },
       { label: '창(W)', items: windowMenuItems },
-      { label: '도움말(H)', items: () => [c('사용법과 명령', CMD.HELP), c('K군의 CAD 정보', aboutDialog), '-', { label: '한국어', check: LANG === 'ko', run: () => setLang('ko') }, { label: 'English', check: LANG === 'en', run: () => setLang('en') }] },
+      { label: '도움말(H)', items: () => [c('사용법과 명령', CMD.HELP), c(L(`릴리즈 노트 (${APP_VER})`, `Release notes (${APP_VER})`), releaseNotesDialog), c('K군의 CAD 정보', aboutDialog), '-', { label: '한국어', check: LANG === 'ko', run: () => setLang('ko') }, { label: 'English', check: LANG === 'en', run: () => setLang('en') }] },
     ];
   }
   function setTitle() { $('#acTitle').textContent = `2D 도면 · ${doc.name}.dwg`; }
@@ -10112,13 +10320,14 @@ const Dwg = (() => {
     d.tg = d.tg || { snap: false, grid: false, ortho: false, osnap: true, lwt: true };
     d.osm = d.osm || { end: true, mid: true, cen: true, quad: true, int: true, perp: true, ins: true };
     buildChrome(); setTitle(); resize();
-    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.62 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
+    setTimeout(() => { if (doc === d) syncViews(false, true); }, 0);
+    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.70 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
     setPrompt('명령:');
     setTimeout(() => cin.focus({ preventScroll: true }), 30);
     redraw();
   }
   function close() { if (R.running) cancelReq(); doc = null; }
-  return { newDoc, open, close, redraw, titleBlockEnts, buildViews, placeViews, dimGeom, zoomExtents, toDXF, get doc() { return doc; } };
+  return { newDoc, open, close, redraw, titleBlockEnts, buildViews, placeViews, dimGeom, zoomExtents, toDXF, srcSig, staleViews, syncViews, get doc() { return doc; } };
 })();
 /* ================= DXF import (R12 … 2018), DWG detection & conversion guidance ================= */
 const DXFIN = (() => {
@@ -10352,13 +10561,13 @@ function makeSample() {
   const ws = App.ws;
   // --- part 1: flange block (fully defined constraint sketches) ---
   const fl = newPartDoc('플랜지'); fl.material = 'steel'; fl.color = '#AEB8C6';
-  const topAt = y => { const b = Geo.faceBasis([0, 1, 0], [0, y, 0]); return { kind: 'face', o: b.o, n: b.n, u: b.u, v: b.v }; };
+  const topAt = (y, a) => { const b = Geo.faceBasis([0, 1, 0], [0, y, 0]); return { kind: 'face', o: b.o, n: b.n, u: b.u, v: b.v, face: a ? { p: a, c: y } : undefined }; };
   const s1 = Sk.blank({ kind: 'std', which: 'top' }, '스케치1', 'fs1');
   const r1 = Sk.B.rectCenter(s1, [0, 0], 80, 80);
   Sk.B.dim(s1, 'len', [r1.lines[0].id], 80, [0, -12]); Sk.B.dim(s1, 'len', [r1.lines[1].id], 80, [14, 0]);
-  const s2 = Sk.blank(topAt(15), '스케치2', 'fs2'); const c2 = Sk.B.circle(s2, [0, 0], 20); Sk.B.dim(s2, 'diam', [c2.id], 40, [22, 18]);
-  const s3 = Sk.blank(topAt(40), '스케치3', 'fs3'); const c3 = Sk.B.circle(s3, [0, 0], 10); Sk.B.dim(s3, 'diam', [c3.id], 20, [14, 12]);
-  const s4 = Sk.blank(topAt(15), '스케치4', 'fs4'); const c4 = Sk.B.circle(s4, [30, 30], 4.5);
+  const s2 = Sk.blank(topAt(15, [0, 15, 35]), '스케치2', 'fs2'); const c2 = Sk.B.circle(s2, [0, 0], 20); Sk.B.dim(s2, 'diam', [c2.id], 40, [22, 18]);
+  const s3 = Sk.blank(topAt(40, [0, 40, 15]), '스케치3', 'fs3'); const c3 = Sk.B.circle(s3, [0, 0], 10); Sk.B.dim(s3, 'diam', [c3.id], 20, [14, 12]);
+  const s4 = Sk.blank(topAt(15, [0, 15, 35]), '스케치4', 'fs4'); const c4 = Sk.B.circle(s4, [30, 30], 4.5);
   Sk.B.dim(s4, 'hdist', [Sk.O, c4.c], 30, [0, 24], { s: 1 }); Sk.B.dim(s4, 'vdist', [Sk.O, c4.c], 30, [26, 0], { s: 1 }); Sk.B.dim(s4, 'diam', [c4.id], 9, [10, 9]);
   for (const sk of [s1, s2, s3, s4]) { Sk.solve(sk); Sk.analyze(sk); }
   fl.features = [
@@ -10402,8 +10611,10 @@ function makeSample() {
   const add = e => { e.id = uid('e'); dw.ents.push(e); };
   Dwg.titleBlockEnts([0, 0], 'A3', { title: '플랜지', scale: '1:1', author: '', date: '2026.10.09', school: '' }).forEach(add);
   try {
-    const views = Dwg.buildViews(fl, { views: { front: true, top: true, right: true, iso: true } });
-    Dwg.placeViews(views, [105, 95], { scale: 1, hidden: true, centers: true, labels: false, gap: 25 }).forEach(add);
+    const vopts = { views: { front: true, top: true, right: true, iso: true }, scale: 1, hidden: true, centers: true, labels: false, gap: 25 };
+    const views = Dwg.buildViews(fl, vopts);
+    Dwg.placeViews(views, [105, 95], vopts).forEach(e => { e.vg = 'vs1'; add(e); });
+    dw.views = [{ id: 'vs1', src: fl.id, opts: vopts, at: [105, 95], sig: Dwg.srcSig(fl) }];
     const D = (k, p1, p2, loc) => add({ t: 'dim', k, p1, p2, loc, layer: '치수' });
     D('h', [65, 75], [145, 75], [105, 62]);
     D('v', [65, 75], [65, 90], [52, 82]);
