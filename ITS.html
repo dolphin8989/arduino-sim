@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 통합 시뮬레이터 Ver0.97</title>
+<title>K군의 통합 시뮬레이터 Ver0.971</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -2471,8 +2471,8 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b>K군의 통합 시뮬레이터 Ver0.97</b>
-      <span>아두이노(Ver1.05) + PLC(Ver0.97) · 2단계 연동(릴레이 인터페이스)</span>
+      <b>K군의 통합 시뮬레이터 Ver0.971</b>
+      <span>아두이노(Ver1.06) + PLC(Ver0.97) · 2단계 연동(릴레이 인터페이스)</span>
     </div>
   </div>
   <div class="mode-switch" id="modeSwitch">
@@ -3984,7 +3984,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver1.05", en: "K's Simulator Ver1.05" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver1.06", en: "K's Simulator Ver1.06" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -4936,7 +4936,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.05", en: "K's Arduino Simulator Ver1.05" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.06", en: "K's Arduino Simulator Ver1.06" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -5711,6 +5711,7 @@ function injectDebugCheckpoints(rawCode, board){
       for (let k = info.lineNo - 2; k >= 0; k--){ const t = (maskedLines[k] || '').trim(); if (t){ prevSig = t; break; } }
       if (!/[;{}:]$/.test(prevSig)) return;
       if (/^(else\b|while\b|\{|catch\b)/.test(maskedTrim) && /\}$/.test(prevSig)) return;
+      if (!maskedTrim) return;
       if (/^(else\b|\{)/.test(maskedTrim)) return;
       const varsSnapshot = globalNames.concat(localNames);
       const indent = (rawLine.match(/^\s*/) || [''])[0];
@@ -6340,6 +6341,11 @@ function executeCompilerPipeline(board) {
     bracketDepth = Math.max(0, bracketDepth + opens - closes);
     if (!codePart) return;
     if (startDepth > 0 || bracketDepth > 0) return; // 여러 줄에 걸친 구문(배열/구조체 초기화, 다중 행 호출 등) 도중이면 건너뜁니다.
+    { // 다음 의미 있는 줄이 '{'로 시작하면(함수/블록 머리줄) 세미콜론 검사 제외
+      let nx = '';
+      for (let j = idx + 1; j < lines.length; j++){ const tt = lines[j].trim().replace(/\/\/.*$/, '').trim(); if (tt){ nx = tt; break; } }
+      if (nx.startsWith('{')) return;
+    }
     if (codePart.endsWith('{') || codePart.endsWith('}') || codePart.startsWith('if') || codePart.startsWith('for') || codePart.startsWith('while') || codePart.startsWith('else')) return;
     if (!codePart.endsWith(';') && !codePart.endsWith(':')) {
       errors.push(`sketch.ino:${idx + 1}:${codePart.length}: error: expected ';' before end of line`);
@@ -8214,6 +8220,7 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver1.06', ko: ['함수 여는 중괄호 { 를 다음 줄에 쓰는 코드(void setup() 다음 줄에 { )에서 세미콜론 오류로 잘못 판단하던 문제 수정', '회로도 PNG 저장 시 핀 위에 검은 점이 찍히던 문제 수정'] },
   { ver: 'Ver1.05', ko: ['회로도 그리기: 실행 취소 · 다시 실행(Ctrl+Z / Ctrl+Y) 추가', '회로도 그리기: 지운 선 다시 그리기(핀 → 핀) 추가', '회로도 그리기: 부품 포트 위치 변경(하단 · 좌우 · 4면 등) 추가', '드래그로 여러 부품 · 전선 한꺼번에 선택 · 이동 · 삭제', '상단 메뉴 · 코드 편집 메뉴 접기/펼치기', '부품이 많을 때 속도 개선', '붙여넣은 코드의 보이지 않는 특수문자 자동 정리', 'Serial.print 줄바꿈 오류 수정 · if/else · do-while 실행 오류 수정', 'L298N 2채널 실제 핀 배치로 변경', 'USB 포트(아두이노 · 라즈베리파이) · USB 허브 · USB 라이다 부품 추가'] },
   { ver: 'Ver1.04', ko: ['브레드보드에 꽂힌 부품 함께 이동 기능 추가', '배선 브레드보드 위로 그리기 수정'] },
   { ver: 'Ver1.03', ko: ['부품 검색 기능 추가', '코드 창 높이 조절(위아래 드래그) 기능 추가', '코드 에디터 전체화면 기능 추가'] },
