@@ -2150,6 +2150,11 @@
   .usbhub-led{width:7px; height:7px; border-radius:50%; background:#3a8bff; box-shadow:0 0 5px #3a8bff;}
   .usbhub-slots{display:flex; gap:6px;}
   .usbhub-slots i{width:18px; height:8px; background:#0a0c10; border:1px solid #7a8496; border-radius:1px;}
+
+  /* [USB 라이다 — 표시·연결 전용] 기존 라이다와 같은 모양 */
+  .comp-lidar-usb{width:150px; padding:10px; background:#20262e; border:1px solid #3a4048; border-radius:9px; text-align:center;}
+  .lidar-usb-badge{margin:-4px -4px 6px; padding:3px 4px; border-radius:5px; background:#4a1f1f; border:1px solid #a33; color:#ffb4b4; font-size:.58rem; font-weight:700; line-height:1.3;}
+  .comp-lidar-usb .lidar-sweep{background:conic-gradient(from 0deg, rgba(90,169,230,.45), transparent 60deg);}
 </style>
 <style>/* [다중 선택 · 메뉴 접기] */
   /* ==== [다중 선택] 러버밴드 상자 · 선택 표시 · 선택 막대 ==== */
@@ -2843,6 +2848,10 @@
           <div class="palette-item" onclick="spawnComponent('lidar')">
             <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#3a4450,#1a1f24 72%);border:1.5px solid #4a5560;position:relative;"><div style="position:absolute;top:2px;left:9px;width:2px;height:8px;background:#3ddc84;box-shadow:0 0 3px 1px rgba(61,220,132,.8);"></div></div></div>
             <span data-i18n="palette.lidar">라이다 센서<br>(1차원 회전형)</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('lidar-usb')">
+            <div class="swatch"><div style="width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#3a4450,#1a1f24 72%);border:1.5px solid #4a5560;position:relative;"><div style="position:absolute;top:2px;left:9px;width:2px;height:8px;background:#5aa9e6;box-shadow:0 0 3px 1px rgba(90,169,230,.8);"></div></div></div>
+            <span>라이다 센서 (USB)<br>(회로 동작 X · 연결 표시용)</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('sensor-ldr')">
             <div class="swatch"><div style="width:16px;height:16px;border-radius:50%;background:#e8d38a;box-shadow:inset 0 0 0 3px #7a6a3a;"></div></div>
@@ -9539,6 +9548,22 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ECHO" title="ECHO"></div><span class="pin-cap cap-sig">ECHO</span></div>
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_ANG" data-i18n-title="comp.lidar.angTitle" title="ANG → 보드 아날로그 핀 (analogRead, 0~1023 = 0~360°, 지금 회전 각도를 그대로 실어보냄)"></div><span class="pin-cap cap-sig">ANG</span></div>
+      </div>`;
+  } else if (type === 'lidar-usb'){
+    // [표시·연결 전용] USB로만 연결하는 라이다 센서 — 기존 라이다와 같은 모양이지만 회로 동작은 하지 않습니다.
+    div.classList.add('comp-lidar-usb');
+    div.innerHTML = `
+      <div class="lidar-usb-badge" title="USB 연결 표시용 부품 — 시뮬레이션에서 동작하지 않습니다">⚠ 회로 동작 X</div>
+      <div class="lidar-body">
+        <div class="lidar-sweep"></div>
+        <div class="lidar-dot"></div>
+      </div>
+      <div class="lidar-cur-angle">현재 각도: <span>0°</span></div>
+      <div class="comp-label"><span>라이다 센서 (USB)</span> <span class="lidar-usb-val">200cm</span></div>
+      <input type="range" min="2" max="1200" value="200" style="width:100%;accent-color:var(--teal);margin:4px 0;" oninput="this.parentNode.querySelector('.lidar-usb-val').textContent=this.value+'cm'">
+      <div class="lidar-angle-row"><label>장애물 각도</label><input type="range" min="0" max="359" value="90" oninput="this.nextElementSibling.textContent=this.value+'°'"><span>90°</span></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_USB" title="USB → 라즈베리파이·PC·USB 허브의 USB 포트 (연결 표시용)"></div><span class="pin-cap cap-sig">USB</span></div>
       </div>`;
   } else if (type === 'gyro'){
     div.classList.add('comp-gyro');
@@ -21166,7 +21191,7 @@ function BOM_LABELS_FN(){ return {
   rgbled: tr('bom.rgbled'), psu: tr('comp.psu.title'), breadboard: tr('bom.breadboard'),
   btmodule: tr('bom.btmodule'), wifiap: tr('bom.wifiap'), dac: tr('comp.dac.title').replace(/<br>.*/,'').trim(),
   ultrasonic: tr('bom.ultrasonic'), lidar: tr('comp.lidar.label'), gyro: tr('bom.gyro'), accel: tr('bom.accel'), servo: tr('comp.servo.label'), rs485servo: tr('comp.rs485servo.label'), canmodule: tr('comp.canmodule.title'), canfdmodule: tr('comp.canfdmodule.title'), 'rs485module': tr('comp.rs485module.title'), pmsensor: tr('comp.pmsensor.title'), dcmotor: tr('comp.dcmotor.label'), fan: tr('comp.fan.label'),
-  usbhub: 'USB 허브(4포트)', rpi3: 'Raspberry Pi 3', rpi4: 'Raspberry Pi 4', rpi5: 'Raspberry Pi 5', hdmimonitor: tr('comp.hdmimonitor.title'), camera: tr('comp.camera.title'), usbsound: tr('comp.usbsound.title'), speaker: tr('comp.speaker.title'), custom: tr('comp.custom.defaultName'),
+  usbhub: 'USB 허브(4포트)', 'lidar-usb': '라이다 센서 (USB)', rpi3: 'Raspberry Pi 3', rpi4: 'Raspberry Pi 4', rpi5: 'Raspberry Pi 5', hdmimonitor: tr('comp.hdmimonitor.title'), camera: tr('comp.camera.title'), usbsound: tr('comp.usbsound.title'), speaker: tr('comp.speaker.title'), custom: tr('comp.custom.defaultName'),
   motordriver: tr('bom.motordriver'), motordriver2: tr('bom.motordriver2'), motordriverenc: tr('bom.motordriverenc'), 'motordriver-bts7960': tr('bom.mdbts'), 'motordriver-7a2ch': tr('bom.md7a'), 'imu-mpu6050': tr('bom.imumpu6050'), 'sensor-ldr': tr('sensor.ldr'), 'sensor-temp': tr('sensor.temp'), 'sensor-humid': tr('sensor.humid'),
   lcd: tr('bom.lcd'), oled: tr('bom.oled'),
   resistor: tr('bom.resistor'), powercable: tr('bom.powercable'), motor3ph: tr('comp.motor3ph.label'),
