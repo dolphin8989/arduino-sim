@@ -2070,6 +2070,28 @@
   .editor-fs-btn:hover{border-color:var(--teal);}
   .editor-dock-tabs{padding-right:110px;}
   .editor-dock.dock-fullscreen{position:fixed !important; inset:0 !important; width:auto !important; max-width:none !important; z-index:3000 !important; border-left:none;}
+
+  /* [L298N 2채널 — 실제 보드 모양] */
+  .comp-l298n2{width:236px; padding:0; border-radius:10px; background:none;}
+  .l298-board{position:relative; padding:8px 8px 6px; border-radius:10px; background:linear-gradient(160deg,#d7262b,#a3151a); border:1px solid #6e0d10; box-shadow:0 6px 14px rgba(0,0,0,.45);}
+  .l298-heatsink{display:flex; gap:3px; justify-content:center; height:20px; margin:-2px 40px 2px;}
+  .l298-heatsink i{flex:1; background:linear-gradient(90deg,#1a1a1a,#4a4a4a,#1a1a1a); border-radius:2px 2px 0 0;}
+  .comp-l298n2 .md-title{color:#fff; font-weight:700; font-size:.78rem; text-align:center; margin:2px 0 4px;}
+  .comp-l298n2 .md-title span{font-weight:500; font-size:.62rem; color:#ffd6d6;}
+  .l298-mid{display:flex; align-items:center; justify-content:space-between; gap:6px;}
+  .l298-screw{display:flex; gap:4px; align-items:flex-start; padding:4px 5px; background:#1e7fd1; border-radius:4px; border:1px solid #0d4f87;}
+  .l298-screw .pin-cap{color:#fff !important; font-weight:600;}
+  .l298-out{flex-direction:column; align-items:center; gap:3px;}
+  .l298-out b{font-size:.55rem; color:#e6f3ff;}
+  .l298-caps{display:flex; gap:8px;}
+  .l298-caps i{width:22px; height:22px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#9aa3ab,#3a4148 70%); border:1px solid #222;}
+  .l298-bottom{display:flex; align-items:flex-end; justify-content:space-between; gap:6px; margin-top:6px;}
+  .l298-header{display:flex; gap:2px; align-items:flex-end; padding:3px 4px; background:rgba(0,0,0,.35); border-radius:4px;}
+  .l298-header .pin-cap{color:#fff !important; font-size:.5rem;}
+  .l298-jp{display:flex; flex-direction:column; align-items:center; gap:1px;}
+  .l298-jumper{width:14px; height:10px; padding:0; font-size:7px; line-height:1; border:1px dashed #ffd0d0; background:transparent; color:transparent; border-radius:2px; cursor:pointer;}
+  .l298-jumper.on{background:#111; border:1px solid #000; color:#111;}
+  .l298-hint{margin-top:5px; font-size:.5rem; line-height:1.35; color:#ffe1e1; text-align:center;}
 </style>
 <style>/* [다중 선택 · 메뉴 접기] */
   /* ==== [다중 선택] 러버밴드 상자 · 선택 표시 · 선택 막대 ==== */
@@ -5366,6 +5388,7 @@ function injectDebugCheckpoints(rawCode, board){
   const masked = maskCodeForDepth(rawCode);
   const depthInfo = computeLineDepthInfo(masked);
   const rawLines = rawCode.split('\n');
+  const maskedLines = masked.split('\n');
 
   // 1) 전역(파일 최상위, 깊이 0) 변수 이름 수집 — setup()/loop() 등 어떤 함수 본문에도 속하지
   //    않는, 깊이가 줄 시작·끝 모두 0인 줄에서만 찾습니다(자연히 함수 본문 내부는 제외됨).
@@ -5391,6 +5414,15 @@ function injectDebugCheckpoints(rawCode, board){
       if (info.depthBefore !== 1 || info.depthAfter !== 1) return;
       const trimmed = rawLine.trim();
       if (!trimmed) return;
+      // [버그 수정] 바로 앞의 "의미 있는" 줄(주석·문자열 제외)이 ; { } : 로 끝나지 않으면(예: 중괄호 없는
+      // if/for/while 다음 줄) 체크포인트를 끼우면 문장 구조가 바뀌므로 건너뜁니다. else 줄, do{}의 while 꼬리,
+      // 여는 중괄호만 있는 줄도 앞에 끼우면 문법이 깨지므로 건너뜁니다(건너뛰어도 실행에는 영향 없음).
+      const maskedTrim = (maskedLines[info.lineNo - 1] || '').trim();
+      let prevSig = '';
+      for (let k = info.lineNo - 2; k >= 0; k--){ const t = (maskedLines[k] || '').trim(); if (t){ prevSig = t; break; } }
+      if (!/[;{}:]$/.test(prevSig)) return;
+      if (/^(else\b|while\b|\{|catch\b)/.test(maskedTrim) && /\}$/.test(prevSig)) return;
+      if (/^(else\b|\{)/.test(maskedTrim)) return;
       const varsSnapshot = globalNames.concat(localNames);
       const indent = (rawLine.match(/^\s*/) || [''])[0];
       const varsObj = varsSnapshot.length ? `{${varsSnapshot.join(',')}}` : '{}';
@@ -10026,32 +10058,50 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT2" data-i18n-title="comp.md.out2Title" title="모터 출력 2 → DC 모터 단자 2"></div><span class="pin-cap" style="color:var(--text-faint)">OUT2</span></div>
       </div>`;
   } else if (type === 'motordriver2'){
-    // L298N류 2채널 모터 드라이버 — VCC/GND는 공유하고, 채널 A(IN1/ENA/OUT1/OUT2)와 채널 B
-    // (IN2/ENB/OUT3/OUT4)는 서로 완전히 독립적으로 모터 두 대를 각각 구동합니다. comp-motordriver
-    // 클래스를 함께 붙여서 채널 A는 기존 단일채널 구동 로직(runTick)을 그대로 재사용하고,
-    // 채널 B만 comp-motordriver2 전용 구동 블록을 새로 둡니다.
-    div.classList.add('comp-motordriver', 'comp-motordriver2');
+    // [L298N 2채널 — 실제 보드 핀배열] 왼쪽 OUT1/OUT2(모터A), 오른쪽 OUT3/OUT4(모터B) 스크류 단자,
+    // 아래 전원 단자대 +12V / GND / +5V, 신호 헤더 ENA · IN1 · IN2 · IN3 · IN4 · ENB.
+    // 방향: IN1=H·IN2=L 정회전 / IN1=L·IN2=H 역회전 / 둘이 같으면 정지(브레이크) — B채널은 IN3·IN4.
+    // 속도: ENA/ENB에 PWM(analogWrite). ENA/ENB 점퍼 캡을 꽂아 두면(배선 없음) 항상 최고속도(5V)로 동작합니다.
+    div.classList.add('comp-motordriver2', 'comp-l298n2');
     div.innerHTML = `
-      <div class="md-title">L298N (2CH)<br><span data-i18n="comp.md2.title">2채널 모터 드라이버</span></div>
-      <div class="comp-pin-row">
-        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" data-i18n-title="comp.md.vccTitle" title="모터 전원 VCC"></div><span class="pin-cap cap-vcc">VCC</span></div>
-        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
-      </div>
-      <div class="comp-pin-row">
-        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN1" data-i18n-title="comp.dirTitle" title="방향 제어 (디지털) — A채널"></div><span class="pin-cap cap-sig">IN1</span></div>
-        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENA" data-i18n-title="comp.speedTitle" title="속도 제어 (PWM) — A채널"></div><span class="pin-cap cap-pwm">ENA</span></div>
-      </div>
-      <div class="comp-pin-row md-out-row">
-        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT1" data-i18n-title="comp.md.out1Title" title="모터 출력 1 → DC 모터 단자 1 (A채널)"></div><span class="pin-cap" style="color:var(--text-faint)">OUT1</span></div>
-        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT2" data-i18n-title="comp.md.out2Title" title="모터 출력 2 → DC 모터 단자 2 (A채널)"></div><span class="pin-cap" style="color:var(--text-faint)">OUT2</span></div>
-      </div>
-      <div class="comp-pin-row md-out-row">
-        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN2" data-i18n-title="comp.md2.in2Title" title="방향 제어 (디지털) — B채널"></div><span class="pin-cap cap-sig">IN2</span></div>
-        <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENB" data-i18n-title="comp.md2.enbTitle" title="속도 제어 (PWM) — B채널"></div><span class="pin-cap cap-pwm">ENB</span></div>
-      </div>
-      <div class="comp-pin-row">
-        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT3" data-i18n-title="comp.md2.out3Title" title="모터 출력 3 → DC 모터 단자 1 (B채널)"></div><span class="pin-cap" style="color:var(--text-faint)">OUT3</span></div>
-        <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT4" data-i18n-title="comp.md2.out4Title" title="모터 출력 4 → DC 모터 단자 2 (B채널)"></div><span class="pin-cap" style="color:var(--text-faint)">OUT4</span></div>
+      <div class="l298-board">
+        <div class="l298-heatsink"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="md-title">L298N <span>H-Bridge (2CH)</span></div>
+        <div class="l298-mid">
+          <div class="l298-screw l298-out">
+            <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT1" title="OUT1 → 모터A 단자 1"></div><span class="pin-cap">OUT1</span></div>
+            <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT2" title="OUT2 → 모터A 단자 2"></div><span class="pin-cap">OUT2</span></div>
+            <b>모터A</b>
+          </div>
+          <div class="l298-caps"><i></i><i></i></div>
+          <div class="l298-screw l298-out">
+            <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT3" title="OUT3 → 모터B 단자 1"></div><span class="pin-cap">OUT3</span></div>
+            <div class="pin-col"><div class="pin-mini" data-pin="${id}_OUT4" title="OUT4 → 모터B 단자 2"></div><span class="pin-cap">OUT4</span></div>
+            <b>모터B</b>
+          </div>
+        </div>
+        <div class="l298-bottom">
+          <div class="l298-screw l298-pwr">
+            <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="+12V 입력 (모터 전원 7~12V, 최대 35V)"></div><span class="pin-cap cap-vcc">+12V</span></div>
+            <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND (모터 전원 GND와 아두이노 GND를 함께 연결)"></div><span class="pin-cap cap-gnd">GND</span></div>
+            <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_5V" title="+5V (5V 점퍼가 꽂혀 있으면 내장 레귤레이터의 5V 출력 · 12V 초과 전원일 때는 점퍼를 빼고 5V 입력)"></div><span class="pin-cap cap-vcc">+5V</span></div>
+          </div>
+          <div class="l298-header">
+            <div class="l298-jp">
+              <button type="button" class="l298-jumper on" data-jp="ENA" onclick="this.classList.toggle('on')" title="ENA 점퍼: 꽂혀 있으면 모터A 항상 최고속도. PWM으로 속도를 바꾸려면 빼고 ENA를 PWM 핀에 연결">▮</button>
+              <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENA" title="ENA: 모터A 속도(PWM) / 전원 ON·OFF"></div><span class="pin-cap cap-pwm">ENA</span></div>
+            </div>
+            <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN1" title="IN1: 모터A 방향 1"></div><span class="pin-cap cap-sig">IN1</span></div>
+            <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN2" title="IN2: 모터A 방향 2"></div><span class="pin-cap cap-sig">IN2</span></div>
+            <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN3" title="IN3: 모터B 방향 1"></div><span class="pin-cap cap-sig">IN3</span></div>
+            <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_IN4" title="IN4: 모터B 방향 2"></div><span class="pin-cap cap-sig">IN4</span></div>
+            <div class="l298-jp">
+              <button type="button" class="l298-jumper on" data-jp="ENB" onclick="this.classList.toggle('on')" title="ENB 점퍼: 꽂혀 있으면 모터B 항상 최고속도. PWM으로 속도를 바꾸려면 빼고 ENB를 PWM 핀에 연결">▮</button>
+              <div class="pin-col"><div class="pin-mini role-pwm" data-pin="${id}_ENB" title="ENB: 모터B 속도(PWM) / 전원 ON·OFF"></div><span class="pin-cap cap-pwm">ENB</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="l298-hint">IN1=H·IN2=L 정회전 · IN1=L·IN2=H 역회전 · 같으면 정지 | ENA/ENB = PWM 속도 (점퍼 꽂힘 = 최고속도)</div>
       </div>`;
   } else if (type === 'motordriverenc'){
     // 엔코더 입력이 바로 되는(패스스루) 모터 드라이버 — VCC/GND/IN1/ENA/OUT1/OUT2는 기존
@@ -13933,7 +13983,7 @@ const COMP_HELP_BLURB = {
   relay220:   { ko: '코일 자체가 220V로 직접 여자됩니다(별도 5V 제어 신호 없음) — L/N에 220V를 걸면 COM이 NC에서 NO로 전환되는 스위치로 동작합니다.', en: 'The coil itself is energized directly by 220V AC — no separate 5V control signal; COM switches from NC to NO.' },
   transistor: { ko: 'B(베이스)에 작은 신호/전류를 흘리면 C-E(컬렉터-이미터) 사이가 스위치처럼 닫힙니다 — 큰 부하는 C-E 쪽에, 제어 신호는 B에 저항과 함께 연결하세요.', en: 'A small signal into B (base) closes the C-E path like a switch — put the load on C-E and drive B (with a series resistor) from your control signal.' },
   motordriver:{ ko: 'VCC/GND는 모터 전원, IN1/IN2는 보드 디지털 핀(방향 제어), OUT1/OUT2는 모터로 나갑니다 — 로직 전원과 모터 전원이 분리되어 있는 경우가 많으니 핀 설명을 확인하세요.', en: 'VCC/GND powers the motor, IN1/IN2 (from board pins) set direction, OUT1/OUT2 go to the motor. Logic and motor power are often separate — check each pin.' },
-  motordriver2:{ ko: 'VCC/GND(공통 모터 전원) 아래로 A채널(IN1/ENA→OUT1/OUT2)과 B채널(IN2/ENB→OUT3/OUT4)이 완전히 독립적으로 동작합니다 — 모터 두 대를 각자 따로 제어할 수 있습니다.', en: 'Shares VCC/GND for motor power, but channel A (IN1/ENA→OUT1/OUT2) and channel B (IN2/ENB→OUT3/OUT4) drive two motors completely independently.' },
+  motordriver2:{ ko: '실제 L298N 2채널 보드 핀배열입니다. 전원 단자대: +12V(모터 전원)·GND(아두이노 GND와 공통으로 연결)·+5V. 모터A는 OUT1/OUT2, 모터B는 OUT3/OUT4. 방향은 IN1·IN2(모터A), IN3·IN4(모터B)의 조합 — IN1=HIGH·IN2=LOW 정회전, IN1=LOW·IN2=HIGH 역회전, 둘이 같으면 정지. 속도는 ENA/ENB에 analogWrite(PWM)로 조절합니다. ENA/ENB 점퍼 캡(▮)이 꽂혀 있으면 배선 없이도 항상 최고속도이고, PWM으로 속도를 바꾸려면 점퍼를 빼고 ENA/ENB를 PWM 핀(~)에 연결하세요.', en: 'Real L298N dual-channel pinout: power terminal +12V (motor supply), GND (tie to Arduino GND), +5V. Motor A on OUT1/OUT2, motor B on OUT3/OUT4. Direction from IN1/IN2 (A) and IN3/IN4 (B): IN1=HIGH, IN2=LOW forward; IN1=LOW, IN2=HIGH reverse; equal = stop. Speed via PWM (analogWrite) on ENA/ENB. With the ENA/ENB jumper caps fitted the channel runs at full speed with no wiring; remove the jumper and wire ENA/ENB to a PWM pin to control speed.' },
   motordriverenc:{ ko: '기본 동작(VCC/GND/IN1/ENA→OUT1/OUT2)은 motordriver와 같고, ENCV/ENCG/ENCA/ENCB 네 핀은 엔코더 DC 모터의 신호를 그대로 보드로 이어주는 패스스루 단자입니다(드라이버 자체는 엔코더 신호를 가공하지 않음).', en: 'Drives the motor the same way as motordriver (VCC/GND/IN1/ENA→OUT1/OUT2). ENCV/ENCG/ENCA/ENCB are pass-through pins that simply forward an encoder motor\'s signals to the board.' },
   'motordriver-bts7960': { ko: '실제 IBT-2/HW-039(BTS7960) 보드 핀맵 그대로입니다. VCC/GND는 로직 전원(5V), R_EN+RPWM이 함께 HIGH면 정회전, L_EN+LPWM이 함께 HIGH면 역회전합니다(둘 다 켜면 안전하게 정지). 모터 전원은 B+/B-(배터리 등 별도 DC 전원)로 따로 넣고, M+/M-를 모터로 연결하세요. R_IS/L_IS(전류감지)는 배선만 가능하고 값은 시뮬레이션하지 않습니다.', en: 'Matches the real IBT-2/HW-039 (BTS7960) pinout. VCC/GND is 5V logic power; R_EN+RPWM both HIGH drives forward, L_EN+LPWM both HIGH drives reverse (both together = safe stop). Feed motor power separately via B+/B- (battery/DC supply) and wire the motor to M+/M-. R_IS/L_IS (current sense) can be wired but their values are not simulated.' },
   'motordriver-7a2ch': { ko: '실제 "7A 2채널(160W) DC 모터 드라이버"(L298 로직 호환) 핀맵입니다. 9-24V/PGND로 모터 전원을 넣고, A채널은 ENA(속도)+IN1/IN2(방향), B채널은 ENB(속도)+IN3/IN4(방향)로 각각 독립 제어합니다 — IN a=HIGH+IN b=LOW면 정회전, 반대면 역회전, 둘이 같으면 정지(브레이크)입니다. motordriver2와 달리 채널마다 방향 핀이 2개(IN1+IN2)라는 점이 실제 보드와 같습니다.', en: 'Matches the real "7A Dual-Channel (160W) DC Motor Driver" (L298-logic-compatible) pinout. Power the motor via 9-24V/PGND; channel A is ENA(speed)+IN1/IN2(direction), channel B is ENB(speed)+IN3/IN4(direction), fully independent. IN a=HIGH+IN b=LOW drives forward, reversed drives reverse, equal = stop (brake). Unlike motordriver2, each channel has 2 direction pins (IN1+IN2) — matching the real board.' },
@@ -16749,25 +16799,35 @@ function runTick(){
     }
   });
 
-  // 5-0. 2채널 모터 드라이버(motordriver2)의 B채널: comp-motordriver 클래스를 함께 갖고 있어
-  //      A채널(IN1/ENA→OUT1/OUT2)은 바로 위 블록이 이미 구동했으므로, 여기서는 B채널
-  //      (IN2/ENB→OUT3/OUT4)만 같은 방식으로 추가로 구동합니다.
-  document.querySelectorAll('.comp-motordriver2').forEach(md => {
+  // 5-0. 2채널 L298N(motordriver2) — 실제 보드와 같은 핀 사용법:
+  //   방향: IN1/IN2(모터A), IN3/IN4(모터B) 두 핀의 조합 — H·L 정회전 / L·H 역회전 / 같으면 정지(브레이크)
+  //   속도: ENA/ENB의 PWM 듀티. ENA/ENB에 아무 배선이 없고 점퍼 캡이 꽂혀 있으면 5V(최고속도)로 봅니다.
+  document.querySelectorAll('.comp-l298n2').forEach(md => {
     const legReading = (suffix) => {
       const legEl = md.querySelector(`[data-pin$="_${suffix}"]`);
       return legEl ? resistiveReading(legEl) : null;
     };
-    const enbR = legReading('ENB');
-    const in2R = legReading('IN2');
-    const speed = enbR ? Math.max(0, Math.min(1, enbR.v)) : 0;
-    const dir = (in2R && in2R.v <= 0.5) ? -1 : 1;
-    const out3El = md.querySelector('[data-pin$="_OUT3"]');
-    if (out3El){
-      netOf(out3El).forEach(el => {
-        const pid = el.dataset.pin;
-        if (pid && /_T[AB]$/.test(pid)) driveMotor(pid.replace(/_T[AB]$/, ''), speed, dir);
-      });
-    }
+    const driveChannel = (enSuffix, inASuffix, inBSuffix, outSuffix) => {
+      const enR = legReading(enSuffix);
+      const jumper = md.querySelector(`.l298-jumper[data-jp="${enSuffix}"]`);
+      const jumperOn = !!(jumper && jumper.classList.contains('on'));
+      const en = enR ? Math.max(0, Math.min(1, enR.v)) : (jumperOn ? 1 : 0);
+      const inAR = legReading(inASuffix), inBR = legReading(inBSuffix);
+      const aHigh = inAR && inAR.v > 0.5, bHigh = inBR && inBR.v > 0.5;
+      let dir = 1, stopped = true;
+      if (aHigh && !bHigh){ dir = 1; stopped = false; }
+      else if (!aHigh && bHigh){ dir = -1; stopped = false; }
+      const speed = stopped ? 0 : en;
+      const outEl = md.querySelector(`[data-pin$="_${outSuffix}"]`);
+      if (outEl){
+        netOf(outEl).forEach(el => {
+          const pid = el.dataset.pin;
+          if (pid && /_T[AB]$/.test(pid)) driveMotor(pid.replace(/_T[AB]$/, ''), speed, dir);
+        });
+      }
+    };
+    driveChannel('ENA', 'IN1', 'IN2', 'OUT1');
+    driveChannel('ENB', 'IN3', 'IN4', 'OUT3');
   });
 
   // 5-0a. BTS7960(IBT-2/HW-039) 43A 고전류 드라이버 — RPWM/R_EN이 함께 여자되면 정회전,
