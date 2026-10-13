@@ -107,6 +107,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
 .skctx{position:absolute;z-index:30;display:flex;gap:2px;padding:3px;background:var(--bg-panel);border:1px solid var(--teal);border-radius:7px;box-shadow:0 6px 18px rgba(0,0,0,.45)}
 .skctx button{width:30px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:5px;background:transparent;cursor:pointer;color:var(--text)}
 .skctx button:hover{background:var(--bg-panel-3);border-color:var(--teal)}
+.skctx .sep{width:1px;margin:3px 2px;background:var(--border)}
+.skctx button.lt{width:34px}
 .skctx button.close{width:20px;color:var(--text-dim);font-size:14px}
 .errguide{margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,95,86,.4);display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.5}
 .errguide b{color:#FF8A80;margin-right:4px}
@@ -352,7 +354,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 
 <div id="app">
 <section id="sw" class="win" aria-label="3D 모델러">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.71</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.72</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
   <div class="menubar" id="swMenu"></div>
   <div class="swmain">
     <nav class="rail" id="railL" aria-label="피처 · 어셈블리 명령"></nav>
@@ -378,7 +380,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 </section>
 
 <section id="ac" class="win" hidden aria-label="2D 도면">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.71</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.72</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
   <div class="menubar" id="acMenu"></div>
   <div class="acrow" id="acStd"></div>
   <div class="acrow" id="acProps"></div>
@@ -672,7 +674,7 @@ const I18N_DICT = {
 "F3 객체 스냅 · F7 모눈 · F8 직교 · F9 스냅": "F3 object snap · F7 grid · F8 ortho · F9 snap",
 "FeatureManager 디자인 트리": "FeatureManager design tree",
 "K-CAD 작업": "K-CAD workspace",
-"K군의 CAD v0.71": "K-CAD v0.71",
+"K군의 CAD v0.72": "K-CAD v0.72",
 "K군의 CAD 정보": "About K-CAD",
 "K군의 CAD 파일이 아닙니다": "Not a K-CAD file",
 "L 선 · C 원 · A 호 · REC 사각형 · POL 다각형 · DT 문자": "L line · C circle · A arc · REC rectangle · POL polygon · DT text",
@@ -907,7 +909,7 @@ const I18N_DICT = {
 "요소 변환": "Convert entities",
 "요소 잘라내기": "Trim entities",
 "요소·점·치수·구속조건 기호를 클릭해 선택합니다. 점이나 선을 끌면 구속조건을 지키며 움직입니다. 빈 곳을 끌면 영역 선택.": "Click entities, points, dimensions or relation symbols to select. Drag points or lines to move them while keeping relations. Drag an empty area for a box selection.",
-"요소를 클릭(여러 개는 Shift+클릭)하면 넣을 수 있는 구속조건이 여기에 나옵니다. 행을 클릭하면 선택, ×는 삭제.": "Click entities (Shift+click for several) to see the relations you can add here. Click a row to select it, × deletes.",
+"요소를 클릭(여러 개는 Shift 또는 Ctrl+클릭)하면 넣을 수 있는 구속조건이 여기에 나옵니다. 행을 클릭하면 선택, ×는 삭제.": "Click entities (Shift or Ctrl+click for several) to see the relations you can add here. Click a row to select it, × deletes.",
 "원": "Circle",
 "원점": "Origin",
 "원점은 움직일 수 없습니다.": "The origin cannot be moved.",
@@ -989,7 +991,7 @@ const I18N_DICT = {
 "구속조건 기호": "Relation symbols",
 "구속조건 부가": "Add relation",
 "구속조건 창": "Relations window",
-"구속조건을 넣을 요소를 선택하세요. Shift+클릭으로 여러 개를 고릅니다.": "Select entities to add relations to. Shift+click picks several.",
+"구속조건을 넣을 요소를 선택하세요. Shift 또는 Ctrl+클릭으로 여러 개를 고릅니다.": "Select entities to add relations to. Shift or Ctrl+click picks several.",
 "구속조건을 보고 고치는 작은 창 보이기/숨기기": "Show/hide the small window for viewing and editing relations",
 "기준면": "Reference plane",
 "깊이 D1": "Depth D1",
@@ -1314,7 +1316,7 @@ const I18N_DICT = {
 "DXF로 내보내기": "Export to DXF",
 "DXF로 내보냅니다. 치수는 선과 문자로 분해되어 저장됩니다.": "Exports to DXF. Dimensions are exploded into lines and text.",
 "KS 제도 관례: 외형선 굵은 실선(0.5), 숨은선 파선(0.35), 중심선 1점 쇄선(0.25). 행을 두 번 클릭하면 현재 도면층이 됩니다.": "KS drafting practice: visible lines thick solid (0.5), hidden lines dashed (0.35), centerlines chain (0.25). Double-click a row to make it current.",
-"K군의 CAD v0.71 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.71 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
+"K군의 CAD v0.72 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.72 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
 "{0}   도면층: \"{1}\"": "{0}   Layer: \"{1}\"",
 "{0} (객체 선택됨)": "{0} (objects selected)",
 "{0} 가로 ({1}×{2})": "{0} landscape ({1}×{2})",
@@ -1724,6 +1726,7 @@ const ICONS = (() => {
     loftcut: sf('M3 4h18v16H3z', L, L, .08, 1.5) + s('M6 17l3-9M14 17l3-9', R, 2.2) + sf('M6 17l4-1.5 4 1.5-4 1.5z', R, R, .6, 1.3) + s('M9 8h8', R, 2.2),
     fillet: sf('M4 20V11a7 7 0 0 1 7-7h9v16z', L, L, .1, 1.6) + s('M4 11a7 7 0 0 1 7-7', T, 2.8) + txt(15.5, 16.5, 'R', T, 8),
     chamfer: sf('M4 20V10l6-6h10v16z', L, L, .1, 1.6) + s('M4 10l6-6', T, 2.8) + txt(15.5, 16.5, 'C', T, 8),
+    linetype: s('M3 6h18', A, 2.2) + s('M3 12h18', D, 1.6, 'stroke-dasharray="3 2.5"') + s('M3 18h18', R, 1.4, 'stroke-dasharray="7 2 1.5 2"'),
     sfillet: s('M4 20V12a8 8 0 0 1 8-8h8', A, 2.2) + s('M4 12V4h8', D, 1.3, 'stroke-dasharray="2 2"') + dot(4, 4, 1.6, D),
     convert: sf('M3 6l6-3h12l-6 3z', L, L, .15, 1.4) + s('M3 6v6M15 6v6', D, 1.2, 'stroke-dasharray="2 2"') + sf('M3 15l6-3h12l-6 3z', A, 'none', 0, 2) + s('M18 7v5M16 10l2 2 2-2', T, 1.8),
     refplane: sf('M2 17l5-9h15l-5 9z', B, B, .35) + s('M6 12h10', B, 1.2, 'stroke-dasharray="2 2"') + s('M19 3v6M16 6h6', T, 2),
@@ -1756,8 +1759,13 @@ function ic(name, size = 16) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 }
 /* ================= release notes (bottom-left button, Help menu) ================= */
-const APP_VER = 'v0.71';
+const APP_VER = 'v0.72';
 const RELEASES = [
+  { v: 'v0.72', date: '2026-10-13', title: ['다중 선택 · 선 종류 변환', 'Multi-select · line types'], items: [
+    ['스케치에서 여러 요소를 고를 때 Shift와 Ctrl(맥은 ⌘) 모두 됩니다. 이미 고른 요소를 Shift/Ctrl+클릭하면 선택에서 빠집니다. 끌어서 영역 선택할 때도 같습니다.', 'Shift and Ctrl (⌘ on Mac) both add to the sketch selection; Shift/Ctrl+click a selected item to remove it. Same for box selection.'],
+    ['선 종류 변환: 선택한 선·원·호를 실선 / 숨은선(점선) / 중심선(1점 쇄선)으로 바꿉니다. 오른쪽 스케치 메뉴 [선 종류 변환], 커서 옆 팝업, 오른쪽 클릭, 속성 창에서 할 수 있습니다.', 'Line types: change the selected lines, circles and arcs to solid, hidden (dashed) or centre lines (chain) — from the sketch rail, the pop-up next to the cursor, the right-click menu or the PropertyManager.'],
+    ['중심선은 윤곽에서 빠져 회전축·기준선으로 쓰이고, 숨은선은 점선으로 보이지만 윤곽에는 그대로 포함됩니다.', 'Centre lines are left out of profiles (axes, references); hidden lines are dashed but stay part of the profile.'],
+  ] },
   { v: 'v0.71', date: '2026-10-12', title: ['도면 치수 연동 · 스케치 패턴 · 임시 축', 'Associative dimensions · sketch patterns · temporary axes'], items: [
     ['도면 치수가 3D 모델을 따라갑니다. 투상도 형상에 붙인 치수는 모델을 고치면 위치와 값이 함께 바뀝니다 (예: 판 두께 15 → 25, 보스 Ø40 → Ø50).', 'Drawing dimensions follow the 3D model: dimensions attached to view geometry move and update their values when the model changes.'],
     ['스케치 패턴: 스케치 안에서 선택한 요소를 선형(2방향)·원형으로 복사합니다. 중심선을 함께 고르면 그 방향, 점을 함께 고르면 그 점이 중심입니다.', 'Sketch patterns: copy selected sketch entities in a linear (2-direction) or circular pattern; a selected centreline sets the direction, a selected point the centre.'],
@@ -5229,7 +5237,7 @@ async function saveFile(filename, data, mime) {
 }
 function docExport(d) {
   const strip = (k, v) => (k[0] === '_' ? undefined : v);
-  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.71', doc: JSON.parse(JSON.stringify(d, strip)) };
+  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.72', doc: JSON.parse(JSON.stringify(d, strip)) };
   if (d.type === 'asm') o.parts = [...new Set(d.comps.map(c => c.part))].map(docById).filter(Boolean).map(p => JSON.parse(JSON.stringify(p, strip)));
   return JSON.stringify(o, null, 1);
 }
@@ -5382,7 +5390,7 @@ function helpDialog() {
 function aboutDialog() {
   dialog({
     title: 'K군의 CAD 정보', width: 360, classic: App.doc && App.doc.type === 'dwg', body: h('div', { style: 'display:flex;gap:12px;align-items:flex-start' }, icEl('part', 40),
-      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.71'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
+      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.72'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
     buttons: [{ label: '확인' }]
   });
 }
@@ -5447,9 +5455,9 @@ const Sk = (() => {
   function flatA(sk) {
     const pm = pmap(sk); const V = id => { const p = pm.get(id); return p ? [p.x, p.y] : [0, 0]; };
     return sk.ents.map(e => {
-      if (e.t === 'line') return { t: 'line', a: V(e.p1), b: V(e.p2), cl: e.cl };
-      if (e.t === 'circle') return { t: 'circle', c: V(e.c), r: e.r, cl: e.cl };
-      if (e.t === 'arc') { const c = V(e.c), s = V(e.p1), t = V(e.p2); return { t: 'arc', c, r: Math.hypot(s[0] - c[0], s[1] - c[1]), a0: Math.atan2(s[1] - c[1], s[0] - c[0]), a1: Math.atan2(t[1] - c[1], t[0] - c[0]), cl: e.cl }; }
+      if (e.t === 'line') return { t: 'line', a: V(e.p1), b: V(e.p2), cl: e.cl, hid: e.hid };
+      if (e.t === 'circle') return { t: 'circle', c: V(e.c), r: e.r, cl: e.cl, hid: e.hid };
+      if (e.t === 'arc') { const c = V(e.c), s = V(e.p1), t = V(e.p2); return { t: 'arc', c, r: Math.hypot(s[0] - c[0], s[1] - c[1]), a0: Math.atan2(s[1] - c[1], s[0] - c[0]), a1: Math.atan2(t[1] - c[1], t[0] - c[0]), cl: e.cl, hid: e.hid }; }
       return null;
     });
   }
@@ -5867,8 +5875,8 @@ const Sk = (() => {
       const tc = par(uv); let lo = null, hi = null;
       for (const hh of hs) { if (hh.t < tc) lo = hh; else { hi = hh; break; } }
       const rep = [];
-      if (lo) rep.push({ t: 'line', p1: e.p1, p2: newPt(lo), cl: e.cl });
-      if (hi) rep.push({ t: 'line', p1: newPt(hi), p2: e.p2, cl: e.cl });
+      if (lo) rep.push({ t: 'line', p1: e.p1, p2: newPt(lo), cl: e.cl, hid: e.hid });
+      if (hi) rep.push({ t: 'line', p1: newPt(hi), p2: e.p2, cl: e.cl, hid: e.hid });
       sk.ents = sk.ents.filter(x => x !== e);
       for (const r of rep) { addEnt(sk, r); for (const t of keepRel) sk.cons.push({ id: uid('k'), type: t, r: [r.id] }); }
     } else if (e.t === 'circle') {
@@ -5879,7 +5887,7 @@ const Sk = (() => {
         const ac = angOf(c, uv); let lo = hs[hs.length - 1], hi = hs[0];
         for (let k = 0; k < hs.length; k++) { const A = hs[k].a, B = hs[(k + 1) % hs.length].a; if (A < B ? ac > A && ac < B : ac > A || ac < B) { lo = hs[k]; hi = hs[(k + 1) % hs.length]; break; } }
         sk.ents = sk.ents.filter(x => x !== e);
-        addEnt(sk, { t: 'arc', c: e.c, p1: newPt(hi), p2: newPt(lo), cl: e.cl });
+        addEnt(sk, { t: 'arc', c: e.c, p1: newPt(hi), p2: newPt(lo), cl: e.cl, hid: e.hid });
       }
     } else if (e.t === 'arc') {
       const f = flat({ v: 2, pts: sk.pts, ents: [e] })[0], sw = Geo.arcSweep(f), c = f.c;
@@ -5888,8 +5896,8 @@ const Sk = (() => {
       const tc = par(uv); let lo = null, hi = null;
       for (const hh of hs) { if (hh.t < tc) lo = hh; else { hi = hh; break; } }
       sk.ents = sk.ents.filter(x => x !== e);
-      if (lo) addEnt(sk, { t: 'arc', c: e.c, p1: e.p1, p2: newPt(lo), cl: e.cl });
-      if (hi) addEnt(sk, { t: 'arc', c: e.c, p1: newPt(hi), p2: e.p2, cl: e.cl });
+      if (lo) addEnt(sk, { t: 'arc', c: e.c, p1: e.p1, p2: newPt(lo), cl: e.cl, hid: e.hid });
+      if (hi) addEnt(sk, { t: 'arc', c: e.c, p1: newPt(hi), p2: e.p2, cl: e.cl, hid: e.hid });
     }
     cleanup(sk);
     return true;
@@ -6079,7 +6087,7 @@ const Sk = (() => {
       const sel = isSel(it), hov = sameItem(s.hover, it) || (s.hoverCon && s.hoverCon.r.includes(e.id));
       ctx.strokeStyle = sel ? COL.sel : hov ? COL.hov : e.cl ? COL.cl : colorEnt(e);
       ctx.lineWidth = sel || hov ? 2.6 : 1.7;
-      ctx.setLineDash(e.cl ? [10, 4, 2, 4] : []);
+      ctx.setLineDash(e.cl ? [10, 4, 2, 4] : e.hid ? [6, 4] : []);
       for (const pts of Geo.entPolylines(fl[i])) { ctx.beginPath(); pts.forEach((p, k) => { const q = scr(p); k ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.stroke(); }
       ctx.setLineDash([]);
     });
@@ -6303,8 +6311,9 @@ const Sk = (() => {
       const s = S(); if (s.tool !== 'select') return false;
       const h = hit(sx, sy); const sk = SK();
       if (!h) { s.box = [[sx, sy], [sx, sy]]; s.drag = { kind: 'box' }; return true; }
-      if (!e.shiftKey && !isSel(h)) s.sel = [];
-      if (!isSel(h)) s.sel.push(h);
+      const multi = e.shiftKey || e.ctrlKey || e.metaKey, was = isSel(h);
+      if (!multi && !was) s.sel = [];
+      if (!was) s.sel.push(h);
       const uv0 = rawUV(sx, sy);
       if (h.k === 'dim') { const d = sk.dims.find(x => x.id === h.id); s.drag = { kind: 'dim', d, off0: d.off.slice(), uv0 }; }
       else if (h.k === 'pt') s.drag = { kind: 'pt', id: h.id, uv0 };
@@ -6313,6 +6322,8 @@ const Sk = (() => {
         if (isCurve(en) && !(d2(PV(sk, en.c), uv0) < View.pxSize() * 7)) s.drag = { kind: 'rad', en, uv0 };
         else s.drag = { kind: 'ent', en, uv0, start: Object.fromEntries(ptsOf(en).map(p => [p, PV(sk, p)])) };
       } else s.drag = null;
+      // Shift / Ctrl + click on an item that was already selected removes it again (unless it gets dragged)
+      if (multi && was) { s.drag = s.drag || { kind: 'none' }; s.drag.unsel = h; }
       renderPM(); View.req();
       return true;
     },
@@ -6338,13 +6349,14 @@ const Sk = (() => {
         if (moved) {
           const mn = [Math.min(a[0], b[0]), Math.min(a[1], b[1])], mx = [Math.max(a[0], b[0]), Math.max(a[1], b[1])];
           const inside = uv => { const q = scr(uv); return q[0] >= mn[0] && q[0] <= mx[0] && q[1] >= mn[1] && q[1] <= mx[1]; };
-          if (!e.shiftKey) s.sel = [];
+          if (!(e.shiftKey || e.ctrlKey || e.metaKey)) s.sel = [];
           const sk = SK(); const fl = flatA(sk);
           sk.ents.forEach((en, i) => { if (!fl[i]) return; const pls = Geo.entPolylines(fl[i]); if (pls.length && pls.every(pl => pl.every(inside))) s.sel.push({ k: 'ent', id: en.id }); });
           for (const p of sk.pts) if (p.id !== O && inside([p.x, p.y])) s.sel.push({ k: 'pt', id: p.id });
-        } else if (!e.shiftKey) s.sel = [];
+        } else if (!(e.shiftKey || e.ctrlKey || e.metaKey)) s.sel = [];
         renderPM(); View.req(); showCtxRel(sx, sy); return;
       }
+      if (D && D.unsel && !D.pushed) s.sel = s.sel.filter(i => !sameItem(i, D.unsel));
       if (D && D.pushed) { changed(); hideCtxRel(); }
       else { renderPM(); showCtxRel(sx, sy); }
     },
@@ -6438,7 +6450,7 @@ const Sk = (() => {
       const r = View.ov.getBoundingClientRect(); const s = S();
       const h = hit(sx, sy); if (h && !isSel(h)) { s.sel = [h]; renderPM(); }
       const items = [{ label: '스케치 종료', icon: 'exitsk', run: () => Part.exitSketch(true) }, '-'];
-      if (s.sel.length) { for (const a of relationOptions(s.sel)) items.push({ label: '구속조건 부가: ' + a.label, icon: 'rel', run: a.run }); items.push({ label: '선택 항목 삭제', run: () => { pushUndo(); deleteItems(SK(), s.sel); s.sel = []; changed(); } }, '-'); }
+      if (s.sel.length) { for (const a of relationOptions(s.sel)) items.push({ label: '구속조건 부가: ' + a.label, icon: 'rel', run: a.run }); if (s.sel.some(i => i.k === 'ent')) for (const k of ['solid', 'hidden', 'center']) items.push({ label: L(`선 종류 → ${LT_NAME[k]()}`, `Line type → ${LT_NAME[k]()}`), run: () => setLineType(k) }); items.push({ label: '선택 항목 삭제', run: () => { pushUndo(); deleteItems(SK(), s.sel); s.sel = []; changed(); } }, '-'); }
       items.push({ label: '선택', icon: 'sel', run: () => setTool('select') }, { label: '지능형 치수', icon: 'sdim', run: () => setTool('sdim') }, { label: s.showRel === false ? '구속조건 기호 보이기' : '구속조건 기호 숨기기', run: () => { s.showRel = s.showRel === false; View.req(); renderCM(); } }, '-',
         { label: '수직 보기', icon: 'normal', run: () => View.normalTo(s.pl) }, { label: '전체 보기', icon: 'fit', run: () => View.fit(App._box) });
       popMenu(r.left + sx, r.top + sy, items);
@@ -6573,14 +6585,14 @@ const Sk = (() => {
               const e = sk.ents.find(x => x.id === it.id);
               if (e && e.t === 'line') {
                 const a = PV(sk, e.p1), b = PV(sk, e.p2);
-                body.append(checkInput('작도선 (중심선)', e.cl, v => { pushUndo(); e.cl = v || undefined; changed(true); }),
+                body.append(h('div', null, h('div', { class: 'rwt' }, L('선 종류', 'Line type')), h('div', { class: 'seg' }, ['solid', 'hidden', 'center'].map(k => h('button', { class: ltOf(e) === k ? 'on' : '', onclick: () => setLineType(k, [{ k: 'ent', id: e.id }]) }, LT_NAME[k]())))),
                   field('시작 X', numInput(+fmt(a[0], 4), v => setPt(e.p1, [v, a[1]]))), field('시작 Y', numInput(+fmt(a[1], 4), v => setPt(e.p1, [a[0], v]))),
                   field('끝 X', numInput(+fmt(b[0], 4), v => setPt(e.p2, [v, b[1]]))), field('끝 Y', numInput(+fmt(b[1], 4), v => setPt(e.p2, [b[0], v]))),
                   h('div', { class: 'hint' }, `길이 ${fmt(d2(a, b), 3)} mm · 각도 ${fmt(deg(Math.atan2(b[1] - a[1], b[0] - a[0])), 2)}° — 고정 값으로 하려면 [지능형 치수]를 쓰세요.`));
               }
               if (e && isCurve(e)) {
                 const c = PV(sk, e.c);
-                body.append(checkInput('작도선', e.cl, v => { pushUndo(); e.cl = v || undefined; changed(true); }), field('중심 X', numInput(+fmt(c[0], 4), v => setPt(e.c, [v, c[1]]))), field('중심 Y', numInput(+fmt(c[1], 4), v => setPt(e.c, [c[0], v]))));
+                body.append(h('div', null, h('div', { class: 'rwt' }, L('선 종류', 'Line type')), h('div', { class: 'seg' }, ['solid', 'hidden', 'center'].map(k => h('button', { class: ltOf(e) === k ? 'on' : '', onclick: () => setLineType(k, [{ k: 'ent', id: e.id }]) }, LT_NAME[k]())))), field('중심 X', numInput(+fmt(c[0], 4), v => setPt(e.c, [v, c[1]]))), field('중심 Y', numInput(+fmt(c[1], 4), v => setPt(e.c, [c[0], v]))));
                 if (e.t === 'circle') body.append(field('반지름', numInput(+fmt(e.r, 4), v => { if (v > 0) { pushUndo(); solve(sk, [{ rid: e.id, r: v }]); changed(true); } })));
                 else body.append(h('div', { class: 'hint' }, `반지름 ${fmt(radiusOf(sk, e), 3)} mm`));
               }
@@ -6615,6 +6627,25 @@ const Sk = (() => {
     row.addEventListener('pointerenter', () => { s.hoverCon = c; View.req(); }); row.addEventListener('pointerleave', () => { s.hoverCon = null; View.req(); });
     return row;
   }
+  /* line type of sketch entities: solid / centre line (construction) / hidden (dashed, still part of the profile) */
+  const LT_NAME = { solid: () => L('실선', 'Solid'), center: () => L('중심선', 'Centre line'), hidden: () => L('숨은선', 'Hidden line') };
+  function ltOf(e) { return e.cl ? 'center' : e.hid ? 'hidden' : 'solid'; }
+  function setLineType(kind, items) {
+    const s = S(); if (!s) return 0; const sk = SK();
+    const ids = new Set((items || s.sel).filter(i => i.k === 'ent').map(i => i.id));
+    const ents = sk.ents.filter(e => ids.has(e.id) && e.t !== 'point'); if (!ents.length) { status(L('선·원·호를 먼저 선택하세요 (여러 개는 Shift 또는 Ctrl+클릭)', 'Select lines, circles or arcs first (Shift or Ctrl+click for several)')); return 0; }
+    pushUndo();
+    for (const e of ents) { delete e.cl; delete e.hid; if (kind === 'center') e.cl = true; else if (kind === 'hidden') e.hid = true; }
+    changed(true);
+    status(L(`${ents.length}개를 ${LT_NAME[kind]()}(으)로 바꿨습니다`, `Changed ${ents.length} to ${LT_NAME[kind]()}`) + (kind === 'center' ? L(' — 중심선은 형상(윤곽)에서 빠지고 회전축·기준선으로 쓰입니다.', ' — centre lines are left out of profiles and serve as axes/references.') : kind === 'hidden' ? L(' — 숨은선은 점선으로 보이며 윤곽에는 그대로 포함됩니다.', ' — hidden lines are dashed but still part of the profile.') : ''));
+    return ents.length;
+  }
+  function ltIcon(kind, color = '#E8EDF3') {
+    const cv = h('canvas', { width: 22, height: 16, class: 'relicon' }); const c = cv.getContext('2d');
+    c.strokeStyle = color; c.lineWidth = kind === 'solid' ? 2.2 : 1.6; c.setLineDash(kind === 'center' ? [7, 2, 2, 2] : kind === 'hidden' ? [4, 3] : []);
+    c.beginPath(); c.moveTo(1, 8); c.lineTo(21, 8); c.stroke(); return cv;
+  }
+  const ltButtons = (onDone) => ['solid', 'hidden', 'center'].map(k => h('button', { class: 'lt', title: L(`선 종류: ${LT_NAME[k]()}`, `Line type: ${LT_NAME[k]()}`), 'aria-label': LT_NAME[k](), onclick: e => { e.stopPropagation(); setLineType(k); onDone && onDone(); } }, ltIcon(k)));
   /* context toolbar: the relations that fit the current selection, right next to the cursor */
   function hideCtxRel() { const el = $('#skctx'); if (el) el.remove(); }
   function showCtxRel(sx, sy) {
@@ -6622,10 +6653,12 @@ const Sk = (() => {
     const s = S(); if (!s || s.tool !== 'select' || App.ctxRel === false) return;
     const sel = s.sel.filter(i => i.k === 'ent' || i.k === 'pt'); if (!sel.length) return;
     let opts = []; try { opts = relationOptions(sel); } catch (e) { opts = []; }
-    if (!opts.length) return;
+    const hasEnt = sel.some(i => i.k === 'ent');
+    if (!opts.length && !hasEnt) return;
     const gfx = $('#gfx'); const W = gfx.clientWidth, H = gfx.clientHeight;
     const el = h('div', { id: 'skctx', class: 'skctx', role: 'toolbar', 'aria-label': L('구속조건 부가', 'Add relation') },
       opts.map(o => h('button', { title: o.label, 'aria-label': o.label, onclick: e => { e.stopPropagation(); o.run(); hideCtxRel(); } }, relIcon(o.type))),
+      hasEnt && opts.length ? h('span', { class: 'sep' }) : null, hasEnt ? ltButtons(hideCtxRel) : null,
       h('button', { class: 'close', title: L('닫기 (보기 메뉴에서 끌 수 있음)', 'Close (can be turned off in the View menu)'), onclick: e => { e.stopPropagation(); hideCtxRel(); } }, '×'));
     gfx.append(el);
     const w = el.offsetWidth || 200, hh = el.offsetHeight || 34;
@@ -6670,7 +6703,7 @@ const Sk = (() => {
       body.append(h('div', { class: 'rwt' }, `이 스케치의 구속조건 (${sk.cons.length})`));
       const list = h('div', { class: 'rellist' }); sk.cons.forEach(c => list.append(relRow(sk, s, c)));
       if (!sk.cons.length) list.append(h('div', { class: 'hint' }, '아직 구속조건이 없습니다.'));
-      body.append(list, h('div', { class: 'hint' }, '요소를 클릭(여러 개는 Shift+클릭)하면 넣을 수 있는 구속조건이 여기에 나옵니다. 행을 클릭하면 선택, ×는 삭제.'));
+      body.append(list, h('div', { class: 'hint' }, '요소를 클릭(여러 개는 Shift 또는 Ctrl+클릭)하면 넣을 수 있는 구속조건이 여기에 나옵니다. 행을 클릭하면 선택, ×는 삭제.'));
     }
     w.append(body);
     renderCM();
@@ -6728,7 +6761,7 @@ const Sk = (() => {
     const ctrPt = sel.find(e => e.t === 'point') || null;
     const ctrPtSel = s.sel.find(i => i.k === 'pt');
     const items = sel.filter(e => e !== dirLine && (kind !== 'circ' || e !== ctrPt));
-    if (!items.length) { status(L('먼저 [선택] 도구로 패턴할 스케치 요소를 고르세요 (Shift+클릭으로 여러 개).', 'First select the sketch entities to pattern (Shift+click for several).')); return; }
+    if (!items.length) { status(L('먼저 [선택] 도구로 패턴할 스케치 요소를 고르세요 (Shift 또는 Ctrl+클릭으로 여러 개).', 'First select the sketch entities to pattern (Shift or Ctrl+click for several).')); return; }
     const ids = items.map(e => e.id);
     let a0 = 0; if (dirLine) { const p = PV(sk, dirLine.p1), q = PV(sk, dirLine.p2); a0 = Math.atan2(q[1] - p[1], q[0] - p[0]) * 180 / Math.PI; }
     let C = [0, 0]; if (ctrPt) C = PV(sk, ctrPt.p); else if (ctrPtSel) C = PV(sk, ctrPtSel.id);
@@ -6752,7 +6785,7 @@ const Sk = (() => {
     dialog({ title: kind === 'lin' ? L('스케치 선형 패턴', 'Sketch linear pattern') : L('스케치 원형 패턴', 'Sketch circular pattern'), width: 360, body,
       buttons: [{ label: L('확인', 'OK'), primary: true, onClick() { const xf = apply(); if (!xf.length) return; pushUndo(); const k = patternEntities(sk, ids, xf); s.sel = []; changed(); status(L(`요소 ${ids.length}개를 ${k}개 더 복사했습니다`, `Copied ${ids.length} entities ${k} more times`)); } }, { label: L('취소', 'Cancel') }] });
   }
-  return { blank, flat, migrate, solve, analyze, mode, draw, renderPM, renderRelWin, setTool, TOOL_NAME, TOOL_HINT, B, O, measure, pushUndo, patternDialog, patternEntities, linXfs, circXfs };
+  return { blank, flat, migrate, solve, analyze, mode, draw, renderPM, renderRelWin, setTool, TOOL_NAME, TOOL_HINT, B, O, measure, pushUndo, patternDialog, patternEntities, linXfs, circXfs, setLineType, ltIcon };
 })();
 /* ================= part document: tree, features, sketch entry/exit ================= */
 const Part = (() => {
@@ -6956,9 +6989,11 @@ const Part = (() => {
         T('circle', 'circle', '원'), T('arc', 'arc', '중심점 호'), T('poly', 'polygon', '다각형'), '|',
         T('sfillet', 'sfillet', '스케치 필렛', '두 선이 만나는 꼭짓점을 클릭해 둥글게 만듭니다'), T('trim', 'trim', '요소 잘라내기', '교차점 사이의 선분을 클릭해 지웁니다'),
         T('convert', 'convert', '요소 변환', '모델의 모서리나 면을 클릭해 스케치 평면에 투영합니다'), '|',
+        { icon: 'linetype', label: L('선 종류 변환', 'Line type'), tip: L('선택한 선·원·호를 실선·숨은선·중심선으로 바꿉니다 (여러 개는 Shift 또는 Ctrl+클릭)', 'Change the selected entities to solid, hidden or centre lines (Shift or Ctrl+click for several)'), disabled: !sk, menu: [
+          { label: L('실선', 'Solid'), run: () => Sk.setLineType('solid') }, { label: L('숨은선 (점선)', 'Hidden (dashed)'), run: () => Sk.setLineType('hidden') }, { label: L('중심선 (작도선)', 'Centre line (construction)'), run: () => Sk.setLineType('center') }] }, '|',
         { icon: 'lpattern', label: L('스케치 선형 패턴', 'Sketch linear pattern'), tip: L('선택한 스케치 요소를 줄지어 복사합니다 (중심선을 함께 고르면 그 방향)', 'Copies the selected entities in rows (select a centreline for the direction)'), disabled: !sk, run: () => Sk.patternDialog('lin') },
         { icon: 'cpattern', label: L('스케치 원형 패턴', 'Sketch circular pattern'), tip: L('선택한 스케치 요소를 중심 둘레로 복사합니다 (점을 함께 고르면 그 점이 중심)', 'Copies the selected entities around a centre (select a point for the centre)'), disabled: !sk, run: () => Sk.patternDialog('circ') }, '|',
-        { icon: 'rel', label: '구속조건 부가', tip: '요소를 선택하면 왼쪽 PropertyManager에 넣을 수 있는 구속조건이 나옵니다', disabled: !sk, run: () => { if (!sk) return; Sk.setTool('select'); status('구속조건을 넣을 요소를 선택하세요. Shift+클릭으로 여러 개를 고릅니다.'); } },
+        { icon: 'rel', label: '구속조건 부가', tip: '요소를 선택하면 왼쪽 PropertyManager에 넣을 수 있는 구속조건이 나옵니다', disabled: !sk, run: () => { if (!sk) return; Sk.setTool('select'); status('구속조건을 넣을 요소를 선택하세요. Shift 또는 Ctrl+클릭으로 여러 개를 고릅니다.'); } },
         { icon: 'relshow', label: '구속조건 기호', tip: '스케치 위의 구속조건 기호 보이기/숨기기', on: !sk || sk.showRel !== false, disabled: !sk, run: () => { if (!sk) return; sk.showRel = sk.showRel === false; Sk.renderRelWin(); View.req(); } },
         { icon: 'relwin', label: '구속조건 창', tip: '구속조건을 보고 고치는 작은 창 보이기/숨기기', on: !!sk && App.relWin !== false, disabled: !sk, run: () => { if (!sk) return; App.relWin = App.relWin === false; App.relMin = false; Sk.renderRelWin(); } }];
     }
@@ -7077,7 +7112,7 @@ const Part = (() => {
     const pl = Geo.sketchPlane(f);
     ctx.strokeStyle = color; ctx.lineWidth = width;
     for (const e of Sk.flat(f)) for (const pts of Geo.entPolylines(e)) {
-      ctx.setLineDash(e.cl ? [8, 3, 2, 3] : []);
+      ctx.setLineDash(e.cl ? [8, 3, 2, 3] : e.hid ? [5, 3] : []);
       ctx.beginPath(); pts.forEach((p, i) => { const s = View.project(Geo.toW(pl, p)); i ? ctx.lineTo(s[0], s[1]) : ctx.moveTo(s[0], s[1]); }); ctx.stroke();
     }
     ctx.setLineDash([]);
@@ -10560,7 +10595,7 @@ const Dwg = (() => {
     d.osm = d.osm || { end: true, mid: true, cen: true, quad: true, int: true, perp: true, ins: true };
     buildChrome(); setTitle(); resize();
     setTimeout(() => { if (doc === d) syncViews(false, true); }, 0);
-    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.71 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
+    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.72 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
     setPrompt('명령:');
     setTimeout(() => cin.focus({ preventScroll: true }), 30);
     redraw();
