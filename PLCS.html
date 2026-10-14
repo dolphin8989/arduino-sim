@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>K군의 PLC 시뮬레이터 Ver0.961</title>
+<title>K군의 PLC 시뮬레이터 Ver0.98</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -1173,6 +1173,25 @@
   .vendor-lsh .coil-sym-box{border-radius:2px;}
   .vendor-lsh .coil-sym-box::before{content:'[';margin-right:2px;}
   .vendor-lsh .coil-sym-box::after{content:']';margin-left:2px;}
+/* [Ver0.98] 래더 분기(가지치기) */
+.branch-stack.lb-post{border-left:none; min-width:110px;}
+.branch-connect.lb-connect-r{left:auto; right:0;}
+.rung-diagram.lb-has-post > .branch-stack:not(.lb-post){padding-right:0;}
+.branch-stack.lb-post{padding-left:0;}
+.branch-stack.lb-post > .branch-add-row{padding-left:12px;}
+.lb-post .branch-add-row, .rung-diagram .branch-add-row{gap:4px; flex-wrap:wrap;}
+.branch-add-row .lb-series-btn{border-color:#2e86de !important; color:#0d5ab5 !important; font-weight:700;}
+.branch-add-row .lb-del-block{border-color:#e3a0a0 !important; color:#b23 !important;}
+.lb-cmp-btn{font-size:.62rem; font-weight:700; color:#7a3f00; background:#fff7e8; border:1px dashed #d9a54a; border-radius:4px; height:26px; padding:0 6px; margin-left:3px; cursor:pointer; align-self:center; white-space:nowrap;}
+.lb-cmp-btn:hover{border-style:solid; background:#ffefcc;}
+.contact-mode-btn{opacity:.9 !important; font-size:.72rem !important; color:#7a3f00 !important; font-weight:700;}
+.lb-coil-stack{flex:0 0 auto; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:6px; position:relative; padding-left:12px;}
+.lb-coil-vline{position:absolute; left:0; width:2px; background:#5c6673;}
+.lb-coil-stack > .coil-cell{position:relative;}
+.lb-coil-stack.lb-multi > .coil-cell::before{content:''; position:absolute; left:-12px; top:var(--lb-stub,50%); width:12px; height:1px; background:#5c6673;}
+.lb-coil2-head{display:flex; align-items:center; gap:2px;}
+.lb-coil-add{font-size:.6rem; color:#0d5ab5; background:none; border:1px dashed #9fc0e8; border-radius:4px; padding:2px 6px; cursor:pointer; white-space:nowrap;}
+.lb-coil-add:hover{border-style:solid;}
 </style>
 </head>
 <body>
@@ -1181,7 +1200,7 @@
   <div class="brand">
     <div class="brand-mark">P1</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.961</b>
+      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.98</b>
       <span data-i18n="brand.subtitle">Multi-Vendor PLC / HMI Virtual Commissioning</span>
     </div>
   </div>
@@ -1366,11 +1385,11 @@
    에이전트·실제 산업통신 프로토콜은 다음 버전으로 미룹니다(팔레트에는 자리를 잡아
    두고 "다음 버전에서 지원" 안내만 뜨게 해 확장 지점을 명확히 남겨둡니다).
    ============================================================ */
-const APP_VERSION = 'Ver0.961';
+const APP_VERSION = 'Ver0.98';
 
 /* ---------------- i18n ---------------- */
 const STRINGS = {
-  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.961", en: "K's PLC Simulator Ver0.961" },
+  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.98", en: "K's PLC Simulator Ver0.98" },
   "brand.subtitle": { ko: "Multi-Vendor PLC / HMI Virtual Commissioning", en: "Multi-Vendor PLC / HMI Virtual Commissioning" },
   "toolbar.newProject": { ko: "🆕 새 프로젝트", en: "🆕 New Project" },
   "toolbar.projectNameTitle": { ko: "프로젝트 이름", en: "Project name" },
@@ -1506,7 +1525,7 @@ const STRINGS = {
   "ai.sugg.robot": { ko: "로봇 사용법", en: "Robot how-to" },
   "hmi.dblclickHint": { ko: "(더블클릭: 화면 편집)", en: "(double-click: edit screen)" },
   "ladder.dupCoil": { ko: "이중 코일 경고: {addr} 이 두 개 이상의 랑에서 OUT으로 사용되었습니다.", en: "Double-coil warning: {addr} is used as an OUT coil in more than one rung." },
-  "ladder.legend": { ko: "접점의 기호(⊣⊢)를 클릭하면 NO→NC→상승엣지(P)→하강엣지(N) 순서로 바뀌고, 옆의 ⇄ 버튼으로 일반접점/비교접점을 전환할 수 있습니다. 주소는 드롭다운에서 선택하세요(PLC사에 따라 표시 형식이 다릅니다). RUN 중에는 전류가 흐르는 접점/랑이 초록색으로 표시됩니다. 코일 종류에서 MOV/ADD/SUB/MUL/DIV/INC/DEC를 고르면 D레지스터 연산을, PLS/PLF를 고르면 상승/하강 엣지에서 1스캔만 켜지는 펄스 출력을, CALL을 고르면 다른 프로그램(서브루틴) 호출을 할 수 있습니다 — Main 프로그램만 매 스캔 자동 실행되고, 나머지는 CALL로 호출될 때만 실행됩니다.", en: "Click a contact's symbol (⊣⊢) to cycle NO → NC → rising-edge (P) → falling-edge (N), and use the ⇄ button beside it to switch between a bit contact and a comparison contact. Pick the address from the dropdown (shown per-vendor). While RUN, energized contacts and rungs highlight in green. Setting a coil to MOV/ADD/SUB/MUL/DIV/INC/DEC performs a D-register operation, PLS/PLF outputs a one-scan pulse on a rising/falling edge, and CALL invokes another program (subroutine) — only Main runs automatically every scan; other programs run only when called." },
+  "ladder.legend": { ko: "접점의 기호(⊣⊢)를 클릭하면 NO→NC→상승엣지(P)→하강엣지(N) 순서로 바뀌고, 옆의 ⇄ 버튼으로 일반접점/비교접점을 전환할 수 있습니다. 주소는 드롭다운에서 선택하세요(PLC사에 따라 표시 형식이 다릅니다). RUN 중에는 전류가 흐르는 접점/랑이 초록색으로 표시됩니다. 코일 종류에서 MOV/ADD/SUB/MUL/DIV/INC/DEC를 고르면 D레지스터 연산을, PLS/PLF를 고르면 상승/하강 엣지에서 1스캔만 켜지는 펄스 출력을, CALL을 고르면 다른 프로그램(서브루틴) 호출을 할 수 있습니다 — Main 프로그램만 매 스캔 자동 실행되고, 나머지는 CALL로 호출될 때만 실행됩니다. [분기] '+ OR'로 병렬 가지를, '+ 직렬 접점 ▶'으로 OR 묶음 뒤에 직렬 접점(가지 합류)을, '+ 출력 분기'로 같은 조건의 출력을 여러 개 달 수 있고, '+비교'로 비교 접점(=, <>, >, >=, <, <=)을 바로 넣을 수 있습니다.", en: "Click a contact's symbol (⊣⊢) to cycle NO → NC → rising-edge (P) → falling-edge (N), and use the ⇄ button beside it to switch between a bit contact and a comparison contact. Pick the address from the dropdown (shown per-vendor). While RUN, energized contacts and rungs highlight in green. Setting a coil to MOV/ADD/SUB/MUL/DIV/INC/DEC performs a D-register operation, PLS/PLF outputs a one-scan pulse on a rising/falling edge, and CALL invokes another program (subroutine) — only Main runs automatically every scan; other programs run only when called." },
   "ladder.shortcutHint": { ko: "⌨ 키보드 단축키: 접점 그룹이나 코일을 먼저 클릭해 선택한 뒤 — F5=A접점 추가, F6=B접점 추가, Shift+F5=P접점(상승엣지) 추가, F7=아래에 새 랑 추가, F8=코일 종류 순환 전환, F9=OR 그로개(가로선) 추가.", en: "⌨ Keyboard shortcuts: click a contact group or coil to select it, then — F5 = add NO contact, F6 = add NC contact, Shift+F5 = add rising-edge (P) contact, F7 = add a new rung below, F8 = cycle the coil type, F9 = add an OR branch (horizontal line)." },
   "ladder.rungSelectHint": { ko: "랑 번호 클릭: 선택 / Ctrl+클릭: 다중 선택 / Shift+클릭: 범위 선택 / 드래그: 순서 변경 (Ctrl+C 복사, Ctrl+V 붙여넣기)", en: "Click a rung number to select it / Ctrl+click to multi-select / Shift+click for a range / drag to reorder (Ctrl+C to copy, Ctrl+V to paste)" },
   "ladder.copySelected": { ko: "복사", en: "Copy" },
@@ -8821,6 +8840,8 @@ setTimeout(plcCheckpoint, 600);
 
 /* ---------------- 릴리즈 노트 ---------------- */
 const RELEASE_NOTES = [
+  { ver:'Ver0.98', items:{ ko:['래더 분기(가지치기) 추가 — OR 묶음 뒤에 직렬 접점 연결(+ 직렬 접점 ▶), 직렬 접점에도 OR 가지', '출력 분기 추가 — 같은 조건으로 여러 출력 코일 구동(+ 출력 분기)', '비교 접점(+비교) 버튼을 각 줄에 바로 표시'], en:['Ladder branching: series contacts after an OR block, with their own OR branches', 'Output branching: several coils driven by the same condition', 'Compare-contact (+CMP) button shown on every row'] } },
+  { ver:'Ver0.97', items:{ ko:['시퀀스회로 실습 트레이너(EZT ST-1801 구성 자동 배치 · XBC-DR32H · EOCR 2개) 추가', '드래그로 여러 부품 · 전선 한꺼번에 선택 · 이동 · 삭제', '상단 메뉴 · 래더 편집 메뉴 접기/펼치기', '부품이 많을 때 속도 개선'], en:['Sequence-circuit trainer (auto layout, XBC-DR32H, 2 EOCRs) added', 'Drag multi-select: move/delete parts and wires together', 'Collapsible top/ladder menus', 'Faster with many parts'] } },
   { ver:'Ver0.961', items:{ ko:['새 배선 꺾임점을 부품 밖으로 배치(부품을 피해 우회)', '이더넷 스위칭 허브(5포트) 부품 추가 — HMI · VC 동시 연결'], en:['New wire bends placed outside parts', 'Ethernet switch (5-port) added — HMI + VC at once'] } },
   { ver:'Ver0.96', items:{ ko:['실행 취소 · 다시 실행 기능 추가(Ctrl+Z / Ctrl+Y)', 'PLC 4종 외형 실사형으로 변경(LS XGB · MELSEC-Q · S7-1200 · CP1E)', '단자 · LED 번호 실제 표기로 변경(LS P00000/P00040, 미쓰비시 X0~XF, 오므론 0CH/1CH·100CH/101CH)', '배선 단자 바깥쪽 · 확인용 LED 가운데 배치'], en:['Undo/redo added (Ctrl+Z / Ctrl+Y)', 'Realistic bodies for 4 PLCs', 'Real vendor terminal/LED numbering', 'Terminals on outer edges, I/O LEDs in the center'] } },
   { ver:'Ver0.95', items:{ ko:['배선 도구 추가(색상 · 굵기 · 선 종류 변경)', '배선 직각 정리 · 직각 모드 기능 추가', '선택한 부품 방향키 이동 기능 추가'], en:['Wire tools added (color, width, line style)', 'Wire right-angle tidy & ortho mode added', 'Move selected part with arrow keys'] } },
@@ -10044,6 +10065,66 @@ init();
 </script>
 
 <script>
+/* ==== [코드 자동 정리] 복사·붙여넣기로 딸려 온 "보이지 않는 특수문자" 정리 ====
+   웹페이지·카카오톡·한글(HWP)·AI 답변 등에서 코드를 복사하면 눈에 안 보이는 제로폭 공백(U+200B),
+   BOM(U+FEFF), 줄바꿈 없는 공백(NBSP), 전각 공백, 둥근 따옴표(“ ”), 전각 기호(；（）) 등이 섞여
+   들어와 "[Runtime Compile Error] Invalid or unexpected token"이 납니다. 컴파일 직전에 코드 부분만
+   안전하게 정리하고(문자열 "..." 안의 글자는 그대로 둠), 몇 개를 고쳤는지 콘솔에 알려 줍니다. */
+(function(){
+  if (typeof executeCompilerPipeline !== 'function') return;
+  const ZERO_WIDTH = /[​-‏‪-‮⁠-⁤﻿­]/;
+  const SPACE_LIKE = /[  -   　]/;
+  function cleanCode(src){
+    let out = '', fixed = 0, st = 'code';
+    for (let i = 0; i < src.length; i++){
+      let ch = src[i];
+      if (ZERO_WIDTH.test(ch)){ fixed++; continue; }                 // 어디에 있든 제거
+      if (st === 'code'){
+        if (SPACE_LIKE.test(ch)){ ch = ' '; fixed++; }
+        else if (ch === '“' || ch === '”' || ch === '„' || ch === '″' || ch === '＂'){ ch = '"'; fixed++; }
+        else if (ch === '‘' || ch === '’' || ch === '‚' || ch === '′' || ch === '＇'){ ch = "'"; fixed++; }
+        else if (ch === '–' || ch === '—' || ch === '−'){ ch = '-'; fixed++; }
+        else { const c = ch.charCodeAt(0); if (c >= 0xFF01 && c <= 0xFF5E){ ch = String.fromCharCode(c - 0xFEE0); fixed++; } }
+        // 상태 전환
+        if (ch === '/' && src[i+1] === '/'){ st = 'line'; }
+        else if (ch === '/' && src[i+1] === '*'){ st = 'block'; }
+        else if (ch === '"'){ st = 'str'; }
+        else if (ch === "'"){ st = 'chr'; }
+        out += ch;
+      } else if (st === 'line'){
+        if (SPACE_LIKE.test(ch)){ ch = ' '; fixed++; }
+        out += ch; if (ch === '\n') st = 'code';
+      } else if (st === 'block'){
+        out += ch; if (ch === '/' && src[i-1] === '*') st = 'code';
+      } else { // 문자열/문자 상수 — 내용은 그대로, 닫는 따옴표만 확인(둥근 따옴표로 닫힌 경우도 처리)
+        const q = st === 'str' ? '"' : "'";
+        if (ch === '\\'){ out += ch + (src[i+1] || ''); i++; continue; }
+        if (ch === '\n'){ st = 'code'; out += ch; continue; }
+        const isCloseFancy = st === 'str' ? (ch === '“' || ch === '”') : (ch === '‘' || ch === '’');
+        if (isCloseFancy){ ch = q; fixed++; }
+        out += ch; if (ch === q) st = 'code';
+      }
+    }
+    return { code: out, fixed };
+  }
+  window.__cleanSketchCode = cleanCode;
+  const _ecp = executeCompilerPipeline;
+  executeCompilerPipeline = function(board){
+    try {
+      const editor = document.getElementById(`codeEditor${String(board).toUpperCase()}`);
+      if (editor){
+        const r = cleanCode(editor.value);
+        if (r.fixed){
+          editor.value = r.code;
+          editor.dispatchEvent(new Event('input', { bubbles: true }));
+          setTimeout(() => logSerial(`[자동 정리] 복사·붙여넣기로 섞여 들어온 보이지 않는 특수문자(제로폭 공백·특수 공백·둥근 따옴표·전각 기호 등) ${r.fixed}개를 정리했습니다.`, board), 0);
+        }
+      }
+    } catch(e){ console.warn(e); }
+    return _ecp.apply(this, arguments);
+  };
+})();
+
 /* ==== [성능 개선] 부품이 많을 때 버벅임 줄이기 ====
    동작(계산 결과)은 그대로 두고, "같은 순간에 여러 번 반복하던 똑같은 조회"만 한 번으로 줄입니다.
    1) 시뮬레이션 1틱 동안: 부품 종류별 목록(document.querySelectorAll('.comp-…'))을 틱마다 한 번만 조회
@@ -11624,6 +11705,304 @@ init();
   }, 50);
   // RUN 중에는 기존 스캔 루프가 평가하지만, 전원이 꺼져 있으면 부저 끄기
   setInterval(() => { if (!powerOn) buzzerSound(false); }, 500);
+})();
+
+/* ==== [Ver0.98] 래더 분기(가지치기) — 입력 직렬·병렬 분기 블록 + 출력 병렬 분기 + 비교접점 버튼 ====
+   기존 랑 구조 { groups:[[접점…],[접점…]](OR로 묶인 행들), coil } 은 그대로 두고, 두 필드를 덧붙입니다.
+   - rung.post   : [ 블록, 블록, … ]  — groups 뒤에 "직렬"로 이어지는 병렬 블록들. 블록 = [[접점…],[접점…]] (행끼리 OR)
+                   예) (START OR S1_PTPN) AND NOT SEQ_END  →  groups:[[START],[S1_PTPN]], post:[ [[SEQ_END(b)]] ]
+   - rung.coils2 : [ 코일, … ]          — 같은 조건으로 함께 구동되는 출력 분기(병렬 코일)
+   post 블록의 행 번호(gi)는 1000 + 블록*100 + 행 으로 인코딩해, 기존 접점 편집 함수(주소·종류·비교 전환 등)를
+   그대로 재사용합니다. */
+(function(){
+  if (typeof renderLadderEditor !== 'function' || typeof rungPower !== 'function') return;
+  const POST_BASE = 1000;
+  const encGi = (b, r) => POST_BASE + b * 100 + r;
+  const decGi = gi => ({ b: Math.floor((gi - POST_BASE) / 100), r: (gi - POST_BASE) % 100 });
+  function rowOf(rung, gi){
+    if (!rung) return null;
+    gi = Number(gi);
+    if (gi < POST_BASE) return rung.groups[gi] || null;
+    const d = decGi(gi);
+    return (rung.post && rung.post[d.b] && rung.post[d.b][d.r]) || null;
+  }
+  window.ladderRowOf = rowOf;
+  const R = (plcId, ri) => getActiveRungs(plcId)[ri];
+
+  // ---------- 실행 ----------
+  const rowConducts = (mem, row) => {
+    // 엣지 접점(P/N)의 이전값이 매 스캔 갱신되도록 행 안의 접점은 모두 평가합니다.
+    let ok = row.length > 0;
+    row.forEach(c => { if (!contactConducts(mem, c)) ok = false; });
+    return ok;
+  };
+  const _rungPower = rungPower;
+  rungPower = function(mem, rung){
+    if (rung && '__forced' in rung) return rung.__forced;
+    let p = _rungPower(mem, rung);
+    if (rung && rung.post && rung.post.length){
+      rung.post.forEach(block => {
+        let any = false;
+        block.forEach(row => { if (rowConducts(mem, row)) any = true; });
+        if (!any) p = false;
+      });
+    }
+    return p;
+  };
+  const _execRung = execRung;
+  execRung = function(mem, rung, scanMs, prog, callStack){
+    _execRung(mem, rung, scanMs, prog, callStack);
+    if (rung && rung.coils2 && rung.coils2.length){
+      const pw = !!rung._power;
+      rung.coils2.forEach(coil => _execRung(mem, { groups:[], __forced: pw, coil }, scanMs, prog, callStack));
+    }
+  };
+
+  // ---------- 접점 편집 함수(행 번호 인코딩 대응) ----------
+  ladderAddContact = function(plcId, ri, gi){ const row = rowOf(R(plcId, ri), gi); if (row) row.push({addr:'X0',neg:false,edge:null}); renderLadderEditor(plcId); };
+  window.ladderAddCmpContact = function(plcId, ri, gi){ const row = rowOf(R(plcId, ri), gi); if (row) row.push({mode:'cmp', op:'>=', a:'D0', b:'0'}); renderLadderEditor(plcId); };
+  ladderDelContact = function(plcId, ri, gi, ci){ const row = rowOf(R(plcId, ri), gi); if (row) row.splice(ci, 1); renderLadderEditor(plcId); };
+  ladderSetContactAddr = function(plcId, ri, gi, ci, val){
+    const vm = VENDOR_META[document.getElementById(plcId).dataset.type];
+    const internal = vendorAddrFromDisplay(vm.vendorClass, val);
+    const c = (rowOf(R(plcId, ri), gi) || [])[ci]; if (c) c.addr = (internal || 'X0').toUpperCase().trim();
+    renderLadderEditor(plcId);
+  };
+  ladderCycleContactKind = function(plcId, ri, gi, ci){
+    const c = (rowOf(R(plcId, ri), gi) || [])[ci]; if (!c) return;
+    if (!c.neg && !c.edge) c.neg = true;
+    else if (c.neg && !c.edge){ c.neg = false; c.edge = 'P'; }
+    else if (c.edge === 'P') c.edge = 'N';
+    else { c.edge = null; c.neg = false; }
+    renderLadderEditor(plcId);
+  };
+  ladderToggleContactNeg = function(plcId, ri, gi, ci){ const c = (rowOf(R(plcId, ri), gi) || [])[ci]; if (c) c.neg = !c.neg; renderLadderEditor(plcId); };
+  ladderToggleContactCmpMode = function(plcId, ri, gi, ci){
+    const c = (rowOf(R(plcId, ri), gi) || [])[ci]; if (!c) return;
+    if (c.mode === 'cmp'){ delete c.mode; delete c.op; delete c.a; delete c.b; if (!c.addr) c.addr = 'X0'; c.neg = false; c.edge = null; }
+    else { c.mode = 'cmp'; if (!c.op) c.op = '>='; if (c.a == null) c.a = 'D0'; if (c.b == null) c.b = '0'; }
+    renderLadderEditor(plcId);
+  };
+  ladderSetContactCmp = function(plcId, ri, gi, ci, field, val){
+    const c = (rowOf(R(plcId, ri), gi) || [])[ci]; if (!c) return;
+    if (field === 'op') c.op = val; else if (field === 'a') c.a = val.trim(); else if (field === 'b') c.b = val.trim();
+    renderLadderEditor(plcId);
+  };
+  ladderDelGroup = function(plcId, ri, gi){
+    const rung = R(plcId, ri); if (!rung) return;
+    gi = Number(gi);
+    if (gi < POST_BASE){ if (rung.groups.length > 1) rung.groups.splice(gi, 1); }
+    else {
+      const d = decGi(gi), block = rung.post && rung.post[d.b];
+      if (block){ block.splice(d.r, 1); if (!block.length) rung.post.splice(d.b, 1); if (!rung.post.length) delete rung.post; }
+    }
+    LADDER_SEL = null;
+    renderLadderEditor(plcId);
+  };
+  ladderShortcutAddContact = function(plcId, ri, gi, kind){
+    const rung = R(plcId, ri); if (!rung) return;
+    let row = gi != null ? rowOf(rung, gi) : null, g = gi;
+    if (!row){ row = rung.groups[0]; g = 0; }
+    const c = { addr:'X0', neg:false, edge:null };
+    if (kind === 'NC') c.neg = true; else if (kind === 'P') c.edge = 'P';
+    row.push(c);
+    LADDER_SEL = { plcId, ri, gi:g, coil:false };
+    renderLadderEditor(plcId);
+  };
+  // 분기 블록 추가/행 추가
+  window.ladderAddPostBlock = function(plcId, ri){
+    const rung = R(plcId, ri); if (!rung) return;
+    if (!rung.post) rung.post = [];
+    rung.post.push([[{ addr:'X0', neg:true, edge:null }]]);
+    LADDER_SEL = { plcId, ri, gi: encGi(rung.post.length - 1, 0), coil:false };
+    renderLadderEditor(plcId);
+  };
+  window.ladderAddPostRow = function(plcId, ri, b){
+    const rung = R(plcId, ri); if (!rung || !rung.post || !rung.post[b]) return;
+    rung.post[b].push([{ addr:'X0', neg:false, edge:null }]);
+    LADDER_SEL = { plcId, ri, gi: encGi(b, rung.post[b].length - 1), coil:false };
+    renderLadderEditor(plcId);
+  };
+  window.ladderDelPostBlock = function(plcId, ri, b){
+    const rung = R(plcId, ri); if (!rung || !rung.post) return;
+    rung.post.splice(b, 1); if (!rung.post.length) delete rung.post;
+    LADDER_SEL = null;
+    renderLadderEditor(plcId);
+  };
+  // 출력 분기(병렬 코일)
+  window.ladderAddCoil2 = function(plcId, ri){
+    const rung = R(plcId, ri); if (!rung) return;
+    if (!rung.coils2) rung.coils2 = [];
+    const used = new Set([rung.coil && rung.coil.addr].concat(rung.coils2.map(c => c.addr)));
+    let n = 0; while (used.has('Y' + n) && n < 15) n++;
+    rung.coils2.push({ type:'OUT', addr:'Y' + n, preset:1000 });
+    renderLadderEditor(plcId);
+  };
+  window.ladderDelCoil2 = function(plcId, ri, k){
+    const rung = R(plcId, ri); if (!rung || !rung.coils2) return;
+    rung.coils2.splice(k, 1); if (!rung.coils2.length) delete rung.coils2;
+    renderLadderEditor(plcId);
+  };
+  window.ladderSetCoil2 = function(plcId, ri, k, field, val){
+    const rung = R(plcId, ri); const coil = rung && rung.coils2 && rung.coils2[k]; if (!coil) return;
+    if (field === 'type'){
+      coil.type = val;
+      const allowed = coilAddrTypesFor(val);
+      if (!allowed.includes((coil.addr || '')[0])) coil.addr = allowed[0] + '0';
+    } else if (field === 'addr'){
+      const vm = VENDOR_META[document.getElementById(plcId).dataset.type];
+      coil.addr = (vendorAddrFromDisplay(vm.vendorClass, val) || 'Y0').toUpperCase().trim();
+    } else if (field === 'preset') coil.preset = parseInt(val, 10) || 0;
+    renderLadderEditor(plcId);
+  };
+  const COIL2_TYPES = ['OUT','SET','RST','PLS','PLF','TON','CTU','CRST'];
+  function coil2HTML(plcId, ri, k, coil, vc){
+    const isBox = !['OUT','SET','RST','PLS','PLF'].includes(coil.type);
+    const cls = 'coil-sym' + (isBox ? ' coil-sym-box' + (vc === 'vendor-siemens' ? ' coil-sym-fb' : '') : '');
+    return `<div class="coil-cell lb-coil2">${deviceCommentHTML(plcId, coil.addr, 'coil-comment')}<div class="coil-wrap" data-ri="${ri}">
+      <div class="lb-coil2-head"><div class="${cls}">${coil.type === 'OUT' ? '' : coil.type}</div>
+      <button class="contact-del-btn" title="이 출력 분기 삭제" onclick="event.stopPropagation();ladderDelCoil2('${plcId}',${ri},${k})">✕</button></div>
+      <select onclick="event.stopPropagation()" onchange="ladderSetCoil2('${plcId}',${ri},${k},'type',this.value)">${COIL2_TYPES.map(t => `<option value="${t}" ${coil.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+      <select class="addr-badge addr-select" onclick="event.stopPropagation()" onchange="ladderSetCoil2('${plcId}',${ri},${k},'addr',this.value)">${addrOptionsHTML(vc, coil.addr, coilAddrTypesFor(coil.type))}</select>
+      ${(coil.type === 'TON' || coil.type === 'CTU') ? `<input class="preset-badge" type="number" value="${coil.preset || 0}" onclick="event.stopPropagation()" onchange="ladderSetCoil2('${plcId}',${ri},${k},'preset',this.value)">` : ''}
+    </div></div>`;
+  }
+  function rowHTML(plcId, ri, gi, row, vc, canDel){
+    const sel = LADDER_SEL && LADDER_SEL.plcId === plcId && !LADDER_SEL.coil && LADDER_SEL.ri === ri && LADDER_SEL.gi === gi;
+    let h = `<div class="branch-row${sel ? ' branch-row-selected' : ''}" onclick="ladderSelectCell('${plcId}',${ri},${gi})">`;
+    row.forEach((c, ci) => { h += contactSymHTML(plcId, ri, gi, ci, c, vc); });
+    h += `<button class="add-contact-btn" onclick="event.stopPropagation();ladderAddContact('${plcId}',${ri},${gi})" title="${tr('ladder.addContact')}">+</button>`;
+    h += `<button class="lb-cmp-btn" onclick="event.stopPropagation();ladderAddCmpContact('${plcId}',${ri},${gi})" title="비교 접점(CMP) 추가 — D레지스터·아날로그입력(AI)·상수 비교 (=, <>, >, >=, <, <=)">+비교</button>`;
+    if (canDel) h += `<button class="contact-del-btn" style="opacity:.7;" onclick="event.stopPropagation();ladderDelGroup('${plcId}',${ri},${gi})" title="${tr('ladder.delGroup')}">✕OR</button>`;
+    h += `<div class="branch-wire-end"></div></div>`;
+    return h;
+  }
+
+  // ---------- 화면 ----------
+  const _render = renderLadderEditor;
+  renderLadderEditor = function(plcId){
+    _render(plcId);
+    try { decorate(plcId); } catch(e){ console.warn('[ladder-branch]', e); }
+  };
+  function decorate(plcId){
+    const body = document.getElementById('ladderDrawerBody'); if (!body) return;
+    const canvas = body.querySelector('.ladder-canvas'); if (!canvas) return; // 래더 모드가 아닐 때(IL/ST/FBD/SFC)
+    const comp = document.getElementById(plcId); if (!comp) return;
+    const vc = VENDOR_META[comp.dataset.type].vendorClass;
+    const rungs = getActiveRungs(plcId);
+    canvas.querySelectorAll(':scope > .rung-diagram').forEach(rd => {
+      const ri = parseInt(rd.dataset.ri, 10), rung = rungs[ri]; if (!rung) return;
+      const main = rd.querySelector(':scope > .branch-stack');
+      // 기존 행에도 "+비교" 버튼
+      if (main) main.querySelectorAll(':scope > .branch-row').forEach((row, gi) => {
+        const add = row.querySelector(':scope > .add-contact-btn');
+        if (add) add.insertAdjacentHTML('afterend', `<button class="lb-cmp-btn" onclick="event.stopPropagation();ladderAddCmpContact('${plcId}',${ri},${gi})" title="비교 접점(CMP) 추가 — D레지스터·아날로그입력(AI)·상수 비교 (=, <>, >, >=, <, <=)">+비교</button>`);
+      });
+      const addRow = main && main.querySelector(':scope > .branch-add-row');
+      if (addRow && !(rung.post && rung.post.length)) addRow.insertAdjacentHTML('beforeend', `<button class="lb-series-btn" onclick="ladderAddPostBlock('${plcId}',${ri})" title="위 접점들(OR 묶음) 뒤에 직렬로 접점을 이어 붙입니다 — 예: (기동 OR 자기유지) 다음에 정지 b접점">+ 직렬 접점 ▶</button>`);
+      const post = rung.post || [];
+      if (post.length && main){
+        rd.classList.add('lb-has-post');
+        if (rung.groups.length > 1) main.insertAdjacentHTML('beforeend', '<div class="branch-connect lb-connect-r"></div>');
+        let h = '';
+        post.forEach((block, b) => {
+          h += `<div class="branch-stack lb-post" data-b="${b}">`;
+          if (block.length > 1) h += '<div class="branch-connect"></div><div class="branch-connect lb-connect-r"></div>';
+          block.forEach((row, r) => { h += rowHTML(plcId, ri, encGi(b, r), row, vc, true); });
+          h += `<div class="branch-add-row"><button onclick="ladderAddPostRow('${plcId}',${ri},${b})" title="이 직렬 접점에 병렬(OR) 가지를 추가">+ OR</button>`
+            + (b === post.length - 1 ? `<button class="lb-series-btn" onclick="ladderAddPostBlock('${plcId}',${ri})">+ 직렬 접점 ▶</button>` : '')
+            + `<button class="lb-del-block" onclick="ladderDelPostBlock('${plcId}',${ri},${b})" title="이 직렬 블록 삭제">✕블록</button></div>`;
+          h += '</div>';
+        });
+        main.insertAdjacentHTML('afterend', h);
+        // 마지막 블록만 남은 폭을 채우도록
+        main.style.flex = '0 1 auto';
+        const posts = rd.querySelectorAll(':scope > .lb-post');
+        posts.forEach((p, i) => { p.style.flex = i === posts.length - 1 ? '1 1 auto' : '0 1 auto'; });
+      }
+      // 출력 분기
+      const cell = rd.querySelector(':scope > .coil-cell');
+      if (cell){
+        const stack = document.createElement('div');
+        stack.className = 'lb-coil-stack' + ((rung.coils2 || []).length ? ' lb-multi' : '');
+        cell.parentNode.insertBefore(stack, cell);
+        stack.appendChild(cell);
+        let h = '';
+        (rung.coils2 || []).forEach((c, k) => { h += coil2HTML(plcId, ri, k, c, vc); });
+        h += `<button class="lb-coil-add" onclick="ladderAddCoil2('${plcId}',${ri})" title="같은 조건으로 함께 켜질 출력을 병렬로 추가(출력 분기)">+ 출력 분기</button>`;
+        stack.insertAdjacentHTML('beforeend', h);
+      }
+    });
+    fitConnectors(canvas);
+    refreshLadderHighlight(plcId);
+  }
+  // 세로 연결선을 "첫 가지 ~ 마지막 가지"의 선 높이까지만 그립니다(기존엔 블록 전체 높이라 너무 길었음).
+  function centerY(el, ref){
+    const a = el.getBoundingClientRect(), b = ref.getBoundingClientRect();
+    const z = ref.offsetHeight ? (b.height / ref.offsetHeight) : 1; // 래더 확대/축소 보정
+    return (a.top + a.height / 2 - b.top) / (z || 1);
+  }
+  function fitConnectors(canvas){
+    canvas.querySelectorAll('.branch-stack').forEach(st => {
+      const rows = st.querySelectorAll(':scope > .branch-row');
+      const cons = st.querySelectorAll(':scope > .branch-connect');
+      if (!rows.length || !cons.length) return;
+      const y1 = centerY(rows[0], st), y2 = centerY(rows[rows.length - 1], st);
+      cons.forEach(c => { c.style.top = y1 + 'px'; c.style.bottom = 'auto'; c.style.height = Math.max(0, y2 - y1) + 'px'; });
+    });
+    canvas.querySelectorAll('.lb-coil-stack.lb-multi').forEach(st => {
+      const syms = Array.from(st.querySelectorAll(':scope > .coil-cell .coil-sym'));
+      if (syms.length < 2) return;
+      const ys = syms.map(s => centerY(s, st));
+      let v = st.querySelector(':scope > .lb-coil-vline');
+      if (!v){ v = document.createElement('div'); v.className = 'lb-coil-vline'; st.prepend(v); }
+      v.style.top = ys[0] + 'px'; v.style.height = (ys[ys.length - 1] - ys[0]) + 'px';
+      st.querySelectorAll(':scope > .coil-cell').forEach((cell, i) => cell.style.setProperty('--lb-stub', (ys[i] - centerY(cell, st) + cell.offsetHeight / 2) + 'px'));
+    });
+  }
+  window.addEventListener('resize', () => { const c = document.querySelector('#ladderDrawerBody .ladder-canvas'); if (c) fitConnectors(c); });
+  if (typeof setLadderZoom === 'function'){ const _z = setLadderZoom; setLadderZoom = function(){ const r = _z.apply(this, arguments); const c = document.querySelector('#ladderDrawerBody .ladder-canvas'); if (c) fitConnectors(c); return r; }; }
+  const _hl = refreshLadderHighlight;
+  refreshLadderHighlight = function(plcId){
+    _hl(plcId);
+    if (window.__ladderEditorOpenFor !== plcId) return;
+    const rungs = getActiveRungs(plcId);
+    document.querySelectorAll('#ladderDrawerBody .lb-post .contact-sym').forEach(sym => {
+      const c = (rowOf(rungs[parseInt(sym.dataset.ri, 10)], parseInt(sym.dataset.gi, 10)) || [])[parseInt(sym.dataset.ci, 10)];
+      sym.classList.toggle('contact-live', !!(isRunning && c && c._liveLastResult));
+    });
+  };
+
+  // ---------- 이중 코일 검사 · IL 내보내기 ----------
+  const _vdc = validateDoubleCoils;
+  validateDoubleCoils = function(plcId){
+    const prog = getPlcProg(plcId);
+    const extra = [];
+    (prog.programs || []).forEach(p => (p.rungs || []).forEach(r => (r.coils2 || []).forEach(c => extra.push({ r, c }))));
+    if (!extra.length) return _vdc(plcId);
+    // 출력 분기 코일도 이중 코일 검사에 포함
+    const seen = {}, dups = new Set();
+    (prog.programs || []).forEach(p => (p.rungs || []).forEach(r => {
+      [r.coil].concat(r.coils2 || []).forEach(c => {
+        if (c && c.type === 'OUT' && c.addr){ if (seen[c.addr]) dups.add(c.addr); seen[c.addr] = true; }
+      });
+    }));
+    prog.warnings = Array.from(dups).map(a => tr('ladder.dupCoil').replace('{addr}', a));
+    return prog.warnings;
+  };
+  const _toIL = rungToILLines;
+  rungToILLines = function(rung, vendorClass){
+    const post = (rung.post || []).filter(b => b.some(r => r.length));
+    const coils2 = rung.coils2 || [];
+    if (!post.length && !coils2.length) return _toIL(rung, vendorClass);
+    const lines = _toIL({ groups: rung.groups, coil: null }, vendorClass);
+    post.forEach(block => {
+      lines.push.apply(lines, _toIL({ groups: block.filter(r => r.length), coil: null }, vendorClass));
+      lines.push('ANB');
+    });
+    [rung.coil].concat(coils2).forEach(c => { if (c) lines.push.apply(lines, _toIL({ groups: [], coil: c }, vendorClass)); });
+    return lines;
+  };
 })();
 
 </script>
