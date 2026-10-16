@@ -91,7 +91,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
 .tn[draggable=true]{cursor:default}
 .rbar{display:flex;align-items:center;gap:4px;height:12px;margin:3px 6px 3px 18px;cursor:grab;position:relative}
 .rbar .rbl{flex:1;height:4px;border-radius:2px;background:#3a4452}.rbar:hover .rbl,.rbar.on .rbl{background:var(--amber)}
-.rbar .rbx{height:16px;padding:0 4px;border:0;border-radius:3px;background:var(--bg-panel-3);color:var(--amber);cursor:pointer;font-size:11px;line-height:1}
+.rbar{height:18px;touch-action:none}
+.rbar .rbl{height:5px}
+.rbar .rbh{color:var(--amber);font-size:12px;line-height:1;opacity:.8}
+.rbar.drag{cursor:grabbing}.rbar.drag .rbl{background:var(--amber)}
+.rbar.off{cursor:default;opacity:.5}
+.rbar .rbx{height:16px;padding:0 4px;border:0;border-radius:3px;background:var(--bg-panel-3);color:var(--amber);cursor:pointer;font-size:10px;line-height:1}
+.rbar .rbx:disabled{opacity:.35;cursor:default}
 .tn.err .lb{color:var(--danger)}
 .tn .badge{color:var(--danger);font-weight:700;margin-left:2px}
 .tn.cur .lb{font-weight:600;font-size:13.5px}
@@ -117,6 +123,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
 .skctx .sep{width:1px;margin:3px 2px;background:var(--border)}
 .skctx button.lt{width:34px}
 .skctx button.close{width:20px;color:var(--text-dim);font-size:14px}
+.hint.solver{line-height:1.5}.hint.solver b{color:var(--teal-strong)}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px}.tbl th,.tbl td{padding:3px 4px;border-bottom:1px solid var(--line,#2a323d);text-align:left;vertical-align:top}.tbl th{color:var(--text-dim);font-weight:600}
 .errguide{margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,95,86,.4);display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.5}
 .errguide b{color:#FF8A80;margin-right:4px}
 .pmmsg.err{background:rgba(255,95,86,.1);border-color:rgba(255,95,86,.5)}
@@ -366,7 +374,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 
 <div id="app">
 <section id="sw" class="win" aria-label="3D 모델러">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.76</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.79</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
   <div class="menubar" id="swMenu"></div>
   <div class="swmain">
     <nav class="rail" id="railL" aria-label="피처 · 어셈블리 명령"></nav>
@@ -392,7 +400,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 </section>
 
 <section id="ac" class="win" hidden aria-label="2D 도면">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.76</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.79</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
   <div class="menubar" id="acMenu"></div>
   <div class="acrow" id="acStd"></div>
   <div class="acrow" id="acProps"></div>
@@ -686,7 +694,7 @@ const I18N_DICT = {
 "F3 객체 스냅 · F7 모눈 · F8 직교 · F9 스냅": "F3 object snap · F7 grid · F8 ortho · F9 snap",
 "FeatureManager 디자인 트리": "FeatureManager design tree",
 "K-CAD 작업": "K-CAD workspace",
-"K군의 CAD v0.76": "K-CAD v0.76",
+"K군의 CAD v0.79": "K-CAD v0.79",
 "K군의 CAD 정보": "About K-CAD",
 "K군의 CAD 파일이 아닙니다": "Not a K-CAD file",
 "L 선 · C 원 · A 호 · REC 사각형 · POL 다각형 · DT 문자": "L line · C circle · A arc · REC rectangle · POL polygon · DT text",
@@ -1328,7 +1336,7 @@ const I18N_DICT = {
 "DXF로 내보내기": "Export to DXF",
 "DXF로 내보냅니다. 치수는 선과 문자로 분해되어 저장됩니다.": "Exports to DXF. Dimensions are exploded into lines and text.",
 "KS 제도 관례: 외형선 굵은 실선(0.5), 숨은선 파선(0.35), 중심선 1점 쇄선(0.25). 행을 두 번 클릭하면 현재 도면층이 됩니다.": "KS drafting practice: visible lines thick solid (0.5), hidden lines dashed (0.35), centerlines chain (0.25). Double-click a row to make it current.",
-"K군의 CAD v0.76 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.76 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
+"K군의 CAD v0.79 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.79 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
 "{0}   도면층: \"{1}\"": "{0}   Layer: \"{1}\"",
 "{0} (객체 선택됨)": "{0} (objects selected)",
 "{0} 가로 ({1}×{2})": "{0} landscape ({1}×{2})",
@@ -1729,6 +1737,9 @@ const ICONS = (() => {
     aDist: s('M3 18L21 6', L, 1.6, 'stroke-dasharray="3 2"') + dot(3, 18, 2.4, T) + dot(21, 6, 2.4, T),
     aMatch: sf('M3 17l9-9 3 3-9 9H3z', L, L, .2, 1.6) + sf('M13 7l3-3 4 4-3 3z', A, A, .6, 1.6),
     mag: circ(12, 12, 9, L, 1.6) + circ(12, 12, 4.5, L, 1.4) + f('M12 7.5a4.5 4.5 0 0 1 4.5 4.5H12z', R, .9) + f('M12 16.5a4.5 4.5 0 0 1 -4.5 -4.5H12z', R, .9) + f('M16.5 12a4.5 4.5 0 0 1 -4.5 4.5V12z', B, .9) + f('M7.5 12a4.5 4.5 0 0 1 4.5 -4.5V12z', B, .9) + s('M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3', A, 1.6),
+    thermal: sf('M10 4a2 2 0 0 1 4 0v9.5a4 4 0 1 1 -4 0z', L, 'none', 0, 1.6) + f('M11 10h2v4.5a2.6 2.6 0 1 1 -2 0z', R, .9) + circ(12, 17, 2.4, R, 1, R) + s('M17 6h3M17 9h2M17 12h3', A, 1.4),
+    flow: s('M2 8c4-3 7 3 11 0s7-3 9 0', T, 1.6) + s('M2 13h5M17 13h5', T, 1.6) + s('M2 18c4 3 7-3 11 0s7 3 9 0', T, 1.6) + sf('M7 13a5 3.6 0 1 0 10 0a5 3.6 0 1 0 -10 0', L, L, .25, 1.5),
+    motion: circ(8, 15, 5, L, 1.6) + dot(8, 15, 1.6, T) + s('M8 15L18 6', T, 2) + circ(18, 6, 2.2, A, 1.4, A) + s('M3.5 7.5a6.5 6.5 0 0 1 6-4.5', A, 1.5) + s('M8.6 1.6l1 1.5-1.7.8', A, 1.4),
     fem: sf('M3 18l6-12 6 9 6-6v9z', L, L, .08, 1.4) + s('M3 18l6-12 6 9 6-6', T, 1.6) + f('M3 18L9 6l3 4.5L9 18z', '#3a7bd5', .7) + f('M12 10.5l3 4.5-3 3H9z', '#F2A53D', .8) + f('M15 15l6-6v9h-6z', '#FF6B5E', .75),
     section: sf('M4 8l8-4.5 8 4.5v8l-8 4.5L4 16z', L, L, .1, 1.5) + sf('M3 13.5l9-4 9 4-9 4z', R, R, .35, 1.6) + s('M12 4v5.5', D, 1.2, 'stroke-dasharray="2 2"'),
     mirror: s('M12 2.5v19', B, 1.4, 'stroke-dasharray="3 2"') + sf('M10 5L3.5 9v8l6.5 2z', L, L, .12, 1.6) + sf('M14 5l6.5 4v8L14 19z', T, T, .4, 1.6),
@@ -1772,8 +1783,27 @@ function ic(name, size = 16) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 }
 /* ================= release notes (bottom-left button, Help menu) ================= */
-const APP_VER = 'v0.76';
+const APP_VER = 'v0.79';
 const RELEASES = [
+  { v: 'v0.79', date: '2026-10-16', title: ['모션 스터디 · 어셈블리 정적/충격 해석', 'Motion study · assembly static/shock'], items: [
+    ['어셈블리 [모션 스터디]: 부품의 원통면에 회전 모터(rpm)를, 평면에 직선 모터(일정 속도·왕복)를 달면 메이트로 이어진 부품이 함께 움직이는 애니메이션을 만듭니다. 재생·멈춤·시간 막대·재생 속도·반복을 지원합니다. 기어·풀리는 [연동 회전]으로 회전비를 줍니다.', 'Assembly motion study: put a rotary motor (rpm) on a cylindrical face or a linear motor (constant or reciprocating) on a planar face; parts joined by mates follow in an animation with play/pause, a time slider, speed and loop. Gears and pulleys via coupled rotation with a ratio.'],
+    ['기구학: 메이트를 구속식으로 바꿔 매 프레임 레벤버그-마쿼트법으로 풉니다. 추적 부품의 위치·속도·가속도·각속도 그래프와 무게중심 궤적(주황 선)을 보여 줍니다. 크랭크-슬라이더 검증: 이론식과 위치 오차 1e-8 mm, 최대 속도 201.4 대 201.5 mm/s. 기구가 잠기는(사점) 위치는 경고합니다.', 'Kinematics: mates become constraint equations solved every frame by Levenberg–Marquardt; position, velocity, acceleration and angular-speed charts plus the centre-of-mass path. Slider-crank check: position error 1e-8 mm, peak speed 201.4 vs 201.5 mm/s. Lock-up (dead point) is reported.'],
+    ['동역학: 부품 메시에서 질량·무게중심·관성 텐서를 적분하고, 운동·위치 에너지 변화율로 필요한 모터 토크(직선 모터는 힘)와 동력을 그립니다(중력 방향 선택, 마찰 제외). 검증: 중력 받는 크랭크 토크 m·g·r·cosθ와 1e-7 N·m 이내.', 'Dynamics: mass, centre of mass and inertia tensor integrated from each part; required motor torque (force for linear) and power from the rate of change of kinetic + potential energy (gravity selectable, no friction). Check: crank under gravity matches m·g·r·cosθ within 1e-7 N·m.'],
+    ['어셈블리 해석: 정적(면 하중 + 자중)과 충격(반사인 가속도 펄스 G·ms, 예: 50 G · 11 ms). 부품마다 자기 재질을 쓰고 맞닿은 부품은 접착으로 계산합니다. 부품별 최대 응력·안전율, 충격은 최대 순간 응력·시간 응답·동적 증폭률(정적 해 대비)을 보여 줍니다.', 'Assembly study: static (face loads + self-weight) and shock (half-sine acceleration pulse, e.g. 50 G · 11 ms). Each part keeps its material; touching parts are bonded. Per-part max stress and safety factor; shock adds the peak-moment stress, time response and dynamic amplification vs. static.'],
+    ['어셈블리 화면 위쪽 [해석 ▾]과 왼쪽 메뉴에 [모션 스터디]·[어셈블리 해석]을 넣었습니다.', 'Motion study and Assembly study are on the assembly rail and in the Simulation ▾ menu at the top.'],
+  ] },
+  { v: 'v0.78', date: '2026-10-15', title: ['솔버 표기 · 열 해석 · 유동 해석', 'Solver labels · thermal · flow'], items: [
+    ['해석 창과 결과에 쓰는 솔버를 적었습니다. 구조: 8절점 육면체(복셀)+비적합 모드, 정적은 행렬 없는 CG(자코비 전처리), 모달은 띠 촐레스키+란초스, 주파수 응답은 모드 중첩, 과도는 뉴마크 평균가속도. 자기장: 2D 유한요소 Az, IC(0) 전처리 CG, 뉴턴-랩슨 포화, 이동 띠, 아크키오 토크.', 'Study panels and results now name their solver. Structural: 8-node voxel hexahedra + incompatible modes; static = matrix-free CG (Jacobi), modal = banded Cholesky + Lanczos, FRF = modal superposition, transient = Newmark average acceleration. Magnetics: 2D FEM Az, IC(0)-PCG, Newton–Raphson saturation, moving band, Arkkio torque.'],
+    ['새 열 해석(해석 ▾ → 열 해석): 고정 온도·열 입력(W)·대류(h, T∞)를 면에 주고 나머지 바깥 면은 공기 대류로 식힙니다. 정상 상태와 과도(시간에 따른 최고 온도 그래프)를 고르고, 온도·열유속 분포와 열 균형(들어온 열 = 나간 열)을 봅니다. 손 계산 검증: 막대 전도·핀 방열·집중 열용량 모두 0.3 % 이내.', 'New thermal study (Simulation ▾ → Thermal): fixed temperature, heat input (W) and convection (h, T∞) on faces, other outer faces cooled by air. Steady or transient (max-temperature chart); temperature and heat-flux plots with a heat balance. Hand-check: bar conduction, fin and lumped capacity all within 0.3 %.'],
+    ['새 유동 해석(가상 풍동): 흐름 방향·유체·속도를 고르면 격자 볼츠만법(D3Q19)으로 부품 둘레 흐름을 계산해 속도/압력 단면(위치 조절), 유선, 항력계수 Cd를 보여 줍니다. 낮은 레이놀즈 수의 정성 해석이며 Cd는 25~40 % 크게 나옵니다.', 'New flow study (virtual wind tunnel): choose direction, fluid and speed; a lattice Boltzmann (D3Q19) solver shows a movable speed/pressure slice, streamlines and Cd. Qualitative, low Reynolds number; Cd reads 25–40 % high.'],
+    ['재질에 열전도율과 비열을 넣었습니다.', 'Materials now carry thermal conductivity and specific heat.'],
+  ] },
+  { v: 'v0.77', date: '2026-10-15', title: ['필렛 이음매 · 종속성 · 롤백 막대', 'Fillet seams · dependencies · rollback bar'], items: [
+    ['원형 모서리 필렛(R)의 이음매가 톱니처럼 깨지던 문제를 고쳤습니다. 필렛 공구의 다각형 꼭짓점을 몸체 원통의 꼭짓점과 맞춥니다.', 'Fixed the saw-tooth seam on round-edge fillets: the fillet tool now shares its facet vertices with the body.'],
+    ['종속성: 필렛·모따기는 고른 모서리를 만든 피처를 부모로 기억합니다. 부모/자식 보기, 순서 바꾸기, 억제, 삭제에 모두 반영됩니다.', 'Dependencies: fillets and chamfers remember the features that made their edges; parent/child, reorder, suppress and delete all use this.'],
+    ['피처를 지우면 종속 항목을 보여 주고 [종속 항목도 삭제] / [이 피처만 삭제] / [취소]를 고릅니다. 모서리를 잃은 필렛은 이상한 형상을 만들지 않고 오류로 표시됩니다.', 'Deleting a feature lists its dependents: delete them too, delete only this, or cancel. A fillet whose edges are gone shows an error instead of odd geometry.'],
+    ['롤백 막대: 손잡이(≡)를 끌어 올리고 내릴 수 있습니다(마우스·터치). ▲▼로 한 칸씩, ⤓로 끝까지. 막대를 올린 상태에서 만든 피처는 그 자리에 들어갑니다.', 'Rollback bar: drag its handle (≡) up and down (mouse or touch); ▲▼ step, ⤓ to the end. Features made while rolled back are inserted at the bar.'],
+  ] },
   { v: 'v0.76', date: '2026-10-13', title: ['2D 객체 스냅 설정 · 우선 스냅', '2D object snap settings · priority snap'], items: [
     ['상태줄 [객체 스냅] 옆 ▾(또는 오른쪽 클릭)로 실행 중인 스냅 종류를 여러 개 고릅니다 (모두 선택·모두 해제). 왼쪽 클릭은 켜기/끄기(F3).', 'The ▾ next to [Object snap] (or right-click it) sets the running snaps, several at once; left click toggles them (F3).'],
     ['Shift + 오른쪽 클릭으로 고른 스냅은 다음 왼쪽 클릭까지 최우선으로 동작합니다. 그 스냅이 근처에 없으면 실행 중인 스냅이 대신 동작하고, 객체 스냅을 꺼 둔 상태에서도 고른 스냅은 동작합니다.', 'A snap picked with Shift + right-click takes priority until the next left click; if none is near, the running snaps apply. It works even with object snap off.'],
@@ -3074,7 +3104,48 @@ const Feat2 = (() => {
     return out;
   }
   // after the model changes, find the edge that a stored selection now refers to
-  function relocate(b, ed) {
+  // which earlier feature bodies have a face through points of these edges
+  function edgeParents(ctx, edges) {
+    const pts = []; for (const ed of edges) { pts.push(edgeMid(ed)); for (const e of edgeEnds(ed)) if (e && e.p) pts.push(e.p); }
+    const out = new Set(), tol = 0.02;
+    for (const key of Object.keys(ctx.cache)) {
+      const c = ctx.cache[key]; if (!c || !c.polys || !c.polys.length) continue; const fid = key.startsWith('__ref_') ? key.slice(6) : key;
+      let hit = false;
+      for (const P of c.polys) {
+        if (!P.plane) continue; const n = P.plane.n;
+        for (const q of pts) {
+          if (Math.abs(n.x * q[0] + n.y * q[1] + n.z * q[2] - P.plane.w) > tol) continue;
+          // inside the polygon (2D test on the dominant plane)
+          const ax = Math.abs(n.x) > Math.abs(n.y) ? (Math.abs(n.x) > Math.abs(n.z) ? 0 : 2) : (Math.abs(n.y) > Math.abs(n.z) ? 1 : 2), i1 = (ax + 1) % 3, i2 = (ax + 2) % 3;
+          const V = P.v.map(v => [v.x, v.y, v.z]); let inside = false, near = false;
+          for (let i = 0, j = V.length - 1; i < V.length; j = i++) {
+            const a = V[i], b = V[j];
+            if ((a[i2] > q[i2]) !== (b[i2] > q[i2]) && q[i1] < (b[i1] - a[i1]) * (q[i2] - a[i2]) / (b[i2] - a[i2]) + a[i1]) inside = !inside;
+            const e = sub(b, a), L2 = dot(e, e) || 1e-12, t = clamp(dot(sub(q, a), e) / L2, 0, 1); if (len(sub(q, add(a, mul(e, t)))) < tol) near = true;
+          }
+          if (inside || near) { hit = true; break; }
+        }
+        if (hit) break;
+      }
+      if (hit) out.add(fid);
+    }
+    return [...out];
+  }
+  function alignPhase(b, ed) {
+    const E = b.topo.edges, d = norm(ed.d), u0 = norm(ed.u), v0 = cross(d, u0), tol = Math.max(1e-3, ed.r * 2e-3);
+    const step = 2 * Math.PI / N_RING, cnt = new Map();
+    for (let i = 0; i < E.length; i += 3) {
+      const w = sub([E[i], E[i + 1], E[i + 2]], ed.p), z = dot(w, d); if (Math.abs(z) > tol) continue;
+      const x = dot(w, u0), y = dot(w, v0); if (Math.abs(Math.hypot(x, y) - ed.r) > tol) continue;
+      let a = Math.atan2(y, x) % step; if (a < 0) a += step; const k = Math.round(a * 1e4) % Math.round(step * 1e4);
+      cnt.set(k, (cnt.get(k) || 0) + 1);
+    }
+    let best = null, bn = 0; for (const [k, n] of cnt) if (n > bn) { bn = n; best = k; }
+    if (best == null || bn < 6) return ed;
+    const a = best / 1e4, u = add(mul(u0, Math.cos(a)), mul(v0, Math.sin(a)));
+    return Object.assign({}, ed, { u });
+  }
+  function relocate(b, ed, strict) {
     const tol = Math.max(1e-3, b.topo.diag * 1e-4) * 6, E = b.topo.edges, m = edgeMid(ed), cands = [];
     for (let i = 0; i < E.length; i += 6) {
       const p = [E[i], E[i + 1], E[i + 2]], q = [E[i + 3], E[i + 4], E[i + 5]];
@@ -3095,7 +3166,7 @@ const Feat2 = (() => {
       if (same(nb)) { nb.grp = ed.grp; return nb; }
       if (used.size > 8) break;
     }
-    return ed;
+    return strict ? null : ed;
   }
   // feature edge under the cursor: nearest visible segment, preferring ones the R/C tools can handle
   function pickEdge(b, sx, sy, M, opts = {}) {
@@ -3207,16 +3278,24 @@ const Feat2 = (() => {
       if (!f.edges || !f.edges.length) throw new Error('모서리를 선택하세요');
       if (!ctx.solid || !ctx.solid.length) throw new Error('적용할 바디가 없음');
       // follow the selected edges if earlier features moved or resized them
-      try { const tris = Geo.polysToTris(ctx.solid); const bb = { tris, topo: Geo.analyze(tris, ctx.cyl) }; f.edges = f.edges.map(ed => relocate(bb, ed)); } catch (e) { /* keep stored edges */ }
+      let bb = null; f._missing = null;
+      try { const tris = Geo.polysToTris(ctx.solid); bb = { tris, topo: Geo.analyze(tris, ctx.cyl) }; const miss = []; f.edges = f.edges.map(ed => { const r = relocate(bb, ed, true); if (!r) { miss.push(ed); return ed; } return r; }); f._missing = miss; } catch (e) { bb = null; /* keep stored edges */ }
+      // a full round edge: start the tool's facets where the body's own facets start, so both polygons share
+      // their vertices (otherwise the join shows a saw-tooth seam)
+      if (bb && f._missing && f._missing.length) { const n = f._missing.length; f._missing = null; throw new Error(L(`고른 모서리 ${n}개를 찾을 수 없음 (앞 피처가 바뀌거나 지워짐) — 필렛/모따기를 편집해 모서리를 다시 고르세요`, `${n} picked edge(s) no longer exist (an earlier feature changed or was deleted) — edit the feature and pick the edges again`)); }
+      const toolEdges = f.edges.map(ed => bb && ed.kind === 'circle' && !ed.span ? alignPhase(bb, ed) : ed);
+      // geometric parents: the earlier features whose faces carry the picked edges (kept on the feature as f.refs)
+      try { f.refs = edgeParents(ctx, toolEdges); } catch (e) { /* keep previous refs */ }
       // tangent-joined ends meet exactly (no overshoot), and joined edges are cut as one tool so the round runs continuously
-      const tolJ = 0.02; const ends = f.edges.map(edgeEnds);
+      const tolJ = 0.02; const ends = toolEdges.map(edgeEnds);
       const joined = (i, k) => { const e0 = ends[i][k]; return !!e0 && ends.some((en, j) => j !== i && en.some(x => len(sub(x.p, e0.p)) < tolJ && dot(x.t, e0.t) < -0.99)); };
       let solid = ctx.solid; const groups = new Map();
-      f.edges.forEach((ed, i) => { const key = (ed.grp || 'e' + i) + (ed.convex ? '+' : '-'); let g = groups.get(key); if (!g) groups.set(key, g = []); g.push([ed, i]); });
+      toolEdges.forEach((ed, i) => { const key = (ed.grp || 'e' + i) + (ed.convex ? '+' : '-'); let g = groups.get(key); if (!g) groups.set(key, g = []); g.push([ed, i]); });
       for (const g of groups.values()) {
         let tool = null;
         for (const [ed, i] of g) { const t = edgeTool(ed, f.type, +f.size || 1, ctx.cyl, [joined(i, 0), joined(i, 1)]); tool = tool ? CSG.union(tool, t) : t; }
         solid = g[0][0].convex ? CSG.subtract(solid, tool) : CSG.union(solid, tool);
+        (ctx.cache['__ref_' + f.id] = ctx.cache['__ref_' + f.id] || { polys: [] }).polys.push(...tool);
       }
       ctx.solid = solid;
     } else if (f.type === 'mirror') {
@@ -3670,13 +3749,14 @@ function FEMFactory() {
     const xe = new Float64Array(24);
     for (let e = 0; e < ms.ne; e++) {
       for (let a = 0; a < 8; a++) { const nI = conn[e * 8 + a] * 3; xe[a * 3] = x[nI]; xe[a * 3 + 1] = x[nI + 1]; xe[a * 3 + 2] = x[nI + 2]; }
-      for (let a = 0; a < 8; a++) { const nI = conn[e * 8 + a] * 3; for (let d = 0; d < 3; d++) { const r = (a * 3 + d) * 24; let s = 0; for (let b = 0; b < 24; b++) s += Ke[r + b] * xe[b]; y[nI + d] += E * s; } }
+      const Ee = md.eS ? E * md.eS[e] : E;
+      for (let a = 0; a < 8; a++) { const nI = conn[e * 8 + a] * 3; for (let d = 0; d < 3; d++) { const r = (a * 3 + d) * 24; let s = 0; for (let b = 0; b < 24; b++) s += Ke[r + b] * xe[b]; y[nI + d] += Ee * s; } }
     }
     for (let i = 0; i < md.ndof; i++) if (md.fixed[i]) y[i] = x[i] * md.diag0; // keeps the operator SPD
   }
   function diagK(md) {
     const d = new Float64Array(md.ndof), { ms, Ke } = md, E = md.mat.E;
-    for (let e = 0; e < ms.ne; e++) for (let a = 0; a < 8; a++) { const nI = ms.conn[e * 8 + a] * 3; for (let q = 0; q < 3; q++) d[nI + q] += E * Ke[(a * 3 + q) * 25]; }
+    for (let e = 0; e < ms.ne; e++) { const Ee = md.eS ? E * md.eS[e] : E; for (let a = 0; a < 8; a++) { const nI = ms.conn[e * 8 + a] * 3; for (let q = 0; q < 3; q++) d[nI + q] += Ee * Ke[(a * 3 + q) * 25]; } }
     return d;
   }
   function solveStatic(md, { tol = 1e-8, maxIt = 20000, onProgress } = {}) {
@@ -3705,7 +3785,7 @@ function FEMFactory() {
     for (let e = 0; e < ms.ne; e++) {
       const eps = [0, 0, 0, 0, 0, 0];
       for (let a = 0; a < 8; a++) { const nI = ms.conn[e * 8 + a] * 3; for (let d = 0; d < 3; d++) { const v = u[nI + d], col = a * 3 + d; for (let q = 0; q < 6; q++) eps[q] += B0[q][col] * v; } }
-      const s = D.map(r => E * (r[0] * eps[0] + r[1] * eps[1] + r[2] * eps[2] + r[3] * eps[3] + r[4] * eps[4] + r[5] * eps[5]));
+      const Ee = md.eS ? E * md.eS[e] : E, s = D.map(r => Ee * (r[0] * eps[0] + r[1] * eps[1] + r[2] * eps[2] + r[3] * eps[3] + r[4] * eps[4] + r[5] * eps[5]));
       for (let q = 0; q < 6; q++) sig[e * 6 + q] = s[q];
       vm[e] = Math.sqrt(0.5 * ((s[0] - s[1]) ** 2 + (s[1] - s[2]) ** 2 + (s[2] - s[0]) ** 2) + 3 * (s[3] ** 2 + s[4] ** 2 + s[5] ** 2));
     }
@@ -3716,7 +3796,7 @@ function FEMFactory() {
   }
   function lumpedMass(md) { // per node (same for the 3 dofs)
     const m = new Float64Array(md.ms.nn), me = md.mat.rho * md.ms.g.hs[0] * md.ms.g.hs[1] * md.ms.g.hs[2] / 8;
-    for (let e = 0; e < md.ms.ne; e++) for (let a = 0; a < 8; a++) m[md.ms.conn[e * 8 + a]] += me;
+    for (let e = 0; e < md.ms.ne; e++) { const mm = md.eR ? me * md.eR[e] : me; for (let a = 0; a < 8; a++) m[md.ms.conn[e * 8 + a]] += mm; }
     return m;
   }
 
@@ -3729,8 +3809,9 @@ function FEMFactory() {
     const W = bw + 1; if (n * W > 2.4e7) throw new Error(`메시가 너무 큼 (자유도 ${n}, 대역폭 ${W}) — 요소 크기를 키우세요`);
     const A = new Float64Array(n * W); // A[i*W + (i-j)] = K(i,j), j<=i
     for (let e = 0; e < ms.ne; e++) for (let a = 0; a < 24; a++) {
+      const Ee = md.eS ? E * md.eS[e] : E;
       const ia = map[ms.conn[e * 8 + (a / 3 | 0)] * 3 + a % 3]; if (ia < 0) continue;
-      for (let b = 0; b < 24; b++) { const ib = map[ms.conn[e * 8 + (b / 3 | 0)] * 3 + b % 3]; if (ib < 0 || ib > ia) continue; A[ia * W + (ia - ib)] += E * Ke[a * 24 + b]; }
+      for (let b = 0; b < 24; b++) { const ib = map[ms.conn[e * 8 + (b / 3 | 0)] * 3 + b % 3]; if (ib < 0 || ib > ia) continue; A[ia * W + (ia - ib)] += Ee * Ke[a * 24 + b]; }
     }
     if (shiftMass) { const m = lumpedMass(md); for (let i = 0; i < n0; i++) if (map[i] >= 0) A[map[i] * W] += massScale * m[i / 3 | 0]; }
     return { A, n, W, map };
@@ -3829,7 +3910,7 @@ function FEMFactory() {
     const S = bandCholesky(bandSystem(md, true, a0)); md.mat.E = E0;
     const n0 = md.ndof, u = new Float64Array(n0), v = new Float64Array(n0), acc = new Float64Array(n0), Ku = new Float64Array(n0), tmp = new Float64Array(n0);
     md.diag0 = 0;
-    const hist = [];
+    const hist = []; let upk = 0, uPeak = null, tPeak = 0;
     const loadAt = t => load === 'step' ? 1 : load === 'sine' ? Math.sin(2 * Math.PI * freq * t) : (t < 1 / (2 * Math.max(freq, 1e-9)) ? Math.sin(2 * Math.PI * freq * t) : 0);
     for (let s = 1; s <= steps; s++) {
       const t = s * dt, lf = loadAt(t);
@@ -3840,10 +3921,12 @@ function FEMFactory() {
       for (let i = 0; i < n0; i++) { const q = S.map[i]; if (q < 0) continue; const mi = m[i / 3 | 0]; rhs[q] = F[i] * lf + mi * (a0 * u[i] + 4 / dt * v[i] + acc[i]) + beta * Ku[i]; }
       const un = bandSolve(S, rhs);
       for (let i = 0; i < n0; i++) { const q = S.map[i]; const nu_ = q < 0 ? 0 : un[q]; const an = a0 * (nu_ - u[i]) - 4 / dt * v[i] - acc[i]; v[i] += dt / 2 * (acc[i] + an); acc[i] = an; u[i] = nu_; }
-      hist.push([t, probe(u), lf]);
+      let um = 0; for (let i = 0; i < n0; i += 3) { const v2 = u[i] * u[i] + u[i + 1] * u[i + 1] + u[i + 2] * u[i + 2]; if (v2 > um) um = v2; } um = Math.sqrt(um);
+      if (um > upk) { upk = um; uPeak = u.slice(); tPeak = t; }
+      hist.push([t, probe(u), lf, um]);
       if (onProgress && s % 50 === 0) onProgress(s, steps);
     }
-    return { hist, u };
+    return { hist, u, uPeak: uPeak || u, tPeak, upk };
   }
 
   return { voxelize, boxGrid, mesh, hexKe, model, Kmul, solveStatic, stresses, lumpedMass, bandSystem, bandCholesky, bandSolve, modal, freqResponse, transient, jacobiEig };
@@ -3852,7 +3935,7 @@ const FEM = FEMFactory();
 if (typeof module !== 'undefined') module.exports = FEM;
 /* ================= 2D magnetostatic FEM for radial-flux motors =================
    Unknown: Az (Wb/m) on a polar structured triangle mesh. Linear triangles, IC(0)-preconditioned CG,
-   nonlinear iron by successive substitution on the reluctivity. Rotor turns by shifting the material
+   nonlinear iron by Newton–Raphson (reluctivity derivative from the B-H curve). Rotor turns by shifting the material
    pattern of the rotor rings (moving band = exact for steps of the angular mesh pitch).
    Lengths are given in mm and converted to m. */
 function MagFactory() {
@@ -4112,14 +4195,229 @@ function MagFactory() {
 }
 const Mag = MagFactory();
 if (typeof module !== 'undefined') module.exports = Mag;
+/* ================= heat conduction FEM on the voxel mesh =================
+   Same voxel mesh as the structural solver: 8-node trilinear hexahedra (one shared 8×8 conductivity
+   matrix), lumped heat capacity, convection lumped on the boundary faces.
+   - steady state: matrix-free conjugate gradient with Jacobi (diagonal) preconditioner
+   - transient: implicit (backward) Euler in time, the same PCG at every step (warm start)
+   Units: mm, W, K (°C), s.  k [W/(m·K)] → W/(mm·K) = k/1000;  h [W/(m²·K)] → h/1e6;  ρ [g/cm³] → kg/mm³ = ρ·1e-6. */
+function ThermFactory() {
+  // conductivity matrix of a box element for unit k (2×2×2 Gauss)
+  const KCACHE = new Map();
+  function hexK(hs) {
+    const key = hs.join(','); if (KCACHE.has(key)) return KCACHE.get(key);
+    const C = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]];
+    const K = new Float64Array(64), g = [0.5 - 0.5 / Math.sqrt(3), 0.5 + 0.5 / Math.sqrt(3)], w = hs[0] * hs[1] * hs[2] / 8;
+    for (const x of g) for (const y of g) for (const z of g) {
+      const dN = C.map(([a, b, c]) => {
+        const fx = a ? x : 1 - x, fy = b ? y : 1 - y, fz = c ? z : 1 - z, sx = a ? 1 : -1, sy = b ? 1 : -1, sz = c ? 1 : -1;
+        return [sx * fy * fz / hs[0], fx * sy * fz / hs[1], fx * fy * sz / hs[2]];
+      });
+      for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) K[i * 8 + j] += w * (dN[i][0] * dN[j][0] + dN[i][1] * dN[j][1] + dN[i][2] * dN[j][2]);
+    }
+    KCACHE.set(key, K); return K;
+  }
+  // model: ms = voxel mesh; mat = { k (W/mK), rho (g/cm3), cp (J/kgK) }
+  function model(ms, mat) {
+    const hs = ms.g.hs, k = mat.k / 1000, Ke = hexK(hs).map(v => v * k), nn = ms.nn;
+    const cap = new Float64Array(nn), vol = hs[0] * hs[1] * hs[2], c = mat.rho * 1e-6 * mat.cp * vol / 8;
+    for (let e = 0; e < ms.ne; e++) for (let a = 0; a < 8; a++) cap[ms.conn[e * 8 + a]] += c;
+    return { ms, Ke, k, nn, cap, hconv: new Float64Array(nn), Tinf: new Float64Array(nn), Q: new Float64Array(nn), fixed: new Uint8Array(nn), Tfix: new Float64Array(nn) };
+  }
+  // y = (K + H + s·C) x   (H = convection, C = capacity)
+  function Amul(md, x, y, s) {
+    const { ms, Ke } = md, conn = ms.conn; y.fill(0);
+    const xe = new Float64Array(8);
+    for (let e = 0; e < ms.ne; e++) {
+      const o = e * 8; for (let a = 0; a < 8; a++) xe[a] = x[conn[o + a]];
+      for (let a = 0; a < 8; a++) { let t = 0; const r = a * 8; for (let b = 0; b < 8; b++) t += Ke[r + b] * xe[b]; y[conn[o + a]] += t; }
+    }
+    for (let i = 0; i < md.nn; i++) y[i] += (md.hconv[i] + s * md.cap[i]) * x[i];
+  }
+  function diag(md, s) {
+    const d = new Float64Array(md.nn), { ms, Ke } = md;
+    for (let e = 0; e < ms.ne; e++) for (let a = 0; a < 8; a++) d[ms.conn[e * 8 + a]] += Ke[a * 9];
+    for (let i = 0; i < md.nn; i++) d[i] += md.hconv[i] + s * md.cap[i];
+    return d;
+  }
+  // solve (K + H + s C) T = b with fixed temperatures, PCG (Jacobi)
+  function pcg(md, b, s, T0, tol = 1e-9, maxIt = 20000) {
+    const n = md.nn, dg = diag(md, s), x = Float64Array.from(T0);
+    for (let i = 0; i < n; i++) if (md.fixed[i]) x[i] = md.Tfix[i];
+    // r = b - A x, with fixed rows removed
+    const Ax = new Float64Array(n); Amul(md, x, Ax, s);
+    const r = new Float64Array(n); for (let i = 0; i < n; i++) r[i] = md.fixed[i] ? 0 : b[i] - Ax[i];
+    const z = new Float64Array(n), p = new Float64Array(n), Ap = new Float64Array(n);
+    let bn = 0; for (let i = 0; i < n; i++) if (!md.fixed[i]) bn += b[i] * b[i]; bn = Math.sqrt(bn) || 1;
+    let rz = 0; for (let i = 0; i < n; i++) { z[i] = r[i] / dg[i]; p[i] = z[i]; rz += r[i] * z[i]; }
+    let it = 0, res = 0; for (let i = 0; i < n; i++) res += r[i] * r[i]; res = Math.sqrt(res) / bn;
+    for (; it < maxIt && res > tol; it++) {
+      Amul(md, p, Ap, s); for (let i = 0; i < n; i++) if (md.fixed[i]) Ap[i] = 0;
+      let pAp = 0; for (let i = 0; i < n; i++) pAp += p[i] * Ap[i]; if (!(pAp > 0)) break;
+      const al = rz / pAp; let rn = 0;
+      for (let i = 0; i < n; i++) { x[i] += al * p[i]; r[i] -= al * Ap[i]; rn += r[i] * r[i]; }
+      res = Math.sqrt(rn) / bn;
+      let rz2 = 0; for (let i = 0; i < n; i++) { z[i] = md.fixed[i] ? 0 : r[i] / dg[i]; rz2 += r[i] * z[i]; }
+      const be = rz2 / rz; rz = rz2; for (let i = 0; i < n; i++) p[i] = z[i] + be * p[i];
+    }
+    return { T: x, it, res };
+  }
+  function rhs(md) { const b = new Float64Array(md.nn); for (let i = 0; i < md.nn; i++) b[i] = md.Q[i] + md.hconv[i] * md.Tinf[i]; return b; }
+  function steady(md, T0) { const r = pcg(md, rhs(md), 0, T0 || new Float64Array(md.nn)); return r; }
+  // implicit Euler: (K + H + C/dt) T¹ = Q + H T∞ + (C/dt) T⁰
+  function transient(md, T0, dt, steps, probe, onProgress) {
+    let T = Float64Array.from(T0); const base = rhs(md), hist = [[0, probe(T)]];
+    let its = 0;
+    for (let s = 1; s <= steps; s++) {
+      const b = new Float64Array(md.nn); for (let i = 0; i < md.nn; i++) b[i] = base[i] + md.cap[i] / dt * T[i];
+      const r = pcg(md, b, 1 / dt, T, 1e-9); T = r.T; its += r.it; hist.push([s * dt, probe(T)]);
+      if (onProgress && (s % 5 === 0 || s === steps)) onProgress(s, steps);
+    }
+    return { T, hist, its };
+  }
+  // element heat flux magnitude (W/mm²) at the element centre → nodal average
+  function flux(md, T) {
+    const { ms } = md, hs = ms.g.hs, k = md.k, nf = new Float64Array(md.nn), cnt = new Float64Array(md.nn); let qmax = 0;
+    for (let e = 0; e < ms.ne; e++) {
+      const t = i => T[ms.conn[e * 8 + i]];
+      const gx = ((t(1) + t(2) + t(5) + t(6)) - (t(0) + t(3) + t(4) + t(7))) / (4 * hs[0]);
+      const gy = ((t(2) + t(3) + t(6) + t(7)) - (t(0) + t(1) + t(4) + t(5))) / (4 * hs[1]);
+      const gz = ((t(4) + t(5) + t(6) + t(7)) - (t(0) + t(1) + t(2) + t(3))) / (4 * hs[2]);
+      const q = k * Math.hypot(gx, gy, gz); qmax = Math.max(qmax, q);
+      for (let a = 0; a < 8; a++) { const n = ms.conn[e * 8 + a]; nf[n] += q; cnt[n]++; }
+    }
+    for (let i = 0; i < md.nn; i++) nf[i] /= cnt[i] || 1;
+    return { nq: nf, qmax };
+  }
+  // heat leaving through fixed-temperature nodes (reaction) and convection, entering from Q
+  function balance(md, T) {
+    const y = new Float64Array(md.nn); Amul(md, T, y, 0);
+    let fixedOut = 0, convOut = 0, qIn = 0;
+    for (let i = 0; i < md.nn; i++) { qIn += md.Q[i]; if (md.fixed[i]) fixedOut += y[i] - md.hconv[i] * md.Tinf[i] - md.Q[i]; else convOut += md.hconv[i] * (T[i] - md.Tinf[i]); }
+    return { qIn, fixedOut, convOut };
+  }
+  return { hexK, model, Amul, pcg, steady, transient, flux, balance };
+}
+const Therm = ThermFactory();
+/* ================= virtual wind tunnel: lattice Boltzmann (D3Q19, BGK) =================
+   The part is voxelised into a box-shaped tunnel; uniform flow enters on the upstream face (equilibrium
+   inlet), leaves on the downstream face (zero-gradient outlet); the side faces are periodic. Walls of the
+   part use half-way bounce-back; the force on the part comes from momentum exchange.
+   Everything runs in lattice units and is reported as dimensionless numbers (Cd, Cp, u/U). The simulated
+   Reynolds number is low (laminar, tens to ~100), so it shows how the flow goes around the part
+   (stagnation, separation, wake) rather than real high-speed drag. */
+function FlowFactory() {
+  const C = [[0, 0, 0], [1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1],
+    [1, 1, 0], [-1, -1, 0], [1, -1, 0], [-1, 1, 0], [1, 0, 1], [-1, 0, -1], [1, 0, -1], [-1, 0, 1], [0, 1, 1], [0, -1, -1], [0, 1, -1], [0, -1, 1]];
+  const W = [1 / 3, 1 / 18, 1 / 18, 1 / 18, 1 / 18, 1 / 18, 1 / 18, 1 / 36, 1 / 36, 1 / 36, 1 / 36, 1 / 36, 1 / 36, 1 / 36, 1 / 36, 1 / 36, 1 / 36, 1 / 36, 1 / 36];
+  const OPP = C.map(c => C.findIndex(d => d[0] === -c[0] && d[1] === -c[1] && d[2] === -c[2]));
+  const Q = 19;
+  // grid: { n:[nx,ny,nz], solid:Uint8Array, fa: flow axis 0..2, sg: +1/-1 }, opts: { U, tau, steps, onProgress }
+  function run(grid, { U = 0.08, tau = 0.56, steps = 2000, avgFrom = 0.75, onProgress } = {}) {
+    const [nx, ny, nz] = grid.n, N = nx * ny * nz, fa = grid.fa, sg = grid.sg, solid = grid.solid;
+    const idx = (i, j, k) => (i * ny + j) * nz + k, dims = [nx, ny, nz];
+    const u0 = [0, 0, 0]; u0[fa] = U * sg;
+    const CX = Int8Array.from(C.map(c => c[0])), CY = Int8Array.from(C.map(c => c[1])), CZ = Int8Array.from(C.map(c => c[2]));
+    // cell-major storage f[c*19+q]; pull source of each (cell, direction): index*19 of the source cell,
+    // -1 = outside along the flow, -2 = source is solid (bounce back)
+    const src = new Int32Array(Q * N);
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) {
+      const c = idx(i, j, k), P = [i, j, k];
+      for (let q = 0; q < Q; q++) {
+        const s = [P[0] - C[q][0], P[1] - C[q][1], P[2] - C[q][2]]; let out = false;
+        for (let d = 0; d < 3; d++) { if (d === fa) { if (s[d] < 0 || s[d] >= dims[d]) out = true; } else s[d] = (s[d] + dims[d]) % dims[d]; }
+        const sc = out ? -1 : idx(s[0], s[1], s[2]);
+        src[c * Q + q] = sc < 0 ? -1 : solid[sc] ? -2 : sc * Q + q;
+      }
+    }
+    const fluid = []; for (let c = 0; c < N; c++) if (!solid[c]) fluid.push(c); const FL = Int32Array.from(fluid);
+    const eq = new Float64Array(Q);
+    const feqInto = (rho, ux, uy, uz, out, base) => { const uu = 1.5 * (ux * ux + uy * uy + uz * uz); for (let q = 0; q < Q; q++) { const cu = 3 * (CX[q] * ux + CY[q] * uy + CZ[q] * uz); out[base + q] = W[q] * rho * (1 + cu + 0.5 * cu * cu - uu); } };
+    let f = new Float32Array(Q * N), g = new Float32Array(Q * N);
+    for (let c = 0; c < N; c++) feqInto(1, u0[0], u0[1], u0[2], f, c * Q);
+    const layer = L => { const out = []; for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) for (let k = 0; k < nz; k++) { const P = [i, j, k]; if (P[fa] === L) out.push(idx(i, j, k)); } return Int32Array.from(out); };
+    const inl = layer(sg > 0 ? 0 : dims[fa] - 1), outl = layer(sg > 0 ? dims[fa] - 1 : 0);
+    const stepUp = [0, 0, 0]; stepUp[fa] = -sg; const upOff = (stepUp[0] * ny + stepUp[1]) * nz + stepUp[2];
+    const feqIn = new Float32Array(Q); feqInto(1, u0[0], u0[1], u0[2], feqIn, 0);
+    const om = 1 / tau, Fsum = [0, 0, 0]; let nAvg = 0;
+    const startAvg = Math.floor(steps * avgFrom), W0 = W[0], W1 = W[1], W2 = W[7];
+    for (let t = 0; t < steps; t++) {
+      // collide
+      for (let n = 0; n < FL.length; n++) {
+        const b = FL[n] * Q;
+        const f0 = f[b], f1 = f[b + 1], f2 = f[b + 2], f3 = f[b + 3], f4 = f[b + 4], f5 = f[b + 5], f6 = f[b + 6], f7 = f[b + 7], f8 = f[b + 8], f9 = f[b + 9], f10 = f[b + 10], f11 = f[b + 11], f12 = f[b + 12], f13 = f[b + 13], f14 = f[b + 14], f15 = f[b + 15], f16 = f[b + 16], f17 = f[b + 17], f18 = f[b + 18];
+        const rho = f0 + f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f11 + f12 + f13 + f14 + f15 + f16 + f17 + f18, ir = 1 / rho;
+        const ux = (f1 + f7 + f9 + f11 + f13 - f2 - f8 - f10 - f12 - f14) * ir;
+        const uy = (f3 + f7 + f10 + f15 + f17 - f4 - f8 - f9 - f16 - f18) * ir;
+        const uz = (f5 + f11 + f14 + f15 + f18 - f6 - f12 - f13 - f16 - f17) * ir;
+        const uu = 1.5 * (ux * ux + uy * uy + uz * uz), r0 = rho * W0, r1 = rho * W1, r2 = rho * W2;
+        f[b] = f0 + om * (r0 * (1 - uu) - f0);
+        { const cu = 3 * (ux); f[b + 1] = f1 + om * (r1 * (1 + cu + 0.5 * cu * cu - uu) - f1); }
+        { const cu = 3 * (-ux); f[b + 2] = f2 + om * (r1 * (1 + cu + 0.5 * cu * cu - uu) - f2); }
+        { const cu = 3 * (uy); f[b + 3] = f3 + om * (r1 * (1 + cu + 0.5 * cu * cu - uu) - f3); }
+        { const cu = 3 * (-uy); f[b + 4] = f4 + om * (r1 * (1 + cu + 0.5 * cu * cu - uu) - f4); }
+        { const cu = 3 * (uz); f[b + 5] = f5 + om * (r1 * (1 + cu + 0.5 * cu * cu - uu) - f5); }
+        { const cu = 3 * (-uz); f[b + 6] = f6 + om * (r1 * (1 + cu + 0.5 * cu * cu - uu) - f6); }
+        { const cu = 3 * (ux + uy); f[b + 7] = f7 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f7); }
+        { const cu = 3 * (-ux + -uy); f[b + 8] = f8 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f8); }
+        { const cu = 3 * (ux + -uy); f[b + 9] = f9 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f9); }
+        { const cu = 3 * (-ux + uy); f[b + 10] = f10 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f10); }
+        { const cu = 3 * (ux + uz); f[b + 11] = f11 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f11); }
+        { const cu = 3 * (-ux + -uz); f[b + 12] = f12 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f12); }
+        { const cu = 3 * (ux + -uz); f[b + 13] = f13 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f13); }
+        { const cu = 3 * (-ux + uz); f[b + 14] = f14 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f14); }
+        { const cu = 3 * (uy + uz); f[b + 15] = f15 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f15); }
+        { const cu = 3 * (-uy + -uz); f[b + 16] = f16 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f16); }
+        { const cu = 3 * (uy + -uz); f[b + 17] = f17 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f17); }
+        { const cu = 3 * (-uy + uz); f[b + 18] = f18 + om * (r2 * (1 + cu + 0.5 * cu * cu - uu) - f18); }
+      }
+      // stream (pull) + half-way bounce-back; momentum exchange
+      let Fx = 0, Fy = 0, Fz = 0;
+      for (let n = 0; n < FL.length; n++) {
+        const b = FL[n] * Q;
+        for (let q = 0; q < Q; q++) {
+          const s = src[b + q];
+          if (s >= 0) g[b + q] = f[s];
+          else if (s === -2) { const v = f[b + OPP[q]]; g[b + q] = v; Fx -= 2 * v * CX[q]; Fy -= 2 * v * CY[q]; Fz -= 2 * v * CZ[q]; }
+          else g[b + q] = f[b + q];
+        }
+      }
+      for (let n = 0; n < inl.length; n++) g.set(feqIn, inl[n] * Q);
+      for (let n = 0; n < outl.length; n++) { const c = outl[n]; g.copyWithin(c * Q, (c + upOff) * Q, (c + upOff) * Q + Q); }
+      const tmp = f; f = g; g = tmp;
+      if (t >= startAvg) { Fsum[0] += Fx; Fsum[1] += Fy; Fsum[2] += Fz; nAvg++; }
+      if (onProgress && (t % 50 === 0 || t === steps - 1)) onProgress(t + 1, steps);
+    }
+    const vel = new Float32Array(N * 3), cp = new Float32Array(N); let umax = 0;
+    for (let c = 0; c < N; c++) {
+      if (solid[c]) continue; const b = c * Q;
+      let rho = 0, ux = 0, uy = 0, uz = 0;
+      for (let q = 0; q < Q; q++) { const v = f[b + q]; rho += v; ux += v * CX[q]; uy += v * CY[q]; uz += v * CZ[q]; }
+      vel[c * 3] = ux / rho / U; vel[c * 3 + 1] = uy / rho / U; vel[c * 3 + 2] = uz / rho / U;
+      cp[c] = ((rho - 1) / 3) / (0.5 * U * U);
+      umax = Math.max(umax, Math.hypot(vel[c * 3], vel[c * 3 + 1], vel[c * 3 + 2]));
+    }
+    return { vel, cp, F: Fsum.map(v => v / Math.max(1, nAvg)), umax };
+  }
+  return { run, C, W, OPP };
+}
+const Flow = FlowFactory();
 /* ================= analysis jobs (run in a Web Worker when possible) ================= */
-function JobsFactory(FEM, Mag) {
+function JobsFactory(FEM, Mag, Therm, Flow) {
   /* ---------- structural study preparation ---------- */
   const FACES = [[0, 3, 7, 4, -1, 0, 0], [1, 2, 6, 5, 1, 0, 0], [0, 1, 5, 4, 0, -1, 0], [3, 7, 6, 2, 0, 1, 0], [0, 1, 2, 3, 0, 0, -1], [4, 5, 6, 7, 0, 0, 1]];
-  function prepare(job) {
+  function prepareGeom(job) {
     let h = job.h, g, ms;
+    // several bodies (an assembly): voxelise each on the same grid, the first body owning a cell sets its material;
+    // touching parts share nodes (bonded contact)
+    const vox = h => {
+      if (!job.bodies) return FEM.voxelize(job.tris, job.bbox, h);
+      let g0 = null, mid = null;
+      job.bodies.forEach((bd, bi) => { const gi = FEM.voxelize(bd.tris, job.bbox, h); if (!g0) { g0 = gi; mid = new Uint8Array(gi.solid.length).fill(255); } for (let c = 0; c < gi.solid.length; c++) if (gi.solid[c] && mid[c] === 255) { mid[c] = bi; g0.solid[c] = 1; } });
+      g0.mid = mid; return g0;
+    };
     for (let tries = 0; ; tries++) {
-      g = FEM.voxelize(job.tris, job.bbox, h); ms = FEM.mesh(g);
+      g = vox(h); ms = FEM.mesh(g);
       if (ms.ne >= 8 || tries > 4) break; h *= 0.6;
     }
     if (!ms.ne) throw new Error('VOXEL');
@@ -4145,7 +4443,15 @@ function JobsFactory(FEM, Mag) {
       }
       const out = []; for (let q = 0; q < nq; q++) if (hit[q]) out.push(q); return out;
     }
+    return { g, ms, quads, qel, qn, qa, qc, facesOn, hs, nq };
+  }
+  function prepare(job) {
+    const G = prepareGeom(job), { g, ms, quads, qel, qn, qa, facesOn } = G;
     const md = FEM.model(ms, job.mat);
+    if (g.mid && job.bodies) { // per-element material relative to job.mat
+      md.eS = new Float32Array(ms.ne); md.eR = new Float32Array(ms.ne); md.eB = new Uint8Array(ms.ne);
+      ms.elems.forEach(([i, j, k], e) => { const bi = g.mid[(i * g.ny + j) * g.nz + k], bm = job.bodies[bi === 255 ? 0 : bi].mat; md.eB[e] = bi; md.eS[e] = bm.E / job.mat.E; md.eR[e] = bm.rho / job.mat.rho; });
+    }
     let nFix = 0; const fixedNodes = new Set();
     for (const fx of job.fixtures) for (const q of facesOn(fx.tris)) for (let a = 0; a < 4; a++) fixedNodes.add(quads[q * 4 + a]);
     for (const n of fixedNodes) { md.fixed[n * 3] = md.fixed[n * 3 + 1] = md.fixed[n * 3 + 2] = 1; nFix++; }
@@ -4162,10 +4468,14 @@ function JobsFactory(FEM, Mag) {
         total = total.map((v, d) => v + f[d]);
       }
     }
+    if (job.accel) { // body force m·a (gravity, or the inertia load of a shock)  — t·mm/s² = N
+      const m = FEM.lumpedMass(md);
+      for (let n = 0; n < ms.nn; n++) for (let d = 0; d < 3; d++) { const f = m[n] * job.accel[d]; md.F[n * 3 + d] += f; total[d] += f; }
+    }
     const tl = Math.hypot(...total) || 1, ldir = total.map(v => v / tl);
     const ln = [...loadNodes];
     const probe = u => { if (!ln.length) return 0; let s = 0; for (const n of ln) s += u[n * 3] * ldir[0] + u[n * 3 + 1] * ldir[1] + u[n * 3 + 2] * ldir[2]; return s / ln.length; };
-    return { md, ms, h: g.h, quads: Int32Array.from(quads), qel: Int32Array.from(qel), nFix, loadInfo, total, probe, nLoadNodes: ln.length };
+    return { md, ms, h: g.h, quads: Int32Array.from(quads), qel: Int32Array.from(qel), nFix, loadInfo, total, probe, nLoadNodes: ln.length + (job.accel ? 1 : 0) };
   }
   const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   function ptTri(p, a, b, c) {
@@ -4178,7 +4488,14 @@ function JobsFactory(FEM, Mag) {
     const va = d3 * d6 - d5 * d4; if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0) { const w = (d4 - d3) / ((d4 - d3) + (d5 - d6)); return L(sub(bp, sub(c, b).map(x => x * w))); }
     const den = 1 / (va + vb + vc), v = vb * den, w = vc * den; return L(sub(ap, ab.map(x => x * v).map((x, i) => x + ac[i] * w)));
   }
-  const meshOut = S => ({ coords: Float32Array.from(S.ms.coords), quads: S.quads, h: S.h, ne: S.ms.ne, nn: S.ms.nn, nFix: S.nFix, loadInfo: S.loadInfo, total: S.total });
+  const meshOut = S => {
+    const o = { coords: Float32Array.from(S.ms.coords), quads: S.quads, h: S.h, ne: S.ms.ne, nn: S.ms.nn, nFix: S.nFix, loadInfo: S.loadInfo, total: S.total };
+    if (S.md.eB) { // per body: max stress and node body index (for an assembly)
+      o.nb = new Uint8Array(S.ms.nn); for (let e = 0; e < S.ms.ne; e++) for (let a = 0; a < 8; a++) o.nb[S.ms.conn[e * 8 + a]] = S.md.eB[e];
+    }
+    return o;
+  };
+  const perBody = (S, vm) => { if (!S.md.eB) return null; const out = []; for (let e = 0; e < S.ms.ne; e++) { const b = S.md.eB[e]; out[b] = Math.max(out[b] || 0, vm[e]); } return out; };
   // modal needs a direct factorisation: coarsen the voxels until it fits
   function prepareDirect(job, progress) {
     let h = job.h;
@@ -4195,7 +4512,23 @@ function JobsFactory(FEM, Mag) {
       const st = FEM.stresses(S.md, r.u);
       let umax = 0; for (let i = 0; i < S.ms.nn; i++) umax = Math.max(umax, Math.hypot(r.u[i * 3], r.u[i * 3 + 1], r.u[i * 3 + 2]));
       let vmax = 0; for (const v of st.vm) vmax = Math.max(vmax, v);
-      return Object.assign(meshOut(S), { u: Float32Array.from(r.u), nvm: Float32Array.from(st.nvm), vmax, umax, cgIt: r.it, res: r.res, probe: S.probe(r.u) });
+      return Object.assign(meshOut(S), { u: Float32Array.from(r.u), nvm: Float32Array.from(st.nvm), vmax, umax, cgIt: r.it, res: r.res, probe: S.probe(r.u), bodyMax: perBody(S, st.vm) });
+    },
+    // shock: half-sine acceleration pulse (G, duration) on the fixed base → inertia load, plus optional face loads
+    // with the same pulse shape. Newmark time integration; the result is the moment of peak displacement.
+    shock(job, progress) {
+      const S = prepareDirect(job, progress); progress({ stage: 'mesh', ne: S.ms.ne, nn: S.ms.nn });
+      if (!S.nFix) throw new Error('NOFIX'); if (!S.nLoadNodes) throw new Error('NOLOAD');
+      const m1 = FEM.modal(S.md, 1)[0]; const f1 = m1 ? m1.f : 100;
+      const pulse = job.pulse || 0.011, dur = job.duration || pulse + 4 / f1;
+      let dt = Math.min(pulse / 40, 1 / (f1 * 30)); let steps = Math.ceil(dur / dt); if (steps > 4000) { steps = 4000; dt = dur / steps; }
+      const r = FEM.transient(S.md, S.md.F, S.probe, { dt, steps, load: 'pulse', freq: 1 / (2 * pulse), zeta: job.zeta || 0.02, f1, onProgress: (s, n) => progress({ stage: 'newmark', s, n }) });
+      const st = FEM.stresses(S.md, r.uPeak); let vmax = 0; for (const v of st.vm) vmax = Math.max(vmax, v);
+      // static response to the peak load, for the dynamic amplification factor
+      progress({ stage: 'static' });
+      const rs = FEM.solveStatic(S.md, {}); let us = 0; for (let i = 0; i < S.ms.nn; i++) us = Math.max(us, Math.hypot(rs.u[i * 3], rs.u[i * 3 + 1], rs.u[i * 3 + 2]));
+      const ss = FEM.stresses(S.md, rs.u); let vs = 0; for (const v of ss.vm) vs = Math.max(vs, v);
+      return Object.assign(meshOut(S), { hist: r.hist.map(x => [x[0], x[3], x[2]]), f1, dt, steps, pulse, tPeak: r.tPeak, umax: r.upk, u: Float32Array.from(r.uPeak), nvm: Float32Array.from(st.nvm), vmax, uStatic: us, vStatic: vs, daf: us > 0 ? r.upk / us : 0, bodyMax: perBody(S, st.vm) });
     },
     modal(job, progress) {
       const S = prepareDirect(job, progress); progress({ stage: 'mesh', ne: S.ms.ne, nn: S.ms.nn });
@@ -4221,6 +4554,56 @@ function JobsFactory(FEM, Mag) {
       const st = FEM.stresses(S.md, r.u);
       return Object.assign(meshOut(S), { hist: r.hist, f1, dt, u: Float32Array.from(r.u), nvm: Float32Array.from(st.nvm) });
     },
+    // heat conduction: fixed temperatures, heat inputs (W), convection (h, T∞), steady or transient
+    thermal(job, progress) {
+      const G = prepareGeom(job), { ms, quads, qn, qa, nq } = G; progress({ stage: 'mesh', ne: ms.ne, nn: ms.nn });
+      const md = Therm.model(ms, job.mat), T0 = job.T0 != null ? job.T0 : 20;
+      const used = new Uint8Array(nq);
+      const nodesOf = qs => { const s = new Set(); for (const q of qs) for (let a = 0; a < 4; a++) s.add(quads[q * 4 + a]); return s; };
+      let nFix = 0, nHeat = 0, nConv = 0;
+      for (const fx of job.fixT || []) { const qs = G.facesOn(fx.tris); qs.forEach(q => used[q] = 1); for (const n of nodesOf(qs)) { md.fixed[n] = 1; md.Tfix[n] = fx.T; nFix++; } }
+      for (const hq of job.heat || []) { const qs = G.facesOn(hq.tris); if (!qs.length) continue; qs.forEach(q => used[q] = 1); const A = qs.reduce((t, q) => t + qa[q], 0); for (const q of qs) for (let a = 0; a < 4; a++) md.Q[quads[q * 4 + a]] += hq.W * qa[q] / A / 4; nHeat++; }
+      const conv = (qs, h, Tinf) => { for (const q of qs) for (let a = 0; a < 4; a++) { const n = quads[q * 4 + a], hA = h / 1e6 * qa[q] / 4; md.Tinf[n] = (md.Tinf[n] * md.hconv[n] + Tinf * hA) / (md.hconv[n] + hA); md.hconv[n] += hA; } nConv += qs.length; };
+      for (const cv of job.conv || []) { const qs = G.facesOn(cv.tris); qs.forEach(q => used[q] = 1); conv(qs, cv.h, cv.Tinf); }
+      if (job.convRest) { const qs = []; for (let q = 0; q < nq; q++) if (!used[q]) qs.push(q); conv(qs, job.convRest.h, job.convRest.Tinf); }
+      if (!nFix && !nConv) throw new Error('NOSINK');
+      const T0v = new Float64Array(ms.nn).fill(T0);
+      let r, hist = null;
+      if (job.mode === 'transient') {
+        const steps = Math.max(10, Math.min(400, job.steps || 100)), dt = (job.duration || 60) / steps;
+        let pmax = 0; const probe = T => { let m = -Infinity; for (let i = 0; i < T.length; i++) if (T[i] > m) m = T[i]; return m; };
+        const tr = Therm.transient(md, T0v, dt, steps, probe, (s, n) => progress({ stage: 'time', s, n }));
+        r = { T: tr.T, it: tr.its, res: 0 }; hist = tr.hist;
+      } else r = Therm.steady(md, T0v);
+      const fl = Therm.flux(md, r.T), bal = Therm.balance(md, r.T);
+      let Tmin = Infinity, Tmax = -Infinity; for (const v of r.T) { Tmin = Math.min(Tmin, v); Tmax = Math.max(Tmax, v); }
+      return { coords: Float32Array.from(ms.coords), quads: Int32Array.from(quads), h: G.g.h, ne: ms.ne, nn: ms.nn, T: Float32Array.from(r.T), nq: Float32Array.from(fl.nq), qmax: fl.qmax, Tmin, Tmax, it: r.it, res: r.res, hist, bal, nFix, nHeat, nConv };
+    },
+    // wind tunnel around the part (lattice Boltzmann)
+    flow(job, progress) {
+      const bb = job.bbox, fa = job.fa, sg = job.sg, E = [0, 1, 2].map(d => bb.mx[d] - bb.mn[d]);
+      const cross = [0, 1, 2].filter(d => d !== fa), D = Math.max(...cross.map(d => E[d]), 1e-6);
+      let h = D / (job.nb || 14);
+      const span = d => d === fa ? [1.2 * D, E[d] + 2.8 * D] : [1.0 * D, E[d] + 1.0 * D];
+      const sizeOf = h => [0, 1, 2].map(d => Math.max(4, Math.round((span(d)[0] + span(d)[1]) / h)));
+      while (sizeOf(h).reduce((a, b) => a * b, 1) > (job.maxCells || 300000)) h *= 1.08;
+      const n = sizeOf(h);
+      const o = [0, 1, 2].map(d => { const up = d === fa ? (sg > 0 ? span(d)[0] : n[d] * h - span(d)[1]) : span(d)[0]; return bb.mn[d] - up; });
+      const tb = { mn: o, mx: o.map((v, d) => v + n[d] * h) };
+      const g = FEM.voxelize(job.tris, tb, h); // same voxeliser as the structural mesh, on the tunnel box
+      if (g.nx !== n[0] || g.ny !== n[1] || g.nz !== n[2]) { n[0] = g.nx; n[1] = g.ny; n[2] = g.nz; }
+      const N = n[0] * n[1] * n[2]; let nSolid = 0; for (let i = 0; i < N; i++) nSolid += g.solid[i];
+      if (!nSolid) throw new Error('VOXEL');
+      progress({ stage: 'grid', n, nSolid });
+      // frontal area (cells) seen along the flow
+      const proj = new Set(); for (let i = 0; i < n[0]; i++) for (let j = 0; j < n[1]; j++) for (let k = 0; k < n[2]; k++) if (g.solid[(i * n[1] + j) * n[2] + k]) { const P = [i, j, k]; proj.add(P[cross[0]] + ',' + P[cross[1]]); }
+      const Af = proj.size, Dc = D / h;
+      const U = 0.1, Re = job.Re || 40, nu = U * Dc / Re, tau = Math.max(0.505, 3 * nu + 0.5);
+      const steps = Math.min(job.maxSteps || 6000, Math.ceil((job.passes || 1.5) * n[fa] / U));
+      const r = Flow.run({ n, solid: g.solid, fa, sg }, { U, tau, steps, onProgress: (s, m) => progress({ stage: 'lbm', s, n: m }) });
+      const q = 0.5 * U * U; const Cd = r.F[fa] * sg / (q * Af), Cl = cross.map(d => r.F[d] / (q * Af));
+      return { n, o: g.o, hs: g.hs, h, solid: g.solid, vel: r.vel, cp: r.cp, Cd, Cl, Af: Af * h * h, Re: 3 * (tau - 0.5) > 0 ? U * Dc / ((tau - 0.5) / 3) : Re, tau, steps, umax: r.umax, D, fa, sg };
+    },
     // magnetic: list of rotor positions / currents; full fields for the first task
     motor(job, progress) {
       const M = Mag.buildMotor(job.P); const out = []; let A0 = null, full = null;
@@ -4243,7 +4626,7 @@ function JobsFactory(FEM, Mag) {
 const Work = (() => {
   let worker = null, broken = false, seq = 0; const pending = new Map();
   function src() {
-    return `const FEM=(${FEMFactory.toString()})();const Mag=(${MagFactory.toString()})();const JOBS=(${JobsFactory.toString()})(FEM,Mag);
+    return `const FEM=(${FEMFactory.toString()})();const Mag=(${MagFactory.toString()})();const Therm=(${ThermFactory.toString()})();const Flow=(${FlowFactory.toString()})();const JOBS=(${JobsFactory.toString()})(FEM,Mag,Therm,Flow);
 onmessage=e=>{const {id,job}=e.data;try{const res=JOBS[job.type](job,p=>postMessage({id,progress:p}));postMessage({id,result:res});}catch(err){postMessage({id,error:String(err&&err.message||err)});}};`;
   }
   function get() {
@@ -4257,7 +4640,7 @@ onmessage=e=>{const {id,job}=e.data;try{const res=JOBS[job.type](job,p=>postMess
   }
   let localJobs = null;
   function runLocal(job, onProgress) {
-    localJobs = localJobs || JobsFactory(FEM, Mag);
+    localJobs = localJobs || JobsFactory(FEM, Mag, Therm, Flow);
     return new Promise((res, rej) => setTimeout(() => { try { res(localJobs[job.type](job, p => onProgress && onProgress(p))); } catch (e) { rej(e); } }, 30));
   }
   function run(job, onProgress) {
@@ -4446,13 +4829,13 @@ const Meshes = (() => {
   return { edgeMat, edgeMatHidden, solidMat, makeGeoms, faceGeom, hiMats };
 })();
 /* ================= application shell (documents, 3D window chrome, input plumbing) ================= */
-const MATERIALS = { // rho g/cm³, E MPa, nu, yield MPa
-  steel: { name: '일반 탄소강', rho: 7.85, color: '#B8BEC8', E: 205000, nu: 0.29, yield: 250 },
-  sus: { name: '스테인리스강', rho: 7.93, color: '#C9CED6', E: 193000, nu: 0.29, yield: 205 },
-  al: { name: '알루미늄 합금', rho: 2.70, color: '#D3D7DE', E: 69000, nu: 0.33, yield: 275 },
-  brass: { name: '황동', rho: 8.50, color: '#D9B65A', E: 100000, nu: 0.34, yield: 200 },
-  cast: { name: '회주철', rho: 7.20, color: '#8C9098', E: 110000, nu: 0.26, yield: 150 },
-  abs: { name: 'ABS 수지', rho: 1.05, color: '#E9E4D4', E: 2200, nu: 0.35, yield: 40 },
+const MATERIALS = { // rho g/cm³, E MPa, nu, yield MPa, k W/(m·K), cp J/(kg·K)
+  steel: { name: '일반 탄소강', rho: 7.85, color: '#B8BEC8', E: 205000, nu: 0.29, yield: 250, k: 50, cp: 486 },
+  sus: { name: '스테인리스강', rho: 7.93, color: '#C9CED6', E: 193000, nu: 0.29, yield: 205, k: 16, cp: 500 },
+  al: { name: '알루미늄 합금', rho: 2.70, color: '#D3D7DE', E: 69000, nu: 0.33, yield: 275, k: 167, cp: 896 },
+  brass: { name: '황동', rho: 8.50, color: '#D9B65A', E: 100000, nu: 0.34, yield: 200, k: 109, cp: 380 },
+  cast: { name: '회주철', rho: 7.20, color: '#8C9098', E: 110000, nu: 0.26, yield: 150, k: 52, cp: 460 },
+  abs: { name: 'ABS 수지', rho: 1.05, color: '#E9E4D4', E: 2200, nu: 0.35, yield: 40, k: 0.17, cp: 1300 },
 };
 const App = { ws: null, doc: null, builds: new Map(), display: 'edges', showPlanes: false, sel: null, hover: null, mode: null, pm: null, tab: { part: 'feat', asm: 'asm' }, matCache: new Map() };
 const STORE_KEY = 'kcad.workspace.v1';
@@ -5109,7 +5492,8 @@ function renderStdBar() {
         Q('relshow', L('구속조건 기호 보이기/숨기기', 'Show/hide relation symbols'), () => { sk.showRel = sk.showRel === false; Sk.renderRelWin(); View.req(); renderStdBar(); }, !!sk && sk.showRel !== false, !sk),
         Q('relwin', L('구속조건 창 보이기/숨기기', 'Relations window'), () => { App.relWin = App.relWin === false; App.relMin = false; Sk.renderRelWin(); renderStdBar(); }, !!sk && App.relWin !== false, !sk));
     } else if (d && d.type === 'asm') {
-      bar.append(h('div', { class: 'tsep' }), ...Asm.cmButtons('eval').filter(x => x !== '|').map(x => Q(x.icon, x.label, () => { x.run(); renderStdBar(); }, x.on)));
+      bar.append(h('div', { class: 'tsep' }), ...Asm.cmButtons('eval').filter(x => x !== '|').map(x => Q(x.icon, x.label, () => { x.run(); renderStdBar(); }, x.on)),
+        famQ('fem', L('해석 — 모션 스터디·정적·충격', 'Simulation — motion, static, shock'), () => Asm.simMenu()));
     }
   }
   const hud = $('#vhud'); hud.innerHTML = '';
@@ -5294,7 +5678,7 @@ async function saveFile(filename, data, mime) {
 }
 function docExport(d) {
   const strip = (k, v) => (k[0] === '_' ? undefined : v);
-  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.76', doc: JSON.parse(JSON.stringify(d, strip)) };
+  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.79', doc: JSON.parse(JSON.stringify(d, strip)) };
   if (d.type === 'asm') o.parts = [...new Set(d.comps.map(c => c.part))].map(docById).filter(Boolean).map(p => JSON.parse(JSON.stringify(p, strip)));
   return JSON.stringify(o, null, 1);
 }
@@ -5447,7 +5831,7 @@ function helpDialog() {
 function aboutDialog() {
   dialog({
     title: 'K군의 CAD 정보', width: 360, classic: App.doc && App.doc.type === 'dwg', body: h('div', { style: 'display:flex;gap:12px;align-items:flex-start' }, icEl('part', 40),
-      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.76'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
+      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.79'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
     buttons: [{ label: '확인' }]
   });
 }
@@ -6915,8 +7299,12 @@ const Part = (() => {
     }
     // rollback bar: drag it up or down; everything below it is temporarily off
     if (!fly) {
-      const bar = h('div', { class: 'rbar' + (d.tail ? ' on' : ''), draggable: (!App.pm && !App.sketch) ? 'true' : 'false', 'data-rbar': '1', title: L('롤백 막대 — 위로 끌면 그 아래 피처가 잠시 꺼지고, 새 피처가 이 자리에 들어갑니다', 'Rollback bar — drag up to turn off the features below; new features go here') },
-        h('span', { class: 'rbl' }), d.tail ? h('button', { class: 'rbx', title: L('끝으로 롤 포워드', 'Roll to end'), onclick: e => { e.stopPropagation(); FT.rollEnd(d); } }, '⤓') : null);
+      const live = !App.pm && !App.sketch;
+      const bar = h('div', { class: 'rbar' + (d.tail ? ' on' : '') + (live ? '' : ' off'), draggable: 'false', 'data-rbar': '1', title: L('롤백 막대 — 끌어서 올리면 그 아래 피처가 잠시 꺼지고 새 피처가 이 자리에 들어갑니다. 다시 내리면 켜집니다. (▲▼: 한 칸씩, ⤓: 끝으로)', 'Rollback bar — drag it up to turn off the features below (new features are inserted here); drag down to bring them back. ▲▼ one step, ⤓ to the end') },
+        h('span', { class: 'rbh' }, '≡'), h('span', { class: 'rbl' }),
+        live ? h('button', { class: 'rbx', title: L('한 칸 위로 (롤백)', 'Up one (roll back)'), disabled: !d.features.length, onclick: e => { e.stopPropagation(); FT.rollTo(d, d.features.length - 1); } }, '▲') : null,
+        live ? h('button', { class: 'rbx', title: L('한 칸 아래로 (롤 포워드)', 'Down one (roll forward)'), disabled: !d.tail, onclick: e => { e.stopPropagation(); FT.rollTo(d, d.features.length + 1); } }, '▼') : null,
+        live && d.tail ? h('button', { class: 'rbx', title: L('끝으로 롤 포워드', 'Roll to end'), onclick: e => { e.stopPropagation(); FT.rollEnd(d); } }, '⤓') : null);
       bar.addEventListener('contextmenu', e => { e.preventDefault(); popMenu(e.clientX, e.clientY, [
         { label: L('이전으로 롤백', 'Roll to previous'), disabled: !d.features.length, run: () => FT.rollTo(d, d.features.length - 1) },
         { label: L('다음으로 롤 포워드', 'Roll forward one'), disabled: !d.tail, run: () => FT.rollTo(d, d.features.length + 1) },
@@ -7062,7 +7450,9 @@ const Part = (() => {
         { icon: 'fem', label: L('정적 해석 (응력·변위)', 'Static (stress, displacement)'), run: () => FEMUI.studyCmd('static') },
         { icon: 'fem', label: L('고유진동 해석 (모달)', 'Modal (natural frequencies)'), run: () => FEMUI.studyCmd('modal') },
         { icon: 'fem', label: L('주파수 응답 (진동)', 'Frequency response'), run: () => FEMUI.studyCmd('frf') },
-        { icon: 'fem', label: L('과도 응답 (충격·시간)', 'Transient (shock, time)'), run: () => FEMUI.studyCmd('transient') }]; }
+        { icon: 'fem', label: L('과도 응답 (충격·시간)', 'Transient (shock, time)'), run: () => FEMUI.studyCmd('transient') }, '-',
+        { icon: 'thermal', label: L('열 해석 (정상/과도)', 'Thermal (steady / transient)'), run: () => THERMUI.studyCmd() },
+        { icon: 'flow', label: L('유동 해석 (가상 풍동)', 'Flow (virtual wind tunnel)'), run: () => FLOWUI.studyCmd() }]; }
   function insertMenu() {
     return [
       { label: '스케치', icon: 'sketch', run: () => startSketchCmd('line') }, '-',
@@ -7421,11 +7811,22 @@ const Part = (() => {
   }
   function deleteFeature(id) {
     const d = P(); const f = byId(id); if (!f) return;
-    const del = new Set([id]); let grew = true;
-    while (grew) { grew = false; for (const x of d.features) { if (del.has(x.id)) continue; if ((x.sketch && del.has(x.sketch)) || (x.path && del.has(x.path)) || (x.sketches || []).some(k => del.has(k)) || (x.target && del.has(x.target)) || (x.targets || []).some(k => del.has(k)) || (x.src && del.has(x.src)) || (x.srcs || []).some(k => del.has(k))) { del.add(x.id); grew = true; } } }
-    if (f.type !== 'sketch') for (const k of [f.sketch, f.path, ...(f.sketches || [])].filter(Boolean)) if (!d.features.some(x => x !== f && (x.sketch === k || x.path === k || (x.sketches || []).includes(k)))) del.add(k);
-    const names = d.features.filter(x => del.has(x.id)).map(x => x.name);
-    confirmDlg('삭제 확인', `다음 항목을 삭제합니다: ${names.join(', ')}`, () => { snapshot(d); d.features = d.features.filter(x => !del.has(x.id)); App.sel = null; afterChange(d, true); });
+    // the feature itself + the sketches only it uses
+    const own = new Set([id]);
+    if (f.type !== 'sketch') for (const k of [f.sketch, f.path, ...(f.sketches || [])].filter(Boolean)) if (!d.features.some(x => x !== f && (x.sketch === k || x.path === k || (x.sketches || []).includes(k)))) own.add(k);
+    // everything built on it: sketch/target references and geometric references (edges picked for fillets, …)
+    const deps = new Set(); for (const k of own) for (const x of FT.descendants(d, k)) if (!own.has(x)) deps.add(x);
+    const depList = d.features.filter(x => deps.has(x.id));
+    const ownNames = d.features.filter(x => own.has(x.id)).map(x => x.name);
+    const doDelete = ids => { snapshot(d); d.features = d.features.filter(x => !ids.has(x.id)); if (d.tail) d.tail = d.tail.filter(x => !ids.has(x.id)); App.sel = null; afterChange(d, true); const bad = d.features.filter(x => x.err); if (bad.length) status(L(`삭제했습니다. ${bad.map(x => x.name).join(', ')}에 오류가 있습니다 — 편집해서 참조를 다시 고르거나 Ctrl+Z로 되돌리세요.`, `Deleted. ${bad.map(x => x.name).join(', ')} now fail — edit them to pick new references, or Ctrl+Z.`)); };
+    if (!depList.length) { confirmDlg(L('삭제 확인', 'Confirm delete'), L(`다음 항목을 삭제합니다: ${ownNames.join(', ')}`, `Delete: ${ownNames.join(', ')}`), () => doDelete(own)); return; }
+    dialog({ title: L('삭제 확인 — 종속 항목', 'Confirm delete — dependents'), width: 440,
+      body: h('div', { class: 'col' }, h('div', null, L(`삭제: ${ownNames.join(', ')}`, `Delete: ${ownNames.join(', ')}`)),
+        h('div', { class: 'rwt' }, L('이 피처를 쓰는 항목 (종속)', 'Items that depend on it')),
+        h('div', null, depList.map(x => h('div', { class: 'relrow' }, icEl(featIcon(x), 16), h('span', { class: 'rl' }, x.name + (x.refs && x.refs.some(r => own.has(r)) ? L(' — 이 피처의 모서리·면을 사용', ' — uses its edges/faces') : ''))))),
+        h('div', { class: 'hint' }, L('[종속 항목도 삭제]를 권장합니다. [이 피처만 삭제]하면 남은 항목은 오류로 표시되고, 편집해서 모서리·면을 다시 고를 수 있습니다.', '[Delete dependents too] is recommended. With [Delete this only] the remaining items show an error; edit them to pick new edges/faces.'))),
+      buttons: [{ label: L('종속 항목도 삭제', 'Delete dependents too'), primary: true, onClick() { doDelete(new Set([...own, ...deps])); } },
+        { label: L('이 피처만 삭제', 'Delete this only'), onClick() { doDelete(own); } }, { label: L('취소', 'Cancel') }] });
   }
 
   /* ---------- evaluate ---------- */
@@ -7524,7 +7925,7 @@ const FT = (() => {
   const find = (d, id) => all(d).find(f => f.id === id);
   // explicit references a feature holds (what must exist before it)
   function parentIds(d, f) {
-    const ids = [f.sketch, f.path, ...(f.sketches || []), f.target !== '__body' ? f.target : null, ...(f.targets || []), f.src, ...(f.srcs || [])];
+    const ids = [f.sketch, f.path, ...(f.sketches || []), f.target !== '__body' ? f.target : null, ...(f.targets || []), f.src, ...(f.srcs || []), ...(f.refs || [])];
     if (f.plane && f.plane.kind === 'ref') ids.push(f.plane.id);
     if (f.type === 'sketch' && f.plane && f.plane.ref) ids.push(f.plane.ref);
     return [...new Set(ids.filter(id => id && id !== f.id && find(d, id)))];
@@ -7623,6 +8024,15 @@ const FT = (() => {
   let dragId = null;
   function wire(tree) {
     if (tree._ftWired) return; tree._ftWired = true;
+    // the rollback bar is dragged with the pointer (works with mouse and touch)
+    tree.addEventListener('pointerdown', e => {
+      const bar = e.target.closest('.rbar'); if (!bar || e.target.closest('button') || bar.classList.contains('off') || e.button !== 0) return;
+      e.preventDefault(); bar.classList.add('drag'); let tgt = null, after = false;
+      const clear = () => tree.querySelectorAll('.dropb,.dropa').forEach(n => n.classList.remove('dropb', 'dropa'));
+      const mv = ev => { clear(); const el = document.elementFromPoint(ev.clientX, ev.clientY); const n = el && el.closest && el.closest('#tree [data-fid]'); tgt = n; if (!n) return; const r = n.getBoundingClientRect(); after = ev.clientY > r.top + r.height / 2; n.classList.add(after ? 'dropa' : 'dropb'); };
+      const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); bar.classList.remove('drag'); clear(); if (!tgt) return; const d = App.doc, f = find(d, tgt.dataset.fid); if (f) after ? rollAfter(d, f) : rollBefore(d, f); };
+      addEventListener('pointermove', mv); addEventListener('pointerup', up);
+    });
     const clear = () => tree.querySelectorAll('.dropb,.dropa').forEach(n => n.classList.remove('dropb', 'dropa'));
     tree.addEventListener('dragstart', e => { const n = e.target.closest('[data-fid],[data-rbar]'); if (!n) return; dragId = n.dataset.rbar ? '__bar' : n.dataset.fid; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', dragId); } catch (_) { } });
     tree.addEventListener('dragover', e => {
@@ -7691,7 +8101,7 @@ const Asm = (() => {
     if (open) for (const m of d.mates) {
       const a = compById(m.a.comp), b = compById(m.b.comp);
       out.push(treeNode({
-        icon: MATE[m.type].icon, label: `${m.name} (${a ? a.name : '?'}, ${b ? b.name : '?'})`, depth: 2, sel: sel && sel.kind === 'mate' && sel.id === m.id, cls: m.err ? 'err' : '', badge: m.err,
+        icon: MATE[m.type].icon, label: `${m.name || MATE[m.type].name} (${a ? a.name : '?'}, ${b ? b.name : '?'})`, depth: 2, sel: sel && sel.kind === 'mate' && sel.id === m.id, cls: m.err ? 'err' : '', badge: m.err,
         onClick: () => { App.sel = { kind: 'mate', id: m.id }; renderTree(); updateHighlights(); },
         onDbl: () => mateCmd(m),
         onCtx: e => popMenu(e.clientX, e.clientY, [{ label: '메이트 편집', icon: 'mate', run: () => mateCmd(m) }, { label: '삭제', key: 'Del', icon: 'del', run: () => deleteItem({ kind: 'mate', id: m.id }) }]),
@@ -7729,10 +8139,16 @@ const Asm = (() => {
       { icon: 'fix', label: selC && selC.fixed ? '유동' : '고정', disabled: !selC, run: () => { if (!selC) return; snapshot(A()); selC.fixed = !selC.fixed; afterChange(A()); renderCM(); } }, '|',
       { icon: 'explode', label: '분해도', on: m === 'explode' || exploded(), run: explodeCmd },
       { icon: 'interf', label: '간섭 탐지', on: m === 'interf', run: interferenceCmd }, '|',
+      { icon: 'motion', label: L('모션 스터디', 'Motion study'), on: m === 'motion', tip: L('모터로 움직이는 애니메이션 · 기구학 · 동역학(모터 토크)', 'Motor-driven animation, kinematics, dynamics (motor torque)'), run: () => MOTIONUI.studyCmd() },
+      { icon: 'fem', label: L('어셈블리 해석', 'Assembly study'), on: m === 'asmstudy', tip: L('정적 · 충격 해석', 'Static and shock'), run: () => ASMFEMUI.studyCmd() }, '|',
       { icon: 'part', label: '부품 열기', disabled: !selC, run: () => { const p = selC && docById(selC.part); if (p) activate(p); } }];
   }
   const insertMenu = () => [{ label: '구성 요소 > 기존 부품/어셈블리...', icon: 'insert', run: insertCmd }, { label: '메이트...', icon: 'mate', run: () => mateCmd() }, { label: '부품 패턴 > 선형 패턴...', icon: 'clpattern', run: compPatternCmd }, { label: '분해도...', icon: 'explode', run: explodeCmd }];
-  const toolsMenu = () => [{ label: '측정', icon: 'measure', run: Part.measureCmd }, { label: '질량 특성...', icon: 'mass', run: Part.massDialog }, { label: '간섭 탐지...', icon: 'interf', run: interferenceCmd }, '-', { label: '모든 메이트 다시 풀기', icon: 'rebuild', run: () => { snapshot(A()); solveAll(A()); afterChange(A()); } }];
+  const simMenu = () => [
+    { icon: 'motion', label: L('모션 스터디 (애니메이션 · 기구학 · 동역학)', 'Motion study (animation, kinematics, dynamics)'), run: () => MOTIONUI.studyCmd() }, '-',
+    { icon: 'fem', label: L('어셈블리 정적 해석 (하중·자중)', 'Assembly static (loads, self-weight)'), run: () => ASMFEMUI.studyCmd('static') },
+    { icon: 'fem', label: L('어셈블리 충격 해석 (반사인 펄스)', 'Assembly shock (half-sine pulse)'), run: () => ASMFEMUI.studyCmd('shock') }];
+  const toolsMenu = () => [{ label: '측정', icon: 'measure', run: Part.measureCmd }, { label: '질량 특성...', icon: 'mass', run: Part.massDialog }, { label: '간섭 탐지...', icon: 'interf', run: interferenceCmd }, '-', ...simMenu(), '-', { label: '모든 메이트 다시 풀기', icon: 'rebuild', run: () => { snapshot(A()); solveAll(A()); afterChange(A()); } }];
 
   /* ---------- selection / dragging ---------- */
   function hoverMove(sx, sy) {
@@ -8203,7 +8619,7 @@ const Asm = (() => {
       ctx.setLineDash([]);
     }
   }
-  return { treeNodes, cmButtons, insertMenu, toolsMenu, selectMode, drawOverlay, deleteItem, solveAll, applyMate, insertCmd, mateCmd, addComp, rotateComp, compOrigin, moveCmd };
+  return { simMenu, treeNodes, cmButtons, insertMenu, toolsMenu, selectMode, drawOverlay, deleteItem, solveAll, applyMate, insertCmd, mateCmd, addComp, rotateComp, compOrigin, moveCmd };
 })();
 /* ================= UI for loft, sweep, fillet/chamfer, reference planes, surfaces ================= */
 const F2UI = (() => {
@@ -8868,6 +9284,13 @@ const FEMUI = (() => {
   const P = () => App.doc;
   const TYPES = { static: L('정적 해석', 'Static'), modal: L('고유진동 (모달)', 'Modal (natural frequencies)'), frf: L('주파수 응답', 'Frequency response'), transient: L('과도 응답', 'Transient response') };
   let group = null, legend = null, result = null, anim = 0, show = { field: 'vm', scale: null, mode: 0 };
+  // which numerical method each study uses (shown in the study panel and with the results)
+  const SOLVER = {
+    static: () => L('요소: 8절점 육면체(복셀) + 윌슨 비적합 모드 · 풀이: 행렬 없는(matrix-free) 켤레기울기법(CG), 대각(자코비) 전처리', 'Elements: 8-node voxel hexahedra with Wilson incompatible modes · Solver: matrix-free conjugate gradient (CG), Jacobi preconditioner'),
+    modal: () => L('요소: 8절점 육면체 + 비적합 모드, 집중 질량 · 풀이: 띠 행렬 촐레스키 분해(시프트-역반복) + 란초스(Lanczos) 고유값, 완전 재직교화', 'Elements: 8-node hexahedra + incompatible modes, lumped mass · Solver: banded Cholesky (shift-invert) + Lanczos eigen-solver with full re-orthogonalisation'),
+    frf: () => L('풀이: 란초스로 구한 모드의 모드 중첩법 (모드 감쇠비 ζ)', 'Solver: modal superposition of Lanczos modes (modal damping ζ)'),
+    transient: () => L('풀이: 뉴마크 평균가속도법(무조건 안정) 시간 적분, 띠 촐레스키 직접 풀이 + 강성 비례(레일리 β) 감쇠', 'Solver: Newmark average-acceleration time integration (unconditionally stable), banded Cholesky + stiffness-proportional (Rayleigh β) damping'),
+  };
   function study(d) {
     d.study = d.study || { type: 'static', fixtures: [], loads: [], res: 'normal', nModes: 6, zeta: 2, load: 'step', freq: 0, duration: 0, fmax: 0 };
     return d.study;
@@ -8926,7 +9349,7 @@ const FEMUI = (() => {
     const S = study(d); if (type) S.type = type;
     let pick = S.fixtures.length ? 'load0' : 'fix', busy = false, msg = null, err = false, prog = '';
     if (!S.loads.length && S.type !== 'modal') S.loads.push({ faces: [], kind: 'force', dir: 'normal', value: 100 });
-    result = null; clear();
+    result = null; clear(); if (typeof THERMUI !== 'undefined') { THERMUI.clear(); FLOWUI.clear(); }
     const mat = () => MATERIALS[S.mat || d.material] || MATERIALS.steel;
     const mode = Object.assign({}, Part.selectMode, {
       name: 'study',
@@ -8989,6 +9412,7 @@ const FEMUI = (() => {
     function resultGroups() {
       const r = result; if (!r) return [];
       const g = [], m = r.mat;
+      const solverRow = h('div', { class: 'hint solver' }, h('b', null, L('솔버 ', 'Solver ')), SOLVER[r.type] ? SOLVER[r.type]() : '', r.cgIt ? L(` · 반복 ${r.cgIt}회, 상대 잔차 ${fmtN(r.res)}`, ` · ${r.cgIt} iterations, rel. residual ${fmtN(r.res)}`) : '');
       const head = h('div', { class: 'kv' }, h('span', null, L('요소 / 절점', 'Elements / nodes')), h('b', null, `${r.ne} / ${r.nn}`), h('span', null, L('요소 크기', 'Element size')), h('b', null, fmt(r.h, 2) + ' mm'), h('span', null, L('계산 시간', 'Solve time')), h('b', null, (r.ms / 1000).toFixed(1) + ' s'));
       if (r.type === 'static') {
         const sf = m.yield / (r.vmax || 1e-9);
@@ -9016,6 +9440,7 @@ const FEMUI = (() => {
         const pk = r.hist.reduce((a, c) => Math.abs(c[1]) > Math.abs(a[1]) ? c : a);
         g.push({ title: L('과도 응답', 'Transient response'), icon: 'mass', body: [cv, h('div', { class: 'kv' }, h('span', null, L('최대 변위', 'Peak displacement')), h('b', null, `${fmtN(pk[1])} mm @ ${fmt(pk[0] * 1000, 2)} ms`), h('span', null, L('1차 고유진동수', '1st natural frequency')), h('b', null, fmt(r.f1, 1) + ' Hz'), h('span', null, L('시간 간격', 'Time step')), h('b', null, fmtN(r.dt * 1000) + ' ms')), head, h('div', { class: 'hint' }, L('3D 화면은 마지막 시각의 응력 분포입니다.', 'The 3D view shows the stress at the final time.'))] });
       }
+      g.push({ title: L('솔버', 'Solver'), icon: 'options', body: solverRow });
       g.push({ title: '', body: h('button', { class: 'pbtn wide', onclick: () => { result = null; clear(); renderPM(); updateHighlights(); } }, L('결과 닫고 조건 고치기', 'Close results and edit setup')) });
       return g;
     }
@@ -9043,17 +9468,18 @@ const FEMUI = (() => {
         if (S2.type === 'frf') dyn.push(field(L('최대 주파수 (Hz, 0=자동)', 'Max frequency (Hz, 0 = auto)'), numInput(S2.fmax, v => { S2.fmax = Math.max(0, v); save(); }, { step: 100, min: 0 })));
         if (S2.type === 'transient') dyn.push(field(L('하중 시간 변화', 'Load history'), selectInput([['step', L('계단 (갑자기 가함)', 'Step')], ['sine', L('사인 (진동)', 'Sine')], ['pulse', L('반사인 충격', 'Half-sine pulse')]], S2.load, v => { S2.load = v; save(); renderPM(); })), S2.load !== 'step' ? field(L('주파수 (Hz, 0=1차 고유진동수)', 'Frequency (Hz, 0 = 1st mode)'), numInput(S2.freq, v => { S2.freq = Math.max(0, v); save(); }, { step: 10, min: 0 })) : null, field(L('해석 시간 (s, 0=자동)', 'Duration (s, 0 = auto)'), numInput(S2.duration, v => { S2.duration = Math.max(0, v); save(); }, { step: 0.001, min: 0 })));
         if (dyn.length) gs.push({ title: L('동해석 설정', 'Dynamic settings'), icon: 'options', body: dyn.filter(Boolean) });
+        gs.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER[S2.type]()) });
         gs.push({ title: L('메시와 실행', 'Mesh and run'), icon: 'rebuild', body: [h('div', { class: 'seg' }, [['coarse', L('거침', 'Coarse')], ['normal', L('보통', 'Normal')], ['fine', L('세밀', 'Fine')]].map(([k, l]) => h('button', { class: S2.res === k ? 'on' : '', onclick: () => { S2.res = k; save(); renderPM(); } }, l))),
           h('button', { class: 'pbtn primary wide', disabled: busy, onclick: run }, busy ? L('계산 중…', 'Solving…') : L('▶ 해석 실행', '▶ Run')), busy ? h('button', { class: 'pbtn wide', onclick: () => Work.cancel() }, L('취소', 'Cancel')) : null, h('div', { id: 'femprog', class: 'hint' }, prog)].filter(Boolean) });
         return gs;
       },
-      onOK() { }, onCancel() { }, onClose() { clear(); App.mode = Part.selectMode; updateHighlights(); },
+      onOK() { }, onCancel() { clear(); }, onClose() { clear(); App.mode = Part.selectMode; updateHighlights(); },
     });
     Object.defineProperty(App.pm, 'msg', { get: () => msg, set: v => { msg = v; }, configurable: true });
     Object.defineProperty(App.pm, 'err', { get: () => err, set: v => { err = v; }, configurable: true });
     App.mode = mode; updateHighlights(); renderPM();
   }
-  return { studyCmd, clear, drawChart, result: () => result };
+  return { studyCmd, clear, drawChart, result: () => result, faceTris, faceCentroid, faceNormal, resolve, fref, SOLVER };
 })();
 /* ================= motor magnetics document (2D FEM of a surface-PM motor section) ================= */
 const MagUI = (() => {
@@ -9162,6 +9588,9 @@ const MagUI = (() => {
       h('span', null, L('LCM(슬롯, 극)', 'LCM(slots, poles)')), h('b', null, lcm),
       h('span', null, L('코깅 주기', 'Cogging period')), h('b', null, fmt(360 / lcm, 2) + '°'),
       h('span', null, L('전기 주파수', 'Electrical frequency')), h('b', null, fmt(P.rpm / 60 * p, 1) + ' Hz')));
+    el.append(h('div', { class: 'hint solver', style: 'margin-top:8px' }, h('b', null, L('솔버 ', 'Solver ')),
+      L('2D 정자기장 유한요소법(벡터 포텐셜 Az, 1차 삼각형 요소, 극좌표 구조 격자) · 선형 풀이: 불완전 촐레스키 IC(0) 전처리 켤레기울기법 · 철심 포화: 뉴턴–랩슨 반복(B-H 곡선) · 회전: 이동 띠(격자 한 칸씩) · 토크: 공극 맥스웰 응력(Arkkio) · 역기전력: 자속쇄교 미분',
+        '2-D magnetostatic FEM (vector potential Az, linear triangles, structured polar mesh) · Linear solver: IC(0)-preconditioned conjugate gradient · Iron saturation: Newton–Raphson on the B-H curve · Rotation: moving band (one mesh step) · Torque: air-gap Maxwell stress (Arkkio) · Back-EMF: derivative of flux linkage')));
   }
 
   /* ---------- running analyses ---------- */
@@ -9332,6 +9761,793 @@ const MagUI = (() => {
       h('p', null, L('끝단 효과(3D), 와전류·철손, 온도에 따른 자석 특성 변화는 넣지 않았습니다. 설계 비교와 학습용 근사치로 쓰세요.', 'End effects (3-D), eddy currents/iron loss and magnet temperature effects are not modelled: use the numbers for comparison and learning.'))), buttons: [{ label: L('확인', 'OK'), primary: true }] });
   }
   return { open, close, redraw, newDoc, R: () => R(), job: (...a) => job(...a), runField, runNoLoad, runCogging, runTorqueAngle, runRipple, M: () => M };
+})();
+/* ================= thermal study UI: steady / transient heat conduction ================= */
+const THERMUI = (() => {
+  const P = () => App.doc;
+  const MODES = { steady: () => L('정상 상태 (평형 온도)', 'Steady state'), transient: () => L('과도 (시간에 따른 온도)', 'Transient (temperature over time)') };
+  const SOLVER = {
+    steady: () => L('요소: 8절점 육면체(복셀), 열전도 행렬 공유 · 경계: 고정 온도, 열 입력(W), 대류(h, T∞, 절점 집중) · 풀이: 행렬 없는 켤레기울기법(CG), 대각(자코비) 전처리', 'Elements: 8-node voxel hexahedra sharing one conductivity matrix · Boundaries: fixed temperature, heat input (W), convection (h, T∞, lumped) · Solver: matrix-free conjugate gradient (CG), Jacobi preconditioner'),
+    transient: () => L('요소: 8절점 육면체(복셀), 집중 열용량 · 시간 적분: 후방(암시적) 오일러, 매 단계 켤레기울기법(CG, 자코비 전처리, 이전 해에서 시작)', 'Elements: 8-node voxel hexahedra, lumped heat capacity · Time integration: backward (implicit) Euler; CG with Jacobi preconditioner each step (warm start)'),
+  };
+  let group = null, legend = null, result = null, show = 'T';
+  const F = () => FEMUI; // face helpers live in the structural UI
+  function study(d) {
+    d.thermal = d.thermal || { mode: 'steady', fixT: [{ faces: [], T: 20 }], heat: [{ faces: [], W: 10 }], conv: [], rest: { on: true, h: 10, Tinf: 20 }, T0: 20, duration: 600, res: 'normal' };
+    return d.thermal;
+  }
+  function clear() {
+    if (group) { View.scene.remove(group); group.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); group = null; }
+    if (legend) { legend.remove(); legend = null; }
+    View.world.visible = true; View.req();
+  }
+  function display() {
+    const r = result; if (!r) return; clear();
+    group = new THREE.Group(); View.scene.add(group); View.world.visible = false;
+    const vals = show === 'q' ? r.nq.map(v => v * 1e6) : r.T; let vmin = Infinity, vmax = -Infinity; for (const v of vals) { vmin = Math.min(vmin, v); vmax = Math.max(vmax, v); }
+    if (vmax - vmin < 1e-9) vmax = vmin + 1;
+    const nq = r.quads.length / 4, pos = new Float32Array(nq * 18), col = new Float32Array(nq * 18), tri = [0, 1, 2, 0, 2, 3];
+    for (let q = 0; q < nq; q++) for (let k = 0; k < 6; k++) { const n = r.quads[q * 4 + tri[k]], o = (q * 6 + k) * 3, c = rainbow((vals[n] - vmin) / (vmax - vmin)); for (let d = 0; d < 3; d++) { pos[o + d] = r.coords[n * 3 + d]; col[o + d] = c[d]; } }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals();
+    group.add(new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide })));
+    const B = getBuild(P()); group.add(new THREE.LineSegments(B.egeo, new THREE.LineBasicMaterial({ color: 0x56606c, transparent: true, opacity: 0.6 })));
+    const unit = show === 'q' ? 'W/m²' : '°C', title = show === 'q' ? L('열유속 크기', 'Heat flux magnitude') : L('온도', 'Temperature');
+    legend = h('div', { class: 'femleg' }, h('b', null, title), h('div', { class: 'bar' }), h('div', { class: 'lbl' }, [1, 0.75, 0.5, 0.25, 0].map(t => h('span', null, fmtN(vmin + (vmax - vmin) * t) + ' ' + unit))));
+    $('#gfx').append(legend); View.req();
+  }
+  function studyCmd(mode) {
+    const d = P(); if (!d || d.type !== 'part') return;
+    if (App.sketch) Part.exitSketch(true);
+    const B = getBuild(d); if (!B.topo.nt) { status(L('해석할 몸체가 없습니다. 먼저 형상을 만드세요.', 'There is no body to analyse.')); return; }
+    const S = study(d); if (mode) S.mode = mode;
+    let pick = 'fix0', busy = false, msg = null, err = false, prog = '';
+    result = null; clear(); FEMUI.clear(); FLOWUI.clear();
+    const mat = () => MATERIALS[S.mat || d.material] || MATERIALS.steel;
+    const listOf = key => key.startsWith('fix') ? (S.fixT[+key.slice(3)] || {}).faces : key.startsWith('heat') ? (S.heat[+key.slice(4)] || {}).faces : (S.conv[+key.slice(4)] || {}).faces;
+    const pmode = Object.assign({}, Part.selectMode, {
+      name: 'thermal',
+      click(sx, sy) {
+        const p = pickAt(sx, sy, { planes: false }); if (!p || p.kind !== 'face' || p.body) return;
+        const Bn = getBuild(P()); const list = listOf(pick); if (!list) return;
+        const i = list.findIndex(x => F().resolve(Bn, x) === p.fid); if (i >= 0) list.splice(i, 1); else list.push(F().fref(Bn, p.fid));
+        save(); renderPM(); updateHighlights();
+      },
+      highlights: () => [],
+      overlay3(O) {
+        if (result) return; const Bn = getBuild(P());
+        const add = (ref, color) => { const fid = F().resolve(Bn, ref); if (fid < 0 || !Bn.topo.faces[fid]) return; O.add(new THREE.Mesh(Meshes.faceGeom(Bn, fid), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.55, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, depthWrite: false, side: THREE.DoubleSide }))); };
+        S.fixT.forEach(x => x.faces.forEach(f => add(f, 0x4da3ff))); S.heat.forEach(x => x.faces.forEach(f => add(f, 0xff5f56))); S.conv.forEach(x => x.faces.forEach(f => add(f, 0x3fd0d6)));
+      },
+    });
+    const faceRows = list => list.map((f, i) => h('div', { class: 'relrow' }, icEl('plane', 14), h('span', { class: 'rl' }, L(`면 ${i + 1}`, `Face ${i + 1}`)), h('button', { class: 'x', onclick: e => { e.stopPropagation(); list.splice(i, 1); save(); renderPM(); updateHighlights(); } }, '×')));
+    const selBox = (key, list, hint) => h('div', { class: 'selbox' + (pick === key ? ' active' : ''), onclick: () => { pick = key; renderPM(); } }, list.length ? faceRows(list) : h('div', { class: 'hint' }, hint));
+    const tris = (Bn, refs) => { const parts = refs.map(r => F().resolve(Bn, r)).filter(fid => fid >= 0).map(fid => F().faceTris(Bn, fid)); const n = parts.reduce((t, a) => t + a.length, 0), out = new Float32Array(n); let o = 0; for (const a of parts) { out.set(a, o); o += a.length; } return out; };
+    async function run() {
+      if (busy) return; const d2 = P(), B2 = getBuild(d2), S2 = study(d2), m = mat();
+      const hasSink = S2.fixT.some(x => x.faces.length) || S2.conv.some(x => x.faces.length) || S2.rest.on;
+      if (!hasSink) { msg = L('열이 빠져나갈 곳이 없습니다. 고정 온도 면이나 대류를 넣으세요.', 'Heat has nowhere to go: add a fixed temperature or convection.'); err = true; renderPM(); return; }
+      const target = { coarse: 3000, normal: 9000, fine: 24000 }[S2.res] || 9000, hsz = Math.cbrt(Math.max(B2.topo.vol, 1e-6) / target);
+      const job = { type: 'thermal', tris: B2.tris, bbox: B2.topo.bbox, h: hsz, mat: { k: m.k, rho: m.rho, cp: m.cp }, mode: S2.mode, T0: S2.T0, duration: S2.duration, steps: 100,
+        fixT: S2.fixT.filter(x => x.faces.length).map(x => ({ tris: tris(B2, x.faces), T: x.T })), heat: S2.heat.filter(x => x.faces.length).map(x => ({ tris: tris(B2, x.faces), W: x.W })),
+        conv: S2.conv.filter(x => x.faces.length).map(x => ({ tris: tris(B2, x.faces), h: x.h, Tinf: x.Tinf })), convRest: S2.rest.on ? { h: S2.rest.h, Tinf: S2.rest.Tinf } : null };
+      busy = true; err = false; msg = L('계산 중…', 'Solving…'); prog = ''; renderPM();
+      const t0 = performance.now();
+      try {
+        const r = await Work.run(job, p => { prog = p.stage === 'mesh' ? L(`요소 ${p.ne}개 · 절점 ${p.nn}개`, `${p.ne} elements · ${p.nn} nodes`) : p.stage === 'time' ? L(`시간 단계 ${p.s}/${p.n}`, `time step ${p.s}/${p.n}`) : ''; const el = $('#thprog'); if (el) el.textContent = prog; });
+        r.ms = Math.round(performance.now() - t0); r.mode = S2.mode; r.mat = m; result = r; msg = null; show = 'T'; display();
+      } catch (e) { err = true; msg = e.message === 'NOSINK' ? L('열이 빠져나갈 면이 메시에 닿지 않았습니다.', 'The heat sinks did not touch the mesh.') : e.message === 'VOXEL' ? L('메시를 만들지 못했습니다 (닫힌 몸체가 아님).', 'Could not mesh the body.') : e.message === 'CANCEL' ? L('취소했습니다.', 'Cancelled.') : L('해석 오류: ', 'Solver error: ') + e.message; }
+      busy = false; renderPM();
+    }
+    function resultGroups() {
+      const r = result, g = [];
+      const b = r.bal;
+      g.push({ title: L('결과', 'Results'), icon: 'mass', body: [h('div', { class: 'kv' },
+        h('span', null, L('최고 온도', 'Max temperature')), h('b', { style: 'color:#FF6B5E' }, fmt(r.Tmax, 2) + ' °C'),
+        h('span', null, L('최저 온도', 'Min temperature')), h('b', { style: 'color:#4DA3FF' }, fmt(r.Tmin, 2) + ' °C'),
+        h('span', null, L('최대 열유속', 'Max heat flux')), h('b', null, fmtN(r.qmax * 1e6) + ' W/m²'),
+        h('span', null, L('들어온 열 (열 입력)', 'Heat input')), h('b', null, fmt(b.qIn, 3) + ' W'),
+        h('span', null, L('고정 온도 면으로 나간 열', 'Out through fixed faces')), h('b', null, fmt(b.fixedOut, 3) + ' W'),
+        h('span', null, L('대류로 나간 열', 'Out by convection')), h('b', null, fmt(b.convOut, 3) + ' W'),
+        r.mode === 'transient' ? h('span', null, L('몸체에 쌓이는 열 (마지막 시각)', 'Heat being stored (final time)')) : null, r.mode === 'transient' ? h('b', null, fmt(b.qIn - b.fixedOut - b.convOut, 3) + ' W') : null,
+        h('span', null, L('요소 / 절점', 'Elements / nodes')), h('b', null, `${r.ne} / ${r.nn}`), h('span', null, L('요소 크기 · 계산 시간', 'Element size · time')), h('b', null, `${fmt(r.h, 2)} mm · ${(r.ms / 1000).toFixed(1)} s`)),
+        h('div', { class: 'seg' }, h('button', { class: show === 'T' ? 'on' : '', onclick: () => { show = 'T'; display(); renderPM(); } }, L('온도', 'Temperature')), h('button', { class: show === 'q' ? 'on' : '', onclick: () => { show = 'q'; display(); renderPM(); } }, L('열유속', 'Heat flux'))),
+        h('div', { class: 'hint' }, L('정상 상태에서는 들어온 열 = 나간 열(고정 면 + 대류)이어야 합니다. 열 균형으로 계산이 맞는지 확인하세요. 음수는 반대 방향(들어옴)입니다.', 'At steady state heat in = heat out (fixed faces + convection); use this balance as a check. Negative = flowing in.'))] });
+      if (r.hist) { const cv = h('canvas', { class: 'chart' }); setTimeout(() => FEMUI.drawChart(cv, [{ pts: r.hist.map(p => [p[0], p[1]]), label: L('최고 온도 (°C)', 'max temperature (°C)') }], { xlabel: 's' }), 0); g.push({ title: L('시간에 따른 최고 온도', 'Max temperature over time'), icon: 'mass', body: cv }); }
+      g.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER[r.mode](), L(` · 반복 ${r.it}회`, ` · ${r.it} iterations`)) });
+      g.push({ title: '', body: h('button', { class: 'pbtn wide', onclick: () => { result = null; clear(); renderPM(); updateHighlights(); } }, L('결과 닫고 조건 고치기', 'Close results and edit setup')) });
+      return g;
+    }
+    openPM({
+      title: L('열 해석', 'Thermal study'), icon: 'thermal',
+      groups() {
+        const S2 = study(P()), m = mat();
+        if (result) return [{ title: MODES[S2.mode](), icon: 'thermal', body: h('div', { class: 'hint' }, L('결과를 보는 중입니다.', 'Showing results.')) }, ...resultGroups()];
+        const gs = [];
+        gs.push({ title: L('해석 종류', 'Study type'), icon: 'thermal', body: h('div', { class: 'seg wrap' }, Object.keys(MODES).map(k => h('button', { class: S2.mode === k ? 'on' : '', onclick: () => { S2.mode = k; save(); renderPM(); } }, MODES[k]()))) });
+        gs.push({ title: L('재질', 'Material'), icon: 'material', body: [selectInput(Object.entries(MATERIALS).map(([k, v]) => [k, v.name]), S2.mat || d.material, v => { S2.mat = v; save(); renderPM(); }), h('div', { class: 'kv' }, h('span', null, L('열전도율 k', 'Conductivity k')), h('b', null, m.k + ' W/(m·K)'), h('span', null, L('비열 c', 'Specific heat c')), h('b', null, m.cp + ' J/(kg·K)'), h('span', null, L('밀도', 'Density')), h('b', null, m.rho + ' g/cm³'))] });
+        S2.fixT.forEach((x, i) => gs.push({ title: L(`고정 온도 ${i + 1}`, `Fixed temperature ${i + 1}`), icon: 'mlock', body: [field(L('온도 (°C)', 'Temperature (°C)'), numInput(x.T, v => { x.T = v; save(); }, { step: 5 })), selBox('fix' + i, x.faces, L('이 칸을 누르고 면을 클릭 (파란색)', 'Click here, then click faces (blue)')), S2.fixT.length > 1 ? h('button', { class: 'pbtn', onclick: () => { S2.fixT.splice(i, 1); pick = 'fix0'; save(); renderPM(); updateHighlights(); } }, L('지우기', 'Remove')) : null].filter(Boolean) }));
+        S2.heat.forEach((x, i) => gs.push({ title: L(`열 입력 ${i + 1}`, `Heat input ${i + 1}`), icon: 'thermal', body: [field(L('열량 (W, 면 전체)', 'Power (W, whole selection)'), numInput(x.W, v => { x.W = v; save(); }, { step: 1 })), selBox('heat' + i, x.faces, L('이 칸을 누르고 열이 들어오는 면을 클릭 (빨간색)', 'Click here, then click the heated faces (red)')), h('button', { class: 'pbtn', onclick: () => { S2.heat.splice(i, 1); pick = 'fix0'; save(); renderPM(); updateHighlights(); } }, L('지우기', 'Remove'))] }));
+        S2.conv.forEach((x, i) => gs.push({ title: L(`대류 ${i + 1}`, `Convection ${i + 1}`), icon: 'flow', body: [field(L('열전달계수 h (W/m²·K)', 'Film coefficient h (W/m²·K)'), numInput(x.h, v => { x.h = Math.max(0, v); save(); }, { step: 5 })), field(L('주위 온도 T∞ (°C)', 'Ambient T∞ (°C)'), numInput(x.Tinf, v => { x.Tinf = v; save(); }, { step: 5 })), selBox('conv' + i, x.faces, L('이 칸을 누르고 면을 클릭 (청록색)', 'Click here, then click faces (teal)')), h('button', { class: 'pbtn', onclick: () => { S2.conv.splice(i, 1); pick = 'fix0'; save(); renderPM(); updateHighlights(); } }, L('지우기', 'Remove'))] }));
+        gs.push({ title: '', body: h('div', { class: 'seg wrap' },
+          h('button', { onclick: () => { S2.fixT.push({ faces: [], T: 20 }); pick = 'fix' + (S2.fixT.length - 1); save(); renderPM(); } }, L('+ 고정 온도', '+ Fixed temp.')),
+          h('button', { onclick: () => { S2.heat.push({ faces: [], W: 10 }); pick = 'heat' + (S2.heat.length - 1); save(); renderPM(); } }, L('+ 열 입력', '+ Heat input')),
+          h('button', { onclick: () => { S2.conv.push({ faces: [], h: 25, Tinf: 20 }); pick = 'conv' + (S2.conv.length - 1); save(); renderPM(); } }, L('+ 대류', '+ Convection'))) });
+        gs.push({ title: L('나머지 바깥 면', 'All other outer faces'), icon: 'flow', body: [checkInput(L('공기 대류로 식힘', 'Cooled by air convection'), S2.rest.on, v => { S2.rest.on = v; save(); renderPM(); }),
+          S2.rest.on ? field(L('h (W/m²·K) — 자연 대류 5~25, 강제 대류 25~250', 'h (W/m²·K) — natural 5–25, forced 25–250'), numInput(S2.rest.h, v => { S2.rest.h = Math.max(0, v); save(); }, { step: 5 })) : null,
+          S2.rest.on ? field(L('주위 온도 (°C)', 'Ambient (°C)'), numInput(S2.rest.Tinf, v => { S2.rest.Tinf = v; save(); }, { step: 5 })) : null].filter(Boolean) });
+        if (S2.mode === 'transient') gs.push({ title: L('시간 설정', 'Time'), icon: 'options', body: [field(L('처음 온도 (°C)', 'Initial temperature (°C)'), numInput(S2.T0, v => { S2.T0 = v; save(); }, { step: 5 })), field(L('해석 시간 (s)', 'Duration (s)'), numInput(S2.duration, v => { S2.duration = Math.max(0.1, v); save(); }, { step: 60 })), h('div', { class: 'hint' }, L('시간을 100 단계로 나누어 계산합니다.', 'The time is split into 100 steps.'))] });
+        gs.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER[S2.mode]()) });
+        gs.push({ title: L('메시와 실행', 'Mesh and run'), icon: 'rebuild', body: [h('div', { class: 'seg' }, [['coarse', L('거침', 'Coarse')], ['normal', L('보통', 'Normal')], ['fine', L('세밀', 'Fine')]].map(([k, l]) => h('button', { class: S2.res === k ? 'on' : '', onclick: () => { S2.res = k; save(); renderPM(); } }, l))),
+          h('button', { class: 'pbtn primary wide', disabled: busy, onclick: run }, busy ? L('계산 중…', 'Solving…') : L('▶ 해석 실행', '▶ Run')), busy ? h('button', { class: 'pbtn wide', onclick: () => Work.cancel() }, L('취소', 'Cancel')) : null, h('div', { id: 'thprog', class: 'hint' }, prog)].filter(Boolean) });
+        return gs;
+      },
+      onOK() { }, onCancel() { clear(); }, onClose() { clear(); App.mode = Part.selectMode; updateHighlights(); },
+    });
+    Object.defineProperty(App.pm, 'msg', { get: () => msg, set: v => { msg = v; }, configurable: true });
+    Object.defineProperty(App.pm, 'err', { get: () => err, set: v => { err = v; }, configurable: true });
+    App.mode = pmode; updateHighlights(); renderPM();
+  }
+  return { studyCmd, clear, result: () => result, SOLVER };
+})();
+/* ================= flow study UI: virtual wind tunnel (lattice Boltzmann) ================= */
+const FLOWUI = (() => {
+  const P = () => App.doc;
+  const AX = ['X', 'Y', 'Z'];
+  const FLUIDS = { air: { name: () => L('공기 (20 °C)', 'Air (20 °C)'), nu: 1.5e-5, rho: 1.2 }, water: { name: () => L('물 (20 °C)', 'Water (20 °C)'), nu: 1.0e-6, rho: 998 } };
+  const SOLVER = () => L('격자 볼츠만법(LBM) D3Q19 · BGK 단일 완화 · 벽: 중간점 반사(bounce-back) · 입구: 평형 분포 균일 유속, 출구: 기울기 0, 옆면: 주기 경계 · 힘: 운동량 교환법 · 형상은 풍동 격자에 복셀로 넣음',
+    'Lattice Boltzmann (LBM) D3Q19 · BGK single relaxation · walls: half-way bounce-back · inlet: uniform equilibrium, outlet: zero gradient, sides: periodic · force: momentum exchange · part voxelised into the tunnel grid');
+  let group = null, slice = null, legend = null, result = null;
+  function study(d) {
+    d.flow = d.flow || { dir: '+x', speed: 10, fluid: 'air', Re: 40, nb: 12, show: 'u', sax: -1, spos: 50, streams: true };
+    return d.flow;
+  }
+  const dirOf = s => ({ fa: 'xyz'.indexOf(s[1]), sg: s[0] === '-' ? -1 : 1 });
+  function clear() {
+    if (group) { View.scene.remove(group); group.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); } }); group = null; slice = null; }
+    if (legend) { legend.remove(); legend = null; }
+    View.req();
+  }
+  // trilinear sample of the cell-centred velocity (units of U) at a world point; null = outside or solid
+  function sampler(r) {
+    const [nx, ny, nz] = r.n, o = r.o, hs = r.hs, v = r.vel, sol = r.solid;
+    return p => {
+      const gx = (p[0] - o[0]) / hs[0] - 0.5, gy = (p[1] - o[1]) / hs[1] - 0.5, gz = (p[2] - o[2]) / hs[2] - 0.5;
+      if (gx < 0 || gy < 0 || gz < 0 || gx > nx - 1 || gy > ny - 1 || gz > nz - 1) return null;
+      const i = Math.min(nx - 2, Math.floor(gx)), j = Math.min(ny - 2, Math.floor(gy)), k = Math.min(nz - 2, Math.floor(gz)), fx = gx - i, fy = gy - j, fz = gz - k;
+      const ci = Math.round(gx), cj = Math.round(gy), ck = Math.round(gz); if (sol[(ci * ny + cj) * nz + ck]) return null;
+      const out = [0, 0, 0];
+      for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) for (let c = 0; c < 2; c++) {
+        const w = (a ? fx : 1 - fx) * (b ? fy : 1 - fy) * (c ? fz : 1 - fz), n = ((i + a) * ny + j + b) * nz + k + c;
+        out[0] += w * v[n * 3]; out[1] += w * v[n * 3 + 1]; out[2] += w * v[n * 3 + 2];
+      }
+      return out;
+    };
+  }
+  const range = (r, show) => show === 'cp' ? [-1.5, 1] : [0, Math.min(1.8, Math.max(1.05, r.umax))];
+  function buildSlice(S) {
+    const r = result; if (!r || !group) return;
+    if (slice) { group.remove(slice); slice.geometry.dispose(); slice.material.map.dispose(); slice.material.dispose(); slice = null; }
+    const cross = [0, 1, 2].filter(d => d !== r.fa), sa = S.sax >= 0 && S.sax !== r.fa ? S.sax : cross[cross.length - 1];
+    const [a, b] = [0, 1, 2].filter(d => d !== sa), n = r.n, W = n[a], H = n[b];
+    const layer = clamp(Math.round(S.spos / 100 * (n[sa] - 1)), 0, n[sa] - 1);
+    const [v0, v1] = range(r, S.show), data = new Uint8Array(W * H * 4);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const I = [0, 0, 0]; I[sa] = layer; I[a] = x; I[b] = y; const c = (I[0] * n[1] + I[1]) * n[2] + I[2], o = (y * W + x) * 4;
+      if (r.solid[c]) { data[o] = 70; data[o + 1] = 76; data[o + 2] = 86; data[o + 3] = 255; continue; }
+      const val = S.show === 'cp' ? r.cp[c] : Math.hypot(r.vel[c * 3], r.vel[c * 3 + 1], r.vel[c * 3 + 2]);
+      const col = rainbow((val - v0) / (v1 - v0)); data[o] = col[0] * 255; data[o + 1] = col[1] * 255; data[o + 2] = col[2] * 255; data[o + 3] = 255;
+    }
+    const tex = new THREE.DataTexture(data, W, H, THREE.RGBAFormat); tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearFilter; tex.needsUpdate = true;
+    const lo = r.o.map((v, d) => v + r.hs[d] * 0.5), hi = r.o.map((v, d) => v + r.hs[d] * (n[d] - 0.5)), s0 = r.o[sa] + (layer + 0.5) * r.hs[sa];
+    const corner = (u, w) => { const p = [0, 0, 0]; p[sa] = s0; p[a] = u ? hi[a] : lo[a]; p[b] = w ? hi[b] : lo[b]; return p; };
+    const pos = new Float32Array([...corner(0, 0), ...corner(1, 0), ...corner(1, 1), ...corner(0, 0), ...corner(1, 1), ...corner(0, 1)]);
+    const uv = new Float32Array([0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1]);
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    slice = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide, transparent: true, opacity: 0.88, depthWrite: false }));
+    slice.renderOrder = 2; group.add(slice);
+    if (legend) legend.remove();
+    const title = S.show === 'cp' ? L('압력계수 Cp', 'Pressure coefficient Cp') : L('속도 |u| / U (자유 유속 대비)', 'Speed |u| / U (vs free stream)');
+    legend = h('div', { class: 'femleg' }, h('b', null, title), h('div', { class: 'bar' }), h('div', { class: 'lbl' }, [1, 0.75, 0.5, 0.25, 0].map(t => h('span', null, fmtN(v0 + (v1 - v0) * t)))), h('small', null, L(`단면 ${AX[sa]} = ${fmt(s0, 1)} mm`, `slice ${AX[sa]} = ${fmt(s0, 1)} mm`)));
+    $('#gfx').append(legend); View.req();
+  }
+  function display(S) {
+    const r = result; if (!r) return; clear();
+    group = new THREE.Group(); View.scene.add(group);
+    // tunnel outline
+    const size = r.n.map((v, d) => v * r.hs[d]), box = new THREE.BoxGeometry(size[0], size[1], size[2]);
+    const out = new THREE.LineSegments(new THREE.EdgesGeometry(box), new THREE.LineBasicMaterial({ color: 0x5aa9e6, transparent: true, opacity: 0.45 })); box.dispose();
+    out.position.set(r.o[0] + size[0] / 2, r.o[1] + size[1] / 2, r.o[2] + size[2] / 2); group.add(out);
+    // streamlines: seeds on a grid just downstream of the inlet, around the part
+    if (S.streams) {
+      const smp = sampler(r), fa = r.fa, cross = [0, 1, 2].filter(d => d !== fa), B = getBuild(P()).topo.bbox;
+      const x0 = r.sg > 0 ? r.o[fa] + 1.5 * r.hs[fa] : r.o[fa] + (r.n[fa] - 1.5) * r.hs[fa];
+      const pos = [], col = [], NS = 9, ds = Math.min(...r.hs) * 0.6, maxSteps = Math.ceil(4 * size[fa] / ds);
+      for (let p = 0; p < NS; p++) for (let q = 0; q < NS; q++) {
+        let x = [0, 0, 0]; x[fa] = x0;
+        const c0 = cross[0], c1 = cross[1], m0 = (B.mn[c0] + B.mx[c0]) / 2, m1 = (B.mn[c1] + B.mx[c1]) / 2, e0 = (B.mx[c0] - B.mn[c0]) * 0.7 + r.hs[c0], e1 = (B.mx[c1] - B.mn[c1]) * 0.7 + r.hs[c1];
+        x[c0] = m0 + e0 * (p / (NS - 1) * 2 - 1); x[c1] = m1 + e1 * (q / (NS - 1) * 2 - 1);
+        for (let s = 0; s < maxSteps; s++) {
+          const v1 = smp(x); if (!v1) break; const sp = Math.hypot(...v1); if (sp < 1e-3) break;
+          const mid = x.map((c, d) => c + 0.5 * ds * v1[d] / sp), v2 = smp(mid); if (!v2) break; const sp2 = Math.hypot(...v2); if (sp2 < 1e-3) break;
+          const nx = x.map((c, d) => c + ds * v2[d] / sp2), cc = rainbow(clamp(sp2 / 1.5, 0, 1));
+          pos.push(...x, ...nx); col.push(...cc, ...cc); x = nx;
+        }
+      }
+      if (pos.length) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); group.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 }))); }
+    }
+    buildSlice(S);
+  }
+  function studyCmd() {
+    const d = P(); if (!d || d.type !== 'part') return;
+    if (App.sketch) Part.exitSketch(true);
+    const B = getBuild(d); if (!B.topo.nt) { status(L('해석할 몸체가 없습니다. 먼저 형상을 만드세요.', 'There is no body to analyse.')); return; }
+    const S = study(d); let busy = false, msg = null, err = false, prog = '';
+    result = null; clear(); FEMUI.clear(); THERMUI.clear();
+    const pmode = Object.assign({}, Part.selectMode, {
+      name: 'flow', click() { }, highlights: () => [],
+      draw(ctx) {
+        if (result) return; const Bn = getBuild(P()), bb = Bn.topo.bbox, { fa, sg } = dirOf(S.dir), D = Bn.topo.diag;
+        const c = [0, 1, 2].map(k => (bb.mn[k] + bb.mx[k]) / 2); const tail = c.slice(), head = c.slice();
+        tail[fa] = (sg > 0 ? bb.mn[fa] : bb.mx[fa]) - sg * D * 0.9; head[fa] = (sg > 0 ? bb.mn[fa] : bb.mx[fa]) - sg * D * 0.15;
+        const t = View.project(tail), hd = View.project(head); ctx.strokeStyle = ctx.fillStyle = '#3FD0D6'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(t[0], t[1]); ctx.lineTo(hd[0], hd[1]); ctx.stroke();
+        const a = Math.atan2(hd[1] - t[1], hd[0] - t[0]); ctx.beginPath(); ctx.moveTo(hd[0], hd[1]); ctx.lineTo(hd[0] - 14 * Math.cos(a - 0.4), hd[1] - 14 * Math.sin(a - 0.4)); ctx.lineTo(hd[0] - 14 * Math.cos(a + 0.4), hd[1] - 14 * Math.sin(a + 0.4)); ctx.fill();
+        ctx.font = '12px "IBM Plex Sans", sans-serif'; ctx.fillText(L(`유입 ${S.speed} m/s`, `inflow ${S.speed} m/s`), t[0] + 6, t[1] - 8);
+      },
+    });
+    async function run() {
+      if (busy) return; const d2 = P(), B2 = getBuild(d2), S2 = study(d2), { fa, sg } = dirOf(S2.dir);
+      busy = true; err = false; msg = L('계산 중… (수 초 ~ 수십 초)', 'Solving… (seconds to tens of seconds)'); prog = ''; renderPM();
+      const t0 = performance.now();
+      try {
+        const r = await Work.run({ type: 'flow', tris: B2.tris, bbox: B2.topo.bbox, fa, sg, nb: S2.nb, Re: S2.Re }, p => { prog = p.stage === 'grid' ? L(`풍동 격자 ${p.n.join('×')} (고체 ${p.nSolid}칸)`, `tunnel grid ${p.n.join('×')} (${p.nSolid} solid cells)`) : p.stage === 'lbm' ? L(`시간 단계 ${p.s}/${p.n}`, `time step ${p.s}/${p.n}`) : ''; const el = $('#flprog'); if (el) el.textContent = prog; });
+        r.ms = Math.round(performance.now() - t0); r.speed = S2.speed; r.fluid = S2.fluid; result = r; msg = null; display(S2);
+      } catch (e) { err = true; msg = e.message === 'VOXEL' ? L('형상을 풍동 격자에 넣지 못했습니다 (닫힌 몸체가 아니거나 너무 얇음).', 'Could not place the part in the tunnel grid (not closed, or too thin).') : e.message === 'CANCEL' ? L('취소했습니다.', 'Cancelled.') : L('해석 오류: ', 'Solver error: ') + e.message; }
+      busy = false; renderPM();
+    }
+    function resultGroups(S2) {
+      const r = result, fl = FLUIDS[r.fluid] || FLUIDS.air, V = r.speed, Dm = r.D / 1000, ReReal = V * Dm / fl.nu, Afm = r.Af * 1e-6, Fd = 0.5 * fl.rho * V * V * r.Cd * Afm;
+      const cross = [0, 1, 2].filter(k => k !== r.fa), g = [];
+      g.push({ title: L('결과', 'Results'), icon: 'flow', body: [h('div', { class: 'kv' },
+        h('span', null, L('항력계수 Cd', 'Drag coefficient Cd')), h('b', { style: 'color:#3FD0D6' }, fmt(r.Cd, 3)),
+        h('span', null, L('옆 힘 계수', 'Side-force coefficients')), h('b', null, cross.map((k, i) => `${AX[k]} ${fmt(r.Cl[i], 3)}`).join(' · ')),
+        h('span', null, L('정면 투영 면적', 'Frontal area')), h('b', null, fmtN(r.Af) + ' mm²'),
+        h('span', null, L('최대 속도', 'Max speed')), h('b', null, fmt(r.umax, 2) + ' × U'),
+        h('span', null, L('계산한 레이놀즈 수', 'Simulated Reynolds number')), h('b', null, String(Math.round(r.Re))),
+        h('span', null, L('실제 레이놀즈 수', 'Real Reynolds number')), h('b', null, fmtN(ReReal)),
+        h('span', null, L('항력 어림값 (Cd 그대로)', 'Rough drag (same Cd)')), h('b', null, fmtN(Fd) + ' N'),
+        h('span', null, L('격자 · 단계 · 시간', 'Grid · steps · time')), h('b', null, `${r.n.join('×')} · ${r.steps} · ${(r.ms / 1000).toFixed(1)} s`)),
+        h('div', { class: 'warn' }, L('정성 해석입니다: 낮은 레이놀즈 수(층류)로 흐름 모양(정체점, 박리, 후류)을 봅니다. 거친 계단 격자와 좁은 풍동 때문에 Cd가 실제보다 25~40 % 크게 나옵니다(구 검증: 3.5 대 2.6). 실제 속도(난류)의 항력은 Cd가 달라지므로 어림값은 크기 정도만 참고하세요.',
+          'Qualitative study: a low Reynolds number (laminar) shows the flow pattern (stagnation, separation, wake). The coarse staircase grid and narrow tunnel make Cd 25–40 % too high (sphere check: 3.5 vs 2.6). At real (turbulent) speeds Cd differs, so treat the drag estimate as an order of magnitude only.'))] });
+      const cr = [0, 1, 2].filter(k => k !== r.fa), sa = S2.sax >= 0 && S2.sax !== r.fa ? S2.sax : cr[cr.length - 1];
+      g.push({ title: L('표시', 'Display'), icon: 'eye', body: [
+        h('div', { class: 'seg' }, h('button', { class: S2.show === 'u' ? 'on' : '', onclick: () => { S2.show = 'u'; buildSlice(S2); renderPM(); } }, L('속도', 'Speed')), h('button', { class: S2.show === 'cp' ? 'on' : '', onclick: () => { S2.show = 'cp'; buildSlice(S2); renderPM(); } }, L('압력 Cp', 'Pressure Cp'))),
+        field(L('단면 방향 (수직축)', 'Slice normal'), h('div', { class: 'seg' }, cr.map(k => h('button', { class: sa === k ? 'on' : '', onclick: () => { S2.sax = k; buildSlice(S2); renderPM(); } }, AX[k])))),
+        field(L(`단면 위치 ${S2.spos} %`, `Slice position ${S2.spos} %`), h('input', { type: 'range', min: 0, max: 100, value: S2.spos, class: 'wide', oninput: e => { S2.spos = +e.target.value; buildSlice(S2); const lb = e.target.closest('.fld'); if (lb) lb.firstChild.textContent = L(`단면 위치 ${S2.spos} %`, `Slice position ${S2.spos} %`); } })),
+        checkInput(L('유선 보이기', 'Show streamlines'), S2.streams, v => { S2.streams = v; display(S2); renderPM(); })] });
+      g.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER(), L(` · 완화시간 τ ${fmt(r.tau, 3)}`, ` · relaxation time τ ${fmt(r.tau, 3)}`)) });
+      g.push({ title: '', body: h('button', { class: 'pbtn wide', onclick: () => { result = null; clear(); renderPM(); updateHighlights(); } }, L('결과 닫고 조건 고치기', 'Close results and edit setup')) });
+      return g;
+    }
+    openPM({
+      title: L('유동 해석 (가상 풍동)', 'Flow study (virtual wind tunnel)'), icon: 'flow',
+      groups() {
+        const S2 = study(P());
+        if (result) return resultGroups(S2);
+        const gs = [];
+        gs.push({ title: L('흐름 방향', 'Flow direction'), icon: 'flow', body: [h('div', { class: 'seg wrap' }, ['+x', '-x', '+y', '-y', '+z', '-z'].map(k => h('button', { class: S2.dir === k ? 'on' : '', onclick: () => { S2.dir = k; save(); renderPM(); View.req(); } }, (k[0] === '+' ? '+' : '−') + k[1].toUpperCase()))), h('div', { class: 'hint' }, L('화살표 방향으로 유체가 부품에 부딪힙니다.', 'The fluid hits the part along the arrow.'))] });
+        gs.push({ title: L('유체와 속도', 'Fluid and speed'), icon: 'options', body: [selectInput(Object.entries(FLUIDS).map(([k, v]) => [k, v.name()]), S2.fluid, v => { S2.fluid = v; save(); renderPM(); }), field(L('실제 유속 (m/s)', 'Real speed (m/s)'), numInput(S2.speed, v => { S2.speed = Math.max(0.001, v); save(); View.req(); }, { step: 1, min: 0 })), h('div', { class: 'hint' }, L('실제 유속은 결과에서 실제 레이놀즈 수와 항력 어림값에만 씁니다.', 'The real speed is used only for the real Reynolds number and the rough drag in the results.'))] });
+        gs.push({ title: L('계산 레이놀즈 수', 'Simulated Reynolds number'), icon: 'options', body: [h('div', { class: 'seg' }, [20, 40, 80].map(v => h('button', { class: S2.Re === v ? 'on' : '', onclick: () => { S2.Re = v; save(); renderPM(); } }, 'Re ' + v))), h('div', { class: 'hint' }, L('20: 매끈한 흐름 · 40: 뒤쪽 소용돌이 쌍 · 80: 긴 후류 (격자가 거칠면 불안정할 수 있음)', '20: smooth · 40: wake vortex pair · 80: long wake (may be unstable on coarse grids)'))] });
+        gs.push({ title: L('격자 (부품 폭에 놓을 칸 수)', 'Grid (cells across the part)'), icon: 'rebuild', body: [h('div', { class: 'seg' }, [[10, L('거침 · 빠름', 'Coarse · fast')], [12, L('보통', 'Normal')], [14, L('세밀', 'Fine')]].map(([v, l]) => h('button', { class: S2.nb === v ? 'on' : '', onclick: () => { S2.nb = v; save(); renderPM(); } }, l)))] });
+        gs.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER()) });
+        gs.push({ title: L('실행', 'Run'), icon: 'rebuild', body: [h('button', { class: 'pbtn primary wide', disabled: busy, onclick: run }, busy ? L('계산 중…', 'Solving…') : L('▶ 해석 실행', '▶ Run')), busy ? h('button', { class: 'pbtn wide', onclick: () => Work.cancel() }, L('취소', 'Cancel')) : null, h('div', { id: 'flprog', class: 'hint' }, prog)].filter(Boolean) });
+        return gs;
+      },
+      onOK() { }, onCancel() { clear(); }, onClose() { clear(); App.mode = Part.selectMode; updateHighlights(); },
+    });
+    Object.defineProperty(App.pm, 'msg', { get: () => msg, set: v => { msg = v; }, configurable: true });
+    Object.defineProperty(App.pm, 'err', { get: () => err, set: v => { err = v; }, configurable: true });
+    App.mode = pmode; updateHighlights(); renderPM();
+  }
+  return { studyCmd, clear, result: () => result, SOLVER };
+})();
+/* ================= assembly motion study: animation, kinematics, dynamics =================
+   Kinematics: every mate becomes a set of residual equations on the component placements (6 unknowns per
+   free component: translation + rotation vector about its centre). Motors prescribe the placement of the
+   driven components over time; at every frame the remaining placements are found by Levenberg–Marquardt
+   (damped Gauss–Newton) with a numerical Jacobian, starting from the previous frame.
+   Dynamics: rigid-body mass, centre of mass and inertia tensor of each part are integrated from its mesh;
+   the motor power is the rate of change of kinetic + potential energy (no friction), so the required
+   motor torque is P/ω (force P/v for a linear motor). */
+const MotionSolver = (() => {
+  // 4×4 column-major (THREE layout) helpers on plain arrays
+  const mul = (A, B) => { const o = new Array(16); for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) o[c * 4 + r] = A[r] * B[c * 4] + A[4 + r] * B[c * 4 + 1] + A[8 + r] * B[c * 4 + 2] + A[12 + r] * B[c * 4 + 3]; return o; };
+  const xp = (M, p) => [M[0] * p[0] + M[4] * p[1] + M[8] * p[2] + M[12], M[1] * p[0] + M[5] * p[1] + M[9] * p[2] + M[13], M[2] * p[0] + M[6] * p[1] + M[10] * p[2] + M[14]];
+  const xd = (M, d) => [M[0] * d[0] + M[4] * d[1] + M[8] * d[2], M[1] * d[0] + M[5] * d[1] + M[9] * d[2], M[2] * d[0] + M[6] * d[1] + M[10] * d[2]];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2], sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const nrm = a => { const l = Math.hypot(...a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+  const trans = t => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, t[0], t[1], t[2], 1];
+  // rotation by vector w (axis·angle) about pivot c
+  function rotAbout(w, c) {
+    const th = Math.hypot(...w); if (th < 1e-15) return trans([0, 0, 0]);
+    const k = [w[0] / th, w[1] / th, w[2] / th], C = Math.cos(th), S = Math.sin(th), V = 1 - C;
+    const R = [k[0] * k[0] * V + C, k[1] * k[0] * V + k[2] * S, k[2] * k[0] * V - k[1] * S, 0,
+      k[0] * k[1] * V - k[2] * S, k[1] * k[1] * V + C, k[2] * k[1] * V + k[0] * S, 0,
+      k[0] * k[2] * V + k[1] * S, k[1] * k[2] * V - k[0] * S, k[2] * k[2] * V + C, 0, 0, 0, 0, 1];
+    return mul(trans(c), mul(R, trans([-c[0], -c[1], -c[2]])));
+  }
+  const inv = M => { // rigid inverse
+    const R = [M[0], M[4], M[8], 0, M[1], M[5], M[9], 0, M[2], M[6], M[10], 0, 0, 0, 0, 1];
+    const t = xd(R, [M[12], M[13], M[14]]); R[12] = -t[0]; R[13] = -t[1]; R[14] = -t[2]; return R;
+  };
+  // world feature of a mate reference
+  const feat = (M, r) => r.kind === 'plane' ? { kind: 'plane', p: xp(M, r.p), n: nrm(xd(M, r.n)) } : { kind: 'axis', p: xp(M, r.p), d: nrm(xd(M, r.d)), r: r.r };
+  /* build the constraint set: mates → {ia, ib, f(Ma, Mb) → residual list}, with the declared values
+     (coincident = 0, distance, tangent = radius) and orientation signs taken from the current placement */
+  function constraints(mates, idx, Ms, L) {
+    const out = [];
+    for (const m of mates) {
+      const ia = idx.get(m.a.comp), ib = idx.get(m.b.comp); if (ia == null || ib == null || ia === ib) continue;
+      let ra = m.a, rb = m.b, A = ia, B = ib;
+      if (ra.kind === 'axis' && rb.kind === 'plane') { [ra, rb] = [rb, ra]; [A, B] = [B, A]; } // plane first
+      const fa = feat(Ms[A], ra), fb = feat(Ms[B], rb), k = ra.kind + '+' + rb.kind;
+      let f = null;
+      if (m.type === 'lock') {
+        const rel0 = mul(inv(Ms[A]), Ms[B]);
+        f = (Ma, Mb) => { const rel = mul(inv(Ma), Mb), o = []; for (let i = 0; i < 3; i++) o.push(rel[12 + i] - rel0[12 + i]); for (const i of [0, 1, 2, 4, 5, 6, 8, 9, 10]) o.push((rel[i] - rel0[i]) * L); return o; };
+      } else if (k === 'plane+plane') {
+        const c0 = dot(fa.n, fb.n), sg = c0 >= 0 ? 1 : -1, s0 = dot(fa.n, sub(fb.p, fa.p)), ss = s0 >= 0 ? 1 : -1;
+        const want = m.type === 'coinc' ? 0 : m.type === 'dist' ? ss * (+m.dist || 0) : s0;
+        if (m.type === 'perp') f = (Ma, Mb) => { const a = feat(Ma, ra), b = feat(Mb, rb); return [dot(a.n, b.n) * L]; };
+        else if (m.type === 'angle') { const ca = Math.cos((+m.angle || 0) * Math.PI / 180) * (Math.abs(c0 - Math.cos((+m.angle || 0) * Math.PI / 180)) < Math.abs(c0 + Math.cos((+m.angle || 0) * Math.PI / 180)) ? 1 : -1); f = (Ma, Mb) => { const a = feat(Ma, ra), b = feat(Mb, rb); return [(dot(a.n, b.n) - ca) * L]; }; }
+        else f = (Ma, Mb) => { const a = feat(Ma, ra), b = feat(Mb, rb), o = [(b.n[0] - sg * a.n[0]) * L, (b.n[1] - sg * a.n[1]) * L, (b.n[2] - sg * a.n[2]) * L]; if (m.type !== 'para') o.push(dot(a.n, sub(b.p, a.p)) - want); return o; };
+      } else if (k === 'axis+axis') {
+        const sg = dot(fa.d, fb.d) >= 0 ? 1 : -1;
+        f = (Ma, Mb) => { const a = feat(Ma, ra), b = feat(Mb, rb), o = [(b.d[0] - sg * a.d[0]) * L, (b.d[1] - sg * a.d[1]) * L, (b.d[2] - sg * a.d[2]) * L]; if (m.type === 'conc') { const w = sub(b.p, a.p), t = dot(w, a.d); o.push(w[0] - t * a.d[0], w[1] - t * a.d[1], w[2] - t * a.d[2]); } return o; };
+      } else if (k === 'plane+axis') {
+        if (m.type === 'perp') { const sg = dot(fa.n, fb.d) >= 0 ? 1 : -1; f = (Ma, Mb) => { const a = feat(Ma, ra), b = feat(Mb, rb); return [(b.d[0] - sg * a.n[0]) * L, (b.d[1] - sg * a.n[1]) * L, (b.d[2] - sg * a.n[2]) * L]; }; }
+        else { const s0 = dot(fa.n, sub(fb.p, fa.p)), want = (s0 >= 0 ? 1 : -1) * (fb.r || 0); f = (Ma, Mb) => { const a = feat(Ma, ra), b = feat(Mb, rb); return [dot(a.n, b.d) * L, dot(a.n, sub(b.p, a.p)) - want]; }; }
+      }
+      if (f) out.push({ A, B, f, mate: m });
+    }
+    return out;
+  }
+  function residual(cons, Ms) { const r = []; for (const c of cons) for (const v of c.f(Ms[c.A], Ms[c.B])) r.push(v); return r; }
+  function solveLin(A, b, n) { // Gaussian elimination with partial pivoting (A n×n row-major, overwritten)
+    for (let c = 0; c < n; c++) {
+      let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(A[r * n + c]) > Math.abs(A[p * n + c])) p = r;
+      if (p !== c) { for (let k = 0; k < n; k++) { const t = A[c * n + k]; A[c * n + k] = A[p * n + k]; A[p * n + k] = t; } const t = b[c]; b[c] = b[p]; b[p] = t; }
+      const d = A[c * n + c] || 1e-30;
+      for (let r = c + 1; r < n; r++) { const f = A[r * n + c] / d; if (!f) continue; for (let k = c; k < n; k++) A[r * n + k] -= f * A[c * n + k]; b[r] -= f * b[c]; }
+    }
+    const x = new Float64Array(n); for (let r = n - 1; r >= 0; r--) { let s = b[r]; for (let k = r + 1; k < n; k++) s -= A[r * n + k] * x[k]; x[r] = s / (A[r * n + r] || 1e-30); } return x;
+  }
+  /* Levenberg–Marquardt on the free components (indices in `free`), others fixed/prescribed */
+  function solve(cons, Ms, free, centers, L, { tol = 1e-7, maxIt = 40 } = {}) {
+    const nv = free.length * 6; if (!nv || !cons.length) return { err: cons.length ? Math.max(0, ...residual(cons, Ms).map(Math.abs)) : 0, it: 0 };
+    const place = (base, x) => { const out = base.slice(); free.forEach((ci, k) => { const o = k * 6, c = centers[ci]; out[ci] = mul(trans([x[o], x[o + 1], x[o + 2]]), mul(rotAbout([x[o + 3], x[o + 4], x[o + 5]], c), base[ci])); }); return out; };
+    let cur = Ms.slice(), r = residual(cons, cur), E = r.reduce((s, v) => s + v * v, 0), lam = 1e-3, it = 0;
+    const scale = Math.max(1e-6, tol * L);
+    for (; it < maxIt; it++) {
+      if (Math.sqrt(E / Math.max(1, r.length)) < scale * 1e-2 && Math.max(...r.map(Math.abs)) < scale) break;
+      const m = r.length, J = new Float64Array(m * nv), x0 = new Float64Array(nv);
+      for (let j = 0; j < nv; j++) { const x = x0.slice(), h = (j % 6 < 3 ? 1e-6 * L : 1e-7); x[j] = h; const rj = residual(cons, place(cur, x)); for (let i = 0; i < m; i++) J[i * nv + j] = (rj[i] - r[i]) / h; }
+      const JtJ = new Float64Array(nv * nv), g = new Float64Array(nv);
+      for (let i = 0; i < m; i++) { const ri = r[i], row = i * nv; for (let a = 0; a < nv; a++) { const ja = J[row + a]; if (!ja) continue; g[a] += ja * ri; for (let b = a; b < nv; b++) JtJ[a * nv + b] += ja * J[row + b]; } }
+      for (let a = 0; a < nv; a++) for (let b = 0; b < a; b++) JtJ[a * nv + b] = JtJ[b * nv + a];
+      let ok = false;
+      for (let tries = 0; tries < 8; tries++) {
+        const A = JtJ.slice(), b = new Float64Array(nv); for (let a = 0; a < nv; a++) { A[a * nv + a] += lam * (JtJ[a * nv + a] + 1e-9 * (a % 6 < 3 ? 1 : L * L)) + 1e-12; b[a] = -g[a]; }
+        const dx = solveLin(A, b, nv), nx = place(cur, dx), nr = residual(cons, nx), nE = nr.reduce((s, v) => s + v * v, 0);
+        if (nE < E) { cur = nx; r = nr; E = nE; lam = Math.max(1e-9, lam / 4); ok = true; break; }
+        lam *= 6;
+      }
+      if (!ok) break;
+      // re-centre rotations on the moved components
+      free.forEach(ci => { centers[ci] = xp(cur[ci], centers[ci + '_l']); });
+    }
+    for (let i = 0; i < Ms.length; i++) Ms[i] = cur[i];
+    return { err: r.length ? Math.max(...r.map(Math.abs)) : 0, it };
+  }
+  /* mass, centre of mass and inertia (about the COM) of a closed triangle mesh, local coordinates.
+     Returns volume (mm³), com (mm) and C = ∫(x-c)(x-c)ᵀ dV (mm⁵) → I = tr(C)·1 − C */
+  function inertia(tris) {
+    let V = 0; const c = [0, 0, 0], S = new Float64Array(9);
+    for (let t = 0; t < tris.length; t += 9) {
+      const a = [tris[t], tris[t + 1], tris[t + 2]], b = [tris[t + 3], tris[t + 4], tris[t + 5]], d = [tris[t + 6], tris[t + 7], tris[t + 8]];
+      const v = (a[0] * (b[1] * d[2] - b[2] * d[1]) - a[1] * (b[0] * d[2] - b[2] * d[0]) + a[2] * (b[0] * d[1] - b[1] * d[0])) / 6;
+      V += v; const s = [a[0] + b[0] + d[0], a[1] + b[1] + d[1], a[2] + b[2] + d[2]];
+      for (let k = 0; k < 3; k++) c[k] += v * s[k] / 4;
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) S[i * 3 + j] += v / 20 * (a[i] * a[j] + b[i] * b[j] + d[i] * d[j] + s[i] * s[j]);
+    }
+    if (Math.abs(V) < 1e-12) return { V: 0, com: [0, 0, 0], I: new Float64Array(9) };
+    const com = c.map(v => v / V), C = new Float64Array(9);
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) C[i * 3 + j] = S[i * 3 + j] - V * com[i] * com[j];
+    const tr = C[0] + C[4] + C[8], I = new Float64Array(9); for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) I[i * 3 + j] = (i === j ? tr : 0) - C[i * 3 + j];
+    return { V, com, I };
+  }
+  /* run the motion: comps [{M (16), fixed, center (local), mass: {m kg, com local, I kg·mm²}}], mates,
+     drivers [{ci, kind:'rot'|'lin'|'gear', p, d (world, at t=0), w (rad/s) | v | stroke,f | ratio, of }],
+     T (s), N frames, gravity (m/s² vector) */
+  function run({ comps, mates, drivers, T, N, gravity, L }) {
+    const idx = new Map(comps.map((c, i) => [c.id, i])), M0 = comps.map(c => c.M.slice());
+    const driven = new Set(drivers.map(d => d.ci)), free = []; comps.forEach((c, i) => { if (!c.fixed && !driven.has(i)) free.push(i); });
+    const centers = {}; comps.forEach((c, i) => { centers[i + '_l'] = c.center; centers[i] = xp(c.M, c.center); });
+    let Ms = M0.map(m => m.slice());
+    const cons = constraints(mates, idx, Ms, L);
+    // settle at t = 0 (the mate values may not be met exactly by the placement solver)
+    const s0 = solve(cons, Ms, free, centers, L, { maxIt: 80 });
+    const base = Ms.map(m => m.slice()), dt = T / N, frames = [], errs = [];
+    const motor = drivers.find(d => d.kind !== 'gear');
+    const angleAt = (d, t) => d.kind === 'rot' ? d.w * t : d.kind === 'gear' ? -(d.same ? -1 : 1) * d.ratio * (motor && motor.kind === 'rot' ? motor.w * t : 0) : d.mode === 'osc' ? d.stroke / 2 * (1 - Math.cos(2 * Math.PI * d.f * t)) : d.v * t;
+    let maxErr = s0.err, worst = 0;
+    for (let k = 0; k <= N; k++) {
+      const t = k * dt;
+      for (const d of drivers) { const q = angleAt(d, t); Ms[d.ci] = d.kind === 'lin' ? mul(trans([d.d[0] * q, d.d[1] * q, d.d[2] * q]), base[d.ci]) : mul(rotAbout([d.d[0] * q, d.d[1] * q, d.d[2] * q], d.p), base[d.ci]); }
+      const r = solve(cons, Ms, free, centers, L);
+      frames.push(Ms.map(m => m.slice())); errs.push(r.err); if (r.err > maxErr) { maxErr = r.err; worst = k; }
+    }
+    /* kinematics and energy */
+    const nC = comps.length, comW = (k, i) => xp(frames[k][i], comps[i].mass.com);
+    const pos = [], vel = [], acc = [], omg = [], KE = [], PE = [];
+    for (let k = 0; k <= N; k++) {
+      const km = Math.max(0, k - 1), kp = Math.min(N, k + 1), h = (kp - km) * dt;
+      const P = [], Vv = [], W = []; let ke = 0, pe = 0;
+      for (let i = 0; i < nC; i++) {
+        const c = comW(k, i), cm = comW(km, i), cp = comW(kp, i), v = [(cp[0] - cm[0]) / h, (cp[1] - cm[1]) / h, (cp[2] - cm[2]) / h];
+        // angular velocity from R(k+1) R(k-1)ᵀ
+        const A = frames[kp][i], B = frames[km][i]; const R = (r, c2) => A[r] * B[c2] + A[4 + r] * B[4 + c2] + A[8 + r] * B[8 + c2];
+        const w = [(R(2, 1) - R(1, 2)) / 2 / h, (R(0, 2) - R(2, 0)) / 2 / h, (R(1, 0) - R(0, 1)) / 2 / h];
+        P.push(c); Vv.push(v); W.push(w);
+        const ms = comps[i].mass; if (!ms || comps[i].fixed) continue;
+        const Mk = frames[k][i], Iw = (a, b) => { let s = 0; for (let p = 0; p < 3; p++) for (let q = 0; q < 3; q++) s += Mk[p * 4 + a] * ms.I[p * 3 + q] * Mk[q * 4 + b]; return s; };
+        let rot = 0; for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) rot += w[a] * Iw(a, b) * w[b];
+        ke += 0.5 * ms.m * dot(v, v) * 1e-6 + 0.5 * rot * 1e-6;
+        pe -= ms.m * dot(gravity, c) * 1e-3;
+      }
+      pos.push(P); vel.push(Vv); omg.push(W); KE.push(ke); PE.push(pe);
+    }
+    for (let k = 0; k <= N; k++) { const km = Math.max(0, k - 1), kp = Math.min(N, k + 1), h = (kp - km) * dt; acc.push(vel[k].map((_, i) => [0, 1, 2].map(d => (vel[kp][i][d] - vel[km][i][d]) / h))); }
+    const power = KE.map((_, k) => { const km = Math.max(0, k - 1), kp = Math.min(N, k + 1); return (KE[kp] + PE[kp] - KE[km] - PE[km]) / ((kp - km) * dt); });
+    let effort = null;
+    if (motor) effort = power.map(P => { if (motor.kind === 'rot') return P / motor.w; const v = motor.mode === 'osc' ? null : motor.v * 1e-3; return v ? P / v : null; });
+    if (motor && motor.kind === 'lin' && motor.mode === 'osc') effort = power.map((P, k) => { const t = k * dt, v = motor.stroke / 2 * 2 * Math.PI * motor.f * Math.sin(2 * Math.PI * motor.f * t) * 1e-3; return Math.abs(v) > 1e-3 * motor.stroke * motor.f ? P / v : null; });
+    return { frames, errs, maxErr, worst, dt, N, T, pos, vel, acc, omg, KE, PE, power, effort, settle: s0.err, nFree: free.length, nCons: cons.length };
+  }
+  return { run, solve, constraints, residual, inertia, mul, xp, xd, rotAbout, inv };
+})();
+
+const MOTIONUI = (() => {
+  const A = () => App.doc;
+  const SOLVER = () => L('기구학: 메이트마다 구속식(일치·거리·평행·직각·각도·동심·탄젠트·잠금)을 세우고, 모터가 정한 부품 위치를 넣어 매 프레임 레벤버그-마쿼트법(감쇠 가우스-뉴턴, 수치 야코비안)으로 나머지 부품 위치를 풉니다. 속도·가속도는 중심 차분. 동역학: 부품 메시를 적분해 질량·무게중심·관성 텐서를 구하고, 운동·위치 에너지의 변화율로 필요한 모터 동력·토크(직선 모터는 힘)를 계산합니다 (마찰·접촉 충돌 제외, 강체).',
+    'Kinematics: each mate becomes constraint equations (coincident, distance, parallel, perpendicular, angle, concentric, tangent, lock); with the motor-driven placements given, the other placements are solved every frame by Levenberg–Marquardt (damped Gauss–Newton, numerical Jacobian). Velocity and acceleration by central differences. Dynamics: mass, centre of mass and inertia tensor integrated from each part mesh; the required motor power and torque (force for a linear motor) come from the rate of change of kinetic + potential energy (rigid bodies, no friction or contact impacts).');
+  let result = null, anim = 0, playing = false, tNow = 0, speed = 1, pathGrp = null, saved = null;
+  const MCACHE = new Map();
+  function massOf(p) {
+    const b = getBuild(p), key = p.id + ':' + p.rev; if (MCACHE.has(key)) return MCACHE.get(key);
+    const r = MotionSolver.inertia(b.tris), rho = (MATERIALS[p.material] || MATERIALS.steel).rho, k = rho * 1e-6;
+    const o = { m: r.V * k, com: r.com, I: Array.from(r.I, v => v * k), V: r.V }; MCACHE.set(key, o); return o;
+  }
+  function study(d) {
+    d.motion = d.motion || { motors: [], gears: [], T: 0, grav: '-y', trace: null, fps: 60 };
+    return d.motion;
+  }
+  const compOf = id => A().comps.find(c => c.id === id);
+  // world axis / normal of a picked face of a component (at the current placement)
+  function faceInfo(ref) {
+    const c = compOf(ref.comp); if (!c) return null; const p = docById(c.part); if (!p) return null;
+    const f = getBuild(p).topo.faces[ref.fid]; if (!f) return null; const M = compMatrix(A(), c).toArray();
+    if (f.kind === 'cyl') return { kind: 'axis', p: MotionSolver.xp(M, f.axis.p), d: (v => { const l = Math.hypot(...v); return v.map(x => x / l); })(MotionSolver.xd(M, f.axis.d)), r: f.axis.r };
+    if (f.kind === 'plane') return { kind: 'plane', p: MotionSolver.xp(M, f.p), d: (v => { const l = Math.hypot(...v); return v.map(x => x / l); })(MotionSolver.xd(M, f.n)) };
+    return null;
+  }
+  function stop() { cancelAnimationFrame(anim); anim = 0; playing = false; }
+  function clearPath() { if (pathGrp) { View.scene.remove(pathGrp); pathGrp.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); pathGrp = null; View.req(); } }
+  function restore() { stop(); clearPath(); if (saved) { const d = A(); for (const c of d.comps) if (saved.has(c.id)) c.m = saved.get(c.id); saved = null; refresh3d(); } }
+  function setFrame(k) {
+    const r = result; if (!r) return; k = clamp(Math.round(k), 0, r.N); const d = A();
+    r.comps.forEach((c, i) => { const cc = compOf(c.id); if (cc) cc.m = r.frames[k][i].slice(); });
+    refresh3d(); r.k = k;
+    const sl = $('#mtSlider'); if (sl && +sl.value !== k) sl.value = k; const tl = $('#mtTime'); if (tl) tl.textContent = `${fmt(k * r.dt, 3)} s`;
+  }
+  function play() {
+    if (!result) return; if (playing) { stop(); renderPM(); return; }
+    playing = true; let last = performance.now(); tNow = (result.k || 0) * result.dt; if (tNow >= result.T - 1e-9) tNow = 0;
+    const loop = now => { tNow += (now - last) / 1000 * speed; last = now; if (tNow > result.T) tNow = study(A()).loop === false ? result.T : tNow % result.T; setFrame(tNow / result.dt); if (study(A()).loop === false && tNow >= result.T) { stop(); renderPM(); return; } anim = requestAnimationFrame(loop); };
+    anim = requestAnimationFrame(loop); renderPM();
+  }
+  function drawPath() {
+    clearPath(); const r = result; if (!r || r.ti == null) return;
+    const pts = r.pos.map(P => P[r.ti]); const g = new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(...p)));
+    pathGrp = new THREE.Group(); const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xF2A53D, depthTest: false })); line.renderOrder = 5; pathGrp.add(line); View.scene.add(pathGrp); View.req();
+  }
+  function studyCmd() {
+    const d = A(); if (!d || d.type !== 'asm') return;
+    if (d.comps.length < 2) { status(L('모션 스터디에는 구성 요소가 두 개 이상 필요합니다.', 'A motion study needs at least two components.')); return; }
+    if (d.explode && d.explode.on) { d.explode.on = false; afterChange(d); }
+    restore(); ASMFEMUI.clear();
+    const S = study(d); let pick = S.motors.length ? null : 'motor', busy = false, msg = null, err = false;
+    if (!S.motors.length) S.motors.push({ kind: 'rot', ref: null, rpm: 30, flip: false, mode: 'const', v: 10, stroke: 20, f: 1 });
+    result = null;
+    const pmode = Object.assign({}, Asm.selectMode, {
+      name: 'motion', down: () => false,
+      click(sx, sy) {
+        if (result) return; const p = pickAt(sx, sy, { planes: false }); if (!p || !p.comp || p.kind !== 'face') return;
+        const c = compOf(p.comp), ref = { comp: p.comp, fid: p.fid };
+        if (pick === 'trace') { S.trace = p.comp; pick = null; save(); renderPM(); return; }
+        if (!pick) return;
+        const [kind, i] = pick.split(':'), item = kind === 'motor' ? S.motors[+i || 0] : S.gears[+i];
+        const fi = faceInfo(ref); if (!item || !fi) return;
+        if (kind === 'gear' || item.kind === 'rot') { if (fi.kind !== 'axis') { msg = L('회전축이 될 원통면(축·구멍)을 고르세요.', 'Pick a cylindrical face (shaft or hole) for the rotation axis.'); err = true; renderPM(); return; } }
+        else if (fi.kind !== 'plane' && fi.kind !== 'axis') return;
+        if (c.fixed) { msg = L(`${c.name}은(는) 고정 부품이라 움직일 수 없습니다. 움직일 부품의 면을 고르세요.`, `${c.name} is fixed; pick a face of a moving part.`); err = true; renderPM(); return; }
+        item.ref = ref; msg = null; err = false; pick = null; save(); renderPM(); View.req();
+      },
+      draw(ctx) {
+        if (result) return;
+        const arrow = (fi, col, label) => { const Lm = View.pxSize() * 70, a = View.project(fi.p), b = View.project(fi.p.map((v, k) => v + fi.d[k] * Lm)); ctx.strokeStyle = ctx.fillStyle = col; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); const an = Math.atan2(b[1] - a[1], b[0] - a[0]); ctx.beginPath(); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - 11 * Math.cos(an - 0.4), b[1] - 11 * Math.sin(an - 0.4)); ctx.lineTo(b[0] - 11 * Math.cos(an + 0.4), b[1] - 11 * Math.sin(an + 0.4)); ctx.fill(); ctx.font = '12px "IBM Plex Sans", sans-serif'; ctx.fillText(label, b[0] + 6, b[1] - 4); };
+        S.motors.forEach(m => { const fi = m.ref && faceInfo(m.ref); if (fi) arrow(m.flip ? { p: fi.p, d: fi.d.map(v => -v) } : fi, '#3FD0D6', m.kind === 'rot' ? L(`모터 ${m.rpm} rpm`, `motor ${m.rpm} rpm`) : L('직선 모터', 'linear motor')); });
+        S.gears.forEach(g => { const fi = g.ref && faceInfo(g.ref); if (fi) arrow(fi, '#F2A53D', L(`연동 ×${g.ratio}`, `coupled ×${g.ratio}`)); });
+      },
+    });
+    async function run() {
+      const d2 = A(), S2 = study(d2), mo = S2.motors[0];
+      if (!mo || !mo.ref) { msg = L('모터를 달 부품의 면을 고르세요 (회전: 원통면, 직선: 평면).', 'Pick the face that carries the motor (rotary: cylinder, linear: plane).'); err = true; renderPM(); return; }
+      busy = true; err = false; msg = L('계산 중…', 'Solving…'); renderPM(); await new Promise(r => setTimeout(r, 30));
+      try {
+        saved = new Map(d2.comps.map(c => [c.id, c.m.slice()]));
+        Asm.solveAll(d2);
+        const vis = d2.comps.filter(c => docById(c.part));
+        const box = new THREE.Box3(); vis.forEach(c => { const b = getBuild(docById(c.part)).topo.bbox; box.union(new THREE.Box3(new THREE.Vector3(...b.mn), new THREE.Vector3(...b.mx)).applyMatrix4(compMatrix(d2, c))); });
+        const Lc = Math.max(1, box.getSize(new THREE.Vector3()).length() / 4);
+        const comps = vis.map(c => { const p = docById(c.part), b = getBuild(p).topo.bbox, ms = massOf(p); return { id: c.id, name: c.name, M: compMatrix(d2, c).toArray(), fixed: !!c.fixed, center: [0, 1, 2].map(k => (b.mn[k] + b.mx[k]) / 2), mass: ms }; });
+        const ci = id => comps.findIndex(c => c.id === id);
+        const drivers = [];
+        const fi = faceInfo(mo.ref), sg = mo.flip ? -1 : 1;
+        if (mo.kind === 'rot') drivers.push({ ci: ci(mo.ref.comp), kind: 'rot', p: fi.p, d: fi.d, w: sg * mo.rpm * 2 * Math.PI / 60 });
+        else drivers.push({ ci: ci(mo.ref.comp), kind: 'lin', p: fi.p, d: fi.d.map(v => v * sg), mode: mo.mode, v: mo.v, stroke: mo.stroke, f: mo.f });
+        for (const g of S2.gears) { if (!g.ref) continue; const gi = faceInfo(g.ref); if (!gi || gi.kind !== 'axis') continue; const gd = gi.d[0] * fi.d[0] + gi.d[1] * fi.d[1] + gi.d[2] * fi.d[2] < 0 ? gi.d.map(v => -v) : gi.d; drivers.push({ ci: ci(g.ref.comp), kind: 'gear', p: gi.p, d: gd, ratio: +g.ratio || 1, same: !!g.same }); }
+        const T = S2.T > 0 ? S2.T : mo.kind === 'rot' ? 60 / Math.max(0.01, mo.rpm) : mo.mode === 'osc' ? 1 / Math.max(0.01, mo.f) : 1;
+        let N = Math.round(T * 60); if (mo.kind === 'rot') N = Math.max(N, Math.ceil(Math.abs(drivers[0].w) * T / (3 * Math.PI / 180)));
+        N = clamp(N, 60, 1500);
+        const gv = { '-y': [0, -9.81, 0], '-z': [0, 0, -9.81], '+y': [0, 9.81, 0], none: [0, 0, 0] }[S2.grav] || [0, 0, 0];
+        const t0 = performance.now();
+        const r = MotionSolver.run({ comps, mates: d2.mates.filter(m => !m.suppressed), drivers, T, N, gravity: gv, L: Lc });
+        r.ms = Math.round(performance.now() - t0); r.comps = comps; r.L = Lc; r.motorKind = mo.kind; r.k = 0;
+        const tr = S2.trace && ci(S2.trace) >= 0 ? ci(S2.trace) : (() => { const cand = comps.map((c, i) => i).filter(i => !comps[i].fixed && i !== drivers[0].ci); return cand.length ? cand[cand.length - 1] : drivers[0].ci; })();
+        r.ti = tr; result = r; msg = null; setFrame(0); drawPath(); play();
+      } catch (e) { console.error(e); err = true; msg = L('해석 오류: ', 'Solver error: ') + e.message; restore(); }
+      busy = false; renderPM();
+    }
+    function charts() {
+      const r = result, ti = r.ti, t = k => k * r.dt, g = [];
+      const ser = (f) => r.pos.map((_, k) => [t(k), f(k)]);
+      const mk = (series, opts) => { const cv = h('canvas', { class: 'chart' }); setTimeout(() => drawChart(cv, series, opts), 0); return cv; };
+      g.push({ title: L(`추적 부품: ${r.comps[ti].name} (무게중심)`, `Traced: ${r.comps[ti].name} (centre of mass)`), icon: 'move', body: [
+        mk(['x', 'y', 'z'].map((a, d) => ({ pts: ser(k => r.pos[k][ti][d] - r.pos[0][ti][d]), label: a.toUpperCase() + ' (mm)' })), { xlabel: 's', zeroY: true }),
+        mk([{ pts: ser(k => Math.hypot(...r.vel[k][ti])), label: L('속도 (mm/s)', 'speed (mm/s)') }], { xlabel: 's', zeroY: true }),
+        mk([{ pts: ser(k => Math.hypot(...r.acc[k][ti]) / 1000), label: L('가속도 (m/s²)', 'acceleration (m/s²)'), color: '#FF6B5E' }], { xlabel: 's', zeroY: true }),
+        mk([{ pts: ser(k => Math.hypot(...r.omg[k][ti]) * 60 / (2 * Math.PI)), label: L('각속도 (rpm)', 'angular speed (rpm)'), color: '#7BD88F' }], { xlabel: 's', zeroY: true }),
+        h('div', { class: 'hint' }, L('위치는 처음 위치에서 옮겨간 양입니다. 3D 화면의 주황 선이 무게중심이 지나는 길입니다.', 'Position is measured from the start; the orange line in 3D is the path of the centre of mass.'))] });
+      if (r.effort) g.push({ title: L('필요 모터 ' + (r.motorKind === 'rot' ? '토크' : '힘'), 'Required motor ' + (r.motorKind === 'rot' ? 'torque' : 'force')), icon: 'mass', body: [
+        mk([{ pts: r.effort.map((v, k) => [t(k), v]).filter(p => p[1] != null && isFinite(p[1])), label: r.motorKind === 'rot' ? L('토크 (N·m)', 'torque (N·m)') : L('힘 (N)', 'force (N)'), color: '#3FD0D6' }], { xlabel: 's', zeroY: true }),
+        mk([{ pts: r.KE.map((v, k) => [t(k), v]), label: L('운동 에너지 (J)', 'kinetic energy (J)'), color: '#F2A53D' }, { pts: r.power.map((v, k) => [t(k), v]), label: L('동력 (W)', 'power (W)'), color: '#FF6B5E' }], { xlabel: 's', zeroY: true })] });
+      return g;
+    }
+    function resultGroups() {
+      const r = result, ti = r.ti, g = [];
+      const vmax = Math.max(...r.vel.map(V => Math.hypot(...V[ti]))), amax = Math.max(...r.acc.map(A2 => Math.hypot(...A2[ti]))), eff = (r.effort || []).filter(v => v != null && isFinite(v)), em = eff.length ? eff.reduce((a, b) => Math.abs(b) > Math.abs(a) ? b : a, 0) : 0;
+      const pmax = Math.max(...r.power.map(Math.abs)), mtot = r.comps.reduce((s, c) => s + (c.fixed ? 0 : c.mass.m), 0), bad = r.maxErr > Math.max(0.05, r.L * 1e-3);
+      g.push({ title: L('재생', 'Playback'), icon: 'rotate', body: [
+        h('div', { class: 'row', style: 'gap:6px;align-items:center' }, h('button', { class: 'pbtn primary', onclick: play }, playing ? L('❚❚ 멈춤', '❚❚ Pause') : L('▶ 재생', '▶ Play')), h('button', { class: 'pbtn', onclick: () => { stop(); setFrame(0); renderPM(); } }, '⏮'), h('b', { id: 'mtTime', style: 'margin-left:auto' }, `${fmt((r.k || 0) * r.dt, 3)} s`)),
+        h('input', { id: 'mtSlider', type: 'range', min: 0, max: r.N, value: r.k || 0, class: 'wide', oninput: e => { stop(); setFrame(+e.target.value); } }),
+        field(L('재생 속도', 'Playback speed'), h('div', { class: 'seg' }, [0.25, 0.5, 1, 2].map(v => h('button', { class: speed === v ? 'on' : '', onclick: () => { speed = v; renderPM(); } }, '×' + v)))),
+        checkInput(L('반복 재생', 'Loop'), study(A()).loop !== false, v => { study(A()).loop = v; save(); })] });
+      g.push({ title: L('결과', 'Results'), icon: 'mass', body: [h('div', { class: 'kv' },
+        h('span', null, L('추적 부품 최대 속도', 'Max speed (traced)')), h('b', null, fmtN(vmax) + ' mm/s'),
+        h('span', null, L('추적 부품 최대 가속도', 'Max acceleration (traced)')), h('b', null, fmtN(amax / 1000) + ' m/s²'),
+        r.effort ? h('span', null, r.motorKind === 'rot' ? L('최대 모터 토크', 'Peak motor torque') : L('최대 모터 힘', 'Peak motor force')) : null, r.effort ? h('b', { style: 'color:#3FD0D6' }, fmtN(Math.abs(em)) + (r.motorKind === 'rot' ? ' N·m' : ' N')) : null,
+        h('span', null, L('최대 동력', 'Peak power')), h('b', null, fmtN(pmax) + ' W'),
+        h('span', null, L('움직이는 부품 질량', 'Moving mass')), h('b', null, fmtN(mtot) + ' kg'),
+        h('span', null, L('구속 오차 (최대)', 'Constraint error (max)')), h('b', { style: bad ? 'color:#FF6B5E' : 'color:#7BD88F' }, fmtN(r.maxErr) + ' mm'),
+        h('span', null, L('프레임 · 계산 시간', 'Frames · time')), h('b', null, `${r.N + 1} · ${(r.ms / 1000).toFixed(1)} s`)),
+        bad ? h('div', { class: 'warn' }, L(`${fmt(r.worst * r.dt, 3)} s 근처에서 메이트를 모두 만족할 수 없습니다. 기구가 그 위치에서 잠기거나(사점) 메이트가 서로 모순입니다.`, `Near ${fmt(r.worst * r.dt, 3)} s the mates cannot all be met: the mechanism locks (dead point) or the mates contradict each other.`)) : null,
+        r.nCons === 0 ? h('div', { class: 'warn' }, L('메이트가 없어 모터 부품만 움직입니다.', 'There are no mates, so only the motor part moves.')) : null,
+        field(L('추적할 부품', 'Traced component'), selectInput(r.comps.map((c, i) => [String(i), c.name]), String(ti), v => { r.ti = +v; study(A()).trace = r.comps[+v].id; save(); drawPath(); renderPM(); }))].filter(Boolean) });
+      g.push(...charts());
+      g.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER(), L(` · 미지수 ${r.nFree * 6}개, 구속 ${r.nCons}개`, ` · ${r.nFree * 6} unknowns, ${r.nCons} constraints`)) });
+      g.push({ title: '', body: h('button', { class: 'pbtn wide', onclick: () => { restore(); result = null; renderPM(); } }, L('결과 닫고 조건 고치기 (부품 위치 되돌림)', 'Close results and edit (restores positions)')) });
+      return g;
+    }
+    const refLabel = ref => { if (!ref) return null; const c = compOf(ref.comp), fi = faceInfo(ref); return c ? `${c.name} · ${fi && fi.kind === 'axis' ? L(`원통면 Ø${fmt(2 * fi.r, 1)}`, `cylinder Ø${fmt(2 * fi.r, 1)}`) : L('평면', 'plane')}` : null; };
+    const selBox = (key, ref, hint) => h('div', { class: 'selbox' + (pick === key ? ' active' : ''), onclick: () => { pick = key; renderPM(); } }, ref ? h('div', { class: 'relrow' }, icEl('plane', 14), h('span', { class: 'rl' }, refLabel(ref))) : h('div', { class: 'hint' }, hint));
+    openPM({
+      title: L('모션 스터디', 'Motion study'), icon: 'motion',
+      groups() {
+        const S2 = study(A());
+        if (result) return resultGroups();
+        const gs = [], mo = S2.motors[0];
+        gs.push({ title: L('모터', 'Motor'), icon: 'motion', body: [
+          h('div', { class: 'seg' }, h('button', { class: mo.kind === 'rot' ? 'on' : '', onclick: () => { mo.kind = 'rot'; mo.ref = null; pick = 'motor:0'; save(); renderPM(); } }, L('회전 모터', 'Rotary')), h('button', { class: mo.kind === 'lin' ? 'on' : '', onclick: () => { mo.kind = 'lin'; mo.ref = null; pick = 'motor:0'; save(); renderPM(); } }, L('직선 모터', 'Linear'))),
+          selBox('motor:0', mo.ref, mo.kind === 'rot' ? L('이 칸을 누르고, 돌릴 부품의 원통면(축·구멍)을 클릭 — 그 축으로 돕니다', 'Click here, then a cylindrical face (shaft/hole) of the part to turn') : L('이 칸을 누르고, 움직일 부품의 평면을 클릭 — 면에 수직으로 움직입니다', 'Click here, then a planar face of the part to move (moves along its normal)')),
+          mo.kind === 'rot' ? field(L('회전 속도 (rpm)', 'Speed (rpm)'), numInput(mo.rpm, v => { mo.rpm = Math.max(0.01, v); save(); View.req(); }, { step: 10, min: 0 })) : h('div', { class: 'seg' }, h('button', { class: mo.mode === 'const' ? 'on' : '', onclick: () => { mo.mode = 'const'; save(); renderPM(); } }, L('일정 속도', 'Constant speed')), h('button', { class: mo.mode === 'osc' ? 'on' : '', onclick: () => { mo.mode = 'osc'; save(); renderPM(); } }, L('왕복', 'Reciprocating'))),
+          mo.kind === 'lin' && mo.mode === 'const' ? field(L('속도 (mm/s)', 'Speed (mm/s)'), numInput(mo.v, v => { mo.v = v; save(); }, { step: 5 })) : null,
+          mo.kind === 'lin' && mo.mode === 'osc' ? field(L('행정 (mm)', 'Stroke (mm)'), numInput(mo.stroke, v => { mo.stroke = Math.max(0, v); save(); }, { step: 5, min: 0 })) : null,
+          mo.kind === 'lin' && mo.mode === 'osc' ? field(L('왕복 주기 (회/s, Hz)', 'Cycles per second (Hz)'), numInput(mo.f, v => { mo.f = Math.max(0.01, v); save(); }, { step: 0.5, min: 0 })) : null,
+          checkInput(L('방향 반대로', 'Reverse direction'), !!mo.flip, v => { mo.flip = v; save(); View.req(); })].filter(Boolean) });
+        S2.gears.forEach((gr, i) => gs.push({ title: L(`연동 회전 ${i + 1} (기어·풀리)`, `Coupled rotation ${i + 1} (gear, pulley)`), icon: 'cpattern', body: [
+          selBox('gear:' + i, gr.ref, L('이 칸을 누르고, 함께 돌 부품의 원통면을 클릭', 'Click here, then the cylindrical face of the part that turns with it')),
+          field(L('회전비 (모터 1회전에 몇 회전)', 'Ratio (turns per motor turn)'), numInput(gr.ratio, v => { gr.ratio = v; save(); View.req(); }, { step: 0.1 })),
+          checkInput(L('같은 방향 (풀리·벨트) — 끄면 반대 방향 (맞물린 기어)', 'Same direction (belt/pulley) — off = opposite (meshing gears)'), !!gr.same, v => { gr.same = v; save(); }),
+          h('div', { class: 'hint' }, L('기어 비 = 모터 쪽 잇수 ÷ 이 기어 잇수', 'Ratio = motor-side teeth ÷ teeth of this gear')),
+          h('button', { class: 'pbtn', onclick: () => { S2.gears.splice(i, 1); pick = null; save(); renderPM(); View.req(); } }, L('지우기', 'Remove'))] }));
+        gs.push({ title: '', body: h('button', { class: 'pbtn wide', disabled: mo.kind !== 'rot', onclick: () => { S2.gears.push({ ref: null, ratio: 1, same: false }); pick = 'gear:' + (S2.gears.length - 1); save(); renderPM(); } }, L('+ 연동 회전 (기어·풀리)', '+ Coupled rotation (gear, pulley)')) });
+        gs.push({ title: L('시간과 중력', 'Time and gravity'), icon: 'options', body: [
+          field(L('해석 시간 (s, 0 = 한 바퀴/한 주기)', 'Duration (s, 0 = one turn/cycle)'), numInput(S2.T, v => { S2.T = Math.max(0, v); save(); }, { step: 0.5, min: 0 })),
+          field(L('중력 방향 (동역학)', 'Gravity (dynamics)'), selectInput([['-y', L('−Y (아래)', '−Y (down)')], ['-z', '−Z'], ['+y', '+Y'], ['none', L('없음', 'None')]], S2.grav, v => { S2.grav = v; save(); })),
+          h('div', { class: 'hint' }, L('메이트로 이어진 부품이 함께 움직입니다. 고정 부품(f)은 바닥 역할을 합니다. 재질은 각 부품 문서의 재질 밀도를 씁니다.', 'Parts joined by mates move together; fixed parts (f) act as ground. Each part uses its own material density.'))] });
+        gs.push({ title: L('추적할 부품 (그래프)', 'Traced part (charts)'), icon: 'move', body: h('div', { class: 'selbox' + (pick === 'trace' ? ' active' : ''), onclick: () => { pick = 'trace'; renderPM(); } }, S2.trace && compOf(S2.trace) ? h('div', { class: 'relrow' }, icEl('part', 14), h('span', { class: 'rl' }, compOf(S2.trace).name)) : h('div', { class: 'hint' }, L('비우면 자동 (마지막 움직이는 부품). 이 칸을 누르고 부품을 클릭', 'Empty = automatic (last moving part). Click here, then a part'))) });
+        gs.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER()) });
+        gs.push({ title: L('실행', 'Run'), icon: 'rebuild', body: h('button', { class: 'pbtn primary wide', disabled: busy, onclick: run }, busy ? L('계산 중…', 'Solving…') : L('▶ 계산하고 재생', '▶ Calculate and play')) });
+        return gs;
+      },
+      onOK() { }, onCancel() { restore(); result = null; }, onClose() { restore(); result = null; App.mode = Asm.selectMode; renderCM(); updateHighlights(); },
+    });
+    Object.defineProperty(App.pm, 'msg', { get: () => msg, set: v => { msg = v; }, configurable: true });
+    Object.defineProperty(App.pm, 'err', { get: () => err, set: v => { err = v; }, configurable: true });
+    App.mode = pmode; renderCM(); updateHighlights(); renderPM();
+  }
+  return { studyCmd, result: () => result, setFrame, play, stop, restore, massOf, SOLVER };
+})();
+/* ================= assembly structural study: static and shock (half-sine pulse) =================
+   All visible components are voxelised on one grid; each keeps its own material (per-element modulus and
+   density); parts that touch share nodes (bonded contact). */
+const ASMFEMUI = (() => {
+  const A = () => App.doc;
+  const TYPES = { static: () => L('정적 해석 (하중·자중)', 'Static (loads, self-weight)'), shock: () => L('충격 해석 (반사인 충격 펄스)', 'Shock (half-sine pulse)') };
+  const DIRS = { '-y': [0, -1, 0], '+y': [0, 1, 0], '-x': [-1, 0, 0], '+x': [1, 0, 0], '-z': [0, 0, -1], '+z': [0, 0, 1] };
+  const DIRL = () => Object.keys(DIRS).map(k => [k, (k[0] === '-' ? '−' : '+') + k[1].toUpperCase()]);
+  const SOLVER = {
+    static: () => L('요소: 8절점 육면체(복셀) + 비적합 모드, 부품마다 자기 재질(탄성계수·밀도) · 접촉: 맞닿은 부품은 접착(절점 공유) · 풀이: 행렬 없는 켤레기울기법(CG), 자코비 전처리', 'Elements: 8-node voxel hexahedra + incompatible modes, each part with its own material (modulus, density) · Contact: touching parts bonded (shared nodes) · Solver: matrix-free CG, Jacobi preconditioner'),
+    shock: () => L('충격: 고정면(바닥)이 반사인 가속도 펄스(G, 지속 시간)를 받는 것과 같은 관성력 m·a(t) + 면 하중 · 시간 적분: 뉴마크 평균가속도법, 띠 촐레스키 직접 풀이, 레일리 감쇠 · 결과: 변위가 가장 큰 순간의 응력 · 같은 하중의 정적 해와 비교한 동적 증폭률', 'Shock: inertia load m·a(t) as if the fixed base receives a half-sine acceleration pulse (G, duration) + face loads · Time integration: Newmark average acceleration, banded Cholesky, Rayleigh damping · Result: stress at the moment of peak displacement · dynamic amplification vs. the static solution'),
+  };
+  let group = null, legend = null, result = null;
+  function study(d) {
+    d.asmStudy = d.asmStudy || { type: 'static', fixtures: [], loads: [{ faces: [], dir: 'normal', value: 100 }], grav: false, gdir: '-y', G: 50, pulseMs: 11, sdir: '-y', res: 'normal', zeta: 2 };
+    return d.asmStudy;
+  }
+  const compOf = id => A().comps.find(c => c.id === id);
+  const matOf = c => { const p = docById(c.part); return MATERIALS[p && p.material] || MATERIALS.steel; };
+  function worldTris(c, tris) { const M = compMatrix(A(), c).elements, out = new Float32Array(tris.length); for (let i = 0; i < tris.length; i += 3) { const x = tris[i], y = tris[i + 1], z = tris[i + 2]; out[i] = M[0] * x + M[4] * y + M[8] * z + M[12]; out[i + 1] = M[1] * x + M[5] * y + M[9] * z + M[13]; out[i + 2] = M[2] * x + M[6] * y + M[10] * z + M[14]; } return out; }
+  function faceTrisW(ref) { const c = compOf(ref.comp); if (!c) return new Float32Array(0); const B = getBuild(docById(c.part)); if (!B.topo.faces[ref.fid]) return new Float32Array(0); return worldTris(c, FEMUI.faceTris(B, ref.fid)); }
+  function clear() {
+    if (group) { View.scene.remove(group); group.traverse(o => { if (o.geometry && !o.userData.shared) o.geometry.dispose(); if (o.material) o.material.dispose(); }); group = null; }
+    if (legend) { legend.remove(); legend = null; }
+    View.world.visible = true; View.req();
+  }
+  function display(show) {
+    const r = result; if (!r) return; clear();
+    group = new THREE.Group(); View.scene.add(group); View.world.visible = false;
+    const nq = r.quads.length / 4, pos = new Float32Array(nq * 18), col = new Float32Array(nq * 18), tri = [0, 1, 2, 0, 2, 3];
+    let vals, vmax, unit, title;
+    if (show.field === 'vm') { vals = r.nvm; vmax = maxOf(r.nvm) || 1; unit = 'MPa'; title = r.type === 'shock' ? L('von Mises 응력 (최대 순간)', 'von Mises stress (peak moment)') : L('von Mises 응력', 'von Mises stress'); }
+    else { vals = new Float32Array(r.nn); for (let i = 0; i < r.nn; i++) vals[i] = Math.hypot(r.u[i * 3], r.u[i * 3 + 1], r.u[i * 3 + 2]); vmax = maxOf(vals) || 1; unit = 'mm'; title = L('변위 크기', 'Displacement'); }
+    let umax = 0; for (let i = 0; i < r.nn; i++) umax = Math.max(umax, Math.hypot(r.u[i * 3], r.u[i * 3 + 1], r.u[i * 3 + 2]));
+    const box = App._box ? App._box.getSize(new THREE.Vector3()).length() : 100, S = show.scale == null ? (umax > 0 ? box * 0.05 / umax : 0) : show.scale;
+    for (let q = 0; q < nq; q++) for (let k = 0; k < 6; k++) { const n = r.quads[q * 4 + tri[k]], o = (q * 6 + k) * 3, c = rainbow(vals[n] / vmax); for (let d = 0; d < 3; d++) { pos[o + d] = r.coords[n * 3 + d] + S * r.u[n * 3 + d]; col[o + d] = c[d]; } }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals();
+    group.add(new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide })));
+    for (const c of A().comps) { if (c.hidden) continue; const p = docById(c.part); if (!p) continue; const ls = new THREE.LineSegments(getBuild(p).egeo, new THREE.LineBasicMaterial({ color: 0x56606c, transparent: true, opacity: 0.55 })); ls.userData.shared = true; ls.applyMatrix4(compMatrix(A(), c)); group.add(ls); }
+    legend = h('div', { class: 'femleg' }, h('b', null, title), h('div', { class: 'bar' }), h('div', { class: 'lbl' }, [1, 0.75, 0.5, 0.25, 0].map(t => h('span', null, fmtN(vmax * t) + ' ' + unit))), h('small', null, S ? L(`변형 ×${fmtN(S)}`, `deformation ×${fmtN(S)}`) : ''));
+    $('#gfx').append(legend); View.req();
+  }
+  function studyCmd(type) {
+    const d = A(); if (!d || d.type !== 'asm') return;
+    const comps = d.comps.filter(c => !c.hidden && docById(c.part));
+    if (!comps.length) { status(L('해석할 구성 요소가 없습니다.', 'There are no components to analyse.')); return; }
+    if (d.explode && d.explode.on) { d.explode.on = false; afterChange(d); }
+    MOTIONUI.restore(); clear();
+    const S = study(d); if (type) S.type = type;
+    let pick = S.fixtures.length ? 'load0' : 'fix', busy = false, msg = null, err = false, prog = '', show = { field: 'vm', scale: null };
+    result = null;
+    const listOf = key => key === 'fix' ? S.fixtures : (S.loads[+key.slice(4)] || {}).faces;
+    const same = (a, b) => a.comp === b.comp && a.fid === b.fid;
+    const pmode = Object.assign({}, Asm.selectMode, {
+      name: 'asmstudy', down: () => false,
+      click(sx, sy) {
+        if (result) return; const p = pickAt(sx, sy, { planes: false }); if (!p || !p.comp || p.kind !== 'face') return;
+        const list = listOf(pick); if (!list) return; const ref = { comp: p.comp, fid: p.fid };
+        const i = list.findIndex(x => same(x, ref)); if (i >= 0) list.splice(i, 1); else list.push(ref);
+        save(); renderPM(); updateHighlights();
+      },
+      highlights: () => [],
+      overlay3(O) {
+        if (result) return;
+        const add = (ref, color) => { const c = compOf(ref.comp); if (!c) return; const B = getBuild(docById(c.part)); if (!B.topo.faces[ref.fid]) return; const m = new THREE.Mesh(Meshes.faceGeom(B, ref.fid), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.6, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, depthWrite: false, side: THREE.DoubleSide })); m.applyMatrix4(compMatrix(A(), c)); O.add(m); };
+        S.fixtures.forEach(f => add(f, 0x2ecc71)); S.loads.forEach(l => l.faces.forEach(f => add(f, 0xf2a53d)));
+      },
+    });
+    const refName = ref => { const c = compOf(ref.comp); return c ? `${c.name} · ${L('면', 'face')} ${ref.fid + 1}` : '?'; };
+    const faceRows = list => list.map((f, i) => h('div', { class: 'relrow' }, icEl('plane', 14), h('span', { class: 'rl' }, refName(f)), h('button', { class: 'x', onclick: e => { e.stopPropagation(); list.splice(i, 1); save(); renderPM(); updateHighlights(); } }, '×')));
+    const selBox = (key, list, hint) => h('div', { class: 'selbox' + (pick === key ? ' active' : ''), onclick: () => { pick = key; renderPM(); } }, list.length ? faceRows(list) : h('div', { class: 'hint' }, hint));
+    async function run() {
+      if (busy) return; const d2 = A(), S2 = study(d2), cs = d2.comps.filter(c => !c.hidden && docById(c.part));
+      if (!S2.fixtures.length) { msg = L('고정할 면을 하나 이상 고르세요 (바닥·볼트 자리).', 'Pick at least one fixed face.'); err = true; renderPM(); return; }
+      const hasLoad = S2.loads.some(l => l.faces.length) || (S2.type === 'static' && S2.grav) || S2.type === 'shock';
+      if (!hasLoad) { msg = L('하중 면을 고르거나 자중을 켜세요.', 'Pick a loaded face or turn on self-weight.'); err = true; renderPM(); return; }
+      const bodies = cs.map(c => { const m = matOf(c); return { tris: worldTris(c, getBuild(docById(c.part)).tris), mat: { E: m.E, nu: m.nu, rho: m.rho * 1e-9 }, name: c.name, yield: m.yield, mname: m.name }; });
+      const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity]; for (const b of bodies) for (let i = 0; i < b.tris.length; i += 3) for (let k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], b.tris[i + k]); mx[k] = Math.max(mx[k], b.tris[i + k]); }
+      const vol = cs.reduce((t, c) => t + getBuild(docById(c.part)).topo.vol, 0);
+      const target = (S2.type === 'static' ? { coarse: 4000, normal: 12000, fine: 30000 } : { coarse: 1500, normal: 4000, fine: 9000 })[S2.res] || 4000;
+      const hsz = Math.cbrt(Math.max(vol, 1e-6) / target), nu = bodies.reduce((t, b) => t + b.mat.nu, 0) / bodies.length;
+      const dirV = k => ({ x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] })[k];
+      const job = {
+        type: S2.type, bodies: bodies.map(b => ({ tris: b.tris, mat: b.mat })), tris: new Float32Array(0), bbox: { mn, mx }, h: hsz, mat: { E: bodies[0].mat.E, nu, rho: bodies[0].mat.rho },
+        fixtures: S2.fixtures.map(f => ({ tris: faceTrisW(f) })).filter(f => f.tris.length),
+        loads: S2.loads.filter(l => l.faces.length).flatMap(l => l.faces.map(f => ({ tris: faceTrisW(f), kind: 'force', value: l.value / l.faces.length, dir: l.dir !== 'normal' ? dirV(l.dir) : null }))),
+        accel: S2.type === 'static' ? (S2.grav ? DIRS[S2.gdir].map(v => v * 9810) : null) : DIRS[S2.sdir].map(v => v * 9810 * S2.G),
+        pulse: S2.pulseMs / 1000, zeta: (S2.zeta || 2) / 100,
+      };
+      busy = true; err = false; msg = L('계산 중…', 'Solving…'); prog = ''; renderPM();
+      const t0 = performance.now();
+      try {
+        const r = await Work.run(job, p => { prog = p.stage === 'cg' ? L(`반복 ${p.it} · 잔차 ${p.res.toExponential(1)}`, `iteration ${p.it} · residual ${p.res.toExponential(1)}`) : p.stage === 'mesh' ? L(`요소 ${p.ne}개 · 절점 ${p.nn}개`, `${p.ne} elements · ${p.nn} nodes`) : p.stage === 'newmark' ? L(`시간 적분 ${p.s}/${p.n}`, `time step ${p.s}/${p.n}`) : p.stage === 'static' ? L('같은 하중의 정적 해 계산 중', 'solving the static case') : p.stage === 'coarsen' ? L(`메모리에 맞게 요소 크기 ${fmt(p.h, 2)} mm로 조정`, `element size raised to ${fmt(p.h, 2)} mm`) : ''; const el = $('#afprog'); if (el) el.textContent = prog; });
+        r.ms = Math.round(performance.now() - t0); r.type = S2.type; r.bodies = bodies.map(b => ({ name: b.name, yield: b.yield, mname: b.mname, E: b.mat.E })); result = r; msg = null; show = { field: 'vm', scale: null }; display(show);
+      } catch (e) { err = true; const c = e.message; msg = c === 'NOFIX' ? L('고정 면이 메시와 맞닿지 않았습니다.', 'The fixed faces did not touch the mesh.') : c === 'NOLOAD' ? L('하중 면이 메시와 맞닿지 않았습니다.', 'The loaded faces did not touch the mesh.') : c === 'VOXEL' ? L('메시를 만들지 못했습니다.', 'Could not mesh the assembly.') : c === 'CANCEL' ? L('취소했습니다.', 'Cancelled.') : L('해석 오류: ', 'Solver error: ') + c; }
+      busy = false; renderPM();
+    }
+    function resultGroups() {
+      const r = result, g = [];
+      const sfMin = r.bodyMax ? Math.min(...r.bodies.map((b, i) => b.yield / (r.bodyMax[i] || 1e-9))) : 0;
+      const sfCol = sf => sf < 1 ? '#FF6B5E' : sf < 2 ? '#F2A53D' : '#7BD88F';
+      const kv = [h('span', null, L('최대 von Mises 응력', 'Max von Mises stress')), h('b', null, fmtN(r.vmax) + ' MPa'), h('span', null, L('최대 변위', 'Max displacement')), h('b', null, fmtN(r.umax) + ' mm'), h('span', null, L('최소 안전율', 'Min. safety factor')), h('b', { style: 'color:' + sfCol(sfMin) }, fmt(sfMin, 2))];
+      if (r.type === 'shock') kv.push(h('span', null, L('같은 하중의 정적 응력/변위', 'Static stress / displacement, same load')), h('b', null, `${fmtN(r.vStatic)} MPa / ${fmtN(r.uStatic)} mm`), h('span', null, L('동적 증폭률', 'Dynamic amplification')), h('b', { style: 'color:#3FD0D6' }, '×' + fmt(r.daf, 2)), h('span', null, L('최대 순간', 'Peak at')), h('b', null, fmt(r.tPeak * 1000, 2) + ' ms'), h('span', null, L('1차 고유진동수', '1st natural frequency')), h('b', null, fmt(r.f1, 1) + ' Hz'));
+      kv.push(h('span', null, L('요소 / 절점 · 시간', 'Elements / nodes · time')), h('b', null, `${r.ne} / ${r.nn} · ${(r.ms / 1000).toFixed(1)} s`));
+      g.push({ title: L('결과', 'Results'), icon: 'mass', body: [h('div', { class: 'kv' }, kv),
+        h('div', { class: 'seg' }, h('button', { class: show.field === 'vm' ? 'on' : '', onclick: () => { show.field = 'vm'; display(show); renderPM(); } }, L('응력', 'Stress')), h('button', { class: show.field === 'u' ? 'on' : '', onclick: () => { show.field = 'u'; display(show); renderPM(); } }, L('변위', 'Displacement'))),
+        field(L('변형 배율', 'Deformation scale'), numInput(show.scale == null ? '' : show.scale, v => { show.scale = v >= 0 ? v : null; display(show); }, { step: 10, min: 0 }))] });
+      if (r.bodyMax) g.push({ title: L('부품별 결과', 'Per component'), icon: 'asm', body: h('table', { class: 'tbl' }, h('tr', null, h('th', null, L('부품', 'Part')), h('th', null, L('재질', 'Material')), h('th', null, L('최대 응력', 'Max stress')), h('th', null, L('안전율', 'SF'))),
+        r.bodies.map((b, i) => { const sf = b.yield / (r.bodyMax[i] || 1e-9); return h('tr', null, h('td', null, b.name), h('td', null, b.mname), h('td', null, r.bodyMax[i] != null ? fmtN(r.bodyMax[i]) + ' MPa' : '—'), h('td', { style: 'color:' + sfCol(sf) }, r.bodyMax[i] != null ? fmt(sf, 2) : '—')); })) });
+      if (r.type === 'shock') { const cv = h('canvas', { class: 'chart' }); const pk = Math.max(...r.hist.map(x => x[2])) || 1; setTimeout(() => drawChart(cv, [{ pts: r.hist.map(x => [x[0] * 1000, x[1]]), label: L('최대 변위 (mm)', 'max displacement (mm)') }, { pts: r.hist.map(x => [x[0] * 1000, x[2] * r.uStatic / pk]), label: L('충격 펄스 (정적 변위 기준)', 'pulse (scaled to static)'), color: '#F2A53D' }], { xlabel: 'ms', zeroY: true, marks: [r.tPeak * 1000] }), 0); g.push({ title: L('시간 응답', 'Time response'), icon: 'mass', body: [cv, h('div', { class: 'hint' }, L('펄스가 1차 고유주기의 절반보다 짧으면 증폭률이 1보다 작고, 비슷하면 1.5 안팎까지 커집니다.', 'A pulse much shorter than half the first period gives amplification below 1; a comparable one up to about 1.5.'))] }); }
+      g.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER[r.type](), r.cgIt ? L(` · 반복 ${r.cgIt}회`, ` · ${r.cgIt} iterations`) : '') });
+      g.push({ title: '', body: h('div', { class: 'hint' }, L('맞닿은 부품은 붙어 있는 것(접착)으로 계산하고, 미끄럼·벌어짐·볼트 예압은 넣지 않습니다. 정육면체 요소 근사이므로 응력 집중부는 부품 해석에서 세밀 메시로 다시 확인하세요.', 'Touching parts are bonded; sliding, separation and bolt preload are not modelled. Voxel approximation: re-check stress concentrations in the part study with a fine mesh.')) });
+      g.push({ title: '', body: h('button', { class: 'pbtn wide', onclick: () => { result = null; clear(); renderPM(); updateHighlights(); } }, L('결과 닫고 조건 고치기', 'Close results and edit setup')) });
+      return g;
+    }
+    openPM({
+      title: L('어셈블리 해석', 'Assembly study'), icon: 'fem',
+      groups() {
+        const S2 = study(A());
+        if (result) return [{ title: TYPES[result.type](), icon: 'fem', body: h('div', { class: 'hint' }, L('결과를 보는 중입니다.', 'Showing results.')) }, ...resultGroups()];
+        const gs = [];
+        gs.push({ title: L('해석 종류', 'Study type'), icon: 'fem', body: h('div', { class: 'seg wrap' }, Object.keys(TYPES).map(k => h('button', { class: S2.type === k ? 'on' : '', onclick: () => { S2.type = k; save(); renderPM(); } }, TYPES[k]()))) });
+        gs.push({ title: L('부품 재질 (각 부품 문서)', 'Materials (from each part)'), icon: 'material', body: h('table', { class: 'tbl' }, A().comps.filter(c => !c.hidden && docById(c.part)).map(c => { const m = matOf(c); return h('tr', null, h('td', null, c.name), h('td', null, m.name), h('td', null, `E ${fmtN(m.E)} MPa`)); })) });
+        gs.push({ title: L('고정 (구속)', 'Fixtures'), icon: 'mlock', body: selBox('fix', S2.fixtures, L('이 칸을 누르고 고정할 면(바닥·볼트 자리)을 클릭', 'Click here, then the faces to fix (base, bolt seats)')) });
+        S2.loads.forEach((ld, i) => gs.push({ title: L(`하중 ${i + 1}`, `Load ${i + 1}`), icon: 'extrude', body: [
+          field(L('방향', 'Direction'), selectInput([['normal', L('면에 수직 (누르는 방향)', 'Normal (pushing)')], ['x', 'X'], ['y', 'Y'], ['z', 'Z']], ld.dir, v => { ld.dir = v; save(); })),
+          field(L('힘 (N, 음수=반대)', 'Force (N, negative = reverse)'), numInput(ld.value, v => { ld.value = v; save(); }, { step: 10 })),
+          selBox('load' + i, ld.faces, L('이 칸을 누르고 하중 면을 클릭', 'Click here, then the loaded faces')),
+          h('button', { class: 'pbtn', onclick: () => { S2.loads.splice(i, 1); pick = 'fix'; save(); renderPM(); updateHighlights(); } }, L('이 하중 지우기', 'Remove this load'))] }));
+        gs.push({ title: '', body: h('button', { class: 'pbtn wide', onclick: () => { S2.loads.push({ faces: [], dir: 'normal', value: 100 }); pick = 'load' + (S2.loads.length - 1); save(); renderPM(); } }, L('+ 하중 추가', '+ Add load')) });
+        if (S2.type === 'static') gs.push({ title: L('자중 (중력)', 'Self-weight (gravity)'), icon: 'mass', body: [checkInput(L('부품 무게를 하중으로 넣기', 'Include part weight'), S2.grav, v => { S2.grav = v; save(); renderPM(); }), S2.grav ? field(L('중력 방향', 'Gravity direction'), selectInput(DIRL(), S2.gdir, v => { S2.gdir = v; save(); })) : null].filter(Boolean) });
+        else gs.push({ title: L('충격 펄스', 'Shock pulse'), icon: 'fem', body: [
+          field(L('최대 가속도 (G)', 'Peak acceleration (G)'), numInput(S2.G, v => { S2.G = Math.max(0, v); save(); }, { step: 10, min: 0 })),
+          field(L('지속 시간 (ms)', 'Duration (ms)'), numInput(S2.pulseMs, v => { S2.pulseMs = Math.max(0.05, v); save(); }, { step: 1, min: 0 })),
+          field(L('관성력 방향 (부품이 쏠리는 쪽)', 'Inertia direction (where the parts are thrown)'), selectInput(DIRL(), S2.sdir, v => { S2.sdir = v; save(); })),
+          field(L('감쇠비 (%)', 'Damping ratio (%)'), numInput(S2.zeta, v => { S2.zeta = clamp(v, 0, 50); save(); }, { step: 0.5, min: 0 })),
+          h('div', { class: 'hint' }, L('예) 운반 낙하 시험 50 G · 11 ms, 전자 부품 충격 시험 30 G · 6 ms. 면 하중을 넣으면 같은 펄스 모양으로 가해집니다.', 'e.g. transport drop test 50 G · 11 ms, electronics shock 30 G · 6 ms. Face loads follow the same pulse shape.'))] });
+        gs.push({ title: L('솔버', 'Solver'), icon: 'options', body: h('div', { class: 'hint solver' }, SOLVER[S2.type]()) });
+        gs.push({ title: L('메시와 실행', 'Mesh and run'), icon: 'rebuild', body: [h('div', { class: 'seg' }, [['coarse', L('거침', 'Coarse')], ['normal', L('보통', 'Normal')], ['fine', L('세밀', 'Fine')]].map(([k, l]) => h('button', { class: S2.res === k ? 'on' : '', onclick: () => { S2.res = k; save(); renderPM(); } }, l))),
+          h('button', { class: 'pbtn primary wide', disabled: busy, onclick: run }, busy ? L('계산 중…', 'Solving…') : L('▶ 해석 실행', '▶ Run')), busy ? h('button', { class: 'pbtn wide', onclick: () => Work.cancel() }, L('취소', 'Cancel')) : null, h('div', { id: 'afprog', class: 'hint' }, prog)].filter(Boolean) });
+        return gs;
+      },
+      onOK() { }, onCancel() { clear(); }, onClose() { clear(); App.mode = Asm.selectMode; renderCM(); updateHighlights(); },
+    });
+    Object.defineProperty(App.pm, 'msg', { get: () => msg, set: v => { msg = v; }, configurable: true });
+    Object.defineProperty(App.pm, 'err', { get: () => err, set: v => { err = v; }, configurable: true });
+    App.mode = pmode; renderCM(); updateHighlights(); renderPM();
+  }
+  return { studyCmd, clear, result: () => result, SOLVER };
 })();
 /* ================= 2D drafting window (command-line CAD) ================= */
 const Dwg = (() => {
@@ -10740,7 +11956,7 @@ const Dwg = (() => {
     d.osm = d.osm || { end: true, mid: true, cen: true, quad: true, int: true, perp: true, ins: true };
     buildChrome(); setTitle(); resize();
     setTimeout(() => { if (doc === d) syncViews(false, true); }, 0);
-    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.76 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
+    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.79 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
     setPrompt('명령:');
     setTimeout(() => cin.focus({ preventScroll: true }), 30);
     redraw();
