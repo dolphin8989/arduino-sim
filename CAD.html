@@ -374,7 +374,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 
 <div id="app">
 <section id="sw" class="win" aria-label="3D 모델러">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.79</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.80</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
   <div class="menubar" id="swMenu"></div>
   <div class="swmain">
     <nav class="rail" id="railL" aria-label="피처 · 어셈블리 명령"></nav>
@@ -400,7 +400,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 </section>
 
 <section id="ac" class="win" hidden aria-label="2D 도면">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.79</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.80</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
   <div class="menubar" id="acMenu"></div>
   <div class="acrow" id="acStd"></div>
   <div class="acrow" id="acProps"></div>
@@ -694,7 +694,7 @@ const I18N_DICT = {
 "F3 객체 스냅 · F7 모눈 · F8 직교 · F9 스냅": "F3 object snap · F7 grid · F8 ortho · F9 snap",
 "FeatureManager 디자인 트리": "FeatureManager design tree",
 "K-CAD 작업": "K-CAD workspace",
-"K군의 CAD v0.79": "K-CAD v0.79",
+"K군의 CAD v0.80": "K-CAD v0.80",
 "K군의 CAD 정보": "About K-CAD",
 "K군의 CAD 파일이 아닙니다": "Not a K-CAD file",
 "L 선 · C 원 · A 호 · REC 사각형 · POL 다각형 · DT 문자": "L line · C circle · A arc · REC rectangle · POL polygon · DT text",
@@ -1336,7 +1336,7 @@ const I18N_DICT = {
 "DXF로 내보내기": "Export to DXF",
 "DXF로 내보냅니다. 치수는 선과 문자로 분해되어 저장됩니다.": "Exports to DXF. Dimensions are exploded into lines and text.",
 "KS 제도 관례: 외형선 굵은 실선(0.5), 숨은선 파선(0.35), 중심선 1점 쇄선(0.25). 행을 두 번 클릭하면 현재 도면층이 됩니다.": "KS drafting practice: visible lines thick solid (0.5), hidden lines dashed (0.35), centerlines chain (0.25). Double-click a row to make it current.",
-"K군의 CAD v0.79 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.79 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
+"K군의 CAD v0.80 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.80 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
 "{0}   도면층: \"{1}\"": "{0}   Layer: \"{1}\"",
 "{0} (객체 선택됨)": "{0} (objects selected)",
 "{0} 가로 ({1}×{2})": "{0} landscape ({1}×{2})",
@@ -1783,8 +1783,13 @@ function ic(name, size = 16) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 }
 /* ================= release notes (bottom-left button, Help menu) ================= */
-const APP_VER = 'v0.79';
+const APP_VER = 'v0.80';
 const RELEASES = [
+  { v: 'v0.80', date: '2026-10-16', title: ['스케치 원점 거리 안내', 'Sketch origin distance guide'], items: [
+    ['스케치 중에 원점을 지나는 축을 실제 좌표축 색(X 빨강·Y 초록·Z 파랑)과 이름(+X, −Z 등)으로 표시하고, 화면 밖으로 나오는 세 번째 축은 원점에 ⊙로 표시합니다.', 'While sketching, the axes through the origin are drawn in world-axis colours (X red, Y green, Z blue) with their names (+X, −Z …); the third axis (out of the sketch) is shown as ⊙ at the origin.'],
+    ['커서(또는 가리킨 점)에서 두 축까지 점선 안내선을 긋고 축별 거리, 원점까지 직선거리·각도(R · °), 3D 좌표(X·Y·Z)와 모델 원점까지 거리를 보여 줍니다. 상태줄에도 같은 좌표가 나옵니다.', 'Dashed guides from the cursor (or the hovered point) to both axes show the distance along each axis, the straight distance and angle to the origin (R · °), the 3D coordinates and the distance to the model origin; the status bar shows them too.'],
+    ['맨 위 [원점 거리 안내] 버튼으로 켜고 끕니다 (스케치 중에만).', 'Toggle with the Origin distance guide button at the top (while sketching).'],
+  ] },
   { v: 'v0.79', date: '2026-10-16', title: ['모션 스터디 · 어셈블리 정적/충격 해석', 'Motion study · assembly static/shock'], items: [
     ['어셈블리 [모션 스터디]: 부품의 원통면에 회전 모터(rpm)를, 평면에 직선 모터(일정 속도·왕복)를 달면 메이트로 이어진 부품이 함께 움직이는 애니메이션을 만듭니다. 재생·멈춤·시간 막대·재생 속도·반복을 지원합니다. 기어·풀리는 [연동 회전]으로 회전비를 줍니다.', 'Assembly motion study: put a rotary motor (rpm) on a cylindrical face or a linear motor (constant or reciprocating) on a planar face; parts joined by mates follow in an animation with play/pause, a time slider, speed and loop. Gears and pulleys via coupled rotation with a ratio.'],
     ['기구학: 메이트를 구속식으로 바꿔 매 프레임 레벤버그-마쿼트법으로 풉니다. 추적 부품의 위치·속도·가속도·각속도 그래프와 무게중심 궤적(주황 선)을 보여 줍니다. 크랭크-슬라이더 검증: 이론식과 위치 오차 1e-8 mm, 최대 속도 201.4 대 201.5 mm/s. 기구가 잠기는(사점) 위치는 경고합니다.', 'Kinematics: mates become constraint equations solved every frame by Levenberg–Marquardt; position, velocity, acceleration and angular-speed charts plus the centre-of-mass path. Slider-crank check: position error 1e-8 mm, peak speed 201.4 vs 201.5 mm/s. Lock-up (dead point) is reported.'],
@@ -5490,7 +5495,8 @@ function renderStdBar() {
         Q('convert', L('요소 변환 — 모델 모서리·면을 스케치에 투영', 'Convert entities'), () => Part.startSketchCmd('convert'), sk && sk.tool === 'convert'),
         Q('rel', L('구속조건 부가', 'Add relation'), () => { Sk.setTool('select'); status(L('구속조건을 넣을 요소를 선택하세요. Shift 또는 Ctrl+클릭으로 여러 개를 고릅니다.', 'Select entities to add relations to (Shift or Ctrl+click for several).')); }, false, !sk),
         Q('relshow', L('구속조건 기호 보이기/숨기기', 'Show/hide relation symbols'), () => { sk.showRel = sk.showRel === false; Sk.renderRelWin(); View.req(); renderStdBar(); }, !!sk && sk.showRel !== false, !sk),
-        Q('relwin', L('구속조건 창 보이기/숨기기', 'Relations window'), () => { App.relWin = App.relWin === false; App.relMin = false; Sk.renderRelWin(); renderStdBar(); }, !!sk && App.relWin !== false, !sk));
+        Q('relwin', L('구속조건 창 보이기/숨기기', 'Relations window'), () => { App.relWin = App.relWin === false; App.relMin = false; Sk.renderRelWin(); renderStdBar(); }, !!sk && App.relWin !== false, !sk),
+        Q('origin', L('원점 거리 안내 — 스케치에서 원점 축(X·Y·Z)과 커서까지의 거리 보이기/숨기기', 'Origin distance guide — show/hide origin axes and distances while sketching'), () => { App.originGuide = App.originGuide === false; renderStdBar(); View.req(); }, !!sk && App.originGuide !== false, !sk));
     } else if (d && d.type === 'asm') {
       bar.append(h('div', { class: 'tsep' }), ...Asm.cmButtons('eval').filter(x => x !== '|').map(x => Q(x.icon, x.label, () => { x.run(); renderStdBar(); }, x.on)),
         famQ('fem', L('해석 — 모션 스터디·정적·충격', 'Simulation — motion, static, shock'), () => Asm.simMenu()));
@@ -5678,7 +5684,7 @@ async function saveFile(filename, data, mime) {
 }
 function docExport(d) {
   const strip = (k, v) => (k[0] === '_' ? undefined : v);
-  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.79', doc: JSON.parse(JSON.stringify(d, strip)) };
+  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.80', doc: JSON.parse(JSON.stringify(d, strip)) };
   if (d.type === 'asm') o.parts = [...new Set(d.comps.map(c => c.part))].map(docById).filter(Boolean).map(p => JSON.parse(JSON.stringify(p, strip)));
   return JSON.stringify(o, null, 1);
 }
@@ -5831,7 +5837,7 @@ function helpDialog() {
 function aboutDialog() {
   dialog({
     title: 'K군의 CAD 정보', width: 360, classic: App.doc && App.doc.type === 'dwg', body: h('div', { style: 'display:flex;gap:12px;align-items:flex-start' }, icEl('part', 40),
-      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.79'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
+      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.80'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
     buttons: [{ label: '확인' }]
   });
 }
@@ -5868,9 +5874,6 @@ const Sk = (() => {
       ctx.stroke();
     };
     lines(g, 'rgba(40,120,190,0.16)', 1); lines(major, 'rgba(40,120,190,0.36)', 1);
-    // axes through the sketch origin
-    ctx.strokeStyle = 'rgba(217,48,42,0.35)'; ctx.lineWidth = 1; ctx.setLineDash([8, 4]); ctx.beginPath();
-    let a = scr([mn[0], 0]), b = scr([mx[0], 0]); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); a = scr([0, mn[1]]); b = scr([0, mx[1]]); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
     ctx.restore();
     ctx.strokeStyle = 'rgba(40,120,190,0.55)'; ctx.lineWidth = 1.2; ctx.beginPath(); C.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath(); ctx.stroke();
     // grid size note
@@ -6510,9 +6513,49 @@ const Sk = (() => {
     if (c.type === 'fix') return Object.keys(c.at || {}).filter(k => !k.startsWith('r:')).slice(0, 1).map(at).filter(Boolean);
     return c.r.map(at).filter(Boolean);
   }
+  /* ---------- origin axes and distance guide ---------- */
+  const AXC = { X: '#E5484D', Y: '#2FA84F', Z: '#2F7BE5' };
+  // world axis a sketch direction lies on (e.g. '+X', '−Z'), or null
+  const axName = w => { for (let i = 0; i < 3; i++) if (Math.abs(w[i]) > 0.999) return (w[i] > 0 ? '+' : '−') + 'XYZ'[i]; return null; };
+  const axCol = (nm, fb) => nm ? AXC[nm[1]] : fb;
+  const guideOn = () => App.originGuide !== false;
+  function drawAxes(ctx) {
+    const pl = S().pl, px = View.pxSize(), R = px * 4000, nu = axName(pl.u), nv = axName(pl.v), nn = axName(pl.n);
+    const cu = axCol(nu, '#C0563A'), cv = axCol(nv, '#3A8C5A');
+    ctx.save(); ctx.lineWidth = 1.1; ctx.setLineDash([9, 4, 2, 4]);
+    ctx.globalAlpha = 0.75; ctx.strokeStyle = cu; seg(ctx, scr([-R, 0]), scr([R, 0])); ctx.strokeStyle = cv; seg(ctx, scr([0, -R]), scr([0, R]));
+    ctx.restore();
+    if (!guideOn()) return;
+    const lu = scr([px * 70, 0]), lv = scr([0, px * 70]), o = scr([0, 0]);
+    tag(ctx, lu[0] + 4, lu[1] + 12, nu || 'U', cu, '#fff'); tag(ctx, lv[0] + 6, lv[1] - 4, nv || 'V', cv, '#fff');
+    // the third axis is the plane normal: shown as a symbol at the origin
+    tag(ctx, o[0] - 54, o[1] + 22, '⊙ ' + (nn || L('법선', 'normal')), axCol(nn, '#5A6878'), '#fff');
+  }
+  function drawGuide(ctx) {
+    const s = S(); if (!guideOn() || !s.cur || s.box || s.tool === 'convert' || s.drag) return;
+    const sk = SK(), pl = s.pl; let c = s.cur;
+    if (s.hover && s.hover.k === 'pt') { const p = P(sk, s.hover.id); if (p) c = [p.x, p.y]; }
+    const px = View.pxSize(); if (Math.hypot(c[0], c[1]) < px * 6) return;
+    const nu = axName(pl.u), nv = axName(pl.v), cu = axCol(nu, '#C0563A'), cv = axCol(nv, '#3A8C5A');
+    const o = scr([0, 0]), pu = scr([c[0], 0]), pv = scr([0, c[1]]), pc = scr(c);
+    ctx.save(); ctx.lineWidth = 1.2; ctx.setLineDash([4, 3]);
+    // u distance: line parallel to the u axis from the v axis to the point (and its foot on the u axis)
+    if (Math.abs(c[0]) > px * 3) { ctx.strokeStyle = cu; seg(ctx, pv, pc); ctx.globalAlpha = 0.5; seg(ctx, o, pu); ctx.globalAlpha = 1; }
+    if (Math.abs(c[1]) > px * 3) { ctx.strokeStyle = cv; seg(ctx, pu, pc); ctx.globalAlpha = 0.5; seg(ctx, o, pv); ctx.globalAlpha = 1; }
+    ctx.strokeStyle = 'rgba(120,130,145,.8)'; ctx.setLineDash([2, 3]); seg(ctx, o, pc); ctx.restore();
+    const sgn = v => (v < 0 ? '−' : '') + fmt(Math.abs(v), 2);
+    if (Math.abs(c[0]) > px * 3) { const m = [(pv[0] + pc[0]) / 2, (pv[1] + pc[1]) / 2]; tag(ctx, m[0] - 22, m[1] - 12, `${nu ? nu[1] : 'U'} ${sgn(nu && nu[0] === '−' ? -c[0] : c[0])}`, cu, '#fff'); }
+    if (Math.abs(c[1]) > px * 3) { const m = [(pu[0] + pc[0]) / 2, (pu[1] + pc[1]) / 2]; tag(ctx, m[0] + 6, m[1], `${nv ? nv[1] : 'V'} ${sgn(nv && nv[0] === '−' ? -c[1] : c[1])}`, cv, '#fff'); }
+    const r = Math.hypot(c[0], c[1]), ang = Math.atan2(c[1], c[0]) * 180 / Math.PI, mo = [(o[0] + pc[0]) / 2, (o[1] + pc[1]) / 2];
+    tag(ctx, mo[0] - 30, mo[1] + 14, `R ${fmt(r, 2)} · ${fmt(ang, 1)}°`, 'rgba(70,80,95,.92)', '#fff');
+    // world coordinates and the 3D distance to the model origin
+    const w = Geo.toW(pl, c), d3 = Math.hypot(w[0], w[1], w[2]);
+    tag(ctx, pc[0] + 16, pc[1] + 30, `X ${sgn(w[0])}  Y ${sgn(w[1])}  Z ${sgn(w[2])}`, 'rgba(17,22,29,.88)', '#E8EDF3');
+    tag(ctx, pc[0] + 16, pc[1] + 50, L(`원점까지 ${fmt(d3, 2)} mm`, `to origin ${fmt(d3, 2)} mm`), 'rgba(17,22,29,.88)', '#3FD0D6');
+  }
   function draw(ctx) {
     const s = S(); if (!s) return; const sk = SK();
-    theme(); drawSheet(ctx);
+    theme(); drawSheet(ctx); drawAxes(ctx);
     const an = sk._an || analyze(sk);
     const colorEnt = e => an.status === 'conflict' || an.status === 'over' ? COL.over : an.entDefined(e) ? COL.full : COL.under;
     // origin
@@ -6563,6 +6606,7 @@ const Sk = (() => {
     s.glyphs = gl;
     // tool preview
     drawPreview(ctx);
+    drawGuide(ctx);
     // box selection
     if (s.box) { const [a, b] = s.box; ctx.strokeStyle = COL.sel; ctx.setLineDash([4, 3]); ctx.lineWidth = 1; ctx.strokeRect(Math.min(a[0], b[0]) + .5, Math.min(a[1], b[1]) + .5, Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1])); ctx.setLineDash([]); ctx.fillStyle = 'rgba(63,208,214,.08)'; ctx.fillRect(Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1])); }
   }
@@ -6744,7 +6788,7 @@ const Sk = (() => {
         if (s.tool === 'arc' && st.c && st.s) { const a = angOf(st.c, uv); let dd = a - st.last; while (dd > Math.PI) dd -= 2 * Math.PI; while (dd < -Math.PI) dd += 2 * Math.PI; st.sweep += dd; st.last = a; }
         s.inf = inf; s.cur = uv;
       }
-      if (s.cur) $('#swCoord').textContent = `${fmt(s.cur[0], 2)}mm  ${fmt(s.cur[1], 2)}mm`;
+      if (s.cur) { const w = Geo.toW(s.pl, s.cur); $('#swCoord').textContent = `X ${fmt(w[0], 2)}  Y ${fmt(w[1], 2)}  Z ${fmt(w[2], 2)} mm · ${L('원점', 'origin')} ${fmt(Math.hypot(w[0], w[1], w[2]), 2)} mm`; }
       View.req();
     },
     down(sx, sy, e) {
@@ -11956,7 +12000,7 @@ const Dwg = (() => {
     d.osm = d.osm || { end: true, mid: true, cen: true, quad: true, int: true, perp: true, ins: true };
     buildChrome(); setTitle(); resize();
     setTimeout(() => { if (doc === d) syncViews(false, true); }, 0);
-    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.79 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
+    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.80 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
     setPrompt('명령:');
     setTimeout(() => cin.focus({ preventScroll: true }), 30);
     redraw();
