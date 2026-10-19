@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver1.07</title>
+<title>K군의 아두이노 시뮬레이터 Ver1.09</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -2558,7 +2558,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver1.07</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver1.09</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -2653,6 +2653,10 @@
           <div class="palette-item" onclick="spawnBoard('esp32_4a')">
             <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#3a3f46,#0a0c0e);border:1px solid #555;"><div style="width:14px;height:14px;margin:1px auto;background:#0af;border-radius:1px;"></div></div></div>
             <span data-i18n="palette.addesp32_4a">ESP32 보드 추가<br>(4인치 터치, 480x480)</span>
+          </div>
+          <div class="palette-item" onclick="spawnBoard('esp32_28')">
+            <div class="swatch"><div style="width:22px;height:16px;border-radius:2px;background:#111;border:2px solid #c9a227;"></div></div>
+            <span data-i18n="palette.addesp32_28">ESP32 보드 추가<br>(2.8인치 터치, 320x240)</span>
           </div>
           <div class="palette-item" onclick="spawnBoard('esp32_4b')">
             <div class="swatch"><div style="width:24px;height:16px;border-radius:3px;background:linear-gradient(135deg,#3a3f46,#0a0c0e);border:1px solid #555;"><div style="width:16px;height:9px;margin:3px auto;background:#0af;border-radius:1px;"></div></div></div>
@@ -3121,6 +3125,10 @@
           <div class="palette-item" onclick="spawnComponent('barcodesensor')">
             <div class="swatch">🏷️</div>
             <span data-i18n="palette.barcodesensor">바코드 센서</span>
+          </div>
+          <div class="palette-item" onclick="spawnComponent('huskylens')">
+            <div class="swatch">🤖</div>
+            <span>HuskyLens<br>(AI 카메라)</span>
           </div>
           <div class="palette-item" onclick="spawnComponent('visionsensor')">
             <div class="swatch">📷</div>
@@ -3849,11 +3857,13 @@ const STRINGS = {
   "board.esp32d": { ko: "ESP32 개발보드 (컬러 디스플레이 내장)", en: "ESP32 Board (built-in color display)" },
   "board.esp32t": { ko: "ESP32 + 7인치 터치 디스플레이", en: "ESP32 + 7\" Touch Display" },
   "board.esp32_4a": { ko: "ESP32 + 4인치 터치 디스플레이 (480x480)", en: "ESP32 + 4\" Touch Display (480x480)" },
+  "board.esp32_28": { ko: "ESP32 + 2.8인치 터치 디스플레이 (320x240, ST7789/ILI9341 + XPT2046)", en: "ESP32 + 2.8\" Touch Display (320x240)" },
+  "palette.addesp32_28": { ko: "ESP32 보드 추가<br>(2.8인치 터치, 320x240)", en: "Add ESP32 board<br>(2.8\" touch, 320x240)" },
   "board.esp32_4b": { ko: "ESP32 + 4인치 터치 디스플레이 (480x320)", en: "ESP32 + 4\" Touch Display (480x320)" },
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver1.07", en: "K's Simulator Ver1.07" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver1.09", en: "K's Simulator Ver1.09" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -4805,7 +4815,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.07", en: "K's Arduino Simulator Ver1.07" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.09", en: "K's Arduino Simulator Ver1.09" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -5016,7 +5026,7 @@ const MEGA_DIGITAL_PINS_LOW = [
 const MEGA_PWM_HIGH = new Set([44, 45, 46]);
 const MEGA_DIGITAL_PINS_EXT = [];
 for (let i = 14; i <= 53; i++){
-  MEGA_DIGITAL_PINS_EXT.push({ id: 'D' + i, label: (MEGA_PWM_HIGH.has(i) ? '~' : '') + i });
+  MEGA_DIGITAL_PINS_EXT.push({ id: 'D' + i, label: ({14:'TX3',15:'RX3',16:'TX2',17:'RX2',18:'TX1',19:'RX1'}[i] || (MEGA_PWM_HIGH.has(i) ? '~' : '') + i), title: ({14:'D14 (TX3 · Serial3 송신)',15:'D15 (RX3 · Serial3 수신)',16:'D16 (TX2 · Serial2 송신)',17:'D17 (RX2 · Serial2 수신)',18:'D18 (TX1 · Serial1 송신)',19:'D19 (RX1 · Serial1 수신)'}[i] || undefined) });
 }
 // A0~A15(16개, 10비트 ADC). A0~A5는 ANALOG_PINS와 이름이 같아 이미 PIN_KIND에 등록돼 있습니다.
 const MEGA_ANALOG_PINS = [];
@@ -5066,7 +5076,7 @@ const ESP32_ADC_PINS = [
   PIN_KIND[p.id] = POWER_KIND_PINS.has(p.id) ? 'power' : GND_KIND_PINS.has(p.id) ? 'gnd' : 'signal';
 });
 // 보드 타입별 "온보드 LED"가 실제로 물려있는 핀 — runTick에서 그 핀 상태를 읽어 보드 위 LED를 켭니다.
-const BOARD_ONBOARD_LED_PIN = { r4: 'D13', r3: 'D13', mega: 'D13', esp32b: 'GPIO2', esp32d: 'GPIO2', esp32t: 'GPIO2', esp32_4a: 'GPIO2', esp32_4b: 'GPIO2', esp32_8a: 'GPIO2', esp32_8b: 'GPIO2' };
+const BOARD_ONBOARD_LED_PIN = { r4: 'D13', r3: 'D13', mega: 'D13', esp32b: 'GPIO2', esp32d: 'GPIO2', esp32t: 'GPIO2', esp32_4a: 'GPIO2', esp32_4b: 'GPIO2', esp32_28: 'GPIO2', esp32_8a: 'GPIO2', esp32_8b: 'GPIO2' };
 
 // AVR 8비트 레지스터(DDRx/PORTx) <-> 아두이노 핀 번호 매핑. R3(ATmega328P)의 실제 배선과 동일.
 const AVR_PORT_PIN_MAP = {
@@ -6210,6 +6220,7 @@ function executeCompilerPipeline(board) {
     bracketDepth = Math.max(0, bracketDepth + opens - closes);
     if (!codePart) return;
     if (startDepth > 0 || bracketDepth > 0) return; // 여러 줄에 걸친 구문(배열/구조체 초기화, 다중 행 호출 등) 도중이면 건너뜁니다.
+    if (/[,=+\-*\/%&|^<>?]$/.test(codePart) || /^[,=+\-*\/%&|^<>?.]/.test(((lines.slice(idx + 1).find(x => x.trim() && !x.trim().startsWith('//')) || '').trim()))) return;
     { // 다음 의미 있는 줄이 '{'로 시작하면(함수/블록 머리줄) 세미콜론 검사 제외
       let nx = '';
       for (let j = idx + 1; j < lines.length; j++){ const tt = lines[j].trim().replace(/\/\/.*$/, '').trim(); if (tt){ nx = tt; break; } }
@@ -6302,11 +6313,13 @@ function executeCompilerPipeline(board) {
     logSerial(`[3/3] Generating ${isEsp32Board ? 'Binary' : 'Hex Binary'}: ${objcopyBin} ${isEsp32Board ? '-O binary firmware.elf firmware.bin' : '-O ihex -R .eeprom firmware.elf firmware.hex'}`, board);
 
     const flashBase = board.startsWith('r3') ? 1420 : isMegaBoard ? 3600 : isEsp32Board ? 18000 : 3840;
-    const flashSize = flashBase + rawCode.length * 4;
+    const __codeNoCmt = rawCode.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const __ramLits = (__codeNoCmt.replace(/\bF\s*\(\s*"(?:[^"\\\n]|\\.)*"\s*\)/g, '').match(/"(?:[^"\\\n]|\\.)*"/g) || []).reduce((a, x) => a + new TextEncoder().encode(x).length - 1, 0);
+    const flashSize = flashBase + Math.floor(__codeNoCmt.length * 1.5);
     // Mega 2560: 256KB 플래시(부트로더 약 8KB 제외 후 실사용 가능한 값 기준), 8KB(=8192) SRAM,
     // 4KB EEPROM(이 표시에는 EEPROM을 별도로 안 보여주지만 makeMcuState 등에는 영향 없음).
     const maxFlash = board.startsWith('r3') ? 32256 : isMegaBoard ? 253952 : isEsp32Board ? 1310720 : 262144;
-    const ramSize = 180 + Math.floor(rawCode.length * 0.3) + (isEsp32Board ? 16000 : 0);
+    const ramSize = 200 + Math.floor(__codeNoCmt.length * 0.05) + __ramLits + (isEsp32Board ? 16000 : 0);
     const maxRam = board.startsWith('r3') ? 2048 : isMegaBoard ? 8192 : isEsp32Board ? 327680 : 32768;
 
     logSerial(`\nProgram storage: ${flashSize} bytes (${((flashSize/maxFlash)*100).toFixed(1)}%) of maximum ${maxFlash} bytes.`, board);
@@ -6431,6 +6444,7 @@ function deployToMCU(board, rawCode) {
       // (실제 Arduino의 print(value, format) 동작과 동일).
       const DEC = 10, HEX = 16, OCT = 8, BIN = 2;
       function __fmtPrint(v, opt) {
+        if (typeof v === 'boolean') v = v ? 1 : 0;
         if (opt === undefined) return String(v);
         if (typeof v === 'number' && !Number.isInteger(v)) return Number(v).toFixed(opt);
         const n = Math.round(Number(v));
@@ -8089,6 +8103,8 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver1.09', ko: ['예제 모음에 「🚀 프로젝트 예제」 탭 추가 — 1번 프로젝트: AGV 무인운반차(ESP32 2개 · R4 · MEGA, 센서·모터·카메라 배선 포함)', '정수형 변수에 넣는 나눗셈을 실제 C처럼 소수점 버림으로 계산 (7/2 = 3)', 'HuskyLens AI 카메라 부품 + HUSKYLENS 라이브러리(begin/request/available/read) 지원', '메가 하드웨어 시리얼 Serial1(18/19)·Serial2(16/17)·Serial3(14/15) — 배선한 상대 보드와 실제로 통신', 'enum / enum class(: uint8_t 등) 지원, F("...") 문자열 지원', 'bool 값 출력을 실제 아두이노처럼 1/0으로', '전역 char 변수 출력이 숫자로 나오던 문제 수정', '컴파일 후 메모리 사용량 추정을 실제와 가깝게(주석 제외) 보정'] },
+  { ver: 'Ver1.08', ko: ['ESP32 2.8인치 터치 보드(320x240) 추가', '보드끼리 가상 Wi-Fi 통신 — softAP·WiFi.begin/config, TCP(WiFiServer/WiFiClient), UDP(WiFiUDP), IPAddress', 'Arduino_GFX · LovyanGFX(스프라이트·한글 폰트) · XPT2046 터치 라이브러리 지원', 'R4 Serial1(D0/D1) 지원', 'C++ 문법 지원 확대 — struct, ->, static 지역변수, 캐스트, sprintf/snprintf/sscanf/printf, #ifdef·#ifndef, 1.0f 등', '쉼표로 줄바꿈한 변수 선언을 세미콜론 오류로 잘못 판단하던 문제 수정'] },
   { ver: 'Ver1.07', ko: ['처음 시작 안내(화면을 하나씩 비추며 설명) 추가 — 📘 사용 안내 버튼으로 다시 보기'] },
   { ver: 'Ver1.06', ko: ['함수 여는 중괄호 { 를 다음 줄에 쓰는 코드(void setup() 다음 줄에 { )에서 세미콜론 오류로 잘못 판단하던 문제 수정', '회로도 PNG 저장 시 핀 위에 검은 점이 찍히던 문제 수정'] },
   { ver: 'Ver1.05', ko: ['회로도 그리기: 실행 취소 · 다시 실행(Ctrl+Z / Ctrl+Y) 추가', '회로도 그리기: 지운 선 다시 그리기(핀 → 핀) 추가', '회로도 그리기: 부품 포트 위치 변경(하단 · 좌우 · 4면 등) 추가', '드래그로 여러 부품 · 전선 한꺼번에 선택 · 이동 · 삭제', '상단 메뉴 · 코드 편집 메뉴 접기/펼치기', '부품이 많을 때 속도 개선', '붙여넣은 코드의 보이지 않는 특수문자 자동 정리', 'Serial.print 줄바꿈 오류 수정 · if/else · do-while 실행 오류 수정', 'L298N 2채널 실제 핀 배치로 변경', 'USB 포트(아두이노 · 라즈베리파이) · USB 허브 · USB 라이다 부품 추가'] },
@@ -9534,6 +9550,25 @@ function spawnComponent(type, dropX, dropY){
         <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_BCD" data-i18n-title="comp.barcodesensor.outTitle" title="OUT → 보드 디지털 핀"></div><span class="pin-cap cap-sig">OUT</span></div>
         <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_BCA" data-i18n-title="comp.barcodesensor.codeOutTitle" title="CODE → 보드 아날로그 핀"></div><span class="pin-cap cap-sig">CODE</span></div>
+      </div>`;
+  } else if (type === 'huskylens'){
+    // [Ver1.09] HuskyLens AI 카메라 — HUSKYLENS 라이브러리(begin/request/available/read)로 읽습니다.
+    // 실제 영상 인식 대신 "보이는 ID"를 골라 두면 그 ID의 블록 1개가 인식된 것으로 돌려줍니다.
+    // UART: T(카메라 TX) → 보드 RX(메가 Serial2면 17번), R(카메라 RX) ← 보드 TX(메가 16번)
+    div.classList.add('comp-pmsensor');
+    div.innerHTML = `
+      <div class="pm-title">HuskyLens AI 카메라</div>
+      <select id="${id}_hid" title="카메라에 지금 보이는(인식된) 학습 ID" style="width:100%;margin:3px 0;">
+        <option value="0">인식 없음</option>
+        <option value="1">ID 1 인식</option><option value="2">ID 2 인식</option><option value="3">ID 3 인식</option>
+        <option value="4">ID 4 인식</option><option value="5">ID 5 인식</option>
+      </select>
+      <div style="display:flex;gap:3px;"><input type="number" id="${id}_hx" value="160" min="0" max="320" title="블록 중심 X (0~320)" style="width:50%;"><input type="number" id="${id}_hy" value="120" min="0" max="240" title="블록 중심 Y (0~240)" style="width:50%;"></div>
+      <div class="comp-pin-row">
+        <div class="pin-col"><div class="pin-mini role-vcc" data-pin="${id}_V" title="VCC (5V)"></div><span class="pin-cap cap-vcc">VCC</span></div>
+        <div class="pin-col"><div class="pin-mini role-gnd" data-pin="${id}_G" title="GND"></div><span class="pin-cap cap-gnd">GND</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_HT" title="T: 카메라 TX → 보드 RX (I2C 모드에서는 SDA)"></div><span class="pin-cap cap-sig">T</span></div>
+        <div class="pin-col"><div class="pin-mini role-sig" data-pin="${id}_HR" title="R: 카메라 RX ← 보드 TX (I2C 모드에서는 SCL)"></div><span class="pin-cap cap-sig">R</span></div>
       </div>`;
   } else if (type === 'visionsensor'){
     // 스마트 카메라(머신비전) — 실제 장치는 모양·인쇄상태·XY 위치오차까지 판별해 통신이나 접점으로
@@ -15617,7 +15652,7 @@ const btRxBuffer = {};
 const I2C_PINS = {
   r3: { sda: 'A4', scl: 'A5' }, r4: { sda: 'A4', scl: 'A5' },
   esp32b: { sda: 'GPIO21', scl: 'GPIO22' }, esp32d: { sda: 'GPIO21', scl: 'GPIO22' }, esp32t: { sda: 'GPIO21', scl: 'GPIO22' },
-  esp32_4a: { sda: 'GPIO21', scl: 'GPIO22' }, esp32_4b: { sda: 'GPIO21', scl: 'GPIO22' },
+  esp32_4a: { sda: 'GPIO21', scl: 'GPIO22' }, esp32_4b: { sda: 'GPIO21', scl: 'GPIO22' }, esp32_28: { sda: 'GPIO21', scl: 'GPIO22' },
   esp32_8a: { sda: 'GPIO21', scl: 'GPIO22' }, esp32_8b: { sda: 'GPIO21', scl: 'GPIO22' },
 };
 const i2cRxBuffer = {};
@@ -19303,7 +19338,7 @@ function buildMegaBoardHTML(key){
 // 화면(캔버스)은 sandboxPrefix의 TFT_eSPI 클래스가 즉시 그 위에 직접 그림을 그립니다.
 const ESP32_TFT_RES = {
   esp32d: { w: 240, h: 135 }, esp32t: { w: 480, h: 320 },
-  esp32_4a: { w: 480, h: 480 }, esp32_4b: { w: 480, h: 320 },
+  esp32_4a: { w: 480, h: 480 }, esp32_4b: { w: 480, h: 320 }, esp32_28: { w: 320, h: 240 },
   esp32_8a: { w: 800, h: 480 }, esp32_8b: { w: 1024, h: 600 },
 };
 // esp32d만 화면이 작아 보드 오른쪽 아래 구석에 붙이는 "소형 레이아웃"을 씁니다. 그 외에
@@ -19335,10 +19370,10 @@ function esp32BoardSize(type){
 }
 function esp32TftCanvasId(key){ return `${key}_tft`; }
 function buildESP32BoardHTML(key, type){
-  const suffix = key.includes('_') ? ' #' + key.split('_')[1] : '';
+  const suffix = key.length > type.length && key.startsWith(type + '_') ? ' #' + key.slice(type.length + 1) : '';
   const titleMap = {
     esp32b: 'ESP32 DEVKIT', esp32d: 'ESP32 DISPLAY', esp32t: 'ESP32 TOUCH 7"',
-    esp32_4a: 'ESP32 TOUCH 4" (480x480)', esp32_4b: 'ESP32 TOUCH 4" (480x320)',
+    esp32_4a: 'ESP32 TOUCH 4" (480x480)', esp32_4b: 'ESP32 TOUCH 4" (480x320)', esp32_28: 'ESP32 TOUCH 2.8" (320x240)',
     esp32_8a: 'ESP32 TOUCH 8" (800x480)', esp32_8b: 'ESP32 TOUCH 8" (1024x600)',
   };
   const title = titleMap[type] + suffix;
@@ -19386,7 +19421,7 @@ function buildESP32BoardHTML(key, type){
 // 그 좌표를 터치 입력으로 기록해, 예제 코드의 Touch.pressed()/Touch.x()/Touch.y()로 읽을 수
 // 있게 합니다. 보드를 드래그하는 것과 충돌하지 않도록(캔버스 클릭 = 터치, 보드 클릭 = 이동)
 // mousedown 단계에서 전파를 막습니다.
-const ESP32_TOUCH_TYPES = new Set(['esp32t', 'esp32_4a', 'esp32_4b', 'esp32_8a', 'esp32_8b']);
+const ESP32_TOUCH_TYPES = new Set(['esp32t', 'esp32_28', 'esp32_4a', 'esp32_4b', 'esp32_8a', 'esp32_8b']);
 function bindTouchScreenEvents(key, type){
   if (!ESP32_TOUCH_TYPES.has(type)) return;
   const canvas = document.getElementById(esp32TftCanvasId(key));
@@ -20483,7 +20518,7 @@ function buildBoardPopupHTML(key, type){
   return div;
 }
 
-const ESP32_BOARD_TYPES = new Set(['esp32b', 'esp32d', 'esp32t', 'esp32_4a', 'esp32_4b', 'esp32_8a', 'esp32_8b']);
+const ESP32_BOARD_TYPES = new Set(['esp32b', 'esp32d', 'esp32t', 'esp32_28', 'esp32_4a', 'esp32_4b', 'esp32_8a', 'esp32_8b']);
 // type: 'r4' / 'r3' / 'esp32b'(기본 DevKit) / 'esp32d'(컬러 디스플레이 내장) / 'esp32t'(7인치 터치
 // 디스플레이 내장). 호출할 때마다 그 타입의 보드를 새로 한 대 더 캔버스에 추가합니다 — 기본
 // 내장 R4, 최초 1회의 R3는 이미 만들어져 있는 정적 마크업/팝업을 재사용하고, 그 외 모든 경우는
@@ -21090,13 +21125,13 @@ function BOM_LABELS_FN(){ return {
   timer: tr('comp.timer.title'), pushbutton: tr('comp.pushbutton.title'), pilotlamp: tr('comp.pilotlamp.label'), mccb: tr('comp.mccb.title'),
   auxrelay: tr('comp.auxrelay.title'), selectorswitch: tr('comp.selectorswitch.title'), battselswitch: tr('comp.battselswitch.title'), flickerrelay: tr('comp.flickerrelay.title'), terminalblock: tr('comp.terminalblock.title'),
   ledlantern: tr('comp.ledlantern.label'), lcdi2c: tr('comp.lcdi2c.title'),
-  colorsensor: tr('comp.colorsensor.title'), barcodesensor: tr('comp.barcodesensor.title'), visionsensor: tr('comp.visionsensor.title').replace(/<br>.*/,'').trim(),
+  huskylens: 'HuskyLens AI 카메라', colorsensor: tr('comp.colorsensor.title'), barcodesensor: tr('comp.barcodesensor.title'), visionsensor: tr('comp.visionsensor.title').replace(/<br>.*/,'').trim(),
 }; }
 function boardTypeLabel(type){
   return {
     r4: tr('board.r4'), r3: tr('board.r3'), mega: tr('board.mega'),
     esp32b: tr('board.esp32b'), esp32d: tr('board.esp32d'), esp32t: tr('board.esp32t'),
-    esp32_4a: tr('board.esp32_4a'), esp32_4b: tr('board.esp32_4b'),
+    esp32_4a: tr('board.esp32_4a'), esp32_4b: tr('board.esp32_4b'), esp32_28: tr('board.esp32_28'),
     esp32_8a: tr('board.esp32_8a'), esp32_8b: tr('board.esp32_8b'),
   }[type] || type;
 }
@@ -24895,6 +24930,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const q = (sel) => { if (!sel) return null; try { return document.querySelector(sel); } catch(e){ return null; } };
   const byClick = (fn) => q(`[onclick^="${fn}"]`);
 
+  // 접혀 있는 "시퀀스회로 실습" 그룹을 안내하는 동안만 펼쳤다가, 안내를 닫으면 다시 접습니다.
+  let seqOpened = null;
+  function openSeqGroup(){ const g = q('.palette-group.sq-pgroup'); if (g && g.classList.contains('collapsed')){ g.classList.remove('collapsed'); seqOpened = g; } }
   /* ---------------- 안내 내용 ---------------- */
   const S_EMB = [
     { title:'👋 K군의 아두이노 시뮬레이터에 오신 것을 환영합니다', html:`브라우저만으로 <b>부품 배치 → 배선 → 코딩 → 실행</b>까지 실제 아두이노 실습처럼 해 볼 수 있는 프로그램입니다.<br><br>
@@ -24938,7 +24976,7 @@ window.addEventListener('DOMContentLoaded', () => {
       · <b>PLC 본체</b> — LS XGB · MELSEC-Q · S7-1200 · CP1E<br>
       · <b>PLC 확장 카드 + 실습 부품</b> — 릴레이·TR·SSR 출력, AD/DA, 램프·모터·항온조·수위 탱크 등<br>
       · 전원장치 · 센서/스위치 · 공압 · 유압 · 컨베이어 · 로봇 · HMI · 통신` },
-    { sel:'.sq-trainer-card', title:'② 실습장치 판 한 번에 배치', html:`이 카드를 누르면 교재 사진과 같은 <b>시퀀스 실습장치 전체</b>(PLC XBC-DR32H · MC · EOCR · 인버터 · 릴레이 · 타이머 · 명판…)가 자동으로 놓입니다.<br>
+    { sel:'.sq-trainer-card', before: openSeqGroup, title:'② 실습장치 판 한 번에 배치', html:`이 카드를 누르면 교재 사진과 같은 <b>시퀀스 실습장치 전체</b>(PLC XBC-DR32H · MC · EOCR · 인버터 · 릴레이 · 타이머 · 명판…)가 자동으로 놓입니다.<br>
       시퀀스 회로 수업은 여기서 시작하면 됩니다.` },
     { sel:'#canvasArea', title:'③ 작업 공간 — 배선하기', html:`· <b>단자(점)를 클릭 → 다른 단자를 클릭</b>하면 전선이 연결됩니다.<br>
       · 빈 곳을 <b>드래그</b>하면 여러 부품·전선을 한꺼번에 선택 → 함께 이동 / <b>Delete</b>로 삭제.<br>
@@ -25071,6 +25109,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.removeEventListener('keydown', key, true);
     window.removeEventListener('resize', onResize);
     if (wasMin) document.body.classList.add('hdr-min');
+    if (seqOpened){ seqOpened.classList.add('collapsed'); seqOpened = null; }
   }
   window.kGuideOpen = open;
 
@@ -25094,6 +25133,1139 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!seen && !IN_FRAME && !navigator.webdriver) setTimeout(() => { if (!document.querySelector('.kg-root')) open(0); }, 900);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+
+</script>
+<script>
+/* =====================================================================
+   [Ver1.08] C++ 사전 변환 계층 + ESP32/R4 확장 런타임
+   기존 변환기(transpileCppToJs)가 모르는 C++ 문법을 "이해할 수 있는 형태"로 먼저 바꿔 준 뒤
+   기존 변환기에 넘기고, 필요한 라이브러리를 보드별 실행 환경 맨 앞에 붙입니다.
+   · 문법: struct(초기화 목록·반환·인자), ->, static 지역변수, C 캐스트, 1.0f/UL 접미사, nullptr,
+           #ifdef/#ifndef/#if/#else/#endif, 이름::멤버, 식별자 크기 배열, const char* 배열,
+           char 배열 문자열, sprintf/snprintf/sscanf, printf, char 변수 출력/연결
+   · 라이브러리: Arduino_GFX(Arduino_ST7789/ILI9341…), LovyanGFX(LGFX + LGFX_Sprite + fonts),
+           XPT2046_Touchscreen, SPIClass, IPAddress, WiFi(softAP·config·mode),
+           WiFiServer/WiFiClient(TCP), WiFiUDP — 시뮬레이터 안 보드끼리 가상 Wi-Fi 네트워크로 통신
+   · R4: Serial1 = D0/D1 하드웨어 UART (Serial1을 쓰는 스케치에서는 Serial은 USB 로그 전용)
+   ===================================================================== */
+(function(){
+  if (typeof transpileCppToJs !== 'function' || typeof deployToMCU !== 'function') return;
+
+  /* ---------------- 공통 도우미 ---------------- */
+  function maskCode(src){
+    const lits = []; let out = '', i = 0; const n = src.length;
+    while (i < n){
+      const c = src[i], c2 = src[i + 1];
+      if (c === '/' && c2 === '/'){ while (i < n && src[i] !== '\n') i++; continue; }
+      if (c === '/' && c2 === '*'){ let j = i + 2; while (j < n - 1 && !(src[j] === '*' && src[j + 1] === '/')) j++; const seg = src.slice(i, Math.min(j + 2, n)); out += seg.replace(/[^\n]/g, ' '); i = Math.min(j + 2, n); continue; }
+      if (c === '"' || c === "'"){
+        let j = i + 1; while (j < n && src[j] !== c && src[j] !== '\n'){ if (src[j] === '\\') j++; j++; }
+        const lit = src.slice(i, Math.min(j + 1, n)); lits.push(lit);
+        out += (c === '"' ? '__XS' : '__XC') + (lits.length - 1) + '__'; i = Math.min(j + 1, n); continue;
+      }
+      out += c; i++;
+    }
+    return { code: out, lits };
+  }
+  const unmask = (code, lits) => code.replace(/__X[SC](\d+)__/g, (m, k) => lits[+k]);
+  const isCharTok = (t) => /^__XC\d+__$/.test(t);
+  function matchClose(s, i){ // s[i] is ( [ {
+    const open = s[i], close = { '(': ')', '[': ']', '{': '}' }[open]; let d = 0;
+    for (let k = i; k < s.length; k++){ if (s[k] === open) d++; else if (s[k] === close){ d--; if (d === 0) return k; } }
+    return -1;
+  }
+  function splitTop(s){
+    const out = []; let d = 0, cur = '';
+    for (const ch of s){
+      if ('([{'.includes(ch)) d++; else if (')]}'.includes(ch)) d--;
+      if (ch === ',' && d === 0){ out.push(cur); cur = ''; } else cur += ch;
+    }
+    if (cur.trim() !== '' || out.length) out.push(cur);
+    return out;
+  }
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  const LIB_TYPES = ['WiFiServer','WiFiClient','WiFiUDP','IPAddress','SPIClass','XPT2046_Touchscreen','TS_Point','LGFX_Sprite',
+    'Arduino_DataBus','Arduino_GFX','Arduino_ESP32SPI','Arduino_HWSPI','Arduino_SWSPI','Arduino_ST7789','Arduino_ILI9341','Arduino_ST7735','Arduino_ILI9488','Arduino_Canvas','HUSKYLENSResult','HUSKYLENS'];
+  const BASIC = '(?:unsigned\\s+|signed\\s+)?(?:int|long|short|char|float|double|bool|byte|boolean|uint8_t|uint16_t|uint32_t|int8_t|int16_t|int32_t|int64_t|uint64_t|size_t|word|String)';
+
+  /* ---------------- 사전 변환 ---------------- */
+  function pre(src){
+    const { code: m0, lits } = maskCode(src);
+    let s = m0;
+    const ctx = { structs: {}, lgfx: {}, used: new Set() };
+
+    // 1) 전처리기 조건부(#ifdef/#ifndef/#if/#else/#elif/#endif)
+    {
+      const defined = new Set(); const lines = s.split('\n'); const stack = []; const out = [];
+      const active = () => stack.every(f => f.on);
+      for (const line of lines){
+        const t = line.trim(); let m;
+        if ((m = /^#\s*ifdef\s+(\w+)/.exec(t))){ stack.push({ on: defined.has(m[1]), taken: defined.has(m[1]) }); out.push(''); continue; }
+        if ((m = /^#\s*ifndef\s+(\w+)/.exec(t))){ stack.push({ on: !defined.has(m[1]), taken: !defined.has(m[1]) }); out.push(''); continue; }
+        if ((m = /^#\s*if\s+(.*)$/.exec(t))){
+          const e = m[1].trim(); let v = true;
+          if (/^0\b/.test(e)) v = false; else if (/^1\b/.test(e)) v = true;
+          else if ((m = /^!\s*defined\s*\(?\s*(\w+)\s*\)?/.exec(e))) v = !defined.has(m[1]);
+          else if ((m = /^defined\s*\(?\s*(\w+)\s*\)?/.exec(e))) v = defined.has(m[1]);
+          stack.push({ on: v, taken: v }); out.push(''); continue;
+        }
+        if (/^#\s*elif\b/.test(t)){ const f = stack[stack.length - 1]; if (f){ f.on = !f.taken; if (f.on) f.taken = true; } out.push(''); continue; }
+        if (/^#\s*else\b/.test(t)){ const f = stack[stack.length - 1]; if (f){ f.on = !f.taken; f.taken = true; } out.push(''); continue; }
+        if (/^#\s*endif\b/.test(t)){ stack.pop(); out.push(''); continue; }
+        if (!active()){ out.push(''); continue; }
+        if ((m = /^#\s*define\s+(\w+)/.exec(t))) defined.add(m[1]);
+        if (/^#\s*(pragma|undef|error|warning)\b/.test(t)){ out.push(''); continue; }
+        out.push(line);
+      }
+      s = out.join('\n');
+    }
+
+    // 1-1) enum / enum class (: 바탕 형식 포함) → 상수, 열거형 이름은 int 로
+    {
+      const enumNames = [];
+      s = s.replace(/\b(?:typedef\s+)?enum\s+(class\s+|struct\s+)?([A-Za-z_]\w*)?\s*(?::\s*[\w\s]+?)?\s*\{([^{}]*)\}\s*([A-Za-z_]\w*)?\s*;/g, (mm, cls, name, body, tname) => {
+        const nm = name || tname; const items = []; let prev = null;
+        splitTop(body).forEach(p => {
+          p = p.trim(); if (!p) return;
+          const m = /^([A-Za-z_]\w*)\s*(?:=\s*([\s\S]+))?$/.exec(p); if (!m) return;
+          const val = m[2] !== undefined ? m[2].trim() : (prev ? `(${prev}) + 1` : '0');
+          items.push([m[1], val]); prev = m[1];
+        });
+        if (nm) enumNames.push(nm);
+        const nl = '\n'.repeat((mm.match(/\n/g) || []).length);
+        if (cls && nm) return `const ${nm} = (() => { ${items.map(([k, v]) => `const ${k} = ${v};`).join(' ')} return { ${items.map(([k]) => k).join(', ')} }; })();` + nl;
+        return items.map(([k, v]) => `const ${k} = ${v};`).join(' ') + nl;
+      });
+      enumNames.forEach(nm => { s = s.replace(new RegExp(`\\b${nm}\\b(?=\\s+[A-Za-z_]|\\s*[*&]\\s*[A-Za-z_])`, 'g'), 'int'); });
+    }
+
+    // 2) LovyanGFX 사용자 클래스(class X : public lgfx::LGFX_Device {...};) → 시뮬레이터 화면으로
+    {
+      const re = /class\s+(\w+)\s*:\s*public\s+lgfx::(LGFX_Device|LGFX_Sprite)\s*\{/; let m;
+      while ((m = re.exec(s))){
+        const bs = m.index + m[0].length - 1, be = matchClose(s, bs); if (be < 0) break;
+        const body = s.slice(bs, be);
+        const pw = /panel_width\s*=\s*(\d+)/.exec(body), ph = /panel_height\s*=\s*(\d+)/.exec(body);
+        ctx.lgfx[m[1]] = { w: pw ? +pw[1] : 240, h: ph ? +ph[1] : 320 };
+        let e = be + 1; while (e < s.length && /\s/.test(s[e])) e++; if (s[e] === ';') e++;
+        s = s.slice(0, m.index) + s.slice(e);
+      }
+      Object.keys(ctx.lgfx).forEach(name => {
+        const d = ctx.lgfx[name];
+        s = s.replace(new RegExp(`\\b${name}\\s+(\\w+)\\s*(?:\\(\\s*\\))?\\s*;`, 'g'), `let $1 = new __LGFX(${d.w}, ${d.h});`);
+        s = s.replace(new RegExp(`\\b${name}\\s*&\\s*`, 'g'), '');
+        ctx.used.add('__LGFX');
+      });
+    }
+
+    // 3) struct 정의 수집·제거
+    {
+      const re = /\b(typedef\s+)?struct\s+(\w+)?\s*\{/g; let m; const cuts = [];
+      while ((m = re.exec(s))){
+        const bs = m.index + m[0].length - 1, be = matchClose(s, bs); if (be < 0) continue;
+        const body = s.slice(bs + 1, be);
+        if (/[()]/.test(body)) continue; // 생성자·메서드가 있는 C++ 구조체는 건드리지 않음
+        let e = be + 1; const tail = /^\s*(\w+)?\s*;/.exec(s.slice(e)); if (!tail) continue;
+        const name = m[2] || tail[1]; if (!name) continue;
+        const fields = [];
+        body.split(';').forEach(decl => {
+          decl = decl.trim(); if (!decl) return;
+          const parts = splitTop(decl); if (!parts.length) return;
+          const first = parts[0].trim(); const fm = /^(.*?)([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)$/.exec(first); if (!fm) return;
+          const type = fm[1].replace(/\b(const|static|volatile|unsigned|signed|struct)\b|[*&]/g, ' ').trim().split(/\s+/).pop() || 'int';
+          fields.push({ name: fm[2], type, arr: !!fm[3] });
+          parts.slice(1).forEach(p => { const pm = /([A-Za-z_]\w*)\s*((?:\[[^\]]*\])*)\s*$/.exec(p.trim()); if (pm) fields.push({ name: pm[1], type, arr: !!pm[2] }); });
+        });
+        ctx.structs[name] = fields;
+        cuts.push([m.index, e + tail[0].length]);
+      }
+      cuts.sort((a, b) => b[0] - a[0]).forEach(([a, b]) => { s = s.slice(0, a) + s.slice(b).replace(/^/, ''); });
+    }
+    const SN = Object.keys(ctx.structs);
+    const SRE = SN.length ? `(?:${SN.map(esc).join('|')})` : null;
+    const TYPES_ALL = SN.concat(LIB_TYPES);
+    const TRE = `(?:${TYPES_ALL.map(esc).join('|')})`;
+
+    // 4) 숫자 접미사 · nullptr · 이름::멤버 · ->
+    s = s.replace(/(?<![\w.])(\d+\.\d*|\.\d+)[fF]\b/g, '$1').replace(/(?<![\w.])(\d+)[fF]\b(?!\w)/g, '$1');
+    s = s.replace(/(?<![\w.])((?:0[xX][0-9a-fA-F]+)|\d+)(?:[uU][lL]{0,2}|[lL]{1,2}[uU]?)\b/g, '$1');
+    s = s.replace(/\bnullptr\b/g, 'null');
+    s = s.replace(/\bstd::/g, '');
+    s = s.replace(/\b(\w+)::(\w+)/g, '$1.$2');
+    s = s.replace(/(R_PORT\d+)?\s*->\s*/g, (mm, rp) => rp ? mm : '.');
+
+    // 5) C 캐스트
+    s = s.replace(/\(\s*(?:const\s+)?(?:float|double)\s*\)\s*/g, '');
+    s = s.replace(/\(\s*(?:const\s+)?(?:unsigned\s+|signed\s+)?(?:int|long|long\s+long|short|char|byte|uint8_t|uint16_t|uint32_t|int8_t|int16_t|int32_t|int64_t|uint64_t|size_t|word)?\s*\)\s*(?=\()/g, (mm) => /\(\s*\)/.test(mm) ? mm : '__trunc');
+    s = s.replace(/\(\s*(?:const\s+)?(?:unsigned|signed|(?:unsigned\s+|signed\s+)?(?:int|long|short|char|byte|uint8_t|uint16_t|uint32_t|int8_t|int16_t|int32_t|int64_t|uint64_t|size_t|word))\s*\)\s*(?=[\w])/g, '');
+    if (/__trunc\(/.test(s)) ctx.used.add('__trunc');
+
+    // 6) 함수 정의 찾기(본문 범위)
+    function findFuncs(){
+      const list = []; const re = /(^|[;}\n])\s*((?:static\s+|inline\s+)*(?:const\s+)?[A-Za-z_][\w.]*(?:\s*[*&])?)\s+([A-Za-z_]\w*)\s*\(([^()]*)\)\s*(?:const\s*)?\{/g; let m;
+      while ((m = re.exec(s))){
+        const kw = m[2].replace(/\b(static|inline|const)\b/g, '').replace(/[*&]/g, '').trim();
+        if (/^(if|for|while|switch|return|else|do|new|case)$/.test(kw) || /^(if|for|while|switch|catch)$/.test(m[3])) continue;
+        const open = s.indexOf('{', m.index + m[0].length - 1);
+        const close = matchClose(s, open); if (close < 0) continue;
+        list.push({ start: m.index + m[1].length, headEnd: open, open, close, ret: kw, name: m[3], params: m[4] });
+        re.lastIndex = open + 1;
+      }
+      return list;
+    }
+
+    // 7) static 지역변수 → 전역으로 끌어올리기
+    {
+      const funcs = findFuncs().sort((a, b) => b.start - a.start);
+      funcs.forEach(f => {
+        let body = s.slice(f.open, f.close + 1); const hoisted = [];
+        const re = new RegExp(`\\bstatic\\s+((?:const\\s+)?(?:${BASIC}|${TRE}))\\s+([A-Za-z_]\\w*)\\s*((?:\\[[^\\]]*\\])*)\\s*(=\\s*[^;]+)?;`, 'g');
+        body = body.replace(re, (mm, type, name, arr, init) => { hoisted.push({ type, name, arr, init }); return ''; });
+        if (!hoisted.length) return;
+        hoisted.forEach(h => {
+          const nn = `__s_${f.name}_${h.name}`;
+          body = body.replace(new RegExp(`(?<![\\w.])${h.name}\\b`, 'g'), nn);
+          h.decl = `${h.type} ${nn}${h.arr || ''}${h.init ? ' ' + h.init : ''};\n`;
+        });
+        s = s.slice(0, f.start) + '\n' + hoisted.map(h => h.decl).join('') + s.slice(f.start, f.open) + body + s.slice(f.close + 1);
+      });
+    }
+
+    // 8) 구조체 값 만들기 도우미
+    function braceToMk(S, inner){
+      const flds = ctx.structs[S] || []; ctx.used.add('__mk_' + S);
+      const args = splitTop(inner).map((a, i) => convVal(a.trim(), flds[i] ? flds[i].type : null));
+      return `__mk_${S}(${args.join(', ')})`;
+    }
+    function convVal(a, type){
+      if (a.startsWith('{') && a.endsWith('}')){
+        const inner = a.slice(1, -1);
+        if (type && ctx.structs[type]) return braceToMk(type, inner);
+        return '[' + splitTop(inner).map(x => convVal(x.trim(), type)).join(', ') + ']';
+      }
+      return a;
+    }
+
+    // 9) 함수 머리·반환·인자
+    const sigs = {};
+    if (SRE || true){
+      const funcs = findFuncs().sort((a, b) => b.start - a.start);
+      funcs.forEach(f => {
+        const retS = ctx.structs[f.ret] ? f.ret : null;
+        const params = f.params.trim() && f.params.trim() !== 'void' ? splitTop(f.params) : [];
+        const ptypes = params.map(p => { const t = p.replace(/\b(const|unsigned|signed|struct)\b|[*&]/g, ' ').trim().split(/\s+/); return t.length > 1 ? t[0] : null; });
+        sigs[f.name] = ptypes;
+        let body = s.slice(f.open, f.close + 1);
+        if (retS){
+          let out = '', i = 0;
+          const rr = /\breturn\s*\{/g; let m;
+          while ((m = rr.exec(body))){
+            const bo = m.index + m[0].length - 1, bc = matchClose(body, bo); if (bc < 0) break;
+            out += body.slice(i, m.index) + 'return ' + braceToMk(retS, body.slice(bo + 1, bc)); i = bc + 1; rr.lastIndex = bc + 1;
+          }
+          body = out + body.slice(i);
+        }
+        let head = s.slice(f.start, f.open);
+        const typeTokens = TYPES_ALL.concat(Object.keys(ctx.lgfx));
+        if (retS || LIB_TYPES.includes(f.ret) || ctx.lgfx[f.ret]) head = head.replace(new RegExp(`^(\\s*)(?:static\\s+|inline\\s+)*(?:const\\s+)?${esc(f.ret)}\\s*[*&]?\\s+`), '$1int ');
+        head = head.replace(/\(([^()]*)\)/, (mm, ps) => '(' + splitTop(ps).map(p => p.replace(new RegExp(`^\\s*(?:const\\s+)?(?:struct\\s+)?(?:${typeTokens.map(esc).join('|')})\\s*[*&]?\\s*`), '').trim()).join(', ') + ')');
+        s = s.slice(0, f.start) + head + body + s.slice(f.close + 1);
+      });
+    }
+    // 이름{...} 임시 구조체
+    if (SRE){
+      let m; const re = new RegExp(`\\b(${SN.map(esc).join('|')})\\s*\\{`, 'g');
+      while ((m = re.exec(s))){
+        const before = s.slice(Math.max(0, m.index - 8), m.index);
+        if (/struct\s*$/.test(before)) continue;
+        const bo = m.index + m[0].length - 1, bc = matchClose(s, bo); if (bc < 0) break;
+        const rep = braceToMk(m[1], s.slice(bo + 1, bc));
+        s = s.slice(0, m.index) + rep + s.slice(bc + 1); re.lastIndex = m.index + rep.length;
+      }
+    }
+    // 호출할 때 {..} 인자 → 구조체
+    Object.keys(sigs).forEach(fn => {
+      const pt = sigs[fn]; if (!pt.some(t => t && ctx.structs[t])) return;
+      const re = new RegExp(`(?<![\\w.])${esc(fn)}\\s*\\(`, 'g'); let m;
+      while ((m = re.exec(s))){
+        const po = m.index + m[0].length - 1, pc = matchClose(s, po); if (pc < 0) break;
+        const args = splitTop(s.slice(po + 1, pc));
+        if (!args.some(a => a.trim().startsWith('{'))){ continue; }
+        const conv = args.map((a, i) => { const t = a.trim(); return (t.startsWith('{') && pt[i] && ctx.structs[pt[i]]) ? braceToMk(pt[i], t.slice(1, -1)) : a; }).join(',');
+        s = s.slice(0, po + 1) + conv + s.slice(pc); re.lastIndex = po + 1 + conv.length;
+      }
+    });
+
+    // 10) 구조체 변수 선언
+    if (SRE){
+      const re = new RegExp(`(^|[;{}\\n(])(\\s*)(?:static\\s+)?(const\\s+)?(?:struct\\s+)?(${SN.map(esc).join('|')})\\s*(\\*?)\\s*([A-Za-z_]\\w*)\\s*(\\[[^\\]]*\\])?\\s*(=|;|,)`, 'g');
+      let m;
+      while ((m = re.exec(s))){
+        const [all, lead, sp, isConst, S, ptr, name, arr, op] = m;
+        const kw = isConst ? 'const' : 'let';
+        const declStart = m.index + lead.length;
+        let after = m.index + all.length;
+        let rep, end;
+        if (op === '=' ){
+          let k = after; while (/\s/.test(s[k])) k++;
+          if (s[k] === '{'){
+            const bc = matchClose(s, k); const inner = s.slice(k + 1, bc);
+            rep = arr && !ptr ? `${kw} ${name} = [${splitTop(inner).map(a => convVal(a.trim(), S)).join(', ')}]` : `${kw} ${name} = ${braceToMk(S, inner)}`;
+            end = bc + 1;
+          } else { rep = `${kw} ${name} =`; end = after; }
+        } else if (op === ';'){
+          if (ptr) rep = `let ${name} = null;`;
+          else if (arr){ const n = arr.slice(1, -1).trim(); ctx.used.add('__mk_' + S); rep = `let ${name} = Array.from({length:${n || 0}}, () => __mk_${S}());`; }
+          else { ctx.used.add('__mk_' + S); rep = `let ${name} = __mk_${S}();`; }
+          end = after;
+        } else { ctx.used.add('__mk_' + S); rep = `let ${name} = __mk_${S}(),`; end = after; }
+        s = s.slice(0, declStart) + sp + rep + s.slice(end);
+        re.lastIndex = declStart + sp.length + rep.length;
+      }
+    }
+
+    // 11) 라이브러리 객체 선언
+    s = s.replace(/\b[A-Za-z_]\w*\s*\*\s*([A-Za-z_]\w*)\s*=\s*new\s+([A-Za-z_]\w*)/g, (mm, v, cls) => { if (LIB_TYPES.includes(cls)) ctx.used.add(cls); return `let ${v} = new ${cls}`; });
+    LIB_TYPES.forEach(T => {
+      if (!new RegExp(`\\b${T}\\b`).test(s)) return;
+      ctx.used.add(T);
+      s = s.replace(new RegExp(`(^|[;{}\\n])(\\s*)(?:static\\s+)?(?:const\\s+)?${T}\\s*&?\\s+([A-Za-z_]\\w*)\\s*=`, 'g'), '$1$2let $3 =');
+      s = s.replace(new RegExp(`(^|[;{}\\n])(\\s*)(?:static\\s+)?${T}\\s+([A-Za-z_]\\w*)\\s*\\(([^;{}]*)\\)\\s*;`, 'g'), (mm, a, b, v, args) => `${a}${b}let ${v} = new ${T}(${args.replace(/&\s*(?=[A-Za-z_])/g, '')});`);
+      s = s.replace(new RegExp(`(^|[;{}\\n])(\\s*)(?:static\\s+)?${T}\\s+([A-Za-z_]\\w*)\\s*;`, 'g'), `$1$2let $3 = new ${T}();`);
+    });
+
+    // 12) 배열 선언 보정
+    s = s.replace(/(?:\bconst\s+)?(?:unsigned\s+)?char\s*\*\s*(?:const\s+)?([A-Za-z_]\w*)\s*\[[^\]]*\]\s*=\s*\{/g, (mm, name) => `const ${name} = {`);
+    s = s.replace(/(const\s+[A-Za-z_]\w*\s*=\s*)\{([^{}]*)\}\s*;/g, (mm, a, b) => /__XS\d+__/.test(b) ? `${a}[${b}];` : mm);
+    s = s.replace(/\b(const\s+)?(?:unsigned\s+)?char\s+([A-Za-z_]\w*)\s*\[[^\]]*\]\s*=\s*(__XS\d+__)/g, (mm, c, n, str) => `${c || ''}char* ${n} = ${str}`);
+    s = s.replace(new RegExp(`\\b((?:static\\s+)?(?:const\\s+)?${BASIC}\\s+[A-Za-z_]\\w*\\s*)\\[\\s*[A-Za-z_]\\w*\\s*\\](\\s*=\\s*\\{)`, 'g'), '$1[]$2');
+    s = s.replace(new RegExp(`\\b(?:static\\s+)?(?:const\\s+)?${BASIC}\\s+([A-Za-z_]\\w*)\\s*\\[\\s*([A-Za-z_]\\w*)\\s*\\]\\s*;`, 'g'), 'let $1 = new Array($2).fill(0);');
+
+    // 13) printf 계열
+    function rewriteCalls(fname, fn){
+      const re = new RegExp(`(?<![\\w.])${fname}\\s*\\(`, 'g'); let m;
+      while ((m = re.exec(s))){
+        const po = m.index + m[0].length - 1, pc = matchClose(s, po); if (pc < 0) break;
+        const rep = fn(splitTop(s.slice(po + 1, pc)).map(a => a.trim()));
+        if (rep == null) continue;
+        s = s.slice(0, m.index) + rep + s.slice(pc + 1); re.lastIndex = m.index + rep.length;
+      }
+    }
+    rewriteCalls('snprintf', a => { ctx.used.add('__sprintf'); return `(${a[0]} = __sprintf(${a.slice(2).join(', ')}))`; });
+    rewriteCalls('sprintf', a => { ctx.used.add('__sprintf'); return `(${a[0]} = __sprintf(${a.slice(1).join(', ')}))`; });
+    rewriteCalls('sscanf', a => {
+      ctx.used.add('__sscanf');
+      const outs = a.slice(2).map(x => x.replace(/^&\s*/, '').trim());
+      return `((__SC = __sscanf(${a[0]}, ${a[1]})), ([${outs.map(o => `${o} = ${o}`).join(', ')}] = __SC.v), __SC.n)`;
+    });
+    s = s.replace(/\bsizeof\s*\(\s*([^()]*)\s*\)/g, (mm, x) => { ctx.used.add('__sizeof'); return `__sizeof(${/^(int|long|short|char|float|double|byte|bool|uint\w+|int\w+)$/.test(x.trim()) ? `'${x.trim()}'` : x})`; });
+
+    // 14) char 변수 — 출력·문자열 연결
+    {
+      const funcs = findFuncs().sort((a, b) => b.start - a.start);
+      // 전역 char 변수 (함수 밖에 선언된 것)
+      const gnames = new Set();
+      { let outside = s; funcs.slice().sort((a, b) => b.open - a.open).forEach(f => { outside = outside.slice(0, f.open) + '{}' + outside.slice(f.close + 1); });
+        let m; const re = /(?:^|[;\n])\s*(?:volatile\s+)?(?:unsigned\s+)?char\s+([A-Za-z_]\w*)\s*(?==|;)/g; while ((m = re.exec(outside))) gnames.add(m[1]); }
+      funcs.forEach(f => {
+        let body = s.slice(f.open, f.close + 1);
+        const names = new Set(gnames); let m; const re = /\b(?:unsigned\s+)?char\s+([A-Za-z_]\w*)\s*(?==|;|,)/g;
+        while ((m = re.exec(body))) names.add(m[1]);
+        (f.params || '').split(',').forEach(p => { const pm = /^\s*(?:const\s+)?char\s+([A-Za-z_]\w*)\s*$/.exec(p); if (pm) names.add(pm[1]); });
+        names.forEach(n => {
+          ctx.used.add('__chs'); ctx.used.add('__addc');
+          body = body.replace(new RegExp(`\\.(print|println)\\s*\\(\\s*${n}\\s*\\)`, 'g'), `.$1(__chs(${n}))`);
+          body = body.replace(new RegExp(`([A-Za-z_][\\w.]*(?:\\[[^\\]]*\\])?)\\s*\\+=\\s*${n}\\b(?!\\s*[\\[.(])`, 'g'), `$1 = __addc($1, ${n})`);
+        });
+        s = s.slice(0, f.open) + body + s.slice(f.close + 1);
+      });
+    }
+    // 'x' 글자 상수 출력 / 연결
+    s = s.replace(/\.(print|println)\s*\(\s*(__XC\d+__)\s*\)/g, (mm, fn, tok) => { const lit = lits[+tok.slice(4, -2)]; return `.${fn}(${JSON.stringify(cDecode(lit.slice(1, -1)))})`; });
+    s = s.replace(/([A-Za-z_][\w.]*(?:\[[^\]]*\])?)\s*\+=\s*(__XC\d+__)/g, (mm, lhs, tok) => { ctx.used.add('__addc'); return `${lhs} = __addc(${lhs}, ${tok})`; });
+
+    // 15) 폰트 · 기타
+    s = s.replace(/(?<![\w.])(?:F|PSTR)\s*\(\s*(__XS\d+__)\s*\)/g, '$1');
+    s = s.replace(/\.setFont\s*\(\s*&?\s*/g, '.setFontX(');
+    s = s.replace(/\.loadFont\s*\(/g, '.setFontX(');
+    s = s.replace(/\b(int8_t|int16_t|int32_t|int64_t|uint64_t|size_t|word|boolean)\b/g, (mm) => mm === 'boolean' ? 'bool' : 'int');
+
+    // 사용된 런타임 이름
+    const RT = ['WiFiServer','WiFiClient','WiFiUDP','IPAddress','SPIClass','XPT2046_Touchscreen','TS_Point','LGFX_Sprite','Arduino_DataBus','Arduino_GFX',
+      'Arduino_ESP32SPI','Arduino_HWSPI','Arduino_SWSPI','Arduino_ST7789','Arduino_ILI9341','Arduino_ST7735','Arduino_ILI9488','Arduino_Canvas',
+      'fonts','strlen','strcmp','strcpy','strcat','atoi','atof','Serial1','Serial2','WIFI_STA','WIFI_AP','WIFI_AP_STA','WIFI_OFF','WL_NO_MODULE','WL_NO_SHIELD',
+      'SPI3_HOST','SPI2_HOST','VSPI','HSPI','FSPI','SPI','RGB565_BLACK','RGB565_WHITE','RGB565_RED','RGB565_GREEN','RGB565_BLUE','GFX_NOT_DEFINED',
+      'top_left','top_center','top_right','middle_left','middle_center','middle_right','bottom_left','bottom_center','bottom_right','baseline_left','baseline_center','baseline_right',
+      'textdatum_t','isDigit','isAlpha','isSpace','HUSKYLENS','HUSKYLENSResult','Serial3','ALGORITHM_\\w+','COMMAND_RETURN_\\w+'];
+    RT.forEach(n => { if (new RegExp(`(?<![\\w.])${n}\\b`).test(s)) ctx.used.add(n); });
+    if (/\bWiFi\.(softAP|config|softAPIP|mode)\b/.test(s) || ['WiFiServer','WiFiClient','WiFiUDP'].some(n => ctx.used.has(n))) ctx.used.add('__net');
+    if (/\.printf\s*\(/.test(s)) ctx.used.add('__sprintf');
+    return { code: unmask(s, lits), ctx };
+  }
+  function cDecode(inner){
+    const m = { n:'\n', t:'\t', r:'\r', '0':'\0', '\\':'\\', "'":"'", '"':'"' };
+    return inner.length === 2 && inner[0] === '\\' && m[inner[1]] !== undefined ? m[inner[1]] : inner;
+  }
+
+  /* ---------------- 보드 실행 환경 앞에 붙일 코드 ---------------- */
+  function runtimeChunk(board, js, ctx){
+    const declared = (n) => new RegExp(`(?:^|[;\\s])(?:let|const|var|function|class)\\s+${n}\\b`).test(js);
+    const lines = [`const __X = window.__xrtMake(${JSON.stringify(board)});`];
+    const exportNames = ['WiFiServer','WiFiClient','WiFiUDP','IPAddress','SPIClass','XPT2046_Touchscreen','TS_Point','LGFX_Sprite','__LGFX','Arduino_DataBus','Arduino_GFX',
+      'Arduino_ESP32SPI','Arduino_HWSPI','Arduino_SWSPI','Arduino_ST7789','Arduino_ILI9341','Arduino_ST7735','Arduino_ILI9488','Arduino_Canvas','fonts','textdatum_t',
+      'strlen','strcmp','strcpy','strcat','atoi','atof','isDigit','isAlpha','isSpace','HUSKYLENS','HUSKYLENSResult','__trunc','__sizeof','__sprintf','__sscanf','__addc','__chs'];
+    const consts = { WIFI_OFF:0, WIFI_STA:1, WIFI_AP:2, WIFI_AP_STA:3, WL_NO_SHIELD:255, WL_NO_MODULE:255, SPI3_HOST:2, SPI2_HOST:1, VSPI:3, HSPI:2, FSPI:1, GFX_NOT_DEFINED:-1,
+      RGB565_BLACK:0, RGB565_WHITE:0xFFFF, RGB565_RED:0xF800, RGB565_GREEN:0x07E0, RGB565_BLUE:0x001F,
+      top_left:0, top_center:1, top_right:2, middle_left:4, middle_center:5, middle_right:6, bottom_left:8, bottom_center:9, bottom_right:10, baseline_left:16, baseline_center:17, baseline_right:18 };
+    exportNames.forEach(n => { if (ctx.used.has(n) && !declared(n)) lines.push(`const ${n} = __X.${n};`); });
+    Object.keys(consts).forEach(n => { if (ctx.used.has(n) && !declared(n)) lines.push(`const ${n} = ${consts[n]};`); });
+    if (ctx.used.has('SPI') && !declared('SPI')) lines.push(`const SPI = new __X.SPIClass();`);
+    if (ctx.used.has('__sscanf')) lines.push('let __SC = null;');
+    if (ctx.used.has('__sprintf')) lines.push('if (typeof Serial !== "undefined" && !Serial.printf) Serial.printf = function(){ this.print(__X.__sprintf.apply(null, arguments)); };');
+    if (ctx.used.has('__net')) lines.push('__X.patchWiFi(WiFi);');
+    if (/\.setFontX\(/.test(js)) lines.push('if (typeof TFT_eSPI !== "undefined" && !TFT_eSPI.prototype.setFontX) TFT_eSPI.prototype.setFontX = function(){};');
+    if (ctx.used.has('Serial1') && !declared('Serial1')) lines.push('const Serial1 = __X.makeUart(Serial, __fmtPrint, 1);');
+    if (ctx.used.has('Serial2') && !declared('Serial2')) lines.push('const Serial2 = __X.makeUart(Serial, __fmtPrint, 2);');
+    if (ctx.used.has('Serial3') && !declared('Serial3')) lines.push('const Serial3 = __X.makeUart(Serial, __fmtPrint, 3);');
+    if (/\b(ALGORITHM_|COMMAND_RETURN_)/.test(js)) lines.push('const { ' + Object.keys({ALGORITHM_FACE_RECOGNITION:0,ALGORITHM_OBJECT_TRACKING:0,ALGORITHM_OBJECT_RECOGNITION:0,ALGORITHM_LINE_TRACKING:0,ALGORITHM_COLOR_RECOGNITION:0,ALGORITHM_TAG_RECOGNITION:0,ALGORITHM_OBJECT_CLASSIFICATION:0,COMMAND_RETURN_BLOCK:0,COMMAND_RETURN_ARROW:0}).filter(n => !declared(n)).join(', ') + ' } = __X.HUSKY_CONST;');
+    Object.keys(ctx.structs).forEach(S => {
+      const f = ctx.structs[S];
+      lines.push(`function __mk_${S}(${f.map((x, i) => 'a' + i).join(', ')}){ return { ${f.map((x, i) => `${x.name}: (a${i} === undefined ? ${x.arr ? '[]' : (ctx.structs[x.type] ? `__mk_${x.type}()` : (/^(char|String)$/.test(x.type) ? "''" : '0'))} : a${i})`).join(', ')} }; }`);
+    });
+    return lines.join('\n') + '\n';
+  }
+
+  /* ---------------- 변환기 연결 ---------------- */
+  const TRIGGER = /\bstruct\b|\benum\b|HUSKYLENS|->|\bstatic\b|WiFiServer|WiFiClient|WiFiUDP|softAP|Serial[123]\b|Arduino_|XPT2046|LGFX|sscanf|s?n?printf|#\s*if|nullptr|\d\.\d*f\b|IPAddress|::|\(\s*(?:float|double|int|long|unsigned|uint\w+|int\w+)\s*\)|\bsizeof\b|\bint16_t\b|\bint8_t\b|\bsize_t\b/;
+  /* 정수 나눗셈: C에서는 int 변수에 넣는 나눗셈 결과가 소수점 버림 (7/2 = 3)
+     정수형 변수의 선언 초기값·대입·복합대입(/=)과 정수형 함수의 return 값에 나눗셈이 있으면 Math.trunc로 감쌈 */
+  const INT_T = '(?:(?:const|static|volatile|register)\\s+)*(?:unsigned\\s+long\\s+long|long\\s+long|unsigned\\s+long|unsigned\\s+int|unsigned\\s+short|unsigned\\s+char|signed\\s+char|long\\s+int|short\\s+int|unsigned|int|long|short|byte|char|uint8_t|uint16_t|uint32_t|uint64_t|int8_t|int16_t|int32_t|int64_t|size_t|word)';
+  const FLT_T = /\b(?:float|double)\s+([A-Za-z_]\w*)/g;
+  function scanTo(s, i){ // i부터 깊이 0의 ; 또는 닫는 괄호 직전까지
+    let d = 0;
+    for (let k = i; k < s.length; k++){
+      const c = s[k];
+      if ('([{'.includes(c)) d++;
+      else if (')]}'.includes(c)){ if (d === 0) return k; d--; }
+      else if (c === ';' && d === 0) return k;
+    }
+    return s.length;
+  }
+  const hasDiv = (e) => /\//.test(e) || /(?<![\w.])\d+\.\d*(?![\w])/.test(e);
+  const wrapT = (e) => { const t = e.trim(); return /^Math\.trunc\(/.test(t) ? e : (e.match(/^\s*/)[0] + `Math.trunc(${t})` + e.match(/\s*$/)[0]); };
+  function intDiv(src){
+    const { code: m0, lits } = maskCode(src);
+    let s = m0;
+    if (!/\//.test(s) && !/\d\.\d/.test(s)) return src;
+    const ints = new Set(), flts = new Set(); let m;
+    while ((m = FLT_T.exec(s))) flts.add(m[1]);
+    // 1) 선언: 이름 수집 + 초기값 감싸기 (뒤에서부터 바꿔 인덱스 유지)
+    const reps = [];
+    const re = new RegExp(`(^|[;{}(,\\n])(\\s*)(${INT_T})\\s+(?![*&])(?=[A-Za-z_])`, 'g');
+    while ((m = re.exec(s))){
+      const st = m.index + m[0].length;
+      const end = scanTo(s, st);
+      const list = s.slice(st, end);
+      const first = /^\s*([A-Za-z_]\w*)\s*\(/.exec(list);
+      if (first) continue;                 // 함수 선언/정의
+      if (/^\s*(?:return|if|while|for|switch|else|case|do|sizeof)\b/.test(list)) continue;
+      let off = 0; const parts = splitTop(list); let rebuilt = []; let changed = false;
+      parts.forEach(pt => {
+        const dm = /^(\s*)([A-Za-z_]\w*)(\s*(?:\[[^\]]*\]\s*)*)(=)([\s\S]*)$/.exec(pt);
+        const nm = /^\s*([A-Za-z_]\w*)/.exec(pt);
+        if (nm && /^[A-Za-z_]/.test(pt.trim()) && !/^\s*(?:int|long|short|char|byte|unsigned|const)\b/.test(pt)) ints.add(nm[1]);
+        if (dm && !dm[3].includes('[') && hasDiv(dm[5]) && !dm[5].trim().startsWith('{')){ rebuilt.push(dm[1] + dm[2] + dm[3] + '=' + wrapT(dm[5])); changed = true; }
+        else rebuilt.push(pt);
+      });
+      if (changed) reps.push([st, end, rebuilt.join(',')]);
+    }
+    reps.sort((a, b) => b[0] - a[0]).forEach(([a, b, t]) => { s = s.slice(0, a) + t + s.slice(b); });
+    flts.forEach(n => ints.delete(n));
+    // 2) 대입 / 복합대입
+    if (ints.size){
+      const names = [...ints].map(esc).join('|');
+      const ra = new RegExp(`(?<![\\w.>])(${names})(\\s*(?:\\[[^\\]=;]*\\]\\s*)*)(\\/=|\\*=|\\+=|-=|=)(?!=)`, 'g');
+      const out = []; let last = 0;
+      while ((m = ra.exec(s))){
+        const st = m.index + m[0].length;
+        const before = s.slice(Math.max(0, m.index - 2), m.index);
+        if (/[=!<>]$/.test(before.trim().slice(-1)) && before.trim() !== '') { /* a == b 같은 비교의 일부는 위 (?!=)로 걸러짐 */ }
+        const end = scanTo(s, st);
+        const rhs = s.slice(st, end);
+        let rep = null;
+        if (m[3] === '/=') rep = `${m[1]}${m[2]}= Math.trunc(${m[1]}${m[2].trim()} / (${rhs.trim()}))`;
+        else if (hasDiv(rhs) && !rhs.trim().startsWith('{')) rep = `${m[1]}${m[2]}${m[3]}${wrapT(rhs)}`;
+        if (rep == null) continue;
+        out.push([m.index, end, rep]); ra.lastIndex = end;
+      }
+      out.sort((a, b) => b[0] - a[0]).forEach(([a, b, t]) => { s = s.slice(0, a) + t + s.slice(b); });
+    }
+    // 3) 정수형 함수의 return
+    const rf = new RegExp(`(^|[;}\\n])\\s*(?:static\\s+|inline\\s+)*${INT_T}\\s+[A-Za-z_]\\w*\\s*\\([^()]*\\)\\s*\\{`, 'g');
+    const fr = [];
+    while ((m = rf.exec(s))){
+      const open = m.index + m[0].length - 1, close = matchClose(s, open); if (close < 0) continue;
+      fr.push([open, close]);
+    }
+    fr.sort((a, b) => b[0] - a[0]).forEach(([open, close]) => {
+      let body = s.slice(open, close + 1);
+      body = body.replace(/\breturn\b([^;]*);/g, (mm, e) => hasDiv(e) ? `return ${wrapT(e).trim()};` : mm);
+      s = s.slice(0, open) + body + s.slice(close + 1);
+    });
+    return unmask(s, lits);
+  }
+  window.__xppIntDiv = intDiv;
+
+  const _tr = transpileCppToJs;
+  transpileCppToJs = function(code){
+    const board = window.__xppBoard;
+    try { code = intDiv(code); } catch(e){ console.warn('intDiv', e); }
+    if (!board || !TRIGGER.test(code)) return _tr.call(this, code);
+    const p = pre(code);
+    const js = _tr.call(this, p.code);
+    return runtimeChunk(board, js, p.ctx) + js;
+  };
+  window.__xppPre = pre;
+  const _dep = deployToMCU;
+  deployToMCU = function(board){
+    try { window.__xnet && window.__xnet.purge(board); } catch(e){}
+    window.__xppBoard = board;
+    try { return _dep.apply(this, arguments); } finally { window.__xppBoard = null; }
+  };
+})();
+
+/* =====================================================================
+   런타임 라이브러리 (페이지 전역 — 보드마다 window.__xrtMake(board)로 묶어서 씀)
+   ===================================================================== */
+(function(){
+  /* ---------- 서식 ---------- */
+  function toStr(v){
+    if (Array.isArray(v)){ let s = ''; for (const c of v){ if (!c) break; s += typeof c === 'number' ? String.fromCharCode(c) : String(c); } return s; }
+    if (v == null) return '';
+    return String(v);
+  }
+  function sprintf(fmt){
+    const args = Array.prototype.slice.call(arguments, 1); let ai = 0;
+    return toStr(fmt).replace(/%([-+ 0#]*)(\*|\d+)?(?:\.(\*|\d+))?(hh|h|ll|l|z|j|t|L)?([diufFeEgGxXoscp%])/g, (m, flags, width, prec, len, conv) => {
+      if (conv === '%') return '%';
+      if (width === '*') width = args[ai++]; if (prec === '*') prec = args[ai++];
+      let v = args[ai++], out;
+      switch (conv){
+        case 'd': case 'i': { const n = Math.trunc(Number(v) || 0); out = String(Math.abs(n)); if (prec !== undefined) out = out.padStart(+prec, '0'); out = (n < 0 ? '-' : flags.includes('+') ? '+' : flags.includes(' ') ? ' ' : '') + out; break; }
+        case 'u': out = String(Math.trunc(Number(v) || 0) >>> 0); break;
+        case 'f': case 'F': { const n = Number(v) || 0; out = n.toFixed(prec === undefined ? 6 : +prec); if (n >= 0 && flags.includes('+')) out = '+' + out; break; }
+        case 'e': case 'E': out = (Number(v) || 0).toExponential(prec === undefined ? 6 : +prec); if (conv === 'E') out = out.toUpperCase(); break;
+        case 'g': case 'G': out = String(Number((Number(v) || 0).toPrecision(prec === undefined ? 6 : Math.max(1, +prec)))); break;
+        case 'x': out = (Math.trunc(Number(v) || 0) >>> 0).toString(16); if (flags.includes('#') && out !== '0') out = '0x' + out; break;
+        case 'X': out = (Math.trunc(Number(v) || 0) >>> 0).toString(16).toUpperCase(); if (flags.includes('#') && out !== '0') out = '0X' + out; break;
+        case 'o': out = (Math.trunc(Number(v) || 0) >>> 0).toString(8); break;
+        case 'c': out = typeof v === 'number' ? String.fromCharCode(v) : toStr(v).charAt(0); break;
+        case 's': out = toStr(v); if (prec !== undefined) out = out.slice(0, +prec); break;
+        case 'p': out = '0x3ffb0000'; break;
+      }
+      width = width ? +width : 0;
+      if (out.length < width){
+        if (flags.includes('-')) out = out.padEnd(width, ' ');
+        else if (flags.includes('0') && /[diufFeExXo]/.test(conv)){ const sign = /^[+\- ]/.test(out) ? out[0] : ''; out = sign + out.slice(sign.length).padStart(width - sign.length, '0'); }
+        else out = out.padStart(width, ' ');
+      }
+      return out;
+    });
+  }
+  function sscanf(src, fmt){
+    const s = toStr(src), f = toStr(fmt); let si = 0; const v = []; let n = 0;
+    for (let fi = 0; fi < f.length; fi++){
+      const fc = f[fi];
+      if (/\s/.test(fc)){ while (si < s.length && /\s/.test(s[si])) si++; continue; }
+      if (fc !== '%'){ if (s[si] !== fc) break; si++; continue; }
+      let j = fi + 1; let skip = false; if (f[j] === '*'){ skip = true; j++; }
+      let width = ''; while (/\d/.test(f[j])) width += f[j++];
+      while (/[hlLqjzt]/.test(f[j])) j++;
+      const conv = f[j]; fi = j;
+      if (conv === '%'){ if (s[si] !== '%') break; si++; continue; }
+      if (conv !== 'c') while (si < s.length && /\s/.test(s[si])) si++;
+      const maxW = width ? +width : Infinity; const rest = s.slice(si, si + (maxW === Infinity ? s.length : maxW));
+      let mm, val;
+      if (conv === 'd' || conv === 'i' || conv === 'u'){ mm = /^[+-]?\d+/.exec(rest); if (!mm) break; val = parseInt(mm[0], 10); }
+      else if (conv === 'x' || conv === 'X'){ mm = /^[+-]?(0[xX])?[0-9a-fA-F]+/.exec(rest); if (!mm) break; val = parseInt(mm[0], 16); }
+      else if ('fFeEgGa'.includes(conv)){ mm = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?/.exec(rest); if (!mm) break; val = parseFloat(mm[0]); }
+      else if (conv === 's'){ mm = /^\S+/.exec(rest); if (!mm) break; val = mm[0]; }
+      else if (conv === 'c'){ if (!rest.length) break; mm = [rest[0]]; val = rest.charCodeAt(0); }
+      else break;
+      si += mm[0].length;
+      if (!skip){ v.push(val); n++; }
+    }
+    return { n: (n === 0 && s.length === 0) ? -1 : n, v };
+  }
+  const chs = (c) => typeof c === 'number' ? String.fromCharCode(c) : c;
+  const addc = (a, c) => typeof a === 'string' ? a + chs(c) : a + c;
+  const callable = (C) => new Proxy(C, { apply: (t, th, args) => new t(...args) });
+
+  /* ---------- 가상 Wi-Fi 네트워크 ---------- */
+  const NET = window.__xnet = window.__xnet || { aps:{}, nodes:{}, servers:{}, udps:{}, socks:{} };
+  const genOf = (b) => (mcuVM[b] ? mcuVM[b].gen : -1);
+  const alive = (e) => !!(e && mcuVM[e.board] && mcuVM[e.board].gen === e.gen && (typeof boardInstances === 'undefined' || boardInstances[e.board]));
+  NET.purge = function(board){
+    Object.keys(NET.aps).forEach(k => { if (NET.aps[k].board === board) delete NET.aps[k]; });
+    delete NET.nodes[board];
+    Object.keys(NET.servers).forEach(k => { if (NET.servers[k].board === board) delete NET.servers[k]; });
+    Object.keys(NET.udps).forEach(k => { if (NET.udps[k].board === board) delete NET.udps[k]; });
+    (NET.socks[board] || []).forEach(e => { e.open = false; }); NET.socks[board] = [];
+  };
+  const netLog = (board, msg) => { try { logSerial(msg, board); } catch(e){} };
+  function nodeOf(board){ const n = NET.nodes[board]; return n && n.gen === genOf(board) ? n : null; }
+  function apAlive(ssid){ const ap = NET.aps[ssid]; return ap && alive(ap) ? ap : null; }
+  function myNet(board){ // { ssid, ip } 또는 null
+    const n = nodeOf(board); if (!n) return null;
+    if (n.apSsid && apAlive(n.apSsid)) return { ssid: n.apSsid, ip: n.apIp };
+    if (n.sta && n.sta.connected && apAlive(n.sta.ssid)) return { ssid: n.sta.ssid, ip: n.sta.ip };
+    return null;
+  }
+  function ipStr(v){ if (v && v._oct) return v._oct.join('.'); return String(v); }
+
+  /* 보드 TX 핀 → 배선된 상대 보드의 RX 핀 수신 버퍼 (D0 = 기본 Serial/R4 Serial1, 메가 19/17/15 = Serial1/2/3) */
+  window.__xuartTx = function(board, txPin, str){
+    if (typeof isSimulating !== 'undefined' && !isSimulating) return false;
+    if (!str) return false;
+    const bel = document.getElementById(boardDomId[board] || ''); const pe = bel && bel.querySelector(`[data-pin="${txPin}"]`);
+    let sent = false;
+    if (pe){
+      const done = new Set();
+      for (const el of netOf(pe)){
+        if (el === pe || !el.dataset || !el.dataset.pin) continue;
+        const ob = el.closest && el.closest('.board'); const ok = ob && ob.dataset.board; if (!ok || ok === board) continue;
+        const pin = el.dataset.pin; let key = null;
+        if (pin === 'D0') key = ok;
+        else if (/^mega/.test(ok)) key = ({ D19: ok + ':S1', D17: ok + ':S2', D15: ok + ':S3' })[pin] || null;
+        if (!key || done.has(key)) continue; done.add(key);
+        serialRxBuffer[key] = (serialRxBuffer[key] || '') + str; sent = true;
+        try { logBusActivity('serial', { from: board, to: ok, text: str }); } catch(e){}
+      }
+    }
+    if (!sent && txPin === 'D1') return __serialTransmit(board, str);   // 블루투스 모듈 등 기존 경로
+    return sent;
+  };
+  window.__xrtMake = function(board){
+    const isEsp = /^esp32/.test(board);
+    /* IPAddress */
+    class _IP {
+      constructor(a, b, c, d){
+        if (typeof a === 'string'){ this._oct = a.split('.').map(x => +x || 0); }
+        else if (a && a._oct) this._oct = a._oct.slice();
+        else this._oct = [a || 0, b || 0, c || 0, d || 0];
+      }
+      toString(){ return this._oct.join('.'); }
+      fromString(s){ this._oct = String(s).split('.').map(x => +x || 0); return true; }
+      operator(){ return this.toString(); }
+    }
+    const IPAddress = callable(_IP);
+    ['0','1','2','3'].forEach(i => Object.defineProperty(_IP.prototype, i, { get(){ return this._oct[+i]; } }));
+
+    /* SPI / 터치 */
+    class _SPI { constructor(bus){ this.bus = bus; } begin(){} end(){} beginTransaction(){} endTransaction(){} transfer(v){ return 0; } setFrequency(){} }
+    class _TSP { constructor(x, y, z){ this.x = x || 0; this.y = y || 0; this.z = z || 0; } }
+    class _XPT {
+      constructor(cs, irq){ this.rot = 1; this.calib = { x0: 200, x1: 3700, y0: 240, y1: 3800 }; }
+      begin(){ return true; } setRotation(r){ this.rot = r; }
+      _t(){ return mcuVM[board] && mcuVM[board].touch; }
+      touched(){ const t = this._t(); return !!(t && t.pressed); }
+      tirqTouched(){ return this.touched(); }
+      bufferEmpty(){ return !this.touched(); }
+      getPoint(){
+        const t = this._t(); const cv = document.getElementById(board + '_tft');
+        if (!t || !t.pressed || !cv) return new _TSP(0, 0, 0);
+        const W = cv.width, H = cv.height, c = this.calib;
+        return new _TSP(Math.round(c.x0 + t.x / W * (c.x1 - c.x0)), Math.round(c.y0 + t.y / H * (c.y1 - c.y0)), 1200);
+      }
+    }
+
+    /* 화면 그리기(공통) */
+    const FONT_FACE = '"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",monospace';
+    const css565 = (c) => { c = (c >>> 0) & 0xFFFF; return `rgb(${Math.round(((c >> 11) & 31) * 255 / 31)},${Math.round(((c >> 5) & 63) * 255 / 63)},${Math.round((c & 31) * 255 / 31)})`; };
+    const fontsObj = new Proxy({}, { get: (t, name) => { if (typeof name !== 'string') return undefined; const m = /(\d+)/.exec(name); let h = 8;
+      if (/^Font0$/.test(name)) h = 8; else if (/^Font2$/.test(name)) h = 16; else if (/^Font4$/.test(name)) h = 26; else if (/^Font6$/.test(name)) h = 48; else if (/^Font7$/.test(name)) h = 48; else if (/^Font8$/.test(name)) h = 75; else if (m) h = +m[1];
+      return { name, h, wide: /KR|Japan|JP|CN|Gothic|Mincho|efont/i.test(name), classic: /^Font0$/.test(name) }; } });
+    class _Gfx {
+      constructor(canvas, pw, ph){ this._cv = canvas; this._ctx = canvas ? canvas.getContext('2d') : null; if (this._ctx) this._ctx.imageSmoothingEnabled = false;
+        this._pw = pw || (canvas ? canvas.width : 0); this._ph = ph || (canvas ? canvas.height : 0); this._rot = 0;
+        this._cx = 0; this._cy = 0; this._fg = 0xFFFF; this._bg = null; this._sx = 1; this._sy = 1; this._font = null; this._datum = 0; this._wrap = true; }
+      _c(){ return this._ctx; }
+      begin(){ if (this._cv && this._isScreen) this._fit(); return true; } init(){ return this.begin(); }
+      _fit(){ const cv = this._cv; if (!cv || !this._isScreen) return; const land = this._rot % 2 === 1; let w = land ? Math.max(this._pw, this._ph) : Math.min(this._pw, this._ph), h = land ? Math.min(this._pw, this._ph) : Math.max(this._pw, this._ph);
+        if (!this._pw || !this._ph){ w = cv.width; h = cv.height; }
+        if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; cv.style.width = w + 'px'; cv.style.height = h + 'px'; this._ctx = cv.getContext('2d'); this._ctx.imageSmoothingEnabled = false; } }
+      setRotation(r){ this._rot = (r || 0) & 3; this._fit(); }
+      getRotation(){ return this._rot; }
+      width(){ return this._cv ? this._cv.width : 0; } height(){ return this._cv ? this._cv.height : 0; }
+      color565(r, g, b){ return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xFF) >> 3); }
+      color888(r, g, b){ return (r << 16) | (g << 8) | b; }
+      fillScreen(c){ const x = this._c(); if (x){ x.fillStyle = css565(c); x.fillRect(0, 0, this.width(), this.height()); } }
+      clear(c){ this.fillScreen(c || 0); } clearDisplay(){ this.fillScreen(0); }
+      fillRect(X, Y, w, h, c){ const x = this._c(); if (x){ x.fillStyle = css565(c); x.fillRect(Math.round(X), Math.round(Y), Math.round(w), Math.round(h)); } }
+      drawRect(X, Y, w, h, c){ const x = this._c(); if (x){ x.strokeStyle = css565(c); x.lineWidth = 1; x.strokeRect(Math.round(X) + .5, Math.round(Y) + .5, Math.round(w) - 1, Math.round(h) - 1); } }
+      drawPixel(X, Y, c){ this.fillRect(X, Y, 1, 1, c); } writePixel(X, Y, c){ this.drawPixel(X, Y, c); }
+      drawFastHLine(X, Y, w, c){ this.fillRect(X, Y, w, 1, c); } drawFastVLine(X, Y, h, c){ this.fillRect(X, Y, 1, h, c); }
+      writeFastHLine(X, Y, w, c){ this.drawFastHLine(X, Y, w, c); } writeFastVLine(X, Y, h, c){ this.drawFastVLine(X, Y, h, c); }
+      drawLine(x0, y0, x1, y1, c){ const x = this._c(); if (x){ x.strokeStyle = css565(c); x.lineWidth = 1; x.beginPath(); x.moveTo(x0 + .5, y0 + .5); x.lineTo(x1 + .5, y1 + .5); x.stroke(); } }
+      _rr(X, Y, w, h, r){ const x = this._c(); x.beginPath(); if (x.roundRect) x.roundRect(X, Y, w, h, Math.max(0, Math.min(r, w / 2, h / 2))); else x.rect(X, Y, w, h); }
+      fillRoundRect(X, Y, w, h, r, c){ const x = this._c(); if (x){ x.fillStyle = css565(c); this._rr(X, Y, w, h, r); x.fill(); } }
+      drawRoundRect(X, Y, w, h, r, c){ const x = this._c(); if (x){ x.strokeStyle = css565(c); x.lineWidth = 1; this._rr(X + .5, Y + .5, w - 1, h - 1, r); x.stroke(); } }
+      fillCircle(X, Y, r, c){ const x = this._c(); if (x){ x.fillStyle = css565(c); x.beginPath(); x.arc(X + .5, Y + .5, r + .5, 0, Math.PI * 2); x.fill(); } }
+      drawCircle(X, Y, r, c){ const x = this._c(); if (x){ x.strokeStyle = css565(c); x.lineWidth = 1; x.beginPath(); x.arc(X + .5, Y + .5, r, 0, Math.PI * 2); x.stroke(); } }
+      fillEllipse(X, Y, rx, ry, c){ const x = this._c(); if (x){ x.fillStyle = css565(c); x.beginPath(); x.ellipse(X, Y, rx, ry, 0, 0, Math.PI * 2); x.fill(); } }
+      drawEllipse(X, Y, rx, ry, c){ const x = this._c(); if (x){ x.strokeStyle = css565(c); x.beginPath(); x.ellipse(X, Y, rx, ry, 0, 0, Math.PI * 2); x.stroke(); } }
+      fillTriangle(a, b, c2, d, e, f, c){ const x = this._c(); if (x){ x.fillStyle = css565(c); x.beginPath(); x.moveTo(a, b); x.lineTo(c2, d); x.lineTo(e, f); x.closePath(); x.fill(); } }
+      drawTriangle(a, b, c2, d, e, f, c){ const x = this._c(); if (x){ x.strokeStyle = css565(c); x.beginPath(); x.moveTo(a + .5, b + .5); x.lineTo(c2 + .5, d + .5); x.lineTo(e + .5, f + .5); x.closePath(); x.stroke(); } }
+      fillArc(){ } drawArc(){ } drawBitmap(){ } draw16bitRGBBitmap(){ } pushImage(){ }
+      startWrite(){} endWrite(){} setBrightness(){} display(){} invertDisplay(){} displayOn(){} displayOff(){} setSwapBytes(){} flush(){}
+      /* 글자 */
+      setCursor(x, y){ this._cx = x; this._cy = y; } getCursorX(){ return this._cx; } getCursorY(){ return this._cy; }
+      setTextColor(fg, bg){ this._fg = fg; this._bg = (bg === undefined || bg === fg) ? null : bg; }
+      setTextSize(sx, sy){ this._sx = sx || 1; this._sy = sy || this._sx; }
+      setTextWrap(w){ this._wrap = !!w; }
+      setFontX(f){ this._font = (f && f.h) ? f : null; } setFont(f){ this.setFontX(f); }
+      setTextDatum(d){ this._datum = d | 0; } getTextDatum(){ return this._datum; }
+      _metrics(){ const f = this._font; if (!f || f.classic) return { h: 8 * this._sy, nar: 6 * this._sx, wide: 8 * this._sx * 1.5, px: 8 * this._sy, classic: true };
+        return { h: f.h * this._sy, nar: Math.round(f.h * this._sx / 2), wide: f.h * this._sx, px: f.h * this._sy }; }
+      _adv(ch, m){ return ch.charCodeAt(0) < 0x80 ? m.nar : m.wide; }
+      textWidth(s){ const m = this._metrics(); let w = 0; for (const ch of String(s)) w += this._adv(ch, m); return w; }
+      fontHeight(){ return this._metrics().h; } fontWidth(){ return this._metrics().nar; }
+      _draw(s, X, Y){
+        const x = this._c(); if (!x) return 0; const m = this._metrics(); let cx = X;
+        const w = this.textWidth(s);
+        if (this._bg !== null){ x.fillStyle = css565(this._bg); x.fillRect(X, Y, w, m.h); }
+        x.fillStyle = css565(this._fg); x.textBaseline = 'top';
+        x.font = (m.classic ? `bold ${Math.round(m.px * 1.12)}px monospace` : `${Math.round(m.px * 0.92)}px ${FONT_FACE}`);
+        for (const ch of String(s)){
+          const a = this._adv(ch, m);
+          if (ch !== ' '){ x.save(); x.beginPath(); x.rect(cx, Y, a + 1, m.h + 2); x.clip();
+            const gw = x.measureText(ch).width; const dx = cx + Math.max(0, (a - gw) / 2);
+            x.fillText(ch, dx, Y + (m.classic ? 0 : m.h * 0.04)); x.restore(); }
+          cx += a;
+        }
+        return w;
+      }
+      _print(s){
+        const m = this._metrics(); const lines = String(s).split('\n');
+        lines.forEach((ln, i) => {
+          if (i > 0){ this._cx = 0; this._cy += m.h; }
+          if (!ln) return;
+          if (this._wrap && this._cx + this.textWidth(ln) > this.width() + 1 && this._font == null){
+            for (const ch of ln){ const a = this._adv(ch, m); if (this._cx + a > this.width()){ this._cx = 0; this._cy += m.h; } this._draw(ch, this._cx, this._cy); this._cx += a; }
+          } else { this._draw(ln, this._cx, this._cy); this._cx += this.textWidth(ln); }
+        });
+      }
+      print(v, fmt){ let s; if (fmt !== undefined && typeof v === 'number'){ s = Number.isInteger(v) ? (fmt === 16 ? (v >>> 0).toString(16).toUpperCase() : fmt === 2 ? (v >>> 0).toString(2) : fmt === 8 ? (v >>> 0).toString(8) : String(v)) : v.toFixed(fmt); } else s = (typeof v === 'number' && !Number.isInteger(v)) ? v.toFixed(2) : toStr(v); this._print(s); return s.length; }
+      println(v, fmt){ if (v !== undefined) this.print(v, fmt); this._print('\n'); }
+      write(c){ this._print(typeof c === 'number' ? String.fromCharCode(c) : toStr(c)); return 1; }
+      printf(){ const s = sprintf.apply(null, arguments); this._print(s); return s.length; }
+      drawString(s, X, Y, font){
+        if (font !== undefined && typeof font === 'object') this.setFontX(font);
+        s = toStr(s); const m = this._metrics(); const w = this.textWidth(s); const d = this._datum | 0;
+        const hz = d & 3; let x = X, y = Y;
+        if (hz === 1) x -= w / 2; else if (hz === 2) x -= w;
+        if (d & 4) y -= m.h / 2; else if (d & 8) y -= m.h; else if (d & 16) y -= m.h * 0.8;
+        this._draw(s, Math.round(x), Math.round(y)); return w;
+      }
+      drawCentreString(s, X, Y){ const d = this._datum; this._datum = 1; const w = this.drawString(s, X, Y); this._datum = d; return w; }
+      drawCenterString(s, X, Y){ return this.drawCentreString(s, X, Y); }
+      drawRightString(s, X, Y){ const d = this._datum; this._datum = 2; const w = this.drawString(s, X, Y); this._datum = d; return w; }
+      drawNumber(n, X, Y){ return this.drawString(String(Math.trunc(n)), X, Y); }
+      drawFloat(n, dp, X, Y){ return this.drawString(Number(n).toFixed(dp), X, Y); }
+    }
+    const screen = () => document.getElementById(board + '_tft');
+    class _ArduinoGFX extends _Gfx { constructor(bus, rst, rot, ips, w, h){ super(screen(), w || 240, h || 320); this._isScreen = true; this._initRot = rot || 0; }
+      begin(){ this._rot = this._initRot; this._fit(); return true; } }
+    class _LGFX extends _Gfx { constructor(w, h){ super(screen(), w || 240, h || 320); this._isScreen = true; this._font = null; }
+      init(){ this._fit(); return true; } begin(){ return this.init(); } }
+    class _Sprite extends _Gfx {
+      constructor(parent){ const cv = document.createElement('canvas'); cv.width = 1; cv.height = 1; super(cv, 0, 0); this._parent = parent || null; }
+      setColorDepth(){ } setPsram(){ }
+      createSprite(w, h){ this._cv.width = Math.max(1, w | 0); this._cv.height = Math.max(1, h | 0); this._ctx = this._cv.getContext('2d'); this._ctx.imageSmoothingEnabled = false; return true; }
+      deleteSprite(){ this._cv.width = 1; this._cv.height = 1; }
+      pushSprite(a, b, c){ let dst = this._parent, x = a, y = b; if (a && a._c){ dst = a; x = b; y = c; } if (dst && dst._c()) dst._c().drawImage(this._cv, Math.round(x || 0), Math.round(y || 0)); }
+      pushRotateZoom(){ this.pushSprite(0, 0); }
+    }
+    class _Bus { constructor(){} begin(){ return true; } }
+    class _Canvas extends _Gfx { constructor(w, h, out){ super(screen(), w, h); this._isScreen = true; } flush(){} }
+
+    /* 화면 이벤트 → 터치: 320x240 보드 외에도 화면 있는 보드면 동작 */
+
+    /* ---------- Wi-Fi ---------- */
+    function myNode(){ let n = nodeOf(board); if (!n){ n = NET.nodes[board] = { board, gen: genOf(board), apSsid: null, apIp: null, sta: null, mode: 1, staticIp: null }; } return n; }
+    function staConnect(n){
+      const ap = apAlive(n.sta.ssid);
+      if (!ap){ if (n.sta.connected){ n.sta.connected = false; netLog(board, `[WiFi] "${n.sta.ssid}" 연결 끊김 (공유기 역할 보드가 꺼짐)`); } return; }
+      if (n.sta.connected) return;
+      if ((ap.pass || '') !== (n.sta.pass || '') && (ap.pass || n.sta.pass)){ if (!n.sta.badPassLogged){ netLog(board, `[WiFi] "${n.sta.ssid}" 비밀번호가 다릅니다`); n.sta.badPassLogged = true; } return; }
+      let ip = n.staticIp;
+      if (!ip){ const used = new Set(Object.values(NET.nodes).filter(x => alive(x) && x.sta && x.sta.connected).map(x => x.sta.ip)); do { ip = '192.168.4.' + (ap.next++); } while (used.has(ip)); }
+      n.sta.ip = ip; n.sta.connected = true;
+      netLog(board, `[WiFi] "${n.sta.ssid}" 연결됨 — IP ${ip}`);
+    }
+    const WL = { IDLE:0, NO_SSID:1, CONNECTED:3, FAILED:4, LOST:5, DISCONNECTED:6 };
+    function patchWiFi(W){
+      Object.assign(W, {
+        mode(m){ myNode().mode = m; return true; }, getMode(){ return myNode().mode; },
+        softAP(ssid, pass){ const n = myNode(); ssid = toStr(ssid); NET.aps[ssid] = { ssid, pass: toStr(pass || ''), board, gen: genOf(board), ip: '192.168.4.1', next: 2 };
+          n.apSsid = ssid; n.apIp = '192.168.4.1'; netLog(board, `[WiFi] 공유기(softAP) "${ssid}" 시작 — IP 192.168.4.1`); return true; },
+        softAPConfig(){ return true; }, softAPIP(){ return IPAddress(myNode().apIp || '0.0.0.0'); },
+        softAPgetStationNum(){ return Object.values(NET.nodes).filter(x => alive(x) && x.sta && x.sta.connected && x.sta.ssid === myNode().apSsid).length; },
+        softAPdisconnect(){ const n = myNode(); if (n.apSsid) delete NET.aps[n.apSsid]; n.apSsid = null; return true; },
+        config(ip){ myNode().staticIp = ipStr(ip); return true; },
+        begin(ssid, pass){ const n = myNode(); n.sta = { ssid: toStr(ssid), pass: toStr(pass || ''), connected: false, ip: null }; staConnect(n);
+          if (!n.sta.connected && !n.sta.waitLogged){ netLog(board, `[WiFi] "${n.sta.ssid}" 네트워크를 찾는 중… (같은 이름으로 softAP를 연 보드가 시뮬레이터 안에 있어야 연결됩니다)`); n.sta.waitLogged = true; }
+          return n.sta.connected ? WL.CONNECTED : WL.FAILED; },
+        status(){ const n = myNode(); if (!n.sta) return n.apSsid ? WL.IDLE : WL.DISCONNECTED; staConnect(n); return n.sta.connected ? WL.CONNECTED : WL.DISCONNECTED; },
+        isConnected(){ return this.status() === WL.CONNECTED; },
+        localIP(){ const n = myNode(); return IPAddress((n.sta && n.sta.connected && n.sta.ip) || (n.apSsid ? n.apIp : '0.0.0.0')); },
+        gatewayIP(){ return IPAddress('192.168.4.1'); }, subnetMask(){ return IPAddress('255.255.255.0'); },
+        SSID(){ const n = myNode(); return (n.sta && n.sta.ssid) || n.apSsid || ''; },
+        RSSI(){ return -45 - Math.floor(Math.random() * 10); },
+        disconnect(){ const n = myNode(); if (n.sta) n.sta.connected = false; n.sta = null; return true; },
+        reconnect(){ const n = myNode(); if (n.sta) staConnect(n); return true; },
+        setAutoReconnect(){}, setSleep(){}, persistent(){}, setHostname(){},
+        macAddress(){ return 'AA:BB:CC:00:' + (board.length + 10) + ':' + String(genOf(board) % 90 + 10); },
+        firmwareVersion(){ return '0.4.1'; },
+      });
+    }
+    /* TCP */
+    class _Client {
+      constructor(end){ this._e = end || null; this._timeout = 1000; }
+      connect(host, port){
+        const me = myNet(board); if (!me) return 0;
+        const h = ipStr(host);
+        const srv = Object.values(NET.servers).find(sv => alive(sv) && sv.port === +port && (() => { const nn = myNetOf(sv.board); return nn && nn.ssid === me.ssid && nn.ip === h; })());
+        if (!srv) return 0;
+        const a = { rx: [], open: true, ip: h, port: +port }, b = { rx: [], open: true, ip: me.ip, port: 50000 + Math.floor(Math.random() * 9999) };
+        a.peer = b; b.peer = a;
+        (NET.socks[board] = NET.socks[board] || []).push(a); (NET.socks[srv.board] = NET.socks[srv.board] || []).push(b);
+        srv.pending.push(new _Client(b)); this._e = a; return 1;
+      }
+      connected(){ const e = this._e; return !!(e && ((e.open && e.peer.open) || e.rx.length)); }
+      available(){ return this._e ? this._e.rx.length : 0; }
+      read(buf, len){ const e = this._e; if (!e || !e.rx.length) return -1;
+        if (Array.isArray(buf)){ let n = 0; while (n < (len || buf.length) && e.rx.length){ buf[n++] = e.rx.shift(); } return n; }
+        return e.rx.shift(); }
+      peek(){ const e = this._e; return e && e.rx.length ? e.rx[0] : -1; }
+      _send(str){ const e = this._e; if (!e || !e.open || !e.peer.open) return 0; for (const ch of str) e.peer.rx.push(ch.charCodeAt(0)); return str.length; }
+      write(v, len){ if (typeof v === 'number') return this._send(String.fromCharCode(v & 0xFFFF)); if (Array.isArray(v)) return this._send(v.slice(0, len || v.length).map(c => String.fromCharCode(c)).join('')); return this._send(toStr(v)); }
+      print(v, fmt){ return this._send(fmt !== undefined && typeof v === 'number' ? (Number.isInteger(v) ? v.toString(fmt === 16 ? 16 : fmt === 2 ? 2 : fmt === 8 ? 8 : 10) : v.toFixed(fmt)) : (typeof v === 'number' && !Number.isInteger(v) ? v.toFixed(2) : toStr(v))); }
+      println(v, fmt){ return (v !== undefined ? this.print(v, fmt) : 0) + this._send('\r\n'); }
+      printf(){ return this._send(sprintf.apply(null, arguments)); }
+      readStringUntil(t){ const e = this._e; if (!e) return ''; const tc = typeof t === 'number' ? t : toStr(t).charCodeAt(0); let s = ''; while (e.rx.length){ const c = e.rx.shift(); if (c === tc) break; s += String.fromCharCode(c); } return s; }
+      readString(){ const e = this._e; if (!e) return ''; const s = e.rx.map(c => String.fromCharCode(c)).join(''); e.rx.length = 0; return s; }
+      readBytes(buf, len){ return this.read(buf, len); }
+      setTimeout(ms){ this._timeout = ms; } setNoDelay(){} flush(){}
+      stop(){ if (this._e) this._e.open = false; }
+      remoteIP(){ return IPAddress(this._e ? this._e.peer.ip || '0.0.0.0' : '0.0.0.0'); }
+      remotePort(){ return this._e ? this._e.peer.port : 0; }
+      valueOf(){ return this.connected() ? 1 : 0; }
+    }
+    function myNetOf(b){ const n = NET.nodes[b]; if (!n || n.gen !== genOf(b)) return null;
+      if (n.apSsid && apAlive(n.apSsid)) return { ssid: n.apSsid, ip: n.apIp };
+      if (n.sta && n.sta.connected && apAlive(n.sta.ssid)) return { ssid: n.sta.ssid, ip: n.sta.ip }; return null; }
+    class _Server {
+      constructor(port){ this.port = +port || 80; this._k = board + ':' + this.port; }
+      begin(port){ if (port) { this.port = +port; this._k = board + ':' + this.port; } NET.servers[this._k] = { board, gen: genOf(board), port: this.port, pending: [] }; }
+      _s(){ const sv = NET.servers[this._k]; return sv && alive(sv) ? sv : null; }
+      hasClient(){ const sv = this._s(); return !!(sv && sv.pending.length); }
+      accept(){ const sv = this._s(); return sv && sv.pending.length ? sv.pending.shift() : null; }
+      available(){ return this.accept(); }
+      setNoDelay(){} stop(){ delete NET.servers[this._k]; } end(){ this.stop(); } close(){ this.stop(); }
+    }
+    /* UDP */
+    class _UDP {
+      constructor(){ this._port = 0; this._tx = null; this._cur = null; }
+      begin(port){ this._port = +port; NET.udps[board + ':' + this._port] = { board, gen: genOf(board), port: this._port, q: [] }; return 1; }
+      stop(){ delete NET.udps[board + ':' + this._port]; }
+      _q(){ const u = NET.udps[board + ':' + this._port]; return u && alive(u) ? u.q : null; }
+      beginPacket(ip, port){ this._tx = { ip: ipStr(ip), port: +port, data: '' }; return 1; }
+      write(v, len){ if (!this._tx) return 0; const s = typeof v === 'number' ? String.fromCharCode(v) : Array.isArray(v) ? v.slice(0, len || v.length).map(c => String.fromCharCode(c)).join('') : toStr(v); this._tx.data += s; return s.length; }
+      print(v, fmt){ return this.write(fmt !== undefined && typeof v === 'number' ? (Number.isInteger(v) ? v.toString(fmt) : v.toFixed(fmt)) : (typeof v === 'number' && !Number.isInteger(v) ? v.toFixed(2) : toStr(v))); }
+      println(v){ return (v !== undefined ? this.print(v) : 0) + this.write('\r\n'); }
+      printf(){ return this.write(sprintf.apply(null, arguments)); }
+      endPacket(){
+        const tx = this._tx; this._tx = null; if (!tx) return 0; const me = myNet(board); if (!me) return 0;
+        const bcast = /\.255$/.test(tx.ip) || tx.ip === '255.255.255.255';
+        Object.values(NET.udps).forEach(u => {
+          if (!alive(u) || u.port !== tx.port || u.board === board) return;
+          const nn = myNetOf(u.board); if (!nn || nn.ssid !== me.ssid) return;
+          if (bcast || nn.ip === tx.ip){ if (u.q.length < 200) u.q.push({ data: tx.data, ip: me.ip, port: this._port || 0 }); }
+        });
+        return 1;
+      }
+      parsePacket(){ const q = this._q(); if (!q || !q.length){ this._cur = null; return 0; } this._cur = Object.assign({ pos: 0 }, q.shift()); return this._cur.data.length; }
+      available(){ return this._cur ? this._cur.data.length - this._cur.pos : 0; }
+      read(buf, len){ const c = this._cur; if (!c || c.pos >= c.data.length) return Array.isArray(buf) ? 0 : -1;
+        if (Array.isArray(buf)){ let n = 0; const max = Math.min(len || buf.length, buf.length); while (n < max && c.pos < c.data.length) buf[n++] = c.data.charCodeAt(c.pos++); return n; }
+        return c.data.charCodeAt(c.pos++); }
+      peek(){ const c = this._cur; return c && c.pos < c.data.length ? c.data.charCodeAt(c.pos) : -1; }
+      readString(){ const c = this._cur; if (!c) return ''; const s = c.data.slice(c.pos); c.pos = c.data.length; return s; }
+      remoteIP(){ return IPAddress(this._cur ? this._cur.ip : '0.0.0.0'); } remotePort(){ return this._cur ? this._cur.port : 0; }
+      flush(){}
+    }
+    /* 하드웨어 UART — 보드 핀 배선을 따라 상대 보드의 수신 버퍼로
+       · R4 Serial1 = D0/D1   · 메가 Serial1 = 18(TX)/19(RX), Serial2 = 16/17, Serial3 = 14/15 */
+    const isMega = /^mega/.test(board);
+    function uartPins(n){
+      if (isMega) return ({ 0: ['D1', 'D0'], 1: ['D18', 'D19'], 2: ['D16', 'D17'], 3: ['D14', 'D15'] })[n] || null;
+      if (/^r[34]/.test(board)) return ['D1', 'D0'];
+      return null;
+    }
+    const rxKey = (n) => (isMega && n > 0) ? board + ':S' + n : board;
+    function makeUart(Serial, fmtPrint, n){
+      if (n === 1 && /^r4/.test(board)){
+        // R4: Serial = USB(로그 전용), Serial1 = D0/D1 핀
+        Serial.print = function(v, opt){ logSerial(fmtPrint(v, opt), board, false); };
+        Serial.println = function(v, opt){ logSerial(v !== undefined ? fmtPrint(v, opt) : '', board); };
+        Serial.write = function(v){ logSerial(typeof v === 'number' ? String.fromCharCode(v) : String(v), board, false); };
+      }
+      const pins = uartPins(n); const key = rxKey(n);
+      serialRxBuffer[key] = '';
+      const tx = (s) => { if (pins) window.__xuartTx(board, pins[0], s); else __serialTransmit(board, s); };
+      return {
+        _board: board, _n: n, _pins: pins,
+        begin(){}, end(){}, flush(){},
+        print(v, opt){ tx(fmtPrint(v, opt)); }, println(v, opt){ tx((v !== undefined ? fmtPrint(v, opt) : '') + '\r\n'); },
+        write(v){ tx(typeof v === 'number' ? String.fromCharCode(v & 0xFF) : String(v)); return 1; },
+        printf(){ tx(sprintf.apply(null, arguments)); },
+        available(){ return (serialRxBuffer[key] || '').length; },
+        read(){ const b = serialRxBuffer[key] || ''; if (!b.length) return -1; serialRxBuffer[key] = b.slice(1); return b.charCodeAt(0); },
+        peek(){ const b = serialRxBuffer[key] || ''; return b.length ? b.charCodeAt(0) : -1; },
+        readString(){ const b = serialRxBuffer[key] || ''; serialRxBuffer[key] = ''; return b; },
+        readStringUntil(t){ const b = serialRxBuffer[key] || ''; const ts = typeof t === 'number' ? String.fromCharCode(t) : String(t); const i = b.indexOf(ts); if (i < 0){ serialRxBuffer[key] = ''; return b; } serialRxBuffer[key] = b.slice(i + ts.length); return b.slice(0, i); },
+        setTimeout(){},
+      };
+    }
+
+    /* HuskyLens (HUSKYLENS 라이브러리) — 부품의 "보이는 ID"를 인식 결과로 돌려줌 */
+    function findHusky(port){
+      const bel = document.getElementById(boardDomId[board] || ''); if (!bel) return null;
+      const mine = new Set();
+      if (port && port._pins){ port._pins.forEach(pn => { const e = bel.querySelector(`[data-pin="${pn}"]`); if (e) netOf(e).forEach(x => mine.add(x)); }); }
+      for (const comp of document.querySelectorAll('[id^="comp_huskylens_"]')){
+        for (const pn of ['_HT', '_HR']){
+          const pe = comp.querySelector(`[data-pin$="${pn}"]`); if (!pe) continue;
+          const net = netOf(pe);
+          for (const x of net){
+            if (port && port._pins){ if (mine.has(x)) return comp; }
+            else if (x.closest && x.closest('.board') === bel) return comp;   // I2C·소프트웨어 시리얼: 이 보드 핀에 이어져 있으면
+          }
+        }
+      }
+      return null;
+    }
+    class _HuskyResult { constructor(o){ Object.assign(this, { command: 0x2A, xCenter: 0, yCenter: 0, width: 0, height: 0, ID: 0, xOrigin: 0, yOrigin: 0, xTarget: 0, yTarget: 0 }, o || {}); } }
+    class _Husky {
+      constructor(){ this._comp = null; this._port = null; this._q = []; }
+      begin(port){ this._port = port || null; this._comp = findHusky(this._port); return !!this._comp; }
+      _alive(){ if (!this._comp || !document.body.contains(this._comp)) this._comp = findHusky(this._port); return !!this._comp; }
+      _frame(onlyId){
+        if (!this._alive()) return [];
+        const id = +((document.getElementById(this._comp.id + '_hid') || {}).value || 0); if (!id) return [];
+        if (onlyId !== undefined && onlyId !== id) return [];
+        const x = +((document.getElementById(this._comp.id + '_hx') || {}).value || 160), y = +((document.getElementById(this._comp.id + '_hy') || {}).value || 120);
+        return [new _HuskyResult({ ID: id, xCenter: x, yCenter: y, width: 60, height: 60, xOrigin: x, yOrigin: y + 30, xTarget: x, yTarget: y - 30 })];
+      }
+      request(id){ if (!this._alive()) return false; this._q = this._frame(id); return true; }
+      requestBlocks(id){ return this.request(id); } requestArrows(id){ this._q = []; return this._alive(); }
+      requestLearned(){ return this.request(); } requestBlocksLearned(){ return this.request(); } requestByID(id){ return this.request(id); }
+      available(){ return this._q.length; } count(){ return this._q.length; } countBlocks(){ return this._q.length; } countArrows(){ return 0; }
+      read(){ return this._q.shift() || new _HuskyResult(); }
+      get(i){ return this._q[i || 0] || new _HuskyResult(); } getBlock(i){ return this.get(i); } getArrow(){ return new _HuskyResult({ command: 0x2B }); }
+      isLearned(id){ const f = this._frame(); return id === undefined ? f.length > 0 : f.some(r => r.ID === id); }
+      isAppear(id){ return this.isLearned(id); } countLearnedIDs(){ return 5; } frameNumber(){ return Math.floor(Date.now() / 33); }
+      writeAlgorithm(){ return this._alive(); } customText(){ return true; } clearCustomText(){ return true; } setTimeOutDuration(){} writeLearn(){ return true; } writeForget(){ return true; }
+    }
+    const HUSKY_CONST = { ALGORITHM_FACE_RECOGNITION: 0, ALGORITHM_OBJECT_TRACKING: 1, ALGORITHM_OBJECT_RECOGNITION: 2, ALGORITHM_LINE_TRACKING: 3, ALGORITHM_COLOR_RECOGNITION: 4, ALGORITHM_TAG_RECOGNITION: 5, ALGORITHM_OBJECT_CLASSIFICATION: 6,
+      COMMAND_RETURN_BLOCK: 0x2A, COMMAND_RETURN_ARROW: 0x2B };
+    return {
+      IPAddress, SPIClass: callable(_SPI), XPT2046_Touchscreen: callable(_XPT), TS_Point: callable(_TSP),
+      WiFiServer: callable(_Server), WiFiClient: callable(_Client), WiFiUDP: callable(_UDP),
+      LGFX_Sprite: callable(_Sprite), __LGFX: callable(_LGFX), fonts: fontsObj, textdatum_t: { top_left:0, top_center:1, top_right:2, middle_left:4, middle_center:5, middle_right:6, bottom_left:8, bottom_center:9, bottom_right:10, baseline_left:16, baseline_center:17, baseline_right:18 },
+      Arduino_DataBus: callable(_Bus), Arduino_ESP32SPI: callable(_Bus), Arduino_HWSPI: callable(_Bus), Arduino_SWSPI: callable(_Bus),
+      Arduino_GFX: callable(_ArduinoGFX), Arduino_ST7789: callable(_ArduinoGFX), Arduino_ILI9341: callable(_ArduinoGFX), Arduino_ST7735: callable(_ArduinoGFX), Arduino_ILI9488: callable(_ArduinoGFX), Arduino_Canvas: callable(_Canvas),
+      strlen: (s) => toStr(s).length, strcmp: (a, b) => { a = toStr(a); b = toStr(b); return a < b ? -1 : a > b ? 1 : 0; }, strcpy: (d, s) => toStr(s), strcat: (d, s) => toStr(d) + toStr(s),
+      atoi: (s) => parseInt(toStr(s), 10) || 0, atof: (s) => parseFloat(toStr(s)) || 0,
+      isDigit: (c) => /\d/.test(chs(c)), isAlpha: (c) => /[A-Za-z]/.test(chs(c)), isSpace: (c) => /\s/.test(chs(c)),
+      __trunc: (v) => Math.trunc(Number(v) || 0), __sizeof: (v) => Array.isArray(v) ? v.length : typeof v === 'string' ? ({ int:4, long:4, short:2, char:1, float:4, double:8, byte:1, bool:1 }[v] || v.length + 1) : 4,
+      __sprintf: sprintf, __sscanf: sscanf, __addc: addc, __chs: chs,
+      patchWiFi, makeUart, HUSKYLENS: callable(_Husky), HUSKYLENSResult: callable(_HuskyResult), HUSKY_CONST,
+    };
+  };
+})();
+
+/* =====================================================================
+   [Ver1.09] 예제 모음 — "🚀 프로젝트 예제" 탭
+   1번 프로젝트: AGV 무인운반차 (ESP32 터치 + ESP32 모니터 + UNO R4 WiFi + MEGA 2560)
+   보드 4개 배치 · 코드 4개 업로드 · 메가 주변 센서/모터/카메라와 보드 간 UART 배선까지 한 번에
+   ===================================================================== */
+(function(){
+  if (typeof renderGalleryBody !== 'function' || typeof STRINGS === 'undefined') return;
+  const CODES = {"touch": "#include <Arduino_GFX_Library.h>\n#include <XPT2046_Touchscreen.h>\n#include <WiFi.h>\n\n// =====================================================\n// ESP32 터치스크린 (Wi-Fi AP + TCP 서버)\n//  메가 코드(터치 '1','2','3')에 맞춘 버전\n//    [1]      → '1' : 1번방 출발\n//    [2]      → '2' : 분기점2에서 2번방\n//    [RETURN] → '3' : 복귀\n//    [ - ]    → 사용 안 함 (나중에 기능 추가용 빈 버튼)\n//  R4에서 \"rx,ry,전방,측면,lap\" 수신 → 위쪽에 거리 표시\n// =====================================================\n\nconst char* ap_ssid = \"AGV_WIFI\";\nconst char* ap_pass = \"12345678\";\n\nWiFiServer server(2390);\nWiFiClient r4Client;\n\n#define TFT_BL 27\n#define TOUCH_CS 33\n\nArduino_DataBus *bus = new Arduino_ESP32SPI(2, 15, 14, 13, 12);\nArduino_GFX *gfx = new Arduino_ST7789(bus, -1, 1, false, 240, 320, 0, 0, 0, 0);\n\nSPIClass touchSPI = SPIClass(VSPI);\nXPT2046_Touchscreen touch(TOUCH_CS);\n\nstruct Button {\n  int x, y, w, h;\n  char screenLabel[10];\n  char serialLabel[20];\n  char tcpCommand;      // 0이면 아무것도 보내지 않음\n  uint16_t color;\n};\n\nButton buttons[4] = {\n  {20,  40,  130, 80, \"1\",      \"1번방\",   '1', 0x001F},\n  {170, 40,  130, 80, \"2\",      \"2번방\",   '2', 0x07E0},\n  {20,  140, 130, 80, \"-\",      \"빈 버튼\", 0,   0xC618},\n  {170, 140, 130, 80, \"RETURN\", \"복귀\",    '3', 0x7BEF}\n};\n\nbool isPressed = false;\nbool wasConnected = false;\nint lastDf = -1, lastDr = -1;\n\nvoid showTopText(const char* text, uint16_t color) {\n  gfx->fillRect(0, 0, 320, 34, 0xFFFF);\n  gfx->setTextColor(color);\n  gfx->setTextSize(2);\n  gfx->setCursor(10, 10);\n  gfx->print(text);\n}\n\nvoid updateTelemetryUI(int df, int dr) {\n  if (df == lastDf && dr == lastDr) return;\n  gfx->fillRect(0, 0, 320, 34, 0xFFFF);\n  gfx->setTextColor(0x0000);\n  gfx->setTextSize(2);\n  gfx->setCursor(10, 10);\n  gfx->printf(\"F:%3dcm  R:%3dcm\", df, dr);\n  lastDf = df; lastDr = dr;\n}\n\nvoid drawButton(int i) {\n  gfx->fillRoundRect(buttons[i].x, buttons[i].y, buttons[i].w, buttons[i].h, 10, buttons[i].color);\n  gfx->setTextColor(0xFFFF);\n  gfx->setTextSize(2);\n  int textW = strlen(buttons[i].screenLabel) * 12;\n  gfx->setCursor(buttons[i].x + (buttons[i].w - textW) / 2, buttons[i].y + 32);\n  gfx->print(buttons[i].screenLabel);\n}\n\nvoid drawUI() {\n  gfx->fillScreen(0xFFFF);\n  for (int i = 0; i < 4; i++) drawButton(i);\n}\n\n// 아래쪽에 마지막으로 보낸 명령 표시\nvoid showLastCommand(const char* label) {\n  gfx->fillRect(0, 224, 320, 16, 0xFFFF);\n  gfx->setTextColor(0x0000);\n  gfx->setTextSize(2);\n  gfx->setCursor(10, 224);\n  gfx->print(\"SENT: \");\n  gfx->print(label);\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(TFT_BL, OUTPUT);\n  digitalWrite(TFT_BL, HIGH);\n\n  gfx->begin();\n  gfx->setRotation(1);\n\n  touchSPI.begin(14, 12, 13, 33);\n  touch.begin(touchSPI);\n  touch.setRotation(1);\n\n  drawUI();\n\n  WiFi.softAP(ap_ssid, ap_pass);\n  server.begin();\n\n  showTopText(\"Waiting for R4...\", 0x0000);\n  Serial.println(\"TCP 서버 가동. R4 접속 대기 중...\");\n}\n\n// R4 데이터 한 줄씩 읽기 (논블로킹)\nvoid readR4() {\n  static String buf = \"\";\n  while (r4Client && r4Client.connected() && r4Client.available()) {\n    char c = r4Client.read();\n    if (c == '\\n') {\n      int r_x, r_y, d_f, d_r, lap;\n      if (sscanf(buf.c_str(), \"%d,%d,%d,%d,%d\", &r_x, &r_y, &d_f, &d_r, &lap) == 5) {\n        updateTelemetryUI(d_f, d_r);\n      }\n      buf = \"\";\n    } else if (c != '\\r') {\n      buf += c;\n      if (buf.length() > 60) buf = \"\";\n    }\n  }\n}\n\nvoid loop() {\n  // 1. R4 접속 처리\n  if (server.hasClient()) {\n    WiFiClient newClient = server.accept();\n    if (!r4Client || !r4Client.connected()) {\n      if (r4Client) r4Client.stop();\n      r4Client = newClient;\n      Serial.println(\"[TCP] R4 접속!\");\n      showTopText(\"R4 CONNECTED!\", 0x07E0);\n      delay(800);\n      lastDf = -1; lastDr = -1;\n    } else {\n      newClient.stop();   // 이미 연결되어 있으면 새 접속 거절\n    }\n  }\n\n  bool connected = r4Client && r4Client.connected();\n  if (wasConnected && !connected) {\n    showTopText(\"Waiting for R4...\", 0xF800);\n    lastDf = -1; lastDr = -1;\n  }\n  wasConnected = connected;\n\n  // 2. R4 데이터 수신\n  readR4();\n\n  // 3. 터치 → R4로 명령 전송\n  if (touch.touched()) {\n    TS_Point p = touch.getPoint();\n    int x = map(p.x, 200, 3700, 0, 320);\n    int y = map(p.y, 240, 3800, 0, 240);\n\n    if (!isPressed) {\n      isPressed = true;\n      for (int i = 0; i < 4; i++) {\n        if (x > buttons[i].x && x < (buttons[i].x + buttons[i].w) &&\n            y > buttons[i].y && y < (buttons[i].y + buttons[i].h)) {\n\n          Serial.print(\"터치: \"); Serial.println(buttons[i].serialLabel);\n          if (buttons[i].tcpCommand == 0) break;   // 빈 버튼\n\n          if (connected) {\n            r4Client.write(buttons[i].tcpCommand);\n            gfx->fillRoundRect(buttons[i].x, buttons[i].y, buttons[i].w, buttons[i].h, 10, 0xFFFF);\n            delay(80);\n            drawButton(i);\n            showLastCommand(buttons[i].screenLabel);\n          } else {\n            showTopText(\"R4 NOT CONNECTED\", 0xF800);\n          }\n          break;\n        }\n      }\n    }\n  } else {\n    isPressed = false;\n  }\n}\n", "monitor": "#include <WiFi.h>\n#include <WiFiUdp.h>\n#include <LovyanGFX.hpp>\n\n// ESP32 보드 패키지 3.x 에서는 VSPI_HOST 이름이 없어지고 SPI3_HOST 로 바뀜 (같은 SPI)\n#ifndef VSPI_HOST\n#define VSPI_HOST SPI3_HOST\n#endif\n\n// 좌표/경로 구조체는 맨 위에 둬야 함\n// (Arduino IDE가 함수 선언을 자동으로 위쪽에 끼워 넣기 때문에, 아래에 있으면 'Pt does not name a type' 오류)\n// 한글 폰트 (하나만 사용)\n//  efontKR_12 : 기본 Partition Scheme(1.2MB APP)에서도 들어감\n//  efontKR_16 : 글자가 더 크지만 용량이 커서 Partition Scheme을 \"Huge APP\"으로 바꿔야 함\n#define KR_FONT fonts::efontKR_12\n\nstruct Pt  { int16_t x, y; };\nstruct Seg { const Pt* p; uint8_t n; };\n\n// =====================================================\n// AGV 모니터링 (ESP32 + ST7789 240x320, 가로 사용, 한글 표시)\n//  - AGV_WIFI 에 접속해서 R4가 보내는 UDP 데이터 수신\n//      \"M,상태번호,전방,측면,IR,카메라\"\n//  - 화면 구성 (320 x 240)\n//      위쪽   0~19   : 현재 단계 (한글) / 연결 상태\n//      가운데 20~179 : 코스 지도 + 로봇 위치\n//      아래쪽 180~239: 3칸 x 2줄 상태판\n//  - 로봇 위치 = 메가 상태(어느 구간인지)는 정확,\n//               구간 안 위치는 경과시간 ÷ 구간 시간(SEG_TIME_MS)으로 추정\n// =====================================================\n\nconst char* WIFI_SSID = \"AGV_WIFI\";\nconst char* WIFI_PASS = \"12345678\";\nconst int   UDP_PORT  = 2391;\n\n// =====================================================\n// ★ 구간별 걸리는 시간 (ms) - 직접 재서 넣으세요\n//   화면 아래 \"구간\" 칸이 현재 구간의 경과 시간입니다.\n//   구간이 끝날 때 보이는 값을 여기에 적으면 됩니다. (0 = 아직 모름 → 구간 시작점에 표시)\n// =====================================================\nconst int N_STATE = 14;\nunsigned long SEG_TIME_MS[N_STATE] = {\n  0,   // 0  대기 (이동 없음)\n  0,   // 1  오른쪽 벽추종 → 1번방 (위쪽 682)\n  0,   // 2  라인트레이싱 → 1번방 (보라 282)\n  0,   // 3  1번방 도착 (이동 없음)\n  0,   // 4  제자리 회전 (이동 없음)\n  0,   // 5  1번방에서 라인으로 나옴 (보라 282)\n  0,   // 6  왼쪽 벽추종 → 2번방 (아래쪽 682)\n  0,   // 7  출발 방향 회전 (이동 없음)\n  0,   // 8  라인트레이싱 → 2번방 (노랑 160)\n  0,   // 9  2번방 도착 (이동 없음)\n  0,   // 10 2번방에서 라인으로 나옴 (노랑 160)\n  0,   // 11 짧게 직진\n  0,   // 12 복귀 벽추종 → 시작점 (682)\n  0    // 13 시작점 선 감지 후 정지까지 (메가 HOME_STOP_DELAY_MS 와 같게)\n};\n\n// 상태 번호 → 화면 문구\nconst char* STATE_TEXT[N_STATE] = {\n  \"대기 (1번/2번 터치)\",\n  \"1번방 가는 중 (오른쪽 벽)\",\n  \"1번방 라인 진입\",\n  \"1번방 도착 (복귀 터치)\",\n  \"제자리 회전\",\n  \"1번방에서 나오는 중\",\n  \"2번방 가는 중 (왼쪽 벽)\",\n  \"출발 방향 맞추는 중\",\n  \"2번방 라인 진입\",\n  \"2번방 도착 (복귀 터치)\",\n  \"2번방에서 나오는 중\",\n  \"직진 후 복귀\",\n  \"시작점 복귀 중 (벽추종)\",\n  \"시작점 도착 - 정지 중\"\n};\n\n// =====================================================\n// 디스플레이 설정 (기존 모니터링 코드와 동일)\n// =====================================================\nclass LGFX : public lgfx::LGFX_Device {\n  lgfx::Panel_ST7789 _panel_instance;\n  lgfx::Bus_SPI _bus_instance;\npublic:\n  LGFX(void) {\n    {\n      auto cfg = _bus_instance.config();\n      cfg.spi_host = VSPI_HOST;\n      cfg.freq_write = 40000000;\n      cfg.pin_sclk = 14; cfg.pin_mosi = 13; cfg.pin_dc = 2; cfg.pin_miso = 12;\n      _bus_instance.config(cfg);\n      _panel_instance.setBus(&_bus_instance);\n    }\n    {\n      auto cfg = _panel_instance.config();\n      cfg.pin_cs = 15; cfg.pin_rst = 18;\n      cfg.panel_width = 240; cfg.panel_height = 320;\n      cfg.offset_x = 0; cfg.offset_y = 0;\n      cfg.invert = false;\n      cfg.rgb_order = false;\n      _panel_instance.config(cfg);\n    }\n    setPanel(&_panel_instance);\n  }\n};\n\nLGFX tft;\nLGFX_Sprite mapSpr(&tft);   // 지도 영역 (깜빡임 없이 그리기)\nWiFiUDP udp;\n\nconst int MAP_Y = 20, MAP_H = 160, PANEL_Y = 180;\n\n// 상태판 칸 (3칸 x 2줄, 화면 폭 전체 사용)\nconst int CELL_W = 104, CELL_H = 28, CELL_GAP = 4;\nint cellX(int col) { return 2 + col * (CELL_W + 2); }\nint cellY(int row) { return PANEL_Y + 1 + row * (CELL_H + 2); }\n\n// ---------- 코스 좌표 (지도 영역 안 좌표) ----------\nconst Pt P_START   = {303, 80};\nconst Pt P_ROOM1   = {60, 9};\nconst Pt P_ROOM2   = {60, 149};\nconst Pt P_BRANCH2 = {60, 124};\n\nconst Pt SEG1[]  = {{303, 66}, {303, 36}, {60, 36}};    // 시작점 → 위쪽 682 → 1번 라인 입구\nconst Pt SEG2[]  = {{60, 36}, {60, 16}};                // 보라 282 (들어감)\nconst Pt SEG5[]  = {{60, 16}, {60, 36}};                // 보라 282 (나옴)\nconst Pt SEG6[]  = {{303, 94}, {303, 124}, {60, 124}};  // 시작점 → 아래쪽 682 → 2번 라인 입구\nconst Pt SEG8[]  = {{60, 124}, {60, 142}};              // 노랑 160 (들어감)\nconst Pt SEG10[] = {{60, 142}, {60, 124}};              // 노랑 160 (나옴)\nconst Pt SEG11[]  = {{60, 124}, {76, 124}};             // 짧게 직진 (2번방 복귀)\nconst Pt SEG11A[] = {{60, 36}, {76, 36}};               // 짧게 직진 (1번방 복귀)\nconst Pt SEG12[]  = {{60, 124}, {303, 124}, {303, 94}}; // 2번방 → 아래쪽 682 → 시작점\nconst Pt SEG12A[] = {{60, 36}, {303, 36}, {303, 66}};   // 1번방 → 위쪽 682 → 시작점\n\nint homeFrom = 2;   // 복귀 출발 방 (5번 상태를 보면 1, 10번 상태를 보면 2)\n\nSeg segOf(int st) {\n  switch (st) {\n    case 1:  return {SEG1, 3};\n    case 2:  return {SEG2, 2};\n    case 5:  return {SEG5, 2};\n    case 6:  return {SEG6, 2};\n    case 8:  return {SEG8, 2};\n    case 10: return {SEG10, 2};\n    case 11: return homeFrom == 1 ? Seg{SEG11A, 2} : Seg{SEG11, 2};\n    case 12: return homeFrom == 1 ? Seg{SEG12A, 3} : Seg{SEG12, 3};\n    default: return {nullptr, 0};\n  }\n}\n\n// ---------- 색 ----------\nuint16_t C_BG, C_TOP, C_PURPLE, C_BLUE, C_TAN, C_BOTTOM, C_ROOM1, C_ROOM2, C_START,\n         C_TEXT, C_DIM, C_CELL, C_ACTIVE, C_ROBOT, C_OK, C_BAD;\n\n// ---------- 수신 데이터 ----------\nint agvState = 0, frontCm = 0, sideCm = 0, irBits = 0, camOk = 0;\nunsigned long lastPacket = 0;\nunsigned long segStart = 0;\nint lastStateSeen = -1;\nPt robotPos = P_START;\n\n// =====================================================\n// 지도\n// =====================================================\nvoid drawLine2(LGFX_Sprite& s, Pt a, Pt b, int w, uint16_t c) {\n  // 코스는 가로/세로선뿐이라 사각형으로 두께 표현\n  int x = min(a.x, b.x), y = min(a.y, b.y);\n  int ww = abs(a.x - b.x), hh = abs(a.y - b.y);\n  if (ww == 0) s.fillRect(x - w / 2, y, w, hh + 1, c);\n  else         s.fillRect(x, y - w / 2, ww + 1, w, c);\n}\n\nvoid drawPolyline(LGFX_Sprite& s, const Pt* p, int n, int w, uint16_t c) {\n  for (int i = 0; i < n - 1; i++) drawLine2(s, p[i], p[i + 1], w, c);\n}\n\n// 경로 위에서 비율 t(0~1) 위치\nPt pointOnPath(const Pt* p, int n, float t) {\n  float total = 0;\n  for (int i = 0; i < n - 1; i++) total += abs(p[i+1].x - p[i].x) + abs(p[i+1].y - p[i].y);\n  float d = total * t;\n  for (int i = 0; i < n - 1; i++) {\n    float len = abs(p[i+1].x - p[i].x) + abs(p[i+1].y - p[i].y);\n    if (d <= len || i == n - 2) {\n      float k = (len > 0) ? min(d / len, 1.0f) : 0;\n      return { (int16_t)(p[i].x + (p[i+1].x - p[i].x) * k), (int16_t)(p[i].y + (p[i+1].y - p[i].y) * k) };\n    }\n    d -= len;\n  }\n  return p[n - 1];\n}\n\n// 지도 글자 (가운데 정렬)\nvoid mapText(int x, int y, const char* t, uint16_t c) {\n  mapSpr.setTextColor(c);\n  mapSpr.drawString(t, x, y);\n}\n\nvoid drawMap(bool linkOk) {\n  mapSpr.fillScreen(C_BG);\n  mapSpr.setFont(&KR_FONT);\n  mapSpr.setTextDatum(middle_center);\n\n  // 방 / 시작점\n  mapSpr.drawRect(25, 0, 70, 18, C_ROOM1);   mapText(60, 9,   \"1번방\", C_ROOM1);\n  mapSpr.drawRect(25, 141, 70, 18, C_ROOM2); mapText(60, 150, \"2번방\", C_ROOM2);\n  mapSpr.drawRect(285, 64, 35, 32, C_START); mapText(303, 80, \"시작\", C_START);\n\n  // 코스 (기본 색)\n  drawPolyline(mapSpr, SEG1, 3, 2, C_TOP);\n  drawLine2(mapSpr, {60, 16}, {60, 36}, 2, C_PURPLE);\n  drawLine2(mapSpr, {60, 124}, {60, 142}, 2, C_TAN);\n  drawPolyline(mapSpr, SEG12, 3, 2, C_BOTTOM);\n\n  // 길이 표시\n  mapSpr.setFont(&fonts::Font0);\n  mapText(180, 28, \"682\", C_DIM);\n  mapText(76, 26, \"282\", C_DIM);\n  mapText(76, 133, \"160\", C_DIM);\n  mapText(180, 132, \"682\", C_DIM);\n\n  // 현재 구간 강조\n  Seg sg = segOf(agvState);\n  if (sg.p) drawPolyline(mapSpr, sg.p, sg.n, 4, C_ACTIVE);\n\n  // 로봇\n  mapSpr.fillCircle(robotPos.x, robotPos.y, 5, linkOk ? C_ROBOT : C_DIM);\n  mapSpr.drawCircle(robotPos.x, robotPos.y, 5, C_BG);\n\n  mapSpr.pushSprite(0, MAP_Y);\n}\n\nvoid updateRobotPos() {\n  unsigned long el = millis() - segStart;\n  Seg sg = segOf(agvState);\n  if (sg.p) {\n    float t = 0;\n    if (agvState < N_STATE && SEG_TIME_MS[agvState] > 0) t = min(1.0f, (float)el / SEG_TIME_MS[agvState]);\n    robotPos = pointOnPath(sg.p, sg.n, t);\n  } else {\n    switch (agvState) {\n      case 0: robotPos = P_START;   break;\n      case 3: robotPos = P_ROOM1;   break;\n      case 13: robotPos = P_START;  break;\n      case 9: robotPos = P_ROOM2;   break;\n      default: break;               // 회전(4) 등: 마지막 위치 유지\n    }\n  }\n}\n\n// =====================================================\n// 위쪽 줄\n// =====================================================\nvoid drawTopBar(bool linkOk) {\n  tft.fillRect(0, 0, 320, MAP_Y, C_BG);\n  tft.setFont(&KR_FONT);\n  tft.setTextDatum(middle_left);\n  tft.setTextColor(C_TEXT);\n  if (WiFi.status() != WL_CONNECTED) tft.drawString(\"Wi-Fi 연결 중...\", 4, 10);\n  else if (!linkOk)                  tft.drawString(\"데이터 없음\", 4, 10);\n  else if (agvState >= 0 && agvState < N_STATE) tft.drawString(STATE_TEXT[agvState], 4, 10);\n  tft.fillCircle(310, 10, 6, linkOk ? C_OK : C_BAD);\n}\n\n// =====================================================\n// 아래쪽 상태판 (3칸 x 2줄)\n//   [전방 120cm] [측면 31cm] [카메라 OK]\n//   [IR ● ● ●]  [구간 12.4s] [설정 --  ]\n// =====================================================\nvoid cellBox(int col, int row) {\n  tft.fillRect(cellX(col), cellY(row), CELL_W, CELL_H, C_BG);\n  tft.drawRoundRect(cellX(col), cellY(row), CELL_W, CELL_H, 4, C_CELL);\n}\n\nvoid cellText(int col, int row, const char* label, const char* value, uint16_t valueColor) {\n  cellBox(col, row);\n  tft.setFont(&KR_FONT);\n  int cy = cellY(row) + CELL_H / 2;\n  tft.setTextDatum(middle_left);\n  tft.setTextColor(C_DIM);\n  tft.drawString(label, cellX(col) + 6, cy);\n  tft.setTextDatum(middle_right);\n  tft.setTextColor(valueColor);\n  tft.drawString(value, cellX(col) + CELL_W - 6, cy);\n}\n\nvoid drawPanel() {\n  char v[16];\n\n  snprintf(v, sizeof(v), \"%dcm\", frontCm);\n  cellText(0, 0, \"전방\", v, frontCm <= 15 ? C_BAD : C_TEXT);\n\n  snprintf(v, sizeof(v), \"%dcm\", sideCm);\n  cellText(1, 0, \"측면\", v, C_TEXT);\n\n  cellText(2, 0, \"카메라\", camOk ? \"OK\" : \"--\", camOk ? C_OK : C_DIM);\n\n  // IR: 좌 중 우 (켜지면 노란 원)\n  cellBox(0, 1);\n  tft.setFont(&KR_FONT);\n  tft.setTextDatum(middle_left);\n  tft.setTextColor(C_DIM);\n  int cy = cellY(1) + CELL_H / 2;\n  tft.drawString(\"IR\", cellX(0) + 6, cy);\n  for (int i = 0; i < 3; i++) {\n    bool on = irBits & (1 << (2 - i));\n    int cx = cellX(0) + 46 + i * 20;\n    if (on) tft.fillCircle(cx, cy, 6, C_ROBOT);\n    else    tft.drawCircle(cx, cy, 6, C_DIM);\n  }\n}\n\n// 시간 칸은 0.1초마다 갱신\nvoid drawTimeCells() {\n  char v[16];\n  unsigned long el = millis() - segStart;\n  snprintf(v, sizeof(v), \"%.1fs\", el / 1000.0);\n  cellText(1, 1, \"구간\", v, C_TEXT);\n\n  unsigned long set = (agvState >= 0 && agvState < N_STATE) ? SEG_TIME_MS[agvState] : 0;\n  if (set > 0) snprintf(v, sizeof(v), \"%.1fs\", set / 1000.0);\n  else         snprintf(v, sizeof(v), \"--\");\n  cellText(2, 1, \"설정\", v, set > 0 ? C_TEXT : C_DIM);\n}\n\n// =====================================================\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(27, OUTPUT);\n  digitalWrite(27, HIGH);\n\n  tft.init();\n  tft.setRotation(1);\n\n  C_BG     = tft.color565(0, 0, 0);\n  C_TOP    = tft.color565(170, 220, 40);\n  C_PURPLE = tft.color565(170, 70, 190);\n  C_BLUE   = tft.color565(110, 140, 210);\n  C_TAN    = tft.color565(230, 210, 150);\n  C_BOTTOM = tft.color565(90, 230, 190);\n  C_ROOM1  = tft.color565(250, 190, 30);\n  C_ROOM2  = tft.color565(0, 170, 240);\n  C_START  = tft.color565(230, 170, 230);\n  C_TEXT   = tft.color565(255, 255, 255);\n  C_DIM    = tft.color565(130, 130, 130);\n  C_CELL   = tft.color565(60, 60, 60);\n  C_ACTIVE = tft.color565(255, 255, 255);\n  C_ROBOT  = tft.color565(255, 230, 0);\n  C_OK     = tft.color565(0, 210, 80);\n  C_BAD    = tft.color565(220, 40, 40);\n\n  tft.fillScreen(C_BG);\n  mapSpr.setColorDepth(16);\n  mapSpr.createSprite(320, MAP_H);\n\n  WiFi.mode(WIFI_STA);\n  // 주소 고정 192.168.4.50 (R4가 이 주소로 직접 보냄 - r4_bridge.ino 의 monitorIP 와 같아야 함)\n  WiFi.config(IPAddress(192, 168, 4, 50), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));\n  WiFi.begin(WIFI_SSID, WIFI_PASS);\n\n  segStart = millis();\n  drawTopBar(false);\n  drawMap(false);\n  drawPanel();\n  drawTimeCells();\n}\n\nvoid loop() {\n  // Wi-Fi 연결되면 UDP 수신 시작 (끊기면 다시)\n  static bool udpStarted = false;\n  if (WiFi.status() == WL_CONNECTED) {\n    if (!udpStarted) { udp.begin(UDP_PORT); udpStarted = true; }\n  } else if (udpStarted) {\n    udp.stop(); udpStarted = false;\n  }\n\n  // UDP 수신: \"M,상태,전방,측면,IR,카메라\"\n  static bool panelDirty = false;   // 다음 화면 갱신 때까지 유지\n  if (udpStarted) {\n    int size = udp.parsePacket();\n    while (size > 0) {\n      char buf[64];\n      int len = udp.read(buf, sizeof(buf) - 1);\n      if (len > 0) {\n        buf[len] = 0;\n        int s, f, d, ir, c;\n        if (sscanf(buf, \"M,%d,%d,%d,%d,%d\", &s, &f, &d, &ir, &c) == 5) {\n          lastPacket = millis();\n          if (s != lastStateSeen) {           // 구간 바뀜 → 시간 다시 재기\n            lastStateSeen = s;\n            agvState = s;\n            if (s == 1 || s == 2 || s == 5) homeFrom = 1;    // 1번방 쪽\n            if (s == 6 || s == 8 || s == 10) homeFrom = 2;   // 2번방 쪽\n            segStart = millis();\n          }\n          if (f != frontCm || d != sideCm || ir != irBits || c != camOk) {\n            frontCm = f; sideCm = d; irBits = ir; camOk = c;\n            panelDirty = true;\n          }\n        }\n      }\n      size = udp.parsePacket();\n    }\n  }\n\n  bool linkOk = (lastPacket != 0) && (millis() - lastPacket < 1500);\n\n  // 화면 갱신 (0.1초마다)\n  static unsigned long lastDraw = 0;\n  static int lastTopState = -2;\n  static bool lastLink = false;\n  if (millis() - lastDraw >= 100) {\n    lastDraw = millis();\n    int topKey = (WiFi.status() == WL_CONNECTED ? 100 : 0) + agvState;\n    if (topKey != lastTopState || linkOk != lastLink) {\n      drawTopBar(linkOk);\n      lastTopState = topKey;\n      lastLink = linkOk;\n    }\n    updateRobotPos();\n    drawMap(linkOk);\n    if (panelDirty) { drawPanel(); panelDirty = false; }\n    drawTimeCells();\n  }\n}\n", "r4": "#include <Arduino.h>\n#include <WiFiS3.h>\n#include <WiFiUdp.h>\n\n// =====================================================\n// R4 WiFi 중계\n//   터치스크린(TCP) → 메가 : 'T' + '1' / '2' / '3'\n//   메가 → R4           : \"전방,측면,상태번호,IR,카메라\\n\" (0.2초마다)\n//   R4 → 터치스크린(TCP): \"0,0,전방,측면,1\\n\" (0.4초마다, 기존 형식 유지)\n//   R4 → 모니터링(UDP)  : \"M,상태번호,전방,측면,IR,카메라\\n\" (메가 데이터 받을 때마다)\n// =====================================================\n\nconst char ssid[] = \"AGV_WIFI\";\nconst char pass[] = \"12345678\";\nconst char* esp32_ip = \"192.168.4.1\";\nconst int tcp_port = 2390;\n\n// 모니터링 ESP32로 보내는 UDP\n//  방송(192.168.4.255)은 터치스크린 ESP32(공유기 역할)가 넘겨주지 않는 경우가 있어서\n//  모니터 주소를 192.168.4.50 으로 고정하고 그 주소로 직접 보냄 (esp32_monitor.ino 와 같아야 함)\nIPAddress monitorIP(192, 168, 4, 50);\nconst int MONITOR_PORT = 2391;\n\nint status = WL_IDLE_STATUS;\nWiFiClient client;\nWiFiUDP udp;\n\nint df = 0, dr = 0, agvState = 0, irBits = 0, cam = 0;\n\nvoid setup() {\n  Serial.begin(115200);\n  Serial1.begin(9600);    // 메가 (0번 RX, 1번 TX)\n\n  delay(1000);\n  Serial.println(\"R4 WiFi 중계 가동...\");\n\n  if (WiFi.status() == WL_NO_MODULE) {\n    Serial.println(\"Wi-Fi 모듈 에러!\");\n    while (true);\n  }\n\n  Serial.print(\"Wi-Fi 연결 중...\");\n  while (status != WL_CONNECTED) {\n    status = WiFi.begin(ssid, pass);\n    delay(2000);\n    Serial.print(\".\");\n  }\n  Serial.println(\"\\nWi-Fi 연결 성공!\");\n  udp.begin(2392);\n}\n\nvoid sendToMonitor() {\n  udp.beginPacket(monitorIP, MONITOR_PORT);\n  udp.print(\"M,\");\n  udp.print(agvState); udp.print(',');\n  udp.print(df);       udp.print(',');\n  udp.print(dr);       udp.print(',');\n  udp.print(irBits);   udp.print(',');\n  udp.print(cam);      udp.print('\\n');\n  udp.endPacket();\n}\n\n// 메가 데이터 한 줄씩 읽기 (논블로킹)\nvoid readMega() {\n  static String buf = \"\";\n  while (Serial1.available() > 0) {\n    char c = Serial1.read();\n    if (c == '\\n') {\n      int v[5] = {0, 0, 0, 0, 0};\n      int n = 0, from = 0;\n      while (n < 5) {\n        int comma = buf.indexOf(',', from);\n        if (comma < 0) { if (buf.length() > (unsigned)from) v[n++] = buf.substring(from).toInt(); break; }\n        v[n++] = buf.substring(from, comma).toInt();\n        from = comma + 1;\n      }\n      if (n >= 2) { df = v[0]; dr = v[1]; }\n      if (n >= 5) { agvState = v[2]; irBits = v[3]; cam = v[4]; }\n      if (n >= 2 && WiFi.status() == WL_CONNECTED) sendToMonitor();\n      buf = \"\";\n    } else if (c != '\\r') {\n      buf += c;\n      if (buf.length() > 40) buf = \"\";\n    }\n  }\n}\n\nvoid loop() {\n  readMega();   // TCP 연결과 상관없이 항상 읽음\n\n  // 터치스크린 TCP 연결 유지 (delay 없이 1초 간격 재시도)\n  if (!client.connected()) {\n    static unsigned long lastTry = 0;\n    if (millis() - lastTry < 1000) return;\n    lastTry = millis();\n    Serial.println(\"ESP32 터치스크린 TCP 접속 시도...\");\n    if (client.connect(esp32_ip, tcp_port)) Serial.println(\"TCP 연결 완료!\");\n    else return;\n  }\n\n  // 터치 명령 → 메가\n  while (client.available() > 0) {\n    char touchCmd = client.read();\n    if (touchCmd == '1' || touchCmd == '2' || touchCmd == '3') {\n      Serial1.print('T');\n      Serial1.print(touchCmd);\n      Serial.print(\"터치 → 메가: \"); Serial.println(touchCmd);\n    }\n  }\n\n  // 터치스크린으로 거리 전송 (기존 5개 값 형식 유지)\n  static unsigned long lastTcpSend = 0;\n  if (millis() - lastTcpSend >= 400) {\n    client.print(\"0,0,\");\n    client.print(df); client.print(',');\n    client.print(dr); client.print(\",1\\n\");\n    lastTcpSend = millis();\n  }\n}\n", "mega": "#include \"HUSKYLENS.h\"\n\n// =====================================================\n// AGV 메인 코드 (벽추종 + 카메라 + IR 3개 라인트레이서 + 제자리 회전)\n//\n// 전체 흐름 (출발점에서 1번방 / 2번방 순서 자유)\n//  [대기] 터치 1(1번방, 오른쪽 벽 사용) 또는 터치 2(2번방, 왼쪽 벽 사용)\n//   → 출발 방향 확인: 써야 할 쪽 초음파가 더 가까우면 그대로 출발\n//                     반대쪽이 더 가까우면 제자리 회전 (가까운 벽 반대쪽으로 돎)\n//                     → 써야 할 쪽 앞/뒤 초음파가 벽과 평행이 되면 멈춤\n//  1번방: 오른쪽 벽추종 → 카메라 ID 1 + IR → 라인트레이싱 → 선 끝 정지\n//  2번방: 왼쪽 벽추종  → IR → 라인트레이싱 → 선 끝 정지\n//  터치 3(복귀)\n//   → 제자리 회전(센서 3개 동시에 1이면 멈춤) → 라인트레이싱으로 빠져나옴\n//   → (설정 시간만큼 직진) → 가까운 쪽 벽 30cm 벽추종\n//   → IR 감지 → HOME_STOP_DELAY_MS 더 간 뒤 정지 → 대기\n// =====================================================\n\n#define DIST_S 6000    // 초음파 타임아웃(us) ≈ 1m (예전 코드와 비슷). 길면 루프가 느려져 IR 선을 놓침\n\n// 초음파 센서끼리 간섭(다른 센서의 반사파를 잘못 받는 현상) 방지용 측정 간격 (ms)\n// 센서가 6개라 2ms면 앞 센서의 반사파가 아직 남아 있어 엉뚱한 거리가 읽힘\nconst unsigned long ULTRA_GAP_MS = 10;\n// 카메라 확인 간격 (ms) - 매 루프 요청하면 루프가 느려져 벽추종 반응이 둔해짐\nconst unsigned long CAMERA_INTERVAL_MS = 150;\n\n// =====================================================\n// [핀 설정]\n// =====================================================\n// 모터\nconst uint8_t ENA = 2;  const uint8_t IN1 = 22; const uint8_t IN2 = 23;   // A: 625:1\nconst uint8_t ENB = 5;  const uint8_t IN3 = 24; const uint8_t IN4 = 25;   // B: 200:1\n\n// IR 센서 3개 (검은선 = 1 = HIGH)\nconst uint8_t IR_LEFT   = 10;\nconst uint8_t IR_CENTER = 4;\nconst uint8_t IR_RIGHT  = 9;\nconst uint8_t LINE_LEVEL = HIGH;\n\n// 오른쪽 벽추종 초음파\nconst uint8_t trigRightFront = 34; const uint8_t echoRightFront = 35;\nconst uint8_t trigRightRear  = 42; const uint8_t echoRightRear  = 43;\n// 왼쪽 벽추종 초음파\nconst uint8_t trigLeftFront  = 30; const uint8_t echoLeftFront  = 31;\nconst uint8_t trigLeftRear   = 38; const uint8_t echoLeftRear   = 39;\n// 전방 초음파 2개 (둘 중 가까운 값 사용)\nconst uint8_t trigFrontRight = 46; const uint8_t echoFrontRight = 47;\nconst uint8_t trigFrontLeft  = 26; const uint8_t echoFrontLeft  = 27;\n\n// =====================================================\n// [벽추종 설정]\n// =====================================================\nconst int8_t TARGET_DISTANCE_RIGHT = 30;   // 오른쪽 벽 목표 거리 (cm)\nconst int8_t TARGET_DISTANCE_LEFT  = 30;   // 왼쪽 벽 목표 거리 (cm)\nconst int8_t FRONT_STOP_DIST  = 15;\nconst int8_t FRONT_DECEL_DIST = 40;\n\nconst int8_t Kp_angle = 6; const int8_t Kd_angle = 3;\nconst int8_t Kp_dist  = 4; const int8_t Kd_dist  = 2;\nconst int8_t MAX_CORRECTION = 30;\n\n// 벽추종 모터 값 (실측 값 - 라인트레이서와 별도로 유지)\nconst int WALL_STRAIGHT_A   = 175;\nconst int WALL_STRAIGHT_B   = 55;\nconst int WALL_HARD_LEFT_A  = 185;\nconst int WALL_HARD_LEFT_B  = 40;\nconst int WALL_HARD_RIGHT_A = 80;\nconst int WALL_HARD_RIGHT_B = 100;\n//  - 보정값(±MAX_CORRECTION)을 조향 세기(±WALL_STEER_MAX %)로 바꿔서 그 사이 값을 씀\n//  - 두 모터 감속비가 달라서(625:1 / 200:1) 양쪽에 같은 값을 더하고 빼면 제대로 안 꺾임\nconst int WALL_STEER_MAX = 60;     // 벽추종 최대 조향 세기 (%) - 라인트레이서 최대 회전의 60%\nconst int WALL_SLOW_PCT  = 85;     // 카메라 승인 후 속도 (%)\nconst int WALL_DECEL_MIN_PCT = 70; // 전방 감속 시 최저 속도 (%)\n\n// 왼쪽 벽추종 시작 후 IR이 이 시간 동안 계속 0이어야 IR 정지 감지 시작\n// (방금 빠져나온 선을 다시 감지해서 바로 멈추는 것 방지)\nconst unsigned long IR_ARM_MS = 500;\n\n// =====================================================\n// [라인트레이서 설정] - 실측 값\n// =====================================================\n// 라인트레이싱 직진 속도 = 기존 주행 속도\nconst int STRAIGHT_A = 120;\nconst int STRAIGHT_B = 70;\n// 회전 값은 실측 값 그대로\nconst int HARD_LEFT_A = 200;\nconst int HARD_LEFT_B = 50;\nconst int HARD_RIGHT_A = 70;\nconst int HARD_RIGHT_B = 135;\nconst int Kp = 35;\nconst int Kd = 20;\n\nconst unsigned long END_CONFIRM_MS = 800;    // 0 0 0이 이 시간 유지되면 선 끝\nconst unsigned long LOST_TIMEOUT   = 2200;  // 선을 이 시간 못 찾으면 선 끝으로 처리\n\n// =====================================================\n// [회전 설정] - 실측 값\n// =====================================================\nconst bool TURN_LEFT = true;\nconst int TURN_SPEED_A = 140;\nconst int TURN_SPEED_B = 110;\nconst int TURN_KICK_SPEED = 150;\nconst unsigned long TURN_KICK_MS = 150;\nconst unsigned long TURN_MIN_MS = 900;          // 이 시간 동안 센서 무시\nconst unsigned long TURN_END_PAUSE_MS = 1000;   // 회전 완료 후 정지 시간\nconst unsigned long TURN_TIMEOUT = 10000;       // 이 시간 안에 못 찾으면 정지 후 복귀 터치 다시 대기\n\n// 방에서 라인으로 빠져나온 뒤(선 끝) 이 시간 동안 직진 → 그 다음 복귀 벽추종 (0 = 바로)\nconst unsigned long EXIT_ST1_MS = 0;\nconst unsigned long EXIT_ST2_MS = 500;\n\n// =====================================================\n// [복귀 설정]\n// =====================================================\nconst unsigned long HOME_STOP_DELAY_MS = 2000;  // 복귀 중 IR 감지 후 이 시간 더 가서 정지\n// 복귀할 때 따라갈 벽: 1 = 오른쪽, 2 = 왼쪽 (0 = 자동, 가까운 쪽)\n//  1번방 복귀 = 왼쪽 벽 (갈 때 오른쪽 벽의 반대 방향)\n//  2번방 복귀 = 오른쪽 벽 (갈 때 왼쪽 벽의 반대 방향)\nconst uint8_t HOME_SIDE_FROM_ROOM1 = 2;\nconst uint8_t HOME_SIDE_FROM_ROOM2 = 1;\n\n// =====================================================\n// [출발 방향 회전 설정] - 초음파로 멈춤\n// =====================================================\nconst uint8_t ALIGN_TOL_CM = 4;              // 써야 할 쪽 앞/뒤 차이가 이 값 이하면 벽과 평행\nconst uint8_t ALIGN_MAX_CM = 100;            // 이보다 먼 값은 벽으로 보지 않음\nconst unsigned long ALIGN_MIN_MS = 1000;     // 회전 시작 후 이 시간 동안은 멈춤 판정 안 함\nconst unsigned long ALIGN_TIMEOUT = 10000;   // 이 시간 안에 못 맞추면 정지 → 다시 터치 대기\n// 회전해서 출발한 경우, 출발점 IR 선(정지할 때 지나온 선)을 한 번 무시하는 시간\nconst unsigned long DEPART_SKIP_MS = 4000;\n// 2번방도 카메라(ID 2) 확인을 할지\nconst bool ROOM2_NEED_CAMERA = false;\n\n// =====================================================\n// 상태\n// =====================================================\n// 상태 번호는 R4 → 모니터링 화면으로 그대로 전송되므로 번호를 고정해 둠\nenum AGVState : uint8_t {\n  ST_WAIT_START    = 0,   // 출발점 대기 (터치 1 / 2)\n  ST_WALL_TO_ST1   = 1,   // 오른쪽 벽추종 → 1번방 (카메라 + IR)\n  ST_LINE_TO_ST1   = 2,   // 라인트레이싱 → 1번방 선 끝 정지\n  ST_AT_ST1        = 3,   // 1번방 도착: 터치 3 대기\n  ST_TURN          = 4,   // 방에서 제자리 회전\n  ST_LINE_BACK_ST1 = 5,   // 1번방에서 라인으로 빠져나옴\n  ST_WALL_TO_ST2   = 6,   // 왼쪽 벽추종 → 2번방 (IR)\n  ST_START_TURN    = 7,   // 출발 방향 맞추기 회전 (초음파로 멈춤)\n  ST_LINE_TO_ST2   = 8,   // 라인트레이싱 → 2번방 선 끝 정지\n  ST_AT_ST2        = 9,   // 2번방 도착: 터치 3 대기\n  ST_LINE_BACK_ST2 = 10,  // 2번방에서 라인으로 빠져나옴\n  ST_EXIT          = 11,  // 선 끝 뒤 짧게 직진\n  ST_WALL_HOME     = 12,  // 가까운 쪽 벽추종 → 출발점 (IR 대기)\n  ST_HOME_STOPPING = 13   // IR 감지 후 HOME_STOP_DELAY_MS 더 가고 정지\n};\nAGVState state = ST_WAIT_START;\n\n// 회전 후 이동할 상태 / 회전 실패 시 돌아갈 상태\nAGVState turnNext = ST_WAIT_START;\nAGVState turnFail = ST_WAIT_START;\nunsigned long turnStart = 0;\nunsigned long stateStart = 0;    // 현재 상태에 들어온 시각\n\n// 벽추종 변수\nint16_t lastAngleError = 0;\nint16_t lastDistError  = 0;\nuint8_t lastValidFront[2] = {30, 30};   // [0] 왼쪽, [1] 오른쪽\nuint8_t lastValidRear[2]  = {30, 30};\nbool irArmed = false;\nbool irLatched = false;      // 이번 루프 동안 IR이 한 번이라도 검정을 봤는지 (짧게 지나가는 선도 놓치지 않기 위함)\nunsigned long irClearSince = 0;\n\n// 라인트레이서 변수\nint lastError = 0;\nint lastFoundError = 0;\nunsigned long lastSeenTime = 0;\nunsigned long endCandidate = 0;\nbool seenLineThisPhase = false;\nunsigned long ltFrontCheck = 0;\nuint8_t ltFront = 255;\nuint8_t ltFrontR = 255, ltFrontL = 255;\nbool ltUseRight = true;\n\n// 모니터링용 마지막 측정값\nuint8_t lastFrontDist = 255;\nuint8_t lastSideDist  = 0;\n\n// 출발 / 복귀 변수\nbool    alignTurnLeft = true;    // 출발 방향 회전 방향\nuint8_t alignHits = 0;           // 평행 조건 연속 만족 횟수\nbool    skipLine = false;        // 출발점 선 한 번 무시\nbool    skipSeen = false;\nuint8_t homeFrom = 1;            // 복귀 출발 방 (1 / 2)\nbool    homeRight = true;        // 복귀 때 따라갈 벽 (true = 오른쪽)\nunsigned long exitMs = 0;\n\n// 기타\nuint8_t targetRoom = 1;\nbool cameraConfirmed = false;\nchar touchCmd = '\\0';\nint16_t currentSpeedA = 0;\nint16_t currentSpeedB = 0;\n\nHUSKYLENS huskylens;\n\nenum LTResult : uint8_t { LT_RUNNING, LT_END };\n\nvoid controlMotors(int8_t dirA, uint8_t speedA, int8_t dirB, uint8_t speedB);\nvoid stopMotors();\nvoid enterState(AGVState s);\nvoid startTurn(AGVState next, AGVState fail);\nvoid turnStep();\nLTResult lineTraceStep();\nvoid wallFollow(bool rightSide, uint8_t sideFront, uint8_t sideRear, uint8_t frontDist, bool slow);\nvoid doWallToSt1();\nvoid doWallToSt2();\nvoid doWallHome();\nvoid startDepart();\nvoid startTurnStep();\nvoid startHome();\nuint8_t sideAvg(bool right);\nvoid pollCamera();\nbool checkIR(bool ir);\nvoid readTouch();\nbool irAny();\nvoid sendToR4(uint8_t front, uint8_t side);\nvoid sendTelemetry();\nvoid printState(AGVState s);\nuint8_t trig_ultra(uint8_t trig, uint8_t echo);\nuint8_t readFront();\nvoid gapWatchIR(unsigned long ms);\n\n// =====================================================\nvoid setup() {\n  Serial.begin(9600);\n  Serial1.begin(9600);   // R4 터치 디스플레이\n  Serial2.begin(9600);   // 허스키렌즈\n\n  pinMode(IR_LEFT, INPUT); pinMode(IR_CENTER, INPUT); pinMode(IR_RIGHT, INPUT);\n\n  pinMode(trigRightFront, OUTPUT); pinMode(echoRightFront, INPUT);\n  pinMode(trigRightRear,  OUTPUT); pinMode(echoRightRear,  INPUT);\n  pinMode(trigLeftFront,  OUTPUT); pinMode(echoLeftFront,  INPUT);\n  pinMode(trigLeftRear,   OUTPUT); pinMode(echoLeftRear,   INPUT);\n  pinMode(trigFrontRight, OUTPUT); pinMode(echoFrontRight, INPUT);\n  pinMode(trigFrontLeft,  OUTPUT); pinMode(echoFrontLeft,  INPUT);\n\n  pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);\n  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT); pinMode(ENB, OUTPUT);\n  stopMotors();\n\n  Serial.println(F(\"메가 보드 가동 - 벽추종 + 라인트레이서 + 회전\"));\n  while (!huskylens.begin(Serial2)) {\n    Serial.println(F(\"허스키렌즈 연결 대기 중...\"));\n    delay(500);\n  }\n  Serial.println(F(\"허스키렌즈 연결 성공! 터치 1을 누르면 출발합니다.\"));\n}\n\n// =====================================================\nvoid loop() {\n  readTouch();\n  sendTelemetry();\n\n  switch (state) {\n    case ST_WAIT_START:\n      stopMotors();\n      if (touchCmd == '1' || touchCmd == '2') {\n        targetRoom = (touchCmd == '1') ? 1 : 2;\n        cameraConfirmed = false;\n        startDepart();\n      }\n      break;\n\n    case ST_START_TURN:\n      startTurnStep();\n      break;\n\n    case ST_WALL_TO_ST1:\n      doWallToSt1();\n      break;\n\n    case ST_LINE_TO_ST1:\n      if (lineTraceStep() == LT_END) enterState(ST_AT_ST1);\n      break;\n\n    case ST_AT_ST1:\n      stopMotors();\n      if (touchCmd == '3') startTurn(ST_LINE_BACK_ST1, ST_AT_ST1);\n      break;\n\n    case ST_TURN:\n      turnStep();\n      break;\n\n    case ST_LINE_BACK_ST1:\n      if (lineTraceStep() == LT_END) { homeFrom = 1; exitMs = EXIT_ST1_MS; enterState(ST_EXIT); }\n      break;\n\n    case ST_WALL_TO_ST2:\n      doWallToSt2();\n      break;\n\n    case ST_LINE_TO_ST2:\n      if (lineTraceStep() == LT_END) enterState(ST_AT_ST2);\n      break;\n\n    case ST_AT_ST2:\n      stopMotors();\n      if (touchCmd == '3') startTurn(ST_LINE_BACK_ST2, ST_AT_ST2);\n      break;\n\n    case ST_LINE_BACK_ST2:\n      if (lineTraceStep() == LT_END) { homeFrom = 2; exitMs = EXIT_ST2_MS; enterState(ST_EXIT); }\n      break;\n\n    case ST_EXIT:\n      // 라인을 빠져나온 뒤 짧게 직진하고 복귀 벽추종 시작\n      if (millis() - stateStart >= exitMs) {\n        startHome();\n      } else {\n        currentSpeedA = STRAIGHT_A;\n        currentSpeedB = STRAIGHT_B;\n        controlMotors(1, STRAIGHT_A, 1, STRAIGHT_B);\n      }\n      break;\n\n    case ST_WALL_HOME:\n    case ST_HOME_STOPPING:\n      doWallHome();\n      break;\n  }\n}\n\n// =====================================================\n// 상태 전환 (변수 초기화)\n// =====================================================\nvoid enterState(AGVState s) {\n  state = s;\n  stateStart = millis();\n\n  // 벽추종 초기화\n  lastAngleError = 0;\n  lastDistError  = 0;\n  irArmed = false;\n  irClearSince = 0;\n\n  // 라인트레이서 초기화\n  lastError = 0;\n  lastFoundError = 0;\n  lastSeenTime = millis();\n  endCandidate = 0;\n  seenLineThisPhase = false;\n  ltFrontCheck = 0;\n  ltFront = 255;\n  ltFrontR = 255; ltFrontL = 255;\n\n  alignHits = 0;\n  skipSeen = false;\n\n  if (s == ST_WAIT_START || s == ST_AT_ST1 || s == ST_AT_ST2) stopMotors();\n\n  printState(s);\n}\n\nvoid startTurn(AGVState next, AGVState fail) {\n  turnNext = next;\n  turnFail = fail;\n  turnStart = millis();\n  enterState(ST_TURN);\n}\n\n// =====================================================\n// 제자리 회전\n//  TURN_MIN_MS 동안 센서 무시 → 센서 3개 동시에 1 → 정지 → 잠시 대기 → 다음 상태\n// =====================================================\nvoid turnStep() {\n  unsigned long elapsed = millis() - turnStart;\n\n  if (elapsed > TURN_TIMEOUT) {\n    stopMotors();\n    Serial.println(F(\"[회전 실패] 선을 찾지 못함 → 복귀 터치를 다시 눌러주세요\"));\n    enterState(turnFail);\n    return;\n  }\n\n  bool allBlack = (digitalRead(IR_LEFT)   == LINE_LEVEL) &&\n                  (digitalRead(IR_CENTER) == LINE_LEVEL) &&\n                  (digitalRead(IR_RIGHT)  == LINE_LEVEL);\n\n  if (elapsed >= TURN_MIN_MS && allBlack) {\n    stopMotors();\n    delay(TURN_END_PAUSE_MS);\n    enterState(turnNext);\n    return;\n  }\n\n  int spA = (elapsed < TURN_KICK_MS) ? TURN_KICK_SPEED : TURN_SPEED_A;\n  int spB = (elapsed < TURN_KICK_MS) ? TURN_KICK_SPEED : TURN_SPEED_B;\n  if (TURN_LEFT) controlMotors( 1, spA, -1, spB);\n  else           controlMotors(-1, spA,  1, spB);\n}\n\n// =====================================================\n// 라인트레이싱 1회 (전진)\n//  - 측면 초음파/카메라 없이 IR만 빠르게 확인, 전방 초음파는 100ms마다\n//  - 선 끝(0 0 0) 또는 선을 오래 못 찾으면 LT_END\n// =====================================================\nLTResult lineTraceStep() {\n  // 전방 장애물\n  // 라인트레이싱 중에는 IR을 최대한 자주 봐야 하므로, 전방 센서는 50ms마다 1개씩 번갈아 측정\n  if (millis() - ltFrontCheck >= 50) {\n    if (ltUseRight) ltFrontR = trig_ultra(trigFrontRight, echoFrontRight);\n    else            ltFrontL = trig_ultra(trigFrontLeft,  echoFrontLeft);\n    ltUseRight = !ltUseRight;\n    ltFront = min(ltFrontR, ltFrontL);\n    lastFrontDist = ltFront;\n    ltFrontCheck = millis();\n  }\n  if (ltFront > 0 && ltFront <= FRONT_STOP_DIST) {\n    stopMotors();\n    lastSeenTime = millis();      // 장애물 정지 시간은 선 잃음으로 보지 않음\n    endCandidate = 0;\n    return LT_RUNNING;\n  }\n\n  bool L = (digitalRead(IR_LEFT)   == LINE_LEVEL);\n  bool C = (digitalRead(IR_CENTER) == LINE_LEVEL);\n  bool R = (digitalRead(IR_RIGHT)  == LINE_LEVEL);\n  bool lineFound = (L || C || R);\n\n  if (lineFound) {\n    lastSeenTime = millis();\n    seenLineThisPhase = true;\n  }\n\n  // 선 끝: 0 0 0 (급커브에서 바깥 센서로 놓친 경우는 제외)\n  bool endCond = (!lineFound && seenLineThisPhase && abs(lastFoundError) <= 1);\n  if (endCond) {\n    if (endCandidate == 0) endCandidate = millis();\n    if (millis() - endCandidate >= END_CONFIRM_MS) {\n      stopMotors();\n      return LT_END;\n    }\n  } else {\n    endCandidate = 0;\n  }\n\n  if (!lineFound && millis() - lastSeenTime > LOST_TIMEOUT) {\n    stopMotors();\n    return LT_END;\n  }\n\n  int error;\n  if      (!L &&  C && !R) error = 0;\n  else if ( L &&  C && !R) error = -1;\n  else if ( L && !C && !R) error = -2;\n  else if (!L &&  C &&  R) error = 1;\n  else if (!L && !C &&  R) error = 2;\n  else if ( L &&  C &&  R) error = 0;\n  else if (!L && !C && !R) {\n    if (lastError < 0)      error = -3;\n    else if (lastError > 0) error = 3;\n    else                    error = 0;\n  }\n  else error = lastError;\n\n  int steer = constrain(Kp * error + Kd * (error - lastError), -100, 100);\n  lastError = error;\n  if (lineFound) lastFoundError = error;\n\n  int a, b;\n  if (steer < 0) {\n    int s = -steer;\n    a = STRAIGHT_A + (HARD_LEFT_A - STRAIGHT_A) * s / 100;\n    b = STRAIGHT_B + (HARD_LEFT_B - STRAIGHT_B) * s / 100;\n  } else {\n    a = STRAIGHT_A + (HARD_RIGHT_A - STRAIGHT_A) * steer / 100;\n    b = STRAIGHT_B + (HARD_RIGHT_B - STRAIGHT_B) * steer / 100;\n  }\n  currentSpeedA = constrain(a, 0, 255);\n  currentSpeedB = constrain(b, 0, 255);\n  controlMotors(1, (uint8_t)currentSpeedA, 1, (uint8_t)currentSpeedB);\n\n  static unsigned long lastPrint = 0;\n  if (millis() - lastPrint >= 500) {\n    Serial.print(F(\"[라인] \")); Serial.print(L); Serial.print(C); Serial.print(R);\n    Serial.print(F(\" | 오차: \")); Serial.print(error);\n    Serial.print(F(\" | 모터 A/B: \")); Serial.print(currentSpeedA);\n    Serial.print(F(\" / \")); Serial.println(currentSpeedB);\n    lastPrint = millis();\n  }\n  return LT_RUNNING;\n}\n\n// =====================================================\n// 출발: 써야 할 쪽 벽이 더 가까운지 확인 → 그대로 출발 / 제자리 회전\n//  1번방 = 오른쪽 벽, 2번방 = 왼쪽 벽\n// =====================================================\nvoid startDepart() {\n  bool needRight = (targetRoom == 1);\n  uint8_t l = sideAvg(false);\n  uint8_t r = sideAvg(true);\n  uint8_t need  = needRight ? r : l;\n  uint8_t other = needRight ? l : r;\n\n  Serial.print(F(\"[출발] \")); Serial.print(targetRoom); Serial.print(F(\"번방 | 좌: \")); Serial.print(l);\n  Serial.print(F(\" 우: \")); Serial.println(r);\n\n  // 써야 할 쪽이 더 가깝거나, 반대쪽을 못 읽으면 그대로 출발\n  if (other == 255 || (need != 255 && need <= other)) {\n    skipLine = false;\n    enterState(needRight ? ST_WALL_TO_ST1 : ST_WALL_TO_ST2);\n    return;\n  }\n  // 반대쪽이 더 가까움 → 가까운 벽 반대쪽으로 회전\n  //  오른쪽 벽이 가까우면 좌회전, 왼쪽 벽이 가까우면 우회전\n  bool otherIsRight = !needRight;\n  alignTurnLeft = otherIsRight;\n  turnStart = millis();\n  enterState(ST_START_TURN);\n}\n\n// 출발 방향 회전: 써야 할 쪽 앞/뒤 초음파가 벽과 평행 + 반대쪽보다 가까우면 멈춤\nvoid startTurnStep() {\n  unsigned long elapsed = millis() - turnStart;\n  bool needRight = (targetRoom == 1);\n\n  if (elapsed > ALIGN_TIMEOUT) {\n    stopMotors();\n    Serial.println(F(\"[출발 회전 실패] 벽을 못 맞춤 → 다시 터치해 주세요\"));\n    enterState(ST_WAIT_START);\n    return;\n  }\n\n  int spA = (elapsed < TURN_KICK_MS) ? TURN_KICK_SPEED : TURN_SPEED_A;\n  int spB = (elapsed < TURN_KICK_MS) ? TURN_KICK_SPEED : TURN_SPEED_B;\n  if (alignTurnLeft) controlMotors( 1, spA, -1, spB);\n  else               controlMotors(-1, spA,  1, spB);\n\n  if (elapsed < ALIGN_MIN_MS) return;\n\n  uint8_t nf, nr, of, orr;\n  if (needRight) {\n    nf  = trig_ultra(trigRightFront, echoRightFront); delay(ULTRA_GAP_MS);\n    nr  = trig_ultra(trigRightRear,  echoRightRear);  delay(ULTRA_GAP_MS);\n    of  = trig_ultra(trigLeftFront,  echoLeftFront);  delay(ULTRA_GAP_MS);\n    orr = trig_ultra(trigLeftRear,   echoLeftRear);   delay(ULTRA_GAP_MS);\n  } else {\n    nf  = trig_ultra(trigLeftFront,  echoLeftFront);  delay(ULTRA_GAP_MS);\n    nr  = trig_ultra(trigLeftRear,   echoLeftRear);   delay(ULTRA_GAP_MS);\n    of  = trig_ultra(trigRightFront, echoRightFront); delay(ULTRA_GAP_MS);\n    orr = trig_ultra(trigRightRear,  echoRightRear);  delay(ULTRA_GAP_MS);\n  }\n\n  bool needOk = (nf > 0 && nf <= ALIGN_MAX_CM && nr > 0 && nr <= ALIGN_MAX_CM &&\n                 abs((int)nf - (int)nr) <= ALIGN_TOL_CM);\n  uint8_t needAvg = needOk ? (nf + nr) / 2 : 255;\n  // 반대쪽 평균 (읽힌 것만)\n  int oSum = 0, oCnt = 0;\n  if (of  > 0 && of  < 200) { oSum += of;  oCnt++; }\n  if (orr > 0 && orr < 200) { oSum += orr; oCnt++; }\n  uint8_t otherAvg = oCnt ? oSum / oCnt : 255;\n\n  if (needOk && needAvg <= otherAvg) alignHits++;\n  else alignHits = 0;\n\n  if (alignHits >= 2) {      // 두 번 연속 만족하면 멈춤 (튀는 값 방지)\n    stopMotors();\n    uint8_t s = needRight ? 1 : 0;\n    lastValidFront[s] = nf;\n    lastValidRear[s]  = nr;\n    Serial.print(F(\"[출발 회전 완료] 앞: \")); Serial.print(nf); Serial.print(F(\" 뒤: \")); Serial.println(nr);\n    delay(TURN_END_PAUSE_MS);\n    skipLine = true;         // 회전했으면 앞에 출발점 선이 있음 → 한 번 무시\n    enterState(needRight ? ST_WALL_TO_ST1 : ST_WALL_TO_ST2);\n  }\n}\n\n// 카메라 확인 (targetRoom ID)\nvoid pollCamera() {\n  static unsigned long lastCam = 0;\n  if (cameraConfirmed || millis() - lastCam < CAMERA_INTERVAL_MS) return;\n  lastCam = millis();\n  if (!huskylens.request()) return;\n  while (huskylens.available()) {\n    HUSKYLENSResult result = huskylens.read();\n    if (result.ID == targetRoom && !cameraConfirmed) {\n      cameraConfirmed = true;\n      Serial.print(F(\"[카메라 승인] ID \")); Serial.print(targetRoom);\n      Serial.println(F(\" 확인 → 감속 후 IR 감지 대기\"));\n    }\n  }\n}\n\n// 출발점 선 무시 + 방금 지나온 선 무시(IR이 한동안 0이어야 감지 시작)\n//  true를 돌려주면 \"감지할 선을 봤다\"\nbool checkIR(bool ir) {\n  if (skipLine) {\n    if (millis() - stateStart > DEPART_SKIP_MS) skipLine = false;     // 시간 지나면 무시 끝\n    else if (ir) { skipSeen = true; return false; }\n    else if (skipSeen) { skipLine = false; return false; }             // 선 지나감 → 무시 끝\n    else return false;\n  }\n  if (!ir) {\n    if (irClearSince == 0) irClearSince = millis();\n    if (millis() - irClearSince >= IR_ARM_MS) irArmed = true;\n  } else {\n    irClearSince = 0;\n  }\n  return irArmed && ir;\n}\n\n// =====================================================\n// 1번방: 오른쪽 벽추종 → 카메라 ID 1 + IR → 라인트레이싱\n// =====================================================\nvoid doWallToSt1() {\n  irLatched = false;\n  uint8_t front = readFront();\n  uint8_t rf    = trig_ultra(trigRightFront, echoRightFront); gapWatchIR(ULTRA_GAP_MS);\n  uint8_t rr    = trig_ultra(trigRightRear,  echoRightRear);  gapWatchIR(ULTRA_GAP_MS);\n\n  pollCamera();\n  sendToR4(front, (lastValidFront[1] + lastValidRear[1]) / 2);\n\n  bool ir = irLatched || irAny();\n  if (skipLine) { checkIR(ir); ir = false; }   // 출발점 선 무시 중 (카메라 승인과 별개로)\n  if (cameraConfirmed && ir) {\n    stopMotors();\n    enterState(ST_LINE_TO_ST1);\n    return;\n  }\n\n  if (front > 0 && front <= FRONT_STOP_DIST) {\n    stopMotors();\n    return;\n  }\n  wallFollow(true, rf, rr, front, cameraConfirmed);\n}\n\n// =====================================================\n// 2번방: 왼쪽 벽추종 → (카메라 ID 2) + IR → 라인트레이싱\n// =====================================================\nvoid doWallToSt2() {\n  irLatched = false;\n  uint8_t front = readFront();\n  uint8_t lf    = trig_ultra(trigLeftFront, echoLeftFront); gapWatchIR(ULTRA_GAP_MS);\n  uint8_t lr    = trig_ultra(trigLeftRear,  echoLeftRear);  gapWatchIR(ULTRA_GAP_MS);\n\n  if (ROOM2_NEED_CAMERA) pollCamera();\n  sendToR4(front, (lastValidFront[0] + lastValidRear[0]) / 2);\n\n  bool line = checkIR(irLatched || irAny());\n  bool camOk = !ROOM2_NEED_CAMERA || cameraConfirmed;\n  if (camOk && line) {\n    stopMotors();\n    enterState(ST_LINE_TO_ST2);\n    return;\n  }\n\n  if (front > 0 && front <= FRONT_STOP_DIST) {\n    stopMotors();\n    return;\n  }\n  wallFollow(false, lf, lr, front, ROOM2_NEED_CAMERA && cameraConfirmed);\n}\n\n// =====================================================\n// 복귀 시작: 따라갈 벽 정하기 (자동 = 가까운 쪽)\n// =====================================================\nvoid startHome() {\n  uint8_t cfg = (homeFrom == 1) ? HOME_SIDE_FROM_ROOM1 : HOME_SIDE_FROM_ROOM2;\n  if (cfg == 1)      homeRight = true;\n  else if (cfg == 2) homeRight = false;\n  else {\n    uint8_t l = sideAvg(false);\n    uint8_t r = sideAvg(true);\n    if (l == 255 && r == 255) homeRight = (homeFrom == 2);   // 둘 다 못 읽으면 기본값\n    else homeRight = (r <= l);\n    Serial.print(F(\"[복귀] 좌: \")); Serial.print(l); Serial.print(F(\" 우: \")); Serial.print(r);\n    Serial.println(homeRight ? F(\" → 오른쪽 벽\") : F(\" → 왼쪽 벽\"));\n  }\n  enterState(ST_WALL_HOME);\n}\n\n// =====================================================\n// 복귀 벽추종 → IR 감지 → HOME_STOP_DELAY_MS 더 가서 정지\n// =====================================================\nvoid doWallHome() {\n  irLatched = false;\n  uint8_t front = readFront();\n  uint8_t sf, sr;\n  if (homeRight) {\n    sf = trig_ultra(trigRightFront, echoRightFront); gapWatchIR(ULTRA_GAP_MS);\n    sr = trig_ultra(trigRightRear,  echoRightRear);  gapWatchIR(ULTRA_GAP_MS);\n  } else {\n    sf = trig_ultra(trigLeftFront,  echoLeftFront);  gapWatchIR(ULTRA_GAP_MS);\n    sr = trig_ultra(trigLeftRear,   echoLeftRear);   gapWatchIR(ULTRA_GAP_MS);\n  }\n  uint8_t s = homeRight ? 1 : 0;\n  sendToR4(front, (lastValidFront[s] + lastValidRear[s]) / 2);\n\n  if (state == ST_WALL_HOME) {\n    if (checkIR(irLatched || irAny())) {\n      Serial.println(F(\"[복귀] IR 감지 → 잠시 더 가서 정지\"));\n      enterState(ST_HOME_STOPPING);\n    }\n  } else if (millis() - stateStart >= HOME_STOP_DELAY_MS) {\n    stopMotors();\n    Serial.println(F(\"[복귀 완료] → 대기\"));\n    enterState(ST_WAIT_START);\n    return;\n  }\n\n  if (front > 0 && front <= FRONT_STOP_DIST) {\n    stopMotors();\n    return;\n  }\n  wallFollow(homeRight, sf, sr, front, false);\n}\n\n// 한쪽 초음파 앞/뒤 평균 (읽힌 값만, 없으면 255) - 읽은 값은 벽추종 기준값으로도 저장\nuint8_t sideAvg(bool right) {\n  uint8_t f, r;\n  if (right) {\n    f = trig_ultra(trigRightFront, echoRightFront); delay(ULTRA_GAP_MS);\n    r = trig_ultra(trigRightRear,  echoRightRear);  delay(ULTRA_GAP_MS);\n  } else {\n    f = trig_ultra(trigLeftFront,  echoLeftFront);  delay(ULTRA_GAP_MS);\n    r = trig_ultra(trigLeftRear,   echoLeftRear);   delay(ULTRA_GAP_MS);\n  }\n  uint8_t s = right ? 1 : 0;\n  int sum = 0, cnt = 0;\n  if (f > 0 && f < 200) { sum += f; cnt++; lastValidFront[s] = f; }\n  if (r > 0 && r < 200) { sum += r; cnt++; lastValidRear[s]  = r; }\n  return cnt ? sum / cnt : 255;\n}\n\n// =====================================================\n// 벽추종 (rightSide = true: 오른쪽 벽, false: 왼쪽 벽)\n// =====================================================\nvoid wallFollow(bool rightSide, uint8_t sideFront, uint8_t sideRear, uint8_t frontDist, bool slow) {\n  uint8_t side = rightSide ? 1 : 0;\n\n  if (sideFront > 0 && sideFront < 200) lastValidFront[side] = sideFront;\n  if (sideRear  > 0 && sideRear  < 200) lastValidRear[side]  = sideRear;\n  uint8_t f = lastValidFront[side];\n  uint8_t r = lastValidRear[side];\n  int8_t target = rightSide ? TARGET_DISTANCE_RIGHT : TARGET_DISTANCE_LEFT;\n\n  int16_t angleError = (int16_t)f - (int16_t)r;\n  // 미분항(Kd) 제외 - P 보정만 사용 (상태 시작 순간 보정이 튀는 것 방지)\n  int16_t angleCorrection = Kp_angle * angleError;\n  lastAngleError = angleError;\n\n  int16_t distError = (int16_t)f - target;\n  int16_t distCorrection = Kp_dist * distError;\n  lastDistError = distError;\n\n  int16_t total = constrain(angleCorrection + distCorrection, -MAX_CORRECTION, MAX_CORRECTION);\n\n  // 보정값 → 조향 세기 (양수 = 우회전, 음수 = 좌회전)\n  //  오른쪽 벽: 멀면(total>0) 우회전(벽 쪽), 가까우면 좌회전\n  //  왼쪽 벽 : 반대\n  int16_t sign = rightSide ? 1 : -1;\n  int steer = (int)(sign * total) * WALL_STEER_MAX / MAX_CORRECTION;\n\n  // 라인트레이서와 같은 방식으로 직진 ↔ 최대 회전 값 사이를 계산\n  int a, b;\n  if (steer < 0) {\n    int st = -steer;\n    a = WALL_STRAIGHT_A + (WALL_HARD_LEFT_A - WALL_STRAIGHT_A) * st / 100;\n    b = WALL_STRAIGHT_B + (WALL_HARD_LEFT_B - WALL_STRAIGHT_B) * st / 100;\n  } else {\n    a = WALL_STRAIGHT_A + (WALL_HARD_RIGHT_A - WALL_STRAIGHT_A) * steer / 100;\n    b = WALL_STRAIGHT_B + (WALL_HARD_RIGHT_B - WALL_STRAIGHT_B) * steer / 100;\n  }\n\n  // 속도 비율 (전방 감속 / 카메라 승인 후 감속)\n  int pct = 100;\n  if (frontDist > FRONT_STOP_DIST && frontDist <= FRONT_DECEL_DIST) {\n    pct = WALL_DECEL_MIN_PCT + (100 - WALL_DECEL_MIN_PCT) * (frontDist - FRONT_STOP_DIST) / (FRONT_DECEL_DIST - FRONT_STOP_DIST);\n  }\n  if (slow && pct > WALL_SLOW_PCT) pct = WALL_SLOW_PCT;\n\n  int16_t speedA = constrain(a * pct / 100, 0, 255);\n  int16_t speedB = constrain(b * pct / 100, 0, 255);\n\n  currentSpeedA = speedA;\n  currentSpeedB = speedB;\n  controlMotors(1, (uint8_t)speedA, 1, (uint8_t)speedB);\n\n  static unsigned long lastPrint = 0;\n  if (millis() - lastPrint >= 500) {\n    Serial.print(rightSide ? F(\"[오른쪽 벽] \") : F(\"[왼쪽 벽] \"));\n    Serial.print(F(\"전방: \")); Serial.print(frontDist);\n    Serial.print(F(\" | 앞: \")); Serial.print(sideFront); Serial.print(F(\"→\")); Serial.print(f);\n    Serial.print(F(\" | 뒤: \")); Serial.print(sideRear);  Serial.print(F(\"→\")); Serial.print(r);\n    Serial.print(F(\" | 보정: \")); Serial.print(total);\n    if (state == ST_WALL_TO_ST1) { Serial.print(F(\" | 카메라: \")); Serial.print(cameraConfirmed ? F(\"OK\") : F(\"-\")); }\n    Serial.print(F(\" | 모터 A/B: \")); Serial.print(speedA);\n    Serial.print(F(\" / \")); Serial.println(speedB);\n    lastPrint = millis();\n  }\n}\n\n// =====================================================\n// 보조 함수\n// =====================================================\n// 초음파 센서 사이 대기 시간 동안 IR을 계속 확인 (그냥 delay 하면 그 사이 지나가는 선을 놓침)\nvoid gapWatchIR(unsigned long ms) {\n  unsigned long t = millis();\n  do {\n    if (irAny()) irLatched = true;\n  } while (millis() - t < ms);\n}\n\nbool irAny() {\n  return (digitalRead(IR_LEFT)   == LINE_LEVEL) ||\n         (digitalRead(IR_CENTER) == LINE_LEVEL) ||\n         (digitalRead(IR_RIGHT)  == LINE_LEVEL);\n}\n\n// R4 터치 수신: 'T' + 명령 문자 ('1', '2', '3'=복귀)\nvoid readTouch() {\n  touchCmd = '\\0';\n  while (Serial1.available() > 0) {\n    char header = Serial1.read();\n    if (header == 'T') {\n      unsigned long t = millis();\n      while (Serial1.available() == 0 && millis() - t < 10);\n      if (Serial1.available() > 0) {\n        touchCmd = Serial1.read();\n        Serial.print(F(\"[터치] \")); Serial.println(touchCmd);\n      }\n    }\n  }\n}\n\n// 벽추종 중 측정값 저장 (전송은 sendTelemetry에서)\nvoid sendToR4(uint8_t front, uint8_t side) {\n  lastFrontDist = front;\n  lastSideDist  = side;\n}\n\n// R4로 상태 전송 (모든 단계에서 0.2초마다)\n//  \"전방,측면,상태번호,IR,카메라\\n\"\n//   IR = 좌*4 + 중앙*2 + 우 (0~7),  카메라 = 승인 1 / 미승인 0\nvoid sendTelemetry() {\n  static unsigned long lastSend = 0;\n  if (millis() - lastSend < 400) return;   // 기준 코드와 같은 0.4초 간격\n  lastSend = millis();\n\n  // 멈춰 있는 단계(대기/도착)에서는 주행 함수가 초음파를 안 재므로 여기서 직접 측정\n  //  (안 하면 모니터 전방/측면 값이 마지막 주행 때 값으로 멈춰 있음)\n  if (state == ST_WAIT_START || state == ST_AT_ST1 || state == ST_AT_ST2) {\n    lastFrontDist = readFront();\n    lastSideDist  = sideAvg(true);\n  }\n\n  uint8_t ir = 0;\n  if (digitalRead(IR_LEFT)   == LINE_LEVEL) ir |= 4;\n  if (digitalRead(IR_CENTER) == LINE_LEVEL) ir |= 2;\n  if (digitalRead(IR_RIGHT)  == LINE_LEVEL) ir |= 1;\n\n  Serial1.print(lastFrontDist);   Serial1.print(',');\n  Serial1.print(lastSideDist);    Serial1.print(',');\n  Serial1.print((uint8_t)state);  Serial1.print(',');\n  Serial1.print(ir);              Serial1.print(',');\n  Serial1.println(cameraConfirmed ? 1 : 0);\n}\n\nvoid printState(AGVState s) {\n  Serial.print(F(\">> 상태: \"));\n  switch (s) {\n    case ST_WAIT_START:    Serial.println(F(\"대기 (터치 1 = 1번방, 2 = 2번방)\")); break;\n    case ST_WALL_TO_ST1:   Serial.println(F(\"오른쪽 벽추종 → 1번방 탐색\")); break;\n    case ST_LINE_TO_ST1:   Serial.println(F(\"라인트레이싱 → 1번방\")); break;\n    case ST_AT_ST1:        Serial.println(F(\"1번방 도착 (터치 3 = 복귀)\")); break;\n    case ST_TURN:          Serial.println(F(\"제자리 회전\")); break;\n    case ST_LINE_BACK_ST1: Serial.println(F(\"라인트레이싱 → 1번방 빠져나옴\")); break;\n    case ST_WALL_TO_ST2:   Serial.println(F(\"왼쪽 벽추종 → 2번방 탐색\")); break;\n    case ST_START_TURN:    Serial.println(alignTurnLeft ? F(\"출발 방향 맞추기 (좌회전)\") : F(\"출발 방향 맞추기 (우회전)\")); break;\n    case ST_LINE_TO_ST2:   Serial.println(F(\"라인트레이싱 → 2번방\")); break;\n    case ST_AT_ST2:        Serial.println(F(\"2번방 도착 (터치 3 = 복귀)\")); break;\n    case ST_LINE_BACK_ST2: Serial.println(F(\"라인트레이싱 → 2번방 빠져나옴\")); break;\n    case ST_EXIT:          Serial.println(F(\"선 끝 → 짧게 직진 후 복귀 벽추종\")); break;\n    case ST_WALL_HOME:     Serial.println(homeRight ? F(\"복귀 중 (오른쪽 벽)\") : F(\"복귀 중 (왼쪽 벽)\")); break;\n    case ST_HOME_STOPPING: Serial.println(F(\"출발점 선 감지 → 잠시 후 정지\")); break;\n  }\n}\n\nvoid stopMotors() {\n  currentSpeedA = 0;\n  currentSpeedB = 0;\n  controlMotors(0, 0, 0, 0);\n}\n\nvoid controlMotors(int8_t dirA, uint8_t speedA, int8_t dirB, uint8_t speedB) {\n  if (dirA > 0)      { digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);  }\n  else if (dirA < 0) { digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH); }\n  else               { digitalWrite(IN1, LOW);  digitalWrite(IN2, LOW);  }\n  analogWrite(ENA, speedA);\n\n  if (dirB > 0)      { digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);  }\n  else if (dirB < 0) { digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH); }\n  else               { digitalWrite(IN3, LOW);  digitalWrite(IN4, LOW);  }\n  analogWrite(ENB, speedB);\n}\n\n// 전방 좌/우 초음파 중 가까운 값\nuint8_t readFront() {\n  uint8_t fr = trig_ultra(trigFrontRight, echoFrontRight); gapWatchIR(ULTRA_GAP_MS);\n  uint8_t fl = trig_ultra(trigFrontLeft,  echoFrontLeft);  gapWatchIR(ULTRA_GAP_MS);\n  return min(fr, fl);\n}\n\nuint8_t trig_ultra(uint8_t trig, uint8_t echo) {\n  digitalWrite(trig, LOW);  delayMicroseconds(2);\n  digitalWrite(trig, HIGH); delayMicroseconds(10);\n  digitalWrite(trig, LOW);\n\n  unsigned long duration = pulseIn(echo, HIGH, DIST_S);\n  if (duration == 0) return 255;\n  unsigned long cm = duration / 58;\n  if (cm > 254) cm = 254;\n  return (uint8_t)cm;\n}\n"};
+
+  Object.assign(STRINGS, {
+    'gallery.tabProj': { ko: '🚀 프로젝트 예제', en: '🚀 Projects' },
+    'gallery.projSection1': { ko: '여러 보드를 함께 쓰는 종합 프로젝트', en: 'Multi-board projects' },
+    'gallery.proj1.title': { ko: '1번 프로젝트 — AGV 무인운반차 (ESP32 2개 · R4 1개 · MEGA 1개)', en: 'Project 1 — AGV (2× ESP32 · R4 · MEGA)' },
+    'gallery.proj1.desc': {
+      ko: '터치 ESP32(Wi-Fi 공유기·TCP 서버) ↔ R4 WiFi(중계) ↔ MEGA(주행 제어: 초음파 6 · IR 3 · HuskyLens · L298N 모터), R4 → 모니터 ESP32(UDP 지도 화면). 불러온 뒤 ▶ 시뮬레이션 시작 → 터치 화면 [1] 누르기 → HuskyLens "ID 1 인식" → IR 센서 클릭(검은선)으로 단계를 진행해 보세요.',
+      en: 'Touch ESP32 (soft-AP + TCP server) ↔ R4 WiFi (relay) ↔ MEGA (drive control: 6 ultrasonic · 3 IR · HuskyLens · L298N motors); R4 → monitor ESP32 (UDP map). Start the simulation, tap [1] on the touch screen, set HuskyLens to "ID 1", then click the IR sensors (black line) to advance.' },
+  });
+
+  // 탭 버튼 추가 (주변장치 종합 뒤)
+  function addTab(){
+    const after = document.querySelector('.ep-tab[data-tab="periph"]');
+    if (!after || document.querySelector('.ep-tab[data-tab="proj"]')) return;
+    const b = document.createElement('button');
+    b.className = 'ep-tab'; b.dataset.tab = 'proj'; b.dataset.i18n = 'gallery.tabProj';
+    b.innerHTML = tr('gallery.tabProj');
+    b.setAttribute('onclick', "switchGalleryTab('proj')");
+    after.after(b);
+  }
+  addTab();
+  // 탭이 늘어나 글자가 세로로 깨지지 않도록 여러 줄로 줄바꿈
+  (function(){ const st = document.createElement('style');
+    st.textContent = '.example-panel-tabs{flex-wrap:wrap;} .example-panel-tabs .ep-tab{flex:1 0 auto; white-space:nowrap; padding:7px 8px;} .example-panel-tabs .ep-tab[data-tab="proj"]{font-weight:700;}';
+    document.head.appendChild(st); })();
+
+  const PROJECT_DEFS = [
+    { sectionLabel: 'gallery.projSection1' },
+    { key: 'agv1', icon: '🚚', titleKey: 'gallery.proj1.title', descKey: 'gallery.proj1.desc' },
+  ];
+  const _render = renderGalleryBody;
+  renderGalleryBody = function(){
+    if (galleryTab !== 'proj') return _render.apply(this, arguments);
+    const body = document.getElementById('galleryBody'); if (!body) return;
+    body.innerHTML = PROJECT_DEFS.map(d => d.sectionLabel ? `<div class="ep-section-label">${tr(d.sectionLabel)}</div>` : `
+      <div class="ep-card" onclick="runProjectExample('${d.key}')">
+        <div class="ep-icon" style="font-size:22px;">${d.icon}</div>
+        <div class="ep-text"><div class="ep-title">${tr(d.titleKey)}</div><div class="ep-desc">${tr(d.descKey)}</div></div>
+      </div>`).join('');
+  };
+
+  /* ---------- 공통 도우미 ---------- */
+  function putBoard(type, x, y){
+    const k = spawnBoard(type);
+    moveTo(k, x, y);
+    return k;
+  }
+  // 보드는 문서 흐름 위에서 left/top 만큼 옮겨지는 방식이라, 지금 실제 위치와의 차이만큼 보정
+  function moveTo(k, x, y){
+    const el = document.getElementById(boardDomId[k]); if (!el) return;
+    const cur = elCanvasPos(el);
+    el.style.left = Math.round((parseFloat(el.style.left) || 0) + x - cur.x) + 'px';
+    el.style.top = Math.round((parseFloat(el.style.top) || 0) + y - cur.y) + 'px';
+  }
+  function putComp(type, x, y){ return placeExp(type, 'proj-agv1', x, y); }
+  const P = (k, pin) => { const el = document.getElementById(boardDomId[k]); return el && el.querySelector(`[data-pin="${pin}"]`); };
+  const C = (id, suf) => document.querySelector(`#${id} [data-pin$="${suf}"]`);
+  const W = (a, b) => { if (a && b) taggedWire('proj-agv1', a, b); };
+  function loadCode(k, code){
+    const ed = document.getElementById(`codeEditor${k.toUpperCase()}`); if (!ed) return;
+    ed.value = code;
+    try { refreshLineNumbers(ed, document.getElementById(`lineNum${k.toUpperCase()}`), k); } catch(e){}
+    executeCompilerPipeline(k);
+  }
+  function setUltra(id, cm){
+    const s = document.getElementById(`${id}_slider`); if (!s) return;
+    s.value = cm; s.dispatchEvent(new Event('input', { bubbles: true }));
+    const v = document.getElementById(`${id}_val`); if (v) v.textContent = cm + 'cm';
+  }
+  function label(id, text){
+    const el = document.getElementById(id); if (!el) return;
+    const t = document.createElement('div');
+    t.className = 'proj-tag'; t.textContent = text;
+    t.style.cssText = 'position:absolute;left:0;top:-20px;font:600 11px/1.2 system-ui,sans-serif;color:#f2c94c;white-space:nowrap;pointer-events:none;';
+    el.appendChild(t);
+  }
+
+  /* ---------- 1번 프로젝트: AGV ---------- */
+  function runAgv1(){
+    // 보드 4개 — 위: 터치 ESP32 · 모니터 ESP32 · R4 / 아래: MEGA
+    const kT = putBoard('esp32_28', 60, 60);
+    const kM = putBoard('esp32_28', 760, 60);
+    const kR = putBoard('r4', 1460, 100);
+    const kG = putBoard('mega', 480, 720);
+    [[kT, 60, 60], [kM, 760, 60], [kR, 1460, 100], [kG, 480, 720]].forEach(([k, x, y]) => moveTo(k, x, y));
+
+    // 메가 주변 부품
+    const us = [
+      { name: '전방-오른쪽', trig: 'D46', echo: 'D47', cm: 80 },
+      { name: '전방-왼쪽',   trig: 'D26', echo: 'D27', cm: 80 },
+      { name: '오른쪽-앞',   trig: 'D34', echo: 'D35', cm: 30 },
+      { name: '오른쪽-뒤',   trig: 'D42', echo: 'D43', cm: 30 },
+      { name: '왼쪽-앞',     trig: 'D30', echo: 'D31', cm: 60 },
+      { name: '왼쪽-뒤',     trig: 'D38', echo: 'D39', cm: 60 },
+    ].map((u, i) => Object.assign(u, { id: putComp('ultrasonic', 300 + i * 175, 1290) }));
+    const ir = [
+      { name: 'IR 왼쪽',   pin: 'D10' },
+      { name: 'IR 가운데', pin: 'D4' },
+      { name: 'IR 오른쪽', pin: 'D9' },
+    ].map((s, i) => Object.assign(s, { id: putComp('dsensor-tracking', 1370 + i * 130, 1290) }));
+    const hz = putComp('huskylens', 260, 800);
+    const md = putComp('motordriver2', 1680, 700);
+    const mA = putComp('dcmotor', 1990, 680);
+    const mB = putComp('dcmotor', 1990, 820);
+    const bat = putComp('battery', 1680, 960);
+
+    us.forEach(u => { label(u.id, '초음파 ' + u.name); setUltra(u.id, u.cm); });
+    ir.forEach(s => label(s.id, s.name));
+    label(hz, 'Serial2 (16/17)');
+    label(md, '주행 모터 드라이버');
+    label(mA, '모터 A (625:1)'); label(mB, '모터 B (200:1)');
+    label(bat, '모터 전원 12V');
+
+    // 배터리 12V
+    const batEl = document.getElementById(bat);
+    const sel = batEl && batEl.querySelector('select.battery-rated-volt');
+    if (sel){ sel.value = '12'; try { batteryRatedVoltChanged(bat); } catch(e){} }
+
+    // ① 보드 간 UART: MEGA Serial1(18 TX / 19 RX) ↔ R4 Serial1(D0 / D1), GND 공통
+    W(P(kG, 'D18'), P(kR, 'D0'));
+    W(P(kR, 'D1'), P(kG, 'D19'));
+    W(P(kG, 'GND_D'), P(kR, 'GND_P1'));
+
+    // ② HuskyLens: T → RX2(17), R ← TX2(16)
+    W(C(hz, '_HT'), P(kG, 'D17'));
+    W(C(hz, '_HR'), P(kG, 'D16'));
+
+    // ③ 센서 신호
+    us.forEach(u => { W(P(kG, u.trig), C(u.id, '_TRIG')); W(C(u.id, '_ECHO'), P(kG, u.echo)); });
+    ir.forEach(s => W(C(s.id, '_DO'), P(kG, s.pin)));
+
+    // ④ 5V / GND — 메가 5V·GND에서 센서들로 이어서(데이지 체인) 공급
+    const v5 = [P(kG, '5V'), C(hz, '_V'), ...us.map(u => C(u.id, '_V')), ...ir.map(s => C(s.id, '_V'))];
+    const gnd = [P(kG, 'GND_P1'), C(hz, '_G'), ...us.map(u => C(u.id, '_G')), ...ir.map(s => C(s.id, '_G'))];
+    for (let i = 1; i < v5.length; i++) W(v5[i - 1], v5[i]);
+    for (let i = 1; i < gnd.length; i++) W(gnd[i - 1], gnd[i]);
+
+    // ⑤ 모터 드라이버(L298N): ENA 2 · IN1 22 · IN2 23 / ENB 5 · IN3 24 · IN4 25
+    [['D2', '_ENA'], ['D22', '_IN1'], ['D23', '_IN2'], ['D5', '_ENB'], ['D24', '_IN3'], ['D25', '_IN4']].forEach(([p, s]) => W(P(kG, p), C(md, s)));
+    W(C(md, '_OUT1'), C(mA, '_TA')); W(C(md, '_OUT2'), C(mA, '_TB'));
+    W(C(md, '_OUT3'), C(mB, '_TA')); W(C(md, '_OUT4'), C(mB, '_TB'));
+    W(C(bat, '_V'), C(md, '_V'));
+    W(C(bat, '_G'), C(md, '_G'));
+    W(C(md, '_G'), P(kG, 'GND_P2'));
+
+    // 코드 업로드
+    loadCode(kT, CODES.touch);
+    loadCode(kM, CODES.monitor);
+    loadCode(kR, CODES.r4);
+    loadCode(kG, CODES.mega);
+    ensureSimRunning();
+    focusCanvasOn(60, 40);
+    try { if (typeof showToast === 'function') showToast('1번 프로젝트(AGV)를 불러왔습니다 — ▶ 시뮬레이션 시작 후 터치 화면의 [1]을 눌러 보세요.'); } catch(e){}
+  }
+
+  window.runProjectExample = function(key){
+    clearCanvasAll();
+    if (key === 'agv1') runAgv1();
+    const panel = document.getElementById('examplePanel'); if (panel) panel.hidden = true;
+  };
 })();
 
 </script>
