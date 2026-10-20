@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K군의 아두이노 시뮬레이터 Ver1.09</title>
+<title>K군의 아두이노 시뮬레이터 Ver1.10</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -2509,6 +2509,36 @@
 .aic-head span{flex:1; color:var(--text); font-weight:600;} .aic-head b{transition:transform .15s;}
 .aic-cfg.aic-collapsed .aic-row{display:none !important;} .aic-cfg.aic-collapsed .aic-head b{transform:rotate(-90deg);}
 #aiBlPanel{max-height:min(68vh, 640px);} #aiBlPanel .ai-chat-log{min-height:120px;}
+/* [Ver0.993] 회사별 카드 크기 · PLC 옆 도킹 · 미장착 표시 · 알림 */
+.xm-card.xm-v-ls{width:150px;} .xm-card.xm-v-mit{width:140px;} .xm-card.xm-v-siemens{width:168px;} .xm-card.xm-v-omron{width:178px;}
+.xm-card.xm-v-mit{background:linear-gradient(180deg,#4b5057,#2f3338); color:#e8ecf1; border-color:#1d2024;}
+.xm-card.xm-v-mit .xm-addr{color:#9fd0ff;} .xm-card.xm-v-mit .xm-msg{color:#c3cbd3;} .xm-card.xm-v-mit .xm-status{color:#e8ecf1;}
+.xm-card.xm-v-siemens{border-radius:2px;} .xm-card.xm-v-siemens .xm-band{border-radius:1px 1px 0 0;}
+.placed-component.xm-docked > .xm-card{height:100%; box-sizing:border-box; display:flex; flex-direction:column; border-radius:0 6px 6px 0; box-shadow:2px 3px 8px rgba(0,0,0,.35);}
+.placed-component.xm-docked > .xm-card .xm-band{border-radius:0 5px 0 0;}
+.placed-component.xm-docked > .xm-card .xm-terms{margin-top:auto;}
+.placed-component.xm-docked > .xm-card .comp-label,
+.placed-component.xm-docked > .xm-card .xm-host-row{display:none;}
+.placed-component.xm-docked > .xm-card .xm-ledwin, .placed-component.xm-docked > .xm-card .xm-chwin{margin:3px 6px;}
+.xm-card .xm-led{min-width:0;}
+.xm-orphan-tag{display:none;}
+.placed-component.xm-orphan > .xm-card{outline:2px dashed #e5484d; outline-offset:2px;}
+.placed-component.xm-orphan .xm-orphan-tag{display:block; background:#e5484d; color:#fff; font-size:.56rem; font-weight:700; text-align:center; padding:2px 3px; animation:xmBlink 1.2s ease-in-out infinite;}
+.placed-component.xm-orphan .xm-addr{color:#e5484d;}
+@keyframes xmBlink{50%{opacity:.55;}}
+.placed-component.xm-snap-target{outline:3px solid #3ddc84; outline-offset:3px;}
+.placed-component.xm-snap-bad{outline:3px solid #e5484d; outline-offset:3px;}
+.xm-toast{position:fixed; left:50%; bottom:70px; transform:translate(-50%,20px); background:#1f6f43; color:#fff; padding:9px 16px; border-radius:8px; font-size:.82rem; font-weight:600; box-shadow:0 6px 20px rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:100000; max-width:min(90vw,620px); text-align:center;}
+.xm-toast.bad{background:#b42318;} .xm-toast.show{opacity:1; transform:translate(-50%,0);}
+.xm-notice-ov{position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:100001;}
+.xm-notice{width:min(92vw,470px); background:var(--bg-panel,#1b2027); color:var(--text,#e8ecf1); border:1px solid var(--border-strong,#3a434d); border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.6);}
+.xm-notice-head{color:#fff; font-weight:800; font-size:1rem; padding:12px 16px;}
+.xm-notice-body{padding:12px 16px 4px; font-size:.84rem; line-height:1.55;}
+.xm-notice-body p{margin:0 0 9px;}
+.xm-notice-warn{color:#ff8a80;}
+.xm-notice-tip{color:var(--text-dim,#9fb0c0); font-size:.76rem;}
+.xm-notice-btns{display:flex; gap:8px; justify-content:flex-end; padding:8px 16px 14px;}
+.xm-notice-btns button{border:none; border-radius:7px; padding:8px 13px; font-weight:700; font-size:.8rem; cursor:pointer; color:#fff; background:#4a5560;}
 /* [Ver0.991] 슬롯 실습 부품 */
 .xp{min-width:96px; text-align:center; padding:6px 8px 4px; background:linear-gradient(180deg,#2b3138,#1e2329); border:1px solid #4a5560; border-radius:7px;}
 .xp-sub{font-size:.56rem; color:#9fb0c0; margin:2px 0;}
@@ -2558,7 +2588,7 @@
   <div class="brand">
     <div class="brand-mark">U4</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 시뮬레이터 Ver1.09</b>
+      <b data-i18n="brand.title">K군의 시뮬레이터 Ver1.10</b>
       <span data-i18n="brand.subtitle">Arduino GCC Toolchain &amp; Embedded Engine</span>
     </div>
   </div>
@@ -3863,7 +3893,7 @@ const STRINGS = {
   "board.esp32_8a": { ko: "ESP32 + 8인치 터치 디스플레이 (800x480)", en: "ESP32 + 8\" Touch Display (800x480)" },
   "board.esp32_8b": { ko: "ESP32 + 8인치 터치 디스플레이 (1024x600)", en: "ESP32 + 8\" Touch Display (1024x600)" },
   "brand.subtitle": { ko: "Arduino GCC Toolchain &amp; Embedded Engine", en: "Arduino GCC Toolchain &amp; Embedded Engine" },
-  "brand.title": { ko: "K군의 시뮬레이터 Ver1.09", en: "K's Simulator Ver1.09" },
+  "brand.title": { ko: "K군의 시뮬레이터 Ver1.10", en: "K's Simulator Ver1.10" },
   "comp.ap.power": { ko: "전원", en: "Power" },
   "comp.ap.sigTitle": { ko: "SIG → 보드 디지털 핀 (수신 신호)", en: "SIG → board digital pin (received signal)" },
   "comp.ap.title": { ko: "무선 AP<br>Signal Gen", en: "Wireless AP<br>Signal Gen" },
@@ -4815,7 +4845,7 @@ const STRINGS = {
   "sim.stoppedTag": { ko: "시뮬레이션 중지됨", en: "Simulation stopped" },
   "status.powerOff": { ko: "전원 꺼짐", en: "Power off" },
   "status.signalOn": { ko: "신호 송출 중", en: "Transmitting" },
-  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.09", en: "K's Arduino Simulator Ver1.09" },
+  "title.page": { ko: "K군의 아두이노 시뮬레이터 Ver1.10", en: "K's Arduino Simulator Ver1.10" },
   "toolbar.bom": { ko: "BOM List", en: "BOM List" },
   "toolbar.schematic": { ko: "📐 회로도 그리기", en: "📐 Draw Schematic" },
   "toolbar.openPdf": { ko: "📑 도면 PDF 보기", en: "📑 View Diagram PDF" },
@@ -8103,6 +8133,7 @@ function togglePaletteGroup(headerEl){
 // 지금까지 이 시뮬레이터와 대화하며 추가된 버전별 변경사항을 정리해 한눈에 볼 수 있게 합니다.
 // 새 버전이 나올 때마다 이 배열 맨 앞에 항목을 추가해주면 됩니다.
 const RELEASE_NOTES = [
+  { ver: 'Ver1.10', ko: ['오실로스코프로 모터 드라이버 출력(L298N 1·2채널, 엔코더 드라이버, 7A 2채널 OUT1~4, BTS7960 M+/M−, BLDC U/V/W, A4988 코일)을 볼 수 있음 — 모터 전원 전압(예: 12V) × ENA PWM 펄스, 방향에 따라 OUT1/OUT2 중 한쪽 출력', '통신선(I2C SDA/SCL, UART TX/RX·D0/D1·메가 14~19)도 표시 — 평소 HIGH, 데이터가 오갈 때 펄스', '멀티미터/표시에 PWM 평균 전압 함께 표시'] },
   { ver: 'Ver1.09', ko: ['예제 모음에 「🚀 프로젝트 예제」 탭 추가 — 1번 프로젝트: AGV 무인운반차(ESP32 2개 · R4 · MEGA, 센서·모터·카메라 배선 포함)', '정수형 변수에 넣는 나눗셈을 실제 C처럼 소수점 버림으로 계산 (7/2 = 3)', 'HuskyLens AI 카메라 부품 + HUSKYLENS 라이브러리(begin/request/available/read) 지원', '메가 하드웨어 시리얼 Serial1(18/19)·Serial2(16/17)·Serial3(14/15) — 배선한 상대 보드와 실제로 통신', 'enum / enum class(: uint8_t 등) 지원, F("...") 문자열 지원', 'bool 값 출력을 실제 아두이노처럼 1/0으로', '전역 char 변수 출력이 숫자로 나오던 문제 수정', '컴파일 후 메모리 사용량 추정을 실제와 가깝게(주석 제외) 보정'] },
   { ver: 'Ver1.08', ko: ['ESP32 2.8인치 터치 보드(320x240) 추가', '보드끼리 가상 Wi-Fi 통신 — softAP·WiFi.begin/config, TCP(WiFiServer/WiFiClient), UDP(WiFiUDP), IPAddress', 'Arduino_GFX · LovyanGFX(스프라이트·한글 폰트) · XPT2046 터치 라이브러리 지원', 'R4 Serial1(D0/D1) 지원', 'C++ 문법 지원 확대 — struct, ->, static 지역변수, 캐스트, sprintf/snprintf/sscanf/printf, #ifdef·#ifndef, 1.0f 등', '쉼표로 줄바꿈한 변수 선언을 세미콜론 오류로 잘못 판단하던 문제 수정'] },
   { ver: 'Ver1.07', ko: ['처음 시작 안내(화면을 하나씩 비추며 설명) 추가 — 📘 사용 안내 버튼으로 다시 보기'] },
@@ -16602,7 +16633,7 @@ document.addEventListener('change', (e) => {
   if (compEl) applyLedOffAppearance(compEl);
 });
 
-function SCOPE_TYPE_LABEL_FN(){ return { analog:tr('scope.type.analog'), pwm:'PWM', digital:tr('scope.type.digital'), echo:tr('scope.type.echo'), dac:'DAC', volt:tr('scope.type.volt'), ac:tr('scope.type.ac'), current:tr('scope.type.current') }; }
+function SCOPE_TYPE_LABEL_FN(){ return { fn:'파형', analog:tr('scope.type.analog'), pwm:'PWM', digital:tr('scope.type.digital'), echo:tr('scope.type.echo'), dac:'DAC', volt:tr('scope.type.volt'), ac:tr('scope.type.ac'), current:tr('scope.type.current') }; }
 let SCOPE_TYPE_LABEL = SCOPE_TYPE_LABEL_FN();
 // 가장 느린 TIME/DIV(2s) x 10칸 = 20초 창을 항상 커버할 수 있도록 여유 있게 버퍼를 보존합니다.
 const SCOPE_MAX_BUFFER_MS = 25000;
@@ -16655,9 +16686,12 @@ function pushScopeSamples(key, reading){
   let volts01; // 0~1 정규화 값의 배열
   if (!reading){
     volts01 = new Array(N).fill(0);
+  } else if (reading.type === 'fn'){
+    volts01 = new Array(N).fill(0).map((_, i) => (reading.fn(now - (N - 1 - i) * step) || 0) / 5);
   } else if (reading.type === 'pwm' || reading.type === 'echo'){
     const highCount = Math.round(reading.v * N);
-    volts01 = new Array(N).fill(0).map((_, i) => i < highCount ? 1 : 0);
+    const __hi = reading.ampV != null ? reading.ampV / 5 : 1;
+    volts01 = new Array(N).fill(0).map((_, i) => i < highCount ? __hi : 0);
   } else if (reading.type === 'dac'){
     if (reading.wave === 'ramp') volts01 = new Array(N).fill(0).map((_, i) => (((now - (N - 1 - i) * step)) / 900) % 1);
     else if (reading.wave === 'sine') volts01 = new Array(N).fill(0).map((_, i) => (Math.sin((now - (N - 1 - i) * step) / 260) + 1) / 2);
@@ -17402,7 +17436,7 @@ function runTick(){
         }
       } else {
         const pEl = sc.querySelector(`[data-pin$="_${ch}"]`);
-        r = pEl ? resistiveReading(pEl) : null;
+        r = pEl ? (resistiveReading(pEl) || (window.__probeExtra ? window.__probeExtra(pEl) : null)) : null;
         // [버그 수정] resistiveReading()은 DC 전용 저항망(resistiveEdges)만 쓰는데, 그 안에서
         // 인덕터는 그냥 "도선"(0Ω)으로, 커패시터는 아예 "끊긴 것"으로 단순화되어 있습니다 — 그래서
         // R-L-C가 섞인 실제 AC 회로에서 인덕터/커패시터 양단 전압을 이 전압(V) 모드로 재면 위상은
@@ -26096,6 +26130,152 @@ window.addEventListener('DOMContentLoaded', () => {
       patchWiFi, makeUart, HUSKYLENS: callable(_Husky), HUSKYLENSResult: callable(_HuskyResult), HUSKY_CONST,
     };
   };
+})();
+
+/* =====================================================================
+   [Ver1.10] 오실로스코프 프로브 확장 — 원래는 "미연결"로 나오던 지점의 신호를 보여줌
+   · 모터 드라이버 출력: L298N(1/2채널) · 엔코더 드라이버 · 7A 2채널 · BTS7960 · BLDC(U/V/W) · A4988(코일)
+       → ENA/ENB PWM 듀티 × 모터 전원 전압(VCC/+12V/B+)의 실제 펄스 파형, 방향에 따라 OUT1/OUT2 중 한쪽만 출력
+   · 통신선: I2C(SDA/SCL) · UART(TX/RX, D0/D1, 메가 14~19) · 모듈의 SDA/SCL/TX/RX 단자
+       → 평소 HIGH(아이들), 데이터가 오가는 순간에는 클록/데이터 펄스
+   ===================================================================== */
+(function(){
+  if (typeof resistiveReading !== 'function') return;
+  const RR = (el) => { try { return el ? resistiveReading(el) : null; } catch(e){ return null; } };
+  const volts = (r) => { try { return r ? readingToVolts(r) : 0; } catch(e){ return 0; } };
+  const lvl = (r) => !!(r && r.v > 0.5);
+  const duty = (r) => r ? Math.max(0, Math.min(1, r.v)) : 0;
+  const pin = (comp, suf) => comp.querySelector(`[data-pin$="_${suf}"]`);
+  const out = (map, el, rd) => { if (el) map.set(el, rd); };
+  const OFF = () => ({ type: 'volt', v: 0 });
+  const pwmOut = (d, amp) => {
+    if (amp <= 0.01) return OFF();
+    if (d >= 0.995) return { type: 'volt', v: amp };
+    if (d <= 0.005) return OFF();
+    return { type: 'pwm', v: d, ampV: amp, volts: d * amp };
+  };
+
+  let cache = null, cacheT = 0;
+  function driverMap(){
+    const now = performance.now();
+    if (cache && now - cacheT < 20) return cache;
+    const m = new Map();
+    // L298N 1채널 / 엔코더 드라이버: ENA(속도) · IN1(방향)
+    document.querySelectorAll('.comp-motordriver').forEach(md => {
+      const amp = volts(RR(pin(md, 'V')));
+      const d = duty(RR(pin(md, 'ENA'))), fwd = !(RR(pin(md, 'IN1')) && RR(pin(md, 'IN1')).v <= 0.5);
+      out(m, pin(md, 'OUT1'), fwd ? pwmOut(d, amp) : OFF());
+      out(m, pin(md, 'OUT2'), fwd ? OFF() : pwmOut(d, amp));
+    });
+    // L298N 2채널 · 7A 2채널: ENx · INa/INb 조합
+    document.querySelectorAll('.comp-l298n2, .comp-motordriver-7a2ch').forEach(md => {
+      const amp = volts(RR(pin(md, 'V')));
+      const ch = (en, ia, ib, oa, ob) => {
+        const enR = RR(pin(md, en));
+        const jp = md.querySelector(`.l298-jumper[data-jp="${en}"]`);
+        const d = enR ? duty(enR) : (jp && jp.classList.contains('on') ? 1 : 0);
+        const a = lvl(RR(pin(md, ia))), b = lvl(RR(pin(md, ib)));
+        const hi = (x) => x ? pwmOut(d, amp) : OFF();
+        out(m, pin(md, oa), hi(a)); out(m, pin(md, ob), hi(b));   // 각 출력은 자기 IN 레벨을 EN 듀티로 따라감 (같으면 둘 다 같은 전압 = 브레이크)
+      };
+      ch('ENA', 'IN1', 'IN2', 'OUT1', 'OUT2');
+      ch('ENB', 'IN3', 'IN4', 'OUT3', 'OUT4');
+    });
+    // BTS7960: R_EN·RPWM → M+, L_EN·LPWM → M−
+    document.querySelectorAll('.comp-motordriver-bts7960').forEach(md => {
+      const amp = volts(RR(pin(md, 'BP')));
+      const r = lvl(RR(pin(md, 'REN'))) ? duty(RR(pin(md, 'RPWM'))) : 0;
+      const l = lvl(RR(pin(md, 'LEN'))) ? duty(RR(pin(md, 'LPWM'))) : 0;
+      out(m, pin(md, 'MP'), pwmOut(r, amp)); out(m, pin(md, 'MN'), pwmOut(l, amp));
+    });
+    // BLDC 드라이버: 속도에 비례한 주파수의 3상(120° 차이) 구형파
+    document.querySelectorAll('.comp-bldcdriver').forEach(bd => {
+      const sp = duty(RR(pin(bd, 'ENA'))), dir = (RR(pin(bd, 'IN1')) && RR(pin(bd, 'IN1')).v <= 0.5) ? -1 : 1;
+      if (sp < 0.01){ ['U', 'V', 'W'].forEach(p => out(m, pin(bd, p), OFF())); return; }
+      const hz = 2 + sp * 18;
+      ['U', 'V', 'W'].forEach((p, i) => out(m, pin(bd, p), { type: 'fn', fn: (t) => (Math.sin(2 * Math.PI * hz * t / 1000 - dir * i * 2 * Math.PI / 3) >= 0 ? 12 : 0), volts: 6, label: `3상 ${hz.toFixed(1)}Hz` }));
+    });
+    // A4988: STEP 펄스가 오면 두 코일에 90° 차이 구형파 (EN은 LOW일 때 활성)
+    document.querySelectorAll('.comp-a4988').forEach(st => {
+      const amp = volts(RR(pin(st, 'VM')));
+      const enR = RR(pin(st, 'EN')); const enabled = !(enR && enR.v > 0.5);
+      const stepR = RR(pin(st, 'STEP'));
+      const moving = enabled && stepR && (stepR.type === 'pwm' ? stepR.v > 0.01 : true);
+      const dir = lvl(RR(pin(st, 'DIR'))) ? 1 : -1;
+      const ph = (t, k) => moving && amp > 0.01 ? ((Math.floor(t / 25) + (k ? dir : 0)) % 4 < 2 ? amp : 0) : 0;
+      out(m, pin(st, '1A'), { type: 'fn', fn: (t) => ph(t, 0), volts: amp / 2 }); out(m, pin(st, '1B'), { type: 'fn', fn: (t) => (moving && amp > 0.01 ? amp - ph(t, 0) : 0), volts: amp / 2 });
+      out(m, pin(st, '2A'), { type: 'fn', fn: (t) => ph(t, 1), volts: amp / 2 }); out(m, pin(st, '2B'), { type: 'fn', fn: (t) => (moving && amp > 0.01 ? amp - ph(t, 1) : 0), volts: amp / 2 });
+    });
+    cache = m; cacheT = now;
+    return m;
+  }
+
+  /* ---- 통신선 ---- */
+  const MEGA_UART = { D14: 'uart', D15: 'uart', D16: 'uart', D17: 'uart', D18: 'uart', D19: 'uart', D20: 'sda', D21: 'scl' };
+  function commKind(el){
+    const pid = (el.dataset && el.dataset.pin) || ''; if (!pid) return null;
+    const bd = el.closest && el.closest('.board');
+    if (bd){
+      const key = bd.dataset.board, type = (typeof boardInstances !== 'undefined' && boardInstances[key] && boardInstances[key].type) || key.replace(/_\d+$/, '');
+      const i2c = (typeof I2C_PINS !== 'undefined') && I2C_PINS[type];
+      if (i2c && pid === i2c.sda) return 'sda';
+      if (i2c && pid === i2c.scl) return 'scl';
+      if (/^mega/.test(type) && MEGA_UART[pid]) return MEGA_UART[pid];
+      if ((pid === 'D0' || pid === 'D1') && /^(r3|r4|mega)/.test(type)) return 'uart';
+      return null;
+    }
+    if (/_(SDA|XDA)$/.test(pid)) return 'sda';
+    if (/_(SCL|XCL)$/.test(pid)) return 'scl';
+    if (/_(TX|RX|TXD|RXD|HT|HR|RO|DI)$/.test(pid)) return 'uart';
+    return null;
+  }
+  const hasBoardTx = (net) => { for (const el of net){ if (el.closest && el.closest('.board') && /^D(1|14|16|18)$/.test(el.dataset.pin || '')) return true; } return false; };
+  const recent = (kind) => { try { const a = busActivityLog[kind] || []; const e = a[a.length - 1]; return !!(e && performance.now() - e.t < 160); } catch(e){ return false; } };
+  const hash = (n) => { n = (n ^ 61) ^ (n >>> 16); n = n + (n << 3); n = n ^ (n >>> 4); n = Math.imul(n, 0x27d4eb2d); return ((n ^ (n >>> 15)) >>> 0) & 1; };
+  // 보드 TX 핀별 마지막 송신 시각 (UART 파형을 그 선에서만 보이게)
+  window.__uartAct = window.__uartAct || {};
+  try {
+    if (typeof window.__xuartTx === 'function'){ const _x = window.__xuartTx; window.__xuartTx = function(board, txPin, str){ if (str) window.__uartAct[board + ':' + txPin] = performance.now(); return _x.apply(this, arguments); }; }
+    if (typeof __serialTransmit === 'function'){ const _s = __serialTransmit; __serialTransmit = function(board, str){ if (str) window.__uartAct[board + ':D1'] = performance.now(); return _s.apply(this, arguments); }; }
+  } catch(e){}
+  function uartBusyOnNet(net){
+    const now = performance.now();
+    for (const el of net){
+      const bd = el.closest && el.closest('.board'); if (!bd || !el.dataset.pin) continue;
+      const t = window.__uartAct[bd.dataset.board + ':' + el.dataset.pin];
+      if (t && now - t < 150) return true;
+    }
+    return false;
+  }
+  function commReading(kind, net){
+    const busy = kind === 'uart' ? (uartBusyOnNet(net) || (!hasBoardTx(net) && (recent('serial') || recent('rs485bus') || recent('modbus')))) : recent('i2c');
+    if (!busy) return { type: 'volt', v: 5, label: kind === 'uart' ? 'UART 대기(HIGH)' : 'I2C 대기(HIGH)' };
+    if (kind === 'scl') return { type: 'fn', fn: (t) => (Math.floor(t / 1.5) % 2 ? 5 : 0), volts: 2.5, label: 'I2C 클록' };
+    if (kind === 'sda') return { type: 'fn', fn: (t) => (hash(Math.floor(t / 3)) ? 5 : 0), volts: 2.5, label: 'I2C 데이터' };
+    return { type: 'fn', fn: (t) => (hash(Math.floor(t / 2) + 7) ? 5 : 0), volts: 3.5, label: 'UART 데이터' };
+  }
+
+  window.__probeExtra = function(pEl){
+    try {
+      const net = netOf(pEl);
+      const dm = driverMap();
+      if (dm.size) for (const el of net){ if (el !== pEl && dm.has(el)) return dm.get(el); }
+      for (const el of net){ if (el === pEl) continue; const k = commKind(el); if (k) return commReading(k, net); }
+    } catch(e){}
+    return null;
+  };
+
+  // 표시 문구
+  if (typeof formatReadingValue === 'function'){
+    const _f = formatReadingValue;
+    formatReadingValue = function(r){
+      if (r && r.type === 'fn') return r.label || '파형';
+      if (r && r.type === 'pwm' && r.ampV != null) return `${Math.round(r.v * 100)}% duty · ${r.ampV.toFixed(1)}V 펄스 (평균 ${(r.v * r.ampV).toFixed(2)}V)`;
+      if (r && r.label && r.type === 'volt') return `${r.label} · ${r.v.toFixed(1)} V`;
+      return _f.apply(this, arguments);
+    };
+  }
+  try { if (typeof SCOPE_TYPE_LABEL === 'object') SCOPE_TYPE_LABEL.fn = '파형'; } catch(e){}
 })();
 
 /* =====================================================================

@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>K군의 PLC 시뮬레이터 Ver0.992</title>
+<title>K군의 PLC 시뮬레이터 Ver0.994</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -1267,6 +1267,36 @@
 .aic-head span{flex:1; color:var(--text); font-weight:600;} .aic-head b{transition:transform .15s;}
 .aic-cfg.aic-collapsed .aic-row{display:none !important;} .aic-cfg.aic-collapsed .aic-head b{transform:rotate(-90deg);}
 #aiBlPanel{max-height:min(68vh, 640px);} #aiBlPanel .ai-chat-log{min-height:120px;}
+/* [Ver0.993] 회사별 카드 크기 · PLC 옆 도킹 · 미장착 표시 · 알림 */
+.xm-card.xm-v-ls{width:150px;} .xm-card.xm-v-mit{width:140px;} .xm-card.xm-v-siemens{width:168px;} .xm-card.xm-v-omron{width:178px;}
+.xm-card.xm-v-mit{background:linear-gradient(180deg,#4b5057,#2f3338); color:#e8ecf1; border-color:#1d2024;}
+.xm-card.xm-v-mit .xm-addr{color:#9fd0ff;} .xm-card.xm-v-mit .xm-msg{color:#c3cbd3;} .xm-card.xm-v-mit .xm-status{color:#e8ecf1;}
+.xm-card.xm-v-siemens{border-radius:2px;} .xm-card.xm-v-siemens .xm-band{border-radius:1px 1px 0 0;}
+.placed-component.xm-docked > .xm-card{height:100%; box-sizing:border-box; display:flex; flex-direction:column; border-radius:0 6px 6px 0; box-shadow:2px 3px 8px rgba(0,0,0,.35);}
+.placed-component.xm-docked > .xm-card .xm-band{border-radius:0 5px 0 0;}
+.placed-component.xm-docked > .xm-card .xm-terms{margin-top:auto;}
+.placed-component.xm-docked > .xm-card .comp-label,
+.placed-component.xm-docked > .xm-card .xm-host-row{display:none;}
+.placed-component.xm-docked > .xm-card .xm-ledwin, .placed-component.xm-docked > .xm-card .xm-chwin{margin:3px 6px;}
+.xm-card .xm-led{min-width:0;}
+.xm-orphan-tag{display:none;}
+.placed-component.xm-orphan > .xm-card{outline:2px dashed #e5484d; outline-offset:2px;}
+.placed-component.xm-orphan .xm-orphan-tag{display:block; background:#e5484d; color:#fff; font-size:.56rem; font-weight:700; text-align:center; padding:2px 3px; animation:xmBlink 1.2s ease-in-out infinite;}
+.placed-component.xm-orphan .xm-addr{color:#e5484d;}
+@keyframes xmBlink{50%{opacity:.55;}}
+.placed-component.xm-snap-target{outline:3px solid #3ddc84; outline-offset:3px;}
+.placed-component.xm-snap-bad{outline:3px solid #e5484d; outline-offset:3px;}
+.xm-toast{position:fixed; left:50%; bottom:70px; transform:translate(-50%,20px); background:#1f6f43; color:#fff; padding:9px 16px; border-radius:8px; font-size:.82rem; font-weight:600; box-shadow:0 6px 20px rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:100000; max-width:min(90vw,620px); text-align:center;}
+.xm-toast.bad{background:#b42318;} .xm-toast.show{opacity:1; transform:translate(-50%,0);}
+.xm-notice-ov{position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:100001;}
+.xm-notice{width:min(92vw,470px); background:var(--bg-panel,#1b2027); color:var(--text,#e8ecf1); border:1px solid var(--border-strong,#3a434d); border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.6);}
+.xm-notice-head{color:#fff; font-weight:800; font-size:1rem; padding:12px 16px;}
+.xm-notice-body{padding:12px 16px 4px; font-size:.84rem; line-height:1.55;}
+.xm-notice-body p{margin:0 0 9px;}
+.xm-notice-warn{color:#ff8a80;}
+.xm-notice-tip{color:var(--text-dim,#9fb0c0); font-size:.76rem;}
+.xm-notice-btns{display:flex; gap:8px; justify-content:flex-end; padding:8px 16px 14px;}
+.xm-notice-btns button{border:none; border-radius:7px; padding:8px 13px; font-weight:700; font-size:.8rem; cursor:pointer; color:#fff; background:#4a5560;}
 /* [Ver0.991] 슬롯 실습 부품 */
 .xp{min-width:96px; text-align:center; padding:6px 8px 4px; background:linear-gradient(180deg,#2b3138,#1e2329); border:1px solid #4a5560; border-radius:7px;}
 .xp-sub{font-size:.56rem; color:#9fb0c0; margin:2px 0;}
@@ -1305,6 +1335,209 @@
 .xp-dimlamp{--b:0; width:40px; height:40px; margin:3px auto; border-radius:50%; background:#2a2a22; border:2px solid #777; box-shadow:0 0 calc(var(--b)*24px) calc(var(--b)*8px) rgba(255,230,140,calc(var(--b)*.9)); position:relative;}
 .xp-dimlamp::after{content:''; position:absolute; inset:0; border-radius:50%; background:#fff3b0; opacity:var(--b);}
 .xp .comp-pin-row{justify-content:center; flex-wrap:wrap;}
+/* [Ver0.994] 공압·유압 제어 실습장치 */
+.lab{font-family:'IBM Plex Sans','Noto Sans KR',sans-serif; color:#1c2228;}
+.lab .lab-label{color:#1c2228; font-size:.6rem; margin-top:3px;}
+.lab-j{display:flex; flex-direction:column; align-items:center; gap:1px; min-width:22px;}
+.lab-j .pin-mini{width:14px; height:14px; border-radius:50%; border:3px solid #111; background:radial-gradient(circle at 45% 40%, #3c3c3c 0 2px, #050505 3px 100%); box-shadow:0 1px 1px rgba(0,0,0,.4), inset 0 0 0 1px #666;}
+.lab-j .pin-mini.role-dc24p{border-color:#d62828; box-shadow:0 1px 1px rgba(0,0,0,.4), inset 0 0 0 1px #ff8a8a;}
+.lab-j .pin-mini.role-dc24n{border-color:#1d5fd1; box-shadow:0 1px 1px rgba(0,0,0,.4), inset 0 0 0 1px #8ab4ff;}
+.lab-j .pin-mini.role-air{border-color:#2f7fc4; background:radial-gradient(circle,#dfeffc 0 3px,#5aa9e6 4px 100%);}
+.lab-j .pin-mini.role-oil{border-color:#8a5a1d; background:radial-gradient(circle,#f2e3c9 0 3px,#c98a3e 4px 100%);}
+.lab-jc{font:600 .5rem/1 'IBM Plex Mono',monospace; color:#222; white-space:nowrap;}
+.lab-brand{font:italic 800 .62rem/1 'IBM Plex Sans',sans-serif; color:#1a4f9c; letter-spacing:.04em; padding:2px 8px 0;}
+.lab-small{font-size:.5rem; color:#55606a; text-align:center; margin:1px 4px;}
+.lab-sym{font:700 .62rem/1 'IBM Plex Mono',monospace; color:#333;}
+.lab-led{display:inline-block; width:9px; height:9px; border-radius:50%; background:#5a1515; border:1px solid #222;}
+.lab-led.on{background:#ff3b30; box-shadow:0 0 6px #ff3b30;}
+.lab-led-y.on{background:#ffd60a; box-shadow:0 0 6px #ffd60a;}
+.lab-led-w{background:#555;} .lab-led-w.on{background:#fff7d6; box-shadow:0 0 7px #ffe08a;}
+.lab-mini{font-size:.56rem; padding:2px 6px; border:1px solid #8a939d; border-radius:4px; background:#fff; color:#222; cursor:pointer; margin:3px auto 0; display:block;}
+
+/* 랙 모듈 공통: 은색 패널 + 검은 측면 프레임 */
+.lab-mod{background:linear-gradient(180deg,#f4f6f7,#dfe3e6); border:1px solid #9aa2a8; border-left:6px solid #1b1e21; border-right:6px solid #1b1e21; border-radius:3px; padding:2px 4px 4px; box-shadow:0 4px 12px rgba(0,0,0,.45); min-height:300px; display:flex; flex-direction:column;}
+.lab-bus{position:relative; display:flex; justify-content:space-between; padding:3px 4px; margin:1px 0;}
+.lab-bus .lab-j{z-index:1;}
+.lab-bus-line{position:absolute; left:12px; right:12px; top:10px; height:2px; background:#c62828;}
+.lab-bus-dc24n .lab-bus-line{background:#1d5fd1;}
+.lab-bus-dc24n{margin-top:auto;}
+.lab-coil{display:flex; flex-direction:column; align-items:center; gap:2px; padding:0 4px; border-right:1px dashed #b5bcc2; min-width:34px;}
+.lab-coilsym{font:700 .55rem/1 'IBM Plex Mono',monospace; border:1.5px solid #222; padding:2px 3px; background:#fff;}
+.lab-cc{display:grid; grid-template-columns:1fr 1fr; gap:1px 2px; align-items:center; justify-items:center; padding:0 3px;}
+.lab-cc > .lab-sym{grid-column:1 / span 2;}
+.lab-cc > .lab-j:last-child{grid-column:1 / span 2;}
+.lab-cc2{display:flex; flex-direction:column; align-items:center; gap:2px;}
+.lab-row2{display:flex; gap:4px; grid-column:1 / span 2;}
+
+.lab-psu{width:236px;}
+.lab-psu-top{display:flex; justify-content:flex-end; gap:8px; align-items:flex-end; padding:2px 6px;}
+.lab-psu-title{margin-right:auto; font:600 1rem/1.2 'IBM Plex Sans',sans-serif; color:#333; padding-top:6px;}
+.lab-psu-mid{flex:1; display:flex; align-items:center; justify-content:center;}
+.lab-plate{border:1px solid #9aa; background:#fff; font-size:.6rem; padding:8px 10px; text-align:center; color:#334; line-height:1.4;}
+.lab-psu-bot{display:flex; align-items:flex-end; gap:10px; padding:2px 6px;}
+.lab-led-wrap{display:flex; flex-direction:column; align-items:center; font-size:.5rem; color:#333;}
+.lab-rocker{width:28px; height:36px; background:#111; border:2px solid #444; border-radius:3px; cursor:pointer; position:relative;}
+.lab-rocker i{position:absolute; left:3px; right:3px; top:3px; height:14px; background:#333; border-radius:2px;}
+.lab-rocker.on i{top:auto; bottom:3px; background:#c62828;}
+
+.lab-emg{width:150px;}
+.lab-emg-c{display:flex; justify-content:space-around; padding:4px 0;}
+.lab-emg-btn{width:62px; height:62px; margin:6px auto; border-radius:50%; border:5px solid #ffcf26; background:radial-gradient(circle at 40% 35%,#ff6b5a,#c1121f 60%,#7a0a12); box-shadow:0 5px 0 #7a0a12, 0 7px 10px rgba(0,0,0,.4); cursor:pointer; display:block;}
+.lab-emg-btn.on{transform:translateY(4px); box-shadow:0 1px 0 #7a0a12;}
+
+.lab-pbu{width:250px;}
+.lab-pb-row{display:flex; align-items:center; gap:4px; padding:3px 2px; border-bottom:1px dashed #c3c9ce;}
+.lab-pb{width:34px; height:34px; border-radius:50%; border:3px solid #9aa2a8; background:radial-gradient(circle at 40% 35%,#fff, var(--pb) 70%); cursor:pointer; position:relative; flex:none; box-shadow:0 3px 0 #6b747b;}
+.lab-pb.pressed{transform:translateY(2px); box-shadow:0 1px 0 #6b747b;}
+.lab-pb span{position:absolute; inset:7px; border-radius:50%;}
+.lab-pb span.lit{background:radial-gradient(circle,#fffbe0,#ffd84d 70%); box-shadow:0 0 10px 3px #ffe066;}
+.lab-pb-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:1px 2px; flex:1;}
+.lab-pb-name{font:700 .55rem/1 'IBM Plex Mono',monospace; writing-mode:vertical-rl; color:#333;}
+
+.lab-relay{width:282px;}
+.lab-rly-row{display:flex; align-items:center; padding:3px 0; border-bottom:1px dashed #c3c9ce;}
+.lab-sym-c{font-size:.5rem;}
+
+.lab-timer{width:340px;}
+.lab-tm-row{display:flex; align-items:center; padding:3px 0; border-bottom:1px dashed #c3c9ce;}
+.lab-tm-c{display:flex;}
+.lab-tm-set{display:flex; flex-direction:column; align-items:center; gap:2px; margin-left:auto; padding-right:2px;}
+.lab-tm-name{font:700 .5rem/1 'IBM Plex Mono',monospace; color:#333;}
+.lab-7seg{min-width:52px; text-align:right; background:#2a0606; color:#ff3b30; font:700 .95rem/1.15 'IBM Plex Mono',monospace; padding:1px 4px; border:2px solid #600; border-radius:2px; text-shadow:0 0 5px #ff3b30;}
+.lab-7seg-g{color:#4cff7a; text-shadow:0 0 5px #4cff7a; background:#062a0e; border-color:#064;}
+.lab-tm-btns{display:flex; gap:3px;}
+.lab-tm-btns button{font-size:.55rem; padding:1px 5px; border:1px solid #777; border-radius:3px; background:#eee; cursor:pointer;}
+.lab-tm-rem{font-size:.48rem; color:#a33;}
+
+.lab-counter{width:220px;}
+.lab-ct-body{display:flex; flex-direction:column; gap:4px; padding:4px 0;}
+.lab-ct-face{background:#1d2126; border-radius:4px; padding:5px; display:flex; flex-direction:column; align-items:center; gap:3px; margin:0 6px;}
+.lab-ct-brand{font:700 .5rem/1 'IBM Plex Mono',monospace; color:#ddd;}
+.lab-ct-terms{display:flex; justify-content:space-around; align-items:center;}
+.lab-counter.lab-up .lab-7seg-r{color:#fff36b; text-shadow:0 0 6px #ff3b30;}
+
+.lab-lampu{width:236px; background:linear-gradient(180deg,#f7f1dc,#e4dcc0);}
+.lab-lp-row{display:grid; grid-template-columns:repeat(5,1fr); gap:2px; padding:6px 0;}
+.lab-lp{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.48rem; color:#333;}
+.lab-lamp{width:24px; height:24px; border-radius:50%; background:radial-gradient(circle at 40% 35%,#fff,color-mix(in srgb,var(--pl) 45%,#555) 75%); border:2px solid #777;}
+.lab-lamp.lit{background:radial-gradient(circle at 40% 35%,#fff,var(--pl) 70%); box-shadow:0 0 12px 3px var(--pl);}
+.lab-bz{width:24px; height:24px; border-radius:50%; background:#222; border:2px solid #666; position:relative;}
+.lab-bz i{position:absolute; inset:7px; border-radius:50%; background:#444;}
+.lab-bz.sounding{animation:labBz .15s linear infinite;}
+@keyframes labBz{50%{box-shadow:0 0 0 4px rgba(255,200,0,.5);}}
+
+/* 판 위 부품 */
+.lab-ls,.lab-prox{width:132px; background:linear-gradient(180deg,#26292d,#121416); color:#eee; border:1px solid #000; border-radius:6px; padding:4px 5px; box-shadow:0 4px 10px rgba(0,0,0,.45);}
+.lab-ls .lab-jc,.lab-prox .lab-jc{color:#eee;}
+.lab-ls .lab-label,.lab-prox .lab-label{color:#cfd6dc;}
+.lab-ls-head{display:flex; align-items:center; justify-content:space-between;}
+.lab-ls-lever{width:34px; height:22px; position:relative;}
+.lab-ls-lever i{position:absolute; left:4px; bottom:2px; width:24px; height:4px; background:#bbb; transform-origin:left center; transform:rotate(-30deg); border-radius:2px;}
+.lab-ls-lever i::after{content:''; position:absolute; right:-6px; top:-5px; width:10px; height:10px; border-radius:50%; background:#ddd; border:1px solid #888;}
+.lab-act .lab-ls-lever i{transform:rotate(-5deg); background:#ffd60a;}
+.lab-ls-brand{font:italic 800 .55rem/1 'IBM Plex Sans',sans-serif; color:#5ab0ff;}
+.lab-ls-sym{font:600 .52rem/1.25 'IBM Plex Mono',monospace; color:#ccc; text-align:center; margin:2px 0;}
+.lab-ls-jacks{display:flex; justify-content:space-around; margin:2px 0;}
+.lab-link-sel{width:100%; font-size:.52rem; margin-top:3px; background:#fff; color:#222; border:1px solid #888; border-radius:3px;}
+.lab-act{outline:2px solid #ffd60a; outline-offset:1px;}
+.lab-prox-body{display:flex; align-items:center; justify-content:center; margin:2px 0 4px;}
+.lab-prox-head{width:26px; height:18px; background:#3b6fb6; border-radius:4px 0 0 4px; display:flex; align-items:center; justify-content:center;}
+.lab-prox-thread{width:60px; height:16px; background:repeating-linear-gradient(90deg,#c8cdd2 0 3px,#8d949a 3px 5px); border-radius:0 3px 3px 0;}
+
+.lab-valve{min-width:200px; background:linear-gradient(180deg,#f3f5f6,#d3d8dc); border:1px solid #7f878e; border-radius:5px; padding:3px 4px; box-shadow:0 4px 10px rgba(0,0,0,.4);}
+.lab-valve-oil{background:linear-gradient(180deg,#3c6fb5,#24508f); color:#fff; border-color:#173561;}
+.lab-valve-oil .lab-jc,.lab-valve-oil .lab-v-name,.lab-valve-oil .lab-label{color:#fff;}
+.lab-v-ports{display:flex; justify-content:center; gap:18px; padding:2px 0;}
+.lab-port{display:flex; flex-direction:column; align-items:center; gap:1px;}
+.lab-port .pin-mini{width:15px; height:15px; border-radius:50%; border-width:3px;}
+.lab-v-body{display:flex; align-items:stretch; gap:3px;}
+.lab-coilbox{background:#141619; color:#ddd; border-radius:4px; padding:3px 4px; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.5rem; min-width:40px;}
+.lab-coilbox .lab-jc{color:#ddd;}
+.lab-coilbox b{font-size:.5rem;}
+.lab-spring{justify-content:center; color:#999;}
+.lab-v-spool{flex:1; background:#fff; color:#222; border:1px solid #999; border-radius:3px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2px 4px; gap:2px;}
+.lab-v-sym{font:700 .62rem/1 'IBM Plex Mono',monospace;}
+.lab-v-pos{font:700 .6rem/1.1 'IBM Plex Mono',monospace; color:#0a7d3b; background:#e8f7ee; padding:1px 4px; border-radius:3px;}
+.lab-v-name{font-size:.52rem; color:#334;}
+.lab-valve-oil .lab-v-spool .lab-v-name{color:#334;}
+.lab-v-ctr{font-size:.5rem; max-width:120px;}
+
+.lab-frl,.lab-pu{width:170px; background:linear-gradient(180deg,#f3f5f6,#d3d8dc); border:1px solid #7f878e; border-radius:6px; padding:4px; box-shadow:0 4px 10px rgba(0,0,0,.4); display:flex; flex-direction:column; align-items:center; gap:3px;}
+.lab-frl-gauge{width:62px; height:62px; border-radius:50%; background:radial-gradient(circle,#fff 55%,#dfe6ea); border:4px solid #3a4148; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:8px; font:700 .62rem/1 'IBM Plex Mono',monospace; color:#222;}
+.lab-frl-gauge small{font-size:.45rem; color:#666;}
+.lab-gneedle{position:absolute; left:50%; top:50%; width:2px; height:24px; background:#d62828; transform-origin:50% 100%; margin-left:-1px; margin-top:-24px; transform:rotate(-120deg); transition:transform .3s;}
+.lab-frl-bowls{display:flex; gap:6px;}
+.lab-frl-bowls i{width:16px; height:26px; border-radius:3px 3px 8px 8px; background:linear-gradient(180deg,rgba(150,200,240,.5),rgba(90,140,190,.7)); border:1px solid #567;}
+.lab-frl-valve{font-size:.6rem; padding:2px 8px; border-radius:4px; border:1px solid #777; background:#eee; cursor:pointer;}
+.lab-frl-valve.on{background:#2e8b57; color:#fff; border-color:#1e6b40;}
+.lab-ctrl{display:flex; align-items:center; gap:3px; font-size:.55rem;}
+.lab-ctrl input{width:76px;}
+.lab-pu{width:190px;}
+.lab-pu-tank{width:150px; height:56px; background:linear-gradient(180deg,#5b6168,#33383d); border-radius:4px; position:relative; overflow:hidden;}
+.lab-pu-oil{position:absolute; left:0; right:0; bottom:0; height:40%; background:linear-gradient(180deg,#d8a24f,#9b6a26); opacity:.85;}
+.lab-pu-motor{position:absolute; left:50%; top:6px; margin-left:-16px; width:32px; height:32px; border-radius:50%; background:#1d6fb8; color:#fff; font:700 .8rem/32px 'IBM Plex Sans',sans-serif; text-align:center; border:2px solid #0d3f6b;}
+.lab-pu-motor.spin{animation:labSpin .6s linear infinite;}
+@keyframes labSpin{to{transform:rotate(360deg);}}
+.lab-dist{width:150px; background:linear-gradient(180deg,#d9dee2,#b9c0c6); border:1px solid #7f878e; border-radius:5px; padding:3px 6px; align-items:stretch !important;}
+.lab-dist-row{display:flex; justify-content:space-between;}
+.lab-dist-body{font:700 .5rem/1 'IBM Plex Mono',monospace; text-align:center; color:#333; padding:3px 0;}
+
+.lab-cyl{background:linear-gradient(180deg,#f4f6f7,#d7dce0); border:1px solid #8a939d; border-radius:5px; box-shadow:0 4px 10px rgba(0,0,0,.4); color:#1c2228;}
+.lab-cyl .cyl-body{background:linear-gradient(180deg,#f6f7f8,#b8c0c6 45%,#f6f7f8); border-color:#6d767d;}
+.lab-cyl-oil{background:linear-gradient(180deg,#2b2f33,#14171a); color:#eee;}
+.lab-cyl-oil .cyl-body{background:linear-gradient(180deg,#3c4146,#101214 45%,#3c4146);}
+.lab-cyl-title{font:700 .5rem/1 'IBM Plex Mono',monospace; letter-spacing:.04em; text-align:center; opacity:.8; margin-bottom:2px;}
+
+/* 판 · 랙(배경) */
+.placed-component.lab-bg{z-index:1 !important; pointer-events:none;}
+.placed-component.lab-bg .lab-handle,.placed-component.lab-bg .comp-help-btn{pointer-events:auto;}
+.lab-board{width:1500px; height:780px; border-radius:6px; position:relative; border:2px solid #9ba3aa;
+  background:repeating-linear-gradient(180deg,#dfe3e6 0 22px,#aeb6bc 22px 25px,#f3f5f6 25px 27px,#c5ccd1 27px 30px); box-shadow:0 8px 20px rgba(0,0,0,.5), inset 0 0 0 8px #c9cfd4;}
+.placed-component[data-type^="lab-board"]{width:auto;}
+.placed-component[data-type^="lab-board"] .lab-board{width:100%;}
+.lab-board-no{position:absolute; right:14px; top:12px; width:46px; height:46px; background:#f4f4f4; border:1px solid #888; font:700 1.8rem/46px 'IBM Plex Sans',sans-serif; text-align:center; color:#222;}
+.lab-board-logo{position:absolute; right:22px; bottom:14px; font:italic 800 1.4rem/1 'IBM Plex Sans',sans-serif; color:#2f86d6; opacity:.8;}
+.lab-handle{position:absolute; left:10px; top:-24px; font-size:.68rem; padding:3px 10px; border-radius:5px 5px 0 0; border:1px solid #6d767d; background:#3a4148; color:#fff; cursor:move;}
+.lab-rack{width:1500px; height:350px; border-radius:4px; position:relative; background:linear-gradient(180deg,#8f989f 0 18px,#c9cfd4 18px 26px,transparent 26px calc(100% - 26px),#c9cfd4 calc(100% - 26px) calc(100% - 18px),#8f989f calc(100% - 18px)); border-left:10px solid #9aa2a8; border-right:10px solid #9aa2a8;}
+.placed-component[data-type="lab-rack"]{width:auto;}
+
+/* 팔레트 */
+.lab-bench-card{display:flex; gap:8px; align-items:center; margin:4px 4px 6px; padding:7px 8px; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,rgba(90,169,230,.18),rgba(90,169,230,.05)); border:1px solid var(--w-air);}
+.lab-bench-hy{background:linear-gradient(135deg,rgba(201,138,62,.2),rgba(201,138,62,.05)); border-color:var(--w-oil);}
+.lab-bench-card b{display:block; font-size:.74rem; color:var(--text);}
+.lab-bench-card span{display:block; font-size:.6rem; color:var(--text-dim); line-height:1.3;}
+.lab-bench-card:hover{filter:brightness(1.15);}
+.lab-bc-mini{flex:none; width:42px; height:38px; border-radius:4px; background:repeating-linear-gradient(180deg,#c9cfd4 0 4px,#8f989f 4px 5px); position:relative; display:flex; gap:2px; padding:2px; align-items:flex-start;}
+.lab-bc-mini i{width:7px; height:12px; background:#f2f4f5; border:1px solid #333;}
+.lab-bc-mini b{position:absolute; left:6px; right:6px; bottom:6px; height:5px; background:#5aa9e6; border-radius:3px;}
+.lab-bench-hy .lab-bc-mini b{background:#c98a3e;}
+.lab-sep{font-size:.6rem; color:var(--text-faint); padding:5px 6px 2px; border-top:1px dashed var(--border); margin-top:3px;}
+.lab-banner{position:fixed; left:50%; top:74px; transform:translateX(-50%); z-index:100000; background:#16324f; color:#fff; padding:10px 16px; border-radius:8px; font-size:.82rem; box-shadow:0 8px 24px rgba(0,0,0,.5); max-width:min(92vw,760px); cursor:pointer;}
+.lab-banner[hidden]{display:none;}
+
+/* v2: 컴팩트 릴레이 · 긴 실린더 */
+.lab-cc-r{grid-template-rows:auto auto;}
+.lab-cc-r > .lab-j:last-child{grid-column:1 / span 2;}
+.lab-coil-h{gap:1px;}
+.lab-coil-hd{display:flex; align-items:center; gap:3px;}
+.lab-coil-pins{display:flex; gap:2px;}
+.lab-relay{width:300px;}
+.lab-cyl{min-width:300px; padding:4px 6px;}
+.lab-cyl .cyl-body{width:270px; height:30px; overflow:visible; border-radius:6px; background:linear-gradient(180deg,#fbfcfc,#aeb6bd 45%,#e9ecee 70%,#9aa3aa);}
+.lab-cyl .cyl-body::before{content:''; position:absolute; left:-8px; top:-3px; width:12px; height:36px; background:linear-gradient(90deg,#c2c8cd,#8a939a); border-radius:3px;}
+.lab-cyl .cyl-body::after{content:''; position:absolute; right:-10px; top:-3px; width:14px; height:36px; background:linear-gradient(90deg,#c2c8cd,#8a939a); border-radius:3px;}
+.lab-cyl .cyl-rod{top:3px; width:16px; height:24px; background:linear-gradient(90deg,#3a3f44,#1e2226); border-radius:2px; z-index:3;}
+.lab-cyl .cyl-rod::after{content:''; position:absolute; left:100%; top:8px; width:252px; height:8px; background:linear-gradient(180deg,#f6f8f9,#a9b2b9); border-radius:0 3px 3px 0; box-shadow:0 1px 1px rgba(0,0,0,.3);}
+.lab-cyl .cyl-rod::before{content:''; position:absolute; left:calc(100% + 252px); top:1px; width:26px; height:22px; background:radial-gradient(circle at 40% 35%,#fff,#b9c1c7 60%,#7f888f); border-radius:4px 10px 10px 4px; box-shadow:0 2px 3px rgba(0,0,0,.4);}
+.lab-cyl-oil .cyl-body{background:linear-gradient(180deg,#4a5056,#15181b 45%,#3a4045 70%,#111);}
+.lab-cyl .cyl-ls-row,.lab-cyl .cyl-ls-trip{display:none;}
+.lab-cyl .comp-pin-row{justify-content:space-between; padding:0 10px;}
+.lab-cyl .comp-pin-row .pin-mini{width:15px; height:15px; border-radius:50%; border-width:3px;}
+.lab-cyl > .comp-pin-row{width:100%; box-sizing:border-box;}
+/* 실습장치가 있으면 배선(점퍼선·배관)을 부품 앞에 그림 — 실제 장치처럼 선이 모듈 위로 지나감 */
+body.lab-wires-front svg#wireCanvas{z-index:4;}
+body.lab-wires-front .wire-path{stroke-width:3.5; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.55));}
+body.lab-wires-front .wire-path:hover{filter:drop-shadow(0 0 3px rgba(255,255,255,.6));}
 </style>
 </head>
 <body>
@@ -1313,7 +1546,7 @@
   <div class="brand">
     <div class="brand-mark">P1</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.992</b>
+      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.994</b>
       <span data-i18n="brand.subtitle">Multi-Vendor PLC / HMI Virtual Commissioning</span>
     </div>
   </div>
@@ -1498,11 +1731,11 @@
    에이전트·실제 산업통신 프로토콜은 다음 버전으로 미룹니다(팔레트에는 자리를 잡아
    두고 "다음 버전에서 지원" 안내만 뜨게 해 확장 지점을 명확히 남겨둡니다).
    ============================================================ */
-const APP_VERSION = 'Ver0.992';
+const APP_VERSION = 'Ver0.994';
 
 /* ---------------- i18n ---------------- */
 const STRINGS = {
-  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.992", en: "K's PLC Simulator Ver0.992" },
+  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.994", en: "K's PLC Simulator Ver0.994" },
   "brand.subtitle": { ko: "Multi-Vendor PLC / HMI Virtual Commissioning", en: "Multi-Vendor PLC / HMI Virtual Commissioning" },
   "toolbar.newProject": { ko: "🆕 새 프로젝트", en: "🆕 New Project" },
   "toolbar.projectNameTitle": { ko: "프로젝트 이름", en: "Project name" },
@@ -8953,6 +9186,8 @@ setTimeout(plcCheckpoint, 600);
 
 /* ---------------- 릴리즈 노트 ---------------- */
 const RELEASE_NOTES = [
+  { ver:'Ver0.994', items:{ ko:['부품 상자 맨 아래에 「⑪ 공압제어 실습」 「⑫ 유압제어 실습」 탭 추가(기본 접힘) — 학교 전기-공압/전기-유압 실습장치 구성', '상단 랙 모듈: DC24V 전원·비상정지·푸시버튼(램프 내장)·릴레이(K1~K3 4c)·디지털 타이머(ON/OFF 딜레이)·카운터·부저&램프 — +24V/0V 버스 점퍼 연결', '프로파일 판 부품: FRL·분배기·복동/단동 실린더·5/2 양솔·5/2 편솔·3/2 편솔·5/3 양솔·리밋스위치·근접센서 / 유압 파워유닛·4/3 솔레노이드(중립 형식 선택)·4/2 편솔·4/2 양솔·유압 실린더 등', '「실습장치 배치」 카드 한 번으로 랙+판+배관까지 사진처럼 자동 구성, 리밋스위치는 실린더 끝 위치를 자동 감지', '전력 투입만으로(RUN 없이) 릴레이·타이머·카운터·밸브·실린더가 실제처럼 동작, 공압(하늘색)/유압(황갈색) 배관 구분'], en:['Electro-pneumatic / electro-hydraulic lab tabs'] } },
+  { ver:'Ver0.993', items:{ ko:['확장 카드 크기를 회사별 PLC 높이에 맞춤 — PLC 오른쪽에 틈 없이 딱 붙음(LS·미쓰비시·지멘스·옴론 카드 폭도 회사별로 다름)', '카드를 PLC 쪽으로 끌어오면 자석처럼 붙고(초록 테두리) 슬롯 번호가 정해짐 · 멀리 떼면 분리(미장착)', 'PLC를 옮기면 장착된 카드도 함께 이동', '같은 회사 PLC 없이 카드를 놓으면 알림 창 — 꼭 같은 제조회사 PLC를 선택하도록 안내, 버튼 한 번으로 맞는 PLC 배치·장착', '다른 회사 PLC에 붙이려 하면 빨간 테두리와 경고 문구, 미장착 카드는 빨간 점선과 「PLC에 장착하세요」 표시'], en:['Expansion cards sized to each vendor PLC and docked flush; magnetic snap; no-PLC notice'] } },
   { ver:'Ver0.992', items:{ ko:['처음 시작 안내(화면을 하나씩 비추며 설명) 추가 — 📘 사용 안내 버튼으로 다시 보기'], en:['First-run guided tour added'] } },
   { ver:'Ver0.991', items:{ ko:['슬롯 실습 부품 추가 — AC 220V 램프·팬, DC 24V 솔레노이드·모터, 항온조(히터+온도센서), 수위 탱크(펌프+수위센서+플로트), 아날로그 속도 인버터+모터, 디밍 조명', '예제 갤러리에 슬롯 실습 예제 5종 추가(릴레이 · TR 싱크/소스 · SSR+AD 온도제어 · DA 속도/디밍 · AD+TR 수위제어)'], en:['Slot practice parts added', '5 slot-card examples added to the gallery'] } },
   { ver:'Ver0.99', items:{ ko:['회사별 PLC 확장 카드 추가 — 릴레이 · TR(싱크/소스) · SSR(트라이악) 출력 16점, AD · DA 4채널 (LS · 미쓰비시 · 지멘스 · 옴론)', '아날로그 신호 발생기 · 아날로그 미터(0~10V) 추가', 'AI 도우미: 내 API 키로 Google Gemini · OpenAI GPT · OpenAI 호환 서비스 사용, 🪜 설명으로 래더 자동 생성'], en:['Vendor expansion cards: relay / TR sink·source / SSR outputs, 4-ch AD / DA', 'Analog signal generator and analog meter (0-10V)', 'AI assistant with your own Gemini / OpenAI / compatible API key, ladder generation'] } },
@@ -12359,13 +12594,13 @@ init();
 
   /* ---------------- 회사·카드 정의 ---------------- */
   const VENDORS = {
-    ls:      { name:'LS ELECTRIC', hosts:['vendor-ls','vendor-lsh'], color:'#0d5ab5', fs:4000,
+    ls:      { name:'LS ELECTRIC', hosts:['vendor-ls','vendor-lsh'], color:'#0d5ab5', fs:4000, hostType:'plc-ls', hostName:'LS ELECTRIC XGB',
                models:{ ry:'XBE-RY16A', tn:'XBE-TN16A', tp:'XBE-TP16A', ss:'SSR 16점', ad:'XBF-AD04A', da:'XBF-DV04A' } },
-    mit:     { name:'MITSUBISHI', hosts:['vendor-mit'], color:'#c65420', fs:4000,
+    mit:     { name:'MITSUBISHI', hosts:['vendor-mit'], color:'#c65420', fs:4000, hostType:'plc-mit', hostName:'미쓰비시 MELSEC-Q',
                models:{ ry:'QY10', tn:'QY40P', tp:'QY80', ss:'QY22', ad:'Q64AD', da:'Q64DAN' } },
-    siemens: { name:'SIEMENS', hosts:['vendor-siemens'], color:'#00a0e3', fs:27648,
+    siemens: { name:'SIEMENS', hosts:['vendor-siemens'], color:'#00a0e3', fs:27648, hostType:'plc-siemens', hostName:'지멘스 S7-1200',
                models:{ ry:'SM1222 DQ16 RLY', tn:'SM1222 DQ16 Sink', tp:'SM1222 DQ16 DC', ss:'SSR 16점', ad:'SM1231 AI4', da:'SM1232 AQ4' } },
-    omron:   { name:'OMRON', hosts:['vendor-omron'], color:'#0aa650', fs:6000,
+    omron:   { name:'OMRON', hosts:['vendor-omron'], color:'#0aa650', fs:6000, hostType:'plc-omron', hostName:'옴론 SYSMAC CP1E',
                models:{ ry:'CP1W-16ER', tn:'CP1W-16ET', tp:'CP1W-16ET1', ss:'SSR 16점', ad:'CP1W-AD041', da:'CP1W-DA041' } },
   };
   const KINDS = {
@@ -12406,15 +12641,32 @@ init();
   }
   const hostPowered = (h) => !!(h && h.classList.contains('plc-powered'));
   function hostLabel(h){ const vm = VENDOR_META[h.dataset.type]; return (h.dataset.label || vm.name) + ' (' + h.id + ')'; }
-  function snapCard(card){
-    const host = document.getElementById(hostOf(card)); if (!host) return;
-    let x = (parseFloat(host.style.left) || 0) + host.offsetWidth + 8;
-    for (const c of cardsOf(host.id)){ if (c === card) break; x += c.offsetWidth + 4; }
-    card.style.left = Math.round(x) + 'px';
-    card.style.top = Math.round(parseFloat(host.style.top) || 0) + 'px';
+  /* [Ver0.993] 카드 높이 = 장착 PLC 높이, 틈 없이 PLC 오른쪽에 슬롯 순서대로 붙임 */
+  const L = (el) => parseFloat(el.style.left) || 0, Tp = (el) => parseFloat(el.style.top) || 0;
+  function undock(card){ card.classList.remove('xm-docked'); card.style.height = ''; }
+  function repack(hostId){
+    const host = document.getElementById(hostId); if (!host) return;
+    let x = L(host) + host.offsetWidth; const y = Tp(host), h = host.offsetHeight;
+    cardsOf(hostId).forEach(c => {
+      c.classList.add('xm-docked'); c.style.height = h + 'px';
+      c.style.left = Math.round(x) + 'px'; c.style.top = Math.round(y) + 'px';
+      x += c.offsetWidth;
+    });
     try { updateAllWires(); } catch(e){}
   }
+  function snapCard(card){ const h = hostOf(card); if (h && document.getElementById(h)) repack(h); else undock(card); }
+  function repackAll(){
+    const seen = new Set();
+    document.querySelectorAll('#canvasInner > .placed-component[data-type^="xm-"]').forEach(c => {
+      if (!parseType(c.dataset.type)) return;
+      const h = hostOf(c);
+      if (h && document.getElementById(h)){ if (!seen.has(h)){ seen.add(h); repack(h); } }
+      else undock(c);
+      refreshCardInfo(c);
+    });
+  }
   function attach(card, hostId){
+    if (!hostId) undock(card);
     const hIn = card.querySelector('[data-persist="host"]'), sIn = card.querySelector('[data-persist="slot"]');
     if (!hIn || !sIn) return;
     hIn.value = hostId || '';
@@ -12452,7 +12704,7 @@ init();
   function hostVc(card){ const h = document.getElementById(hostOf(card)); const vm = h && VENDOR_META[h.dataset.type]; return vm ? vm.vendorClass : null; }
   function addrText(card){
     const p = parseType(card.dataset.type), slot = slotOf(card), vc = hostVc(card);
-    if (!slot || !vc) return '장착 PLC 없음 — 아래에서 선택';
+    if (!slot || !vc) return '⚠ PLC 미장착 — 같은 회사 PLC 옆에 붙이세요';
     const D = (a) => vendorAddrToDisplay(vc, a);
     if (isOutKind(p.k)) return `슬롯 ${slot} · ${D('Y' + yBase(slot))} ~ ${D('Y' + (yBase(slot) + 15))}`;
     if (p.k === 'ad') return `슬롯 ${slot} · CH1~4 → ${D('D' + dBase(slot))}~${D('D' + (dBase(slot) + 3))} (AI${aiBase(slot)}~AI${aiBase(slot) + 3})`;
@@ -12460,6 +12712,7 @@ init();
   }
   function refreshCardInfo(card){
     const el = card.querySelector('.xm-addr'); if (el) el.textContent = addrText(card);
+    const hid = hostOf(card); card.classList.toggle('xm-orphan', !(hid && document.getElementById(hid)));
     const p = parseType(card.dataset.type); if (!p) return;
     const sel = card.querySelector('.xm-host-sel');
     if (sel && document.activeElement !== sel){
@@ -12546,6 +12799,7 @@ init();
     const p = parseType(def.type), V = VENDORS[p.v], K = KINDS[p.k];
     const head = `<button class="comp-help-btn" onclick="showCompHelp(this,'${def.type}')">?</button>
       <div class="xm-band" style="background:${V.color}"><b>${V.name}</b><span>${K.short}</span></div>
+      <div class="xm-orphan-tag">⚠ ${V.name} PLC에 장착하세요</div>
       <div class="xm-model">${V.models[p.k]}</div>
       <div class="xm-addr">장착 PLC 없음</div>`;
     const hostRow = `<div class="xm-host-row"><select class="xm-host-sel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" onchange="xmSetHost('${id}', this.value)"><option value="">— 장착 PLC 선택 —</option></select>
@@ -12756,13 +13010,124 @@ init();
       if (el && p){
         const hs = hostsFor(p.v);
         if (hs.length){ attach(el, nearest(el, hs).id); snapCard(el); }
-        else { refreshCardInfo(el); }
+        else { refreshCardInfo(el); showNoHostNotice(p.v, el); }
         kick();
       }
     } catch(e){ console.warn('[xm]', e); }
     return ret;
   };
   window.__xmCardsOf = cardsOf;
+  window.__xmRepackAll = repackAll;
+
+  /* ---------------- [Ver0.993] 알림 · 끌어다 붙이기 ---------------- */
+  function toast(msg, bad){
+    let t = document.getElementById('xmToast');
+    if (!t){ t = document.createElement('div'); t.id = 'xmToast'; document.body.appendChild(t); }
+    t.textContent = msg; t.className = bad ? 'xm-toast bad show' : 'xm-toast show';
+    clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+  const vendorNameOfHost = (h) => { const vm = VENDOR_META[h.dataset.type]; const v = vm && vendorKeyOfClass(vm.vendorClass); return v ? VENDORS[v].hostName : (vm ? vm.name : 'PLC'); };
+  function allHosts(){ return Array.from(document.querySelectorAll('#canvasInner > .placed-component')).filter(c => { const vm = VENDOR_META[c.dataset.type]; return vm && !vm.stub; }); }
+  function showNoHostNotice(v, card){
+    const V = VENDORS[v]; const p = parseType(card.dataset.type);
+    const others = allHosts();
+    document.getElementById('xmNotice')?.remove();
+    const ov = document.createElement('div'); ov.id = 'xmNotice'; ov.className = 'xm-notice-ov';
+    ov.innerHTML = `<div class="xm-notice" role="alertdialog">
+      <div class="xm-notice-head" style="background:${V.color}">⚠ 장착할 PLC가 없습니다</div>
+      <div class="xm-notice-body">
+        <p><b>확장 카드는 반드시 같은 제조회사의 PLC를 먼저 선택(배치)한 뒤, 그 PLC 오른쪽 슬롯에 붙여야 동작합니다.</b></p>
+        <p>방금 놓은 카드 <b>${V.models[p.k]}</b>(${KINDS[p.k].ko})는 <b style="color:${V.color}">${V.name}</b> 전용입니다.<br>
+        「① PLC 본체(벤더별)」에서 <b>${V.hostName}</b> PLC를 먼저 놓아 주세요.</p>
+        ${others.length ? `<p class="xm-notice-warn">지금 캔버스에 있는 PLC: ${others.map(h => escapeHtml((h.dataset.label ? h.dataset.label + ' · ' : '') + vendorNameOfHost(h))).join(', ')}<br>→ 제조회사가 달라 이 카드를 장착할 수 없습니다.</p>` : ''}
+        <p class="xm-notice-tip">PLC를 놓은 뒤 카드를 PLC 쪽으로 끌어다 놓으면 오른쪽에 딱 붙고 슬롯 번호(1, 2, 3…)가 정해집니다.</p>
+      </div>
+      <div class="xm-notice-btns">
+        <button type="button" class="xm-nb-main" style="background:${V.color}">${V.hostName} PLC 놓고 바로 장착</button>
+        <button type="button" class="xm-nb-ok">확인</button>
+      </div></div>`;
+    document.body.appendChild(ov);
+    const close = () => ov.remove();
+    ov.querySelector('.xm-nb-ok').onclick = close;
+    ov.addEventListener('mousedown', (e) => { if (e.target === ov) close(); });
+    ov.querySelector('.xm-nb-main').onclick = () => {
+      close();
+      if (!document.body.contains(card)) return;
+      const hid = spawnComponent(V.hostType, Math.max(20, L(card)), Math.max(20, Tp(card)));
+      const host = document.getElementById(hid); if (!host) return;
+      attach(card, hid); repack(hid); kick();
+      try { plcScheduleCheckpoint(); } catch(e){}
+      toast(`${V.hostName} PLC 슬롯 ${slotOf(card)}에 장착했습니다`);
+    };
+  }
+  window.__xmShowNotice = showNoHostNotice;
+
+  // 끌어다 놓을 때 자석처럼 붙이기 · PLC를 옮기면 카드도 함께
+  const SNAP = 140;
+  function chainEnd(host, except){
+    return L(host) + host.offsetWidth + cardsOf(host.id).filter(c => c !== except).reduce((a, c) => a + c.offsetWidth, 0);
+  }
+  function snapTarget(card, list){
+    const cx = L(card), cy = Tp(card), w = card.offsetWidth, h = card.offsetHeight;
+    let best = null, bd = Infinity;
+    list.forEach(host => {
+      const hl = L(host), ht = Tp(host), end = chainEnd(host, card);
+      const overlapX = cx + w > hl - 20 && cx < end + SNAP, overlapY = cy + h > ht - SNAP / 2 && cy < ht + host.offsetHeight + SNAP / 2;
+      if (!overlapX || !overlapY) return;
+      const d = Math.hypot(cx - end, cy - ht);
+      if (d < bd){ bd = d; best = host; }
+    });
+    return best;
+  }
+  let hint = null;
+  function setHint(h){ if (hint === h) return; if (hint) hint.classList.remove('xm-snap-target', 'xm-snap-bad'); hint = h; }
+  const draggingEl = () => document.querySelector('#canvasInner > .placed-component.dragging');
+  document.addEventListener('mousemove', () => {
+    const d = draggingEl(); if (!d){ setHint(null); return; }
+    const p = parseType(d.dataset.type);
+    if (VENDOR_META[d.dataset.type] && cardsOf(d.id).length){ repack(d.id); return; }
+    if (!p) return;
+    const same = snapTarget(d, hostsFor(p.v));
+    if (same){ setHint(same); same.classList.add('xm-snap-target'); return; }
+    const other = snapTarget(d, allHosts().filter(h => !hostsFor(p.v).includes(h)));
+    if (other){ setHint(other); other.classList.add('xm-snap-bad'); return; }
+    setHint(null);
+  }, true);
+  window.addEventListener('mouseup', () => {
+    const d = draggingEl(); setHint(null); if (!d) return;
+    setTimeout(() => onDrop(d), 0);
+  }, true);
+  function onDrop(d){
+    if (VENDOR_META[d.dataset.type]){ if (cardsOf(d.id).length) repack(d.id); return; }
+    const p = parseType(d.dataset.type); if (!p) return;
+    const V = VENDORS[p.v], old = hostOf(d);
+    const same = snapTarget(d, hostsFor(p.v));
+    if (same){
+      if (same.id !== old){ attach(d, same.id); if (old) repack(old); toast(`${vendorNameOfHost(same)} 슬롯 ${slotOf(d)}에 장착`); }
+      repack(same.id);
+    } else {
+      const other = snapTarget(d, allHosts().filter(h => !hostsFor(p.v).includes(h)));
+      if (old){ attach(d, ''); repack(old); }
+      if (other){ d.style.left = Math.round(chainEnd(other, d) + 40) + 'px'; try { updateAllWires(); } catch(e){} }
+      if (other) toast(`⚠ ${V.name} 카드는 ${vendorNameOfHost(other)} PLC에 장착할 수 없습니다 — 같은 제조회사 PLC를 선택하세요`, true);
+      else if (old) toast('카드를 PLC에서 분리했습니다 (미장착 — 래더 출력이 나가지 않습니다)', true);
+      else if (!hostsFor(p.v).length) showNoHostNotice(p.v, d);
+    }
+    refreshCardInfo(d); kick();
+    try { plcScheduleCheckpoint(); } catch(e){}
+  }
+  // 방향키 이동 · 불러오기/되돌리기/부품 삭제 뒤에도 정렬
+  document.addEventListener('keydown', (e) => {
+    if (!/^Arrow/.test(e.key)) return;
+    setTimeout(() => { const s = document.querySelector('#canvasInner > .placed-component.selected-comp'); if (s && VENDOR_META[s.dataset.type] && cardsOf(s.id).length) repack(s.id); }, 0);
+  });
+  try {
+    let tm = null;
+    new MutationObserver((muts) => {
+      if (!muts.some(m => Array.from(m.addedNodes).concat(Array.from(m.removedNodes)).some(n => n.nodeType === 1 && n.classList && n.classList.contains('placed-component')))) return;
+      clearTimeout(tm); tm = setTimeout(repackAll, 60);
+    }).observe(document.getElementById('canvasInner'), { childList: true });
+  } catch(e){}
 })();
 
 /* =====================================================================
@@ -13396,6 +13761,805 @@ ${sceneContext()}`;
     log.querySelectorAll('.ai-msg-bot .ai-msg-bubble').forEach((b, i) => { if (/^⏳/.test(b.textContent)) b.classList.add('aic-pending'); });
   };
   try { buildUI(); } catch(e){}
+})();
+
+/* =====================================================================
+   [Ver0.994] 공압제어 실습 · 유압제어 실습 (전기-공압 / 전기-유압 실습장치)
+   학교 실습장치(FONE · 4MD · ED 계열) 구성 그대로:
+   · 상단 랙 모듈(4mm 바나나 잭, 위 빨간 줄 = +24V 버스, 아래 파란 줄 = 0V 버스)
+       DC24V 전원 유닛 · 비상정지 유닛 · 푸시버튼 유닛(3×, 램프 내장) · 릴레이 유닛(3×4c)
+       타이머 유닛(ON 딜레이 / OFF 딜레이) · 카운터 유닛 · 부저&램프 유닛
+   · 알루미늄 프로파일 판 위 부품
+       공압: 서비스 유닛(FRL) · 분배기 · 복동/단동 실린더 · 5/2 양솔 · 5/2 편솔 · 3/2 편솔 · 5/3 양솔(올포트블록)
+             리밋스위치(N/O·COM·N/C) · 근접센서(PNP 3선) · 유량제어 · 게이지 …
+       유압: 파워 유닛(펌프+릴리프+게이지) · 4/3 양솔(스프링센터) · 4/2 편솔 · 4/2 양솔
+             유압 실린더 · 유압 모터 · 릴리프 · 체크 · 유량제어 · 카운터밸런스 · 감압 · 게이지 …
+   · 기존 공압/유압 엔진(압력 net, 실린더 위치, 배관 색: 공압 하늘색 / 유압 황갈색)을 그대로 사용
+   ===================================================================== */
+(function(){
+  if (typeof COMPONENT_DEFS === 'undefined' || typeof dvContributeLoad !== 'function') return;
+
+  const PIN = (id, suf) => document.getElementById(id + '_' + suf);
+  const RT = {}; const rt = (id) => (RT[id] || (RT[id] = {}));
+  const nowMs = () => performance.now();
+  const kick = () => { try { evaluateElectricalNets(); } catch(e){} };
+  const HELP = (type) => `<button class="comp-help-btn" onclick="showCompHelp(this,'${type}')">?</button>`;
+  const LABEL = (def) => `<div class="comp-label lab-label">${labelOf(def)}</div>`;
+  // 바나나 잭: role dc24p=빨강, dc24n=파랑, sig=검정
+  function J(id, suf, cap, role, up){
+    const dot = `<div class="pin-mini role-${role || 'sig'}" data-pin="${id}_${suf}" id="${id}_${suf}"></div>`;
+    const c = cap != null && cap !== '' ? `<span class="lab-jc">${cap}</span>` : '';
+    return `<div class="lab-j${up ? ' up' : ''}" title="${cap || suf}">${up ? c + dot : dot + c}</div>`;
+  }
+  function PAIR(id, a, b, key, closed){ return `<div class="contact-pair" data-closed="${closed ? 1 : 0}" data-pin-a="${id}_${a}" data-pin-b="${id}_${b}" id="${id}_cp_${key}" hidden></div>`; }
+  function setPair(id, key, on){ const el = document.getElementById(id + '_cp_' + key); if (el) el.dataset.closed = on ? '1' : '0'; }
+  // +24V / 0V 버스 줄(같은 줄의 잭은 내부 연결)
+  function BUS(id, pre, n, role, cap){
+    let j = '', p = '';
+    for (let i = 1; i <= n; i++){ j += J(id, pre + i, i === 1 ? cap : '', role, false); if (i > 1) p += PAIR(id, pre + '1', pre + i, pre + 'b' + i, true); }
+    return `<div class="lab-bus lab-bus-${role}">${j}<i class="lab-bus-line"></i></div>${p}`;
+  }
+  function VOLT(a, b, nets, stateOf, netOfPin){
+    if (!a || !b) return false;
+    const na = netOfPin(a, nets), nb = netOfPin(b, nets); if (na === nb) return false;
+    const A = stateOf(na), B = stateOf(nb);
+    return !!((A.dc24p && B.dc24n) || (A.dc24n && B.dc24p));
+  }
+  const BRAND = (txt) => `<div class="lab-brand">${txt}</div>`;
+
+  /* ======================= DC24V 전원 유닛 ======================= */
+  function psuRender(id, def){
+    return `<div class="comp-box lab lab-mod lab-psu">${HELP(def.type)}${BRAND('FONE')}
+      <div class="lab-psu-top"><div class="lab-psu-title">DC24V / 5A</div>${J(id,'P1','+24V','dc24p',true)}${J(id,'P2','+24V','dc24p',true)}</div>
+      <div class="lab-psu-mid"><div class="lab-plate">전원 공급 유닛<br><small>AC220V → DC24V</small></div></div>
+      <div class="lab-psu-bot">${J(id,'N1','0V','dc24n',false)}${J(id,'N2','0V','dc24n',false)}
+        <div class="lab-led-wrap"><span class="lab-led" id="${id}_led"></span><small>24V LED</small></div>
+        <button type="button" class="lab-rocker" data-persist="pwr" data-on="1" onclick="labPsuToggle('${id}',this)" title="전원 스위치"><i></i></button></div>
+      ${PAIR(id,'P1','P2','pp',true)}${PAIR(id,'N1','N2','nn',true)}
+      ${LABEL(def)}</div>`;
+  }
+  window.labPsuToggle = function(id, btn){ btn.dataset.on = btn.dataset.on === '1' ? '0' : '1'; btn.classList.toggle('on', btn.dataset.on === '1'); kick(); };
+  function psuSource(comp, nets, stateOf, netOfPin){
+    const on = comp.querySelector('.lab-rocker')?.dataset.on === '1';
+    const live = powerOn && on;
+    comp.dataset.live = live ? '1' : '0';
+    if (!live) return;
+    ['P1','P2'].forEach(s => { const p = PIN(comp.id, s); if (p) stateOf(netOfPin(p, nets)).dc24p = true; });
+    ['N1','N2'].forEach(s => { const p = PIN(comp.id, s); if (p) stateOf(netOfPin(p, nets)).dc24n = true; });
+  }
+  function psuVisual(comp){
+    const led = document.getElementById(comp.id + '_led'); if (led) led.classList.toggle('on', comp.dataset.live === '1');
+    comp.querySelector('.lab-rocker')?.classList.toggle('on', comp.querySelector('.lab-rocker')?.dataset.on === '1');
+  }
+
+  /* ======================= 비상정지 유닛 ======================= */
+  function emgRender(id, def){
+    return `<div class="comp-box lab lab-mod lab-emg">${HELP(def.type)}${BRAND('FONE')}
+      ${BUS(id,'P',4,'dc24p','+24V')}
+      <div class="lab-emg-c"><div class="lab-cc2">${J(id,'13','13','sig',true)}<span class="lab-sym">E-⊸</span>${J(id,'14','14','sig')}</div>
+        <div class="lab-cc2">${J(id,'21','21','sig',true)}<span class="lab-sym">⊸̸</span>${J(id,'22','22','sig')}</div></div>
+      <button type="button" class="lab-emg-btn" data-persist="lat" data-on="0" onclick="labEmg('${id}',this)" title="클릭: 눌러서 잠금 / 다시 클릭: 돌려서 해제"></button>
+      <div class="lab-small">13-14: N/O · 21-22: N/C</div>
+      ${BUS(id,'N',4,'dc24n','0V')}
+      ${PAIR(id,'13','14','a',false)}${PAIR(id,'21','22','b',true)}
+      ${LABEL(def)}</div>`;
+  }
+  window.labEmg = function(id, btn){ btn.dataset.on = btn.dataset.on === '1' ? '0' : '1'; emgSync(document.getElementById(id)); kick(); };
+  function emgSync(comp){
+    if (!comp) return; const b = comp.querySelector('.lab-emg-btn'); if (!b) return;
+    const lat = b.dataset.on === '1'; b.classList.toggle('on', lat);
+    setPair(comp.id, 'a', lat); setPair(comp.id, 'b', !lat);
+  }
+
+  /* ======================= 푸시버튼 유닛 (3×, 램프 내장) ======================= */
+  const PB_COL = [['#e9edf0','PB1'],['#e9edf0','PB2'],['#2fbf5b','PB3']];
+  function pbRender(id, def){
+    let rows = '', pairs = '';
+    PB_COL.forEach(([col, nm], k) => {
+      const K = 'S' + (k + 1);
+      rows += `<div class="lab-pb-row">
+        <button type="button" class="lab-pb" style="--pb:${col}" id="${id}_${K}_btn" onpointerdown="labPb('${id}','${K}',true,event)" onpointerup="labPb('${id}','${K}',false,event)" onpointerleave="labPb('${id}','${K}',false,event)"><span id="${id}_${K}_lamp"></span></button>
+        <div class="lab-pb-grid">
+          ${J(id,K+'_13','13','sig',true)}${J(id,K+'_23','23','sig',true)}${J(id,K+'_31','31','sig',true)}${J(id,K+'_41','41','sig',true)}${J(id,K+'_X1','⊗','sig',true)}
+          ${J(id,K+'_14','14','sig')}${J(id,K+'_24','24','sig')}${J(id,K+'_32','32','sig')}${J(id,K+'_42','42','sig')}${J(id,K+'_X2','⊗','sig')}
+        </div><span class="lab-pb-name">${nm}</span></div>`;
+      pairs += PAIR(id,K+'_13',K+'_14',K+'a1',false) + PAIR(id,K+'_23',K+'_24',K+'a2',false) + PAIR(id,K+'_31',K+'_32',K+'b1',true) + PAIR(id,K+'_41',K+'_42',K+'b2',true);
+    });
+    return `<div class="comp-box lab lab-mod lab-pbu">${HELP(def.type)}${BRAND('FONE')}
+      ${BUS(id,'P',5,'dc24p','+24V')}${rows}<div class="lab-small">13-14·23-24: N/O · 31-32·41-42: N/C · ⊗: 램프</div>${BUS(id,'N',5,'dc24n','0V')}${pairs}
+      ${LABEL(def)}</div>`;
+  }
+  window.labPb = function(id, K, down, ev){
+    const btn = document.getElementById(id + '_' + K + '_btn'); if (!btn) return;
+    if (ev && ev.type === 'pointerdown' && ev.button !== 0) return;
+    if (!down && !btn.classList.contains('pressed')) return;
+    btn.classList.toggle('pressed', down);
+    setPair(id, K + 'a1', down); setPair(id, K + 'a2', down); setPair(id, K + 'b1', !down); setPair(id, K + 'b2', !down);
+    if (down){ try { btn.setPointerCapture(ev.pointerId); } catch(e){} }
+    if (ev) ev.stopPropagation();
+    kick();
+  };
+  document.addEventListener('pointerup', () => {
+    document.querySelectorAll('.lab-pb.pressed').forEach(b => { const m = /^(.*)_(S\d)_btn$/.exec(b.id); if (m) window.labPb(m[1], m[2], false); });
+  });
+  function pbVisual(comp, nets, stateOf, netOfPin){
+    for (let k = 1; k <= 3; k++){
+      const K = 'S' + k; const lit = VOLT(PIN(comp.id, K + '_X1'), PIN(comp.id, K + '_X2'), nets, stateOf, netOfPin);
+      document.getElementById(comp.id + '_' + K + '_lamp')?.classList.toggle('lit', lit);
+    }
+  }
+
+  /* ======================= 릴레이 유닛 (3 릴레이 × 4c 접점) ======================= */
+  function relayRender(id, def){
+    let rows = '', pairs = '';
+    for (let k = 1; k <= 3; k++){
+      const K = 'K' + k;
+      let cc = '';
+      for (let c = 1; c <= 4; c++){
+        cc += `<div class="lab-cc lab-cc-r">${J(id,K+'_'+c+'2',c+'2','sig',true)}${J(id,K+'_'+c+'4',c+'4','sig',true)}${J(id,K+'_'+c+'1',c+'1','sig')}</div>`;
+        pairs += PAIR(id,K+'_'+c+'1',K+'_'+c+'2',K+'nc'+c,true) + PAIR(id,K+'_'+c+'1',K+'_'+c+'4',K+'no'+c,false);
+      }
+      rows += `<div class="lab-rly-row"><div class="lab-coil lab-coil-h"><div class="lab-coil-hd"><span class="lab-led lab-led-w" id="${id}_${K}_led"></span><span class="lab-coilsym">${K}</span></div><div class="lab-coil-pins">${J(id,K+'_A1','A1','dc24p',true)}${J(id,K+'_A2','A2','dc24n',true)}</div></div>${cc}</div>`;
+    }
+    return `<div class="comp-box lab lab-mod lab-relay">${HELP(def.type)}${BRAND('RELAY UNIT')}
+      ${BUS(id,'P',6,'dc24p','+24V')}${rows}<div class="lab-small">코일 A1(+)-A2(−) · 공통 11~41 · N/C 12~42 · N/O 14~44</div>${BUS(id,'N',6,'dc24n','0V')}${pairs}
+      ${LABEL(def)}</div>`;
+  }
+  function relayLoad(comp, nets, stateOf, netOfPin){
+    for (let k = 1; k <= 3; k++){
+      const K = 'K' + k; const e = VOLT(PIN(comp.id, K + '_A1'), PIN(comp.id, K + '_A2'), nets, stateOf, netOfPin);
+      rt(comp.id)[K] = e;
+      for (let c = 1; c <= 4; c++){ setPair(comp.id, K + 'no' + c, e); setPair(comp.id, K + 'nc' + c, !e); }
+    }
+  }
+  function relayVisual(comp){ for (let k = 1; k <= 3; k++) document.getElementById(comp.id + '_K' + k + '_led')?.classList.toggle('on', !!rt(comp.id)['K' + k]); }
+
+  /* ======================= 타이머 유닛 (ON 딜레이 / OFF 딜레이) ======================= */
+  function timerRow(id, T, title, sym){
+    return `<div class="lab-tm-row">
+      <div class="lab-coil"><span class="lab-led" id="${id}_${T}_led"></span>${J(id,T+'_A1','A1','dc24p',true)}<span class="lab-coilsym">${sym}</span>${J(id,T+'_A2','A2','dc24n')}</div>
+      <div class="lab-tm-c">
+        <div class="lab-cc">${J(id,T+'_17','17','sig',true)}<span class="lab-sym">⊸</span>${J(id,T+'_18','18','sig')}</div>
+        <div class="lab-cc">${J(id,T+'_27','27','sig',true)}<span class="lab-sym">⊸</span>${J(id,T+'_28','28','sig')}</div>
+        <div class="lab-cc">${J(id,T+'_35','35','sig',true)}<span class="lab-sym">⊸̸</span>${J(id,T+'_36','36','sig')}</div>
+        <div class="lab-cc">${J(id,T+'_45','45','sig',true)}<span class="lab-sym">⊸̸</span>${J(id,T+'_46','46','sig')}</div>
+      </div>
+      <div class="lab-tm-set"><div class="lab-tm-name">${title}</div>
+        <div class="lab-7seg" id="${id}_${T}_disp">3.0</div>
+        <input type="hidden" data-persist="sp${T}" value="3.0" id="${id}_${T}_sp">
+        <div class="lab-tm-btns"><button type="button" onpointerdown="labTmAdj('${id}','${T}',-1,event)">▼</button><button type="button" onpointerdown="labTmAdj('${id}','${T}',1,event)">▲</button></div>
+        <div class="lab-tm-rem" id="${id}_${T}_rem">PRESET (s)</div></div>
+    </div>`;
+  }
+  function timerRender(id, def){
+    let pairs = '';
+    ['TON','TOF'].forEach(T => { pairs += PAIR(id,T+'_17',T+'_18',T+'a1',false) + PAIR(id,T+'_27',T+'_28',T+'a2',false) + PAIR(id,T+'_35',T+'_36',T+'b1',true) + PAIR(id,T+'_45',T+'_46',T+'b2',true); });
+    return `<div class="comp-box lab lab-mod lab-timer">${HELP(def.type)}${BRAND('DIGITAL TIME RELAY UNIT')}
+      ${BUS(id,'P',6,'dc24p','+24V')}${timerRow(id,'TON','ON DELAY','⊠')}${timerRow(id,'TOF','OFF DELAY','▣')}
+      <div class="lab-small">17-18·27-28: 한시 N/O · 35-36·45-46: 한시 N/C</div>${BUS(id,'N',6,'dc24n','0V')}${pairs}
+      ${LABEL(def)}</div>`;
+  }
+  window.labTmAdj = function(id, T, dir, ev){
+    if (ev){ ev.stopPropagation(); ev.preventDefault(); }
+    const inp = document.getElementById(id + '_' + T + '_sp'); if (!inp) return;
+    const step = () => { let v = parseFloat(inp.value) || 0; v = Math.max(0.1, Math.min(999.9, Math.round((v + dir * (v >= 10 ? 1 : 0.1)) * 10) / 10)); inp.value = v.toFixed(1); const d = document.getElementById(id + '_' + T + '_disp'); if (d) d.textContent = inp.value; };
+    step();
+    let t = setTimeout(function rep(){ step(); t = setTimeout(rep, 70); }, 400);
+    const stop = () => { clearTimeout(t); document.removeEventListener('pointerup', stop); };
+    document.addEventListener('pointerup', stop);
+  };
+  function timerLoad(comp, nets, stateOf, netOfPin){
+    const id = comp.id, S = rt(id), t = nowMs();
+    ['TON','TOF'].forEach(T => {
+      const s = S[T] || (S[T] = {});
+      const e = VOLT(PIN(id, T + '_A1'), PIN(id, T + '_A2'), nets, stateOf, netOfPin);
+      const sp = Math.max(0.1, parseFloat(PIN(id, T + '_sp')?.value) || 3) * 1000;
+      if (e && !s.on){ s.on = true; s.t0 = t; }
+      if (!e && s.on){ s.on = false; s.off0 = t; }
+      let out = false, rem = null;
+      if (T === 'TON'){ if (e){ const el = t - s.t0; out = el >= sp; rem = Math.max(0, sp - el); } }
+      else { if (e){ out = true; rem = sp; } else if (s.off0 != null){ const el = t - s.off0; out = el < sp; rem = Math.max(0, sp - el); if (!out) s.off0 = null; } }
+      setPair(id, T + 'a1', out); setPair(id, T + 'a2', out); setPair(id, T + 'b1', !out); setPair(id, T + 'b2', !out);
+      s.view = { e, out, rem };
+    });
+  }
+  function timerVisual(comp){
+    ['TON','TOF'].forEach(T => {
+      const v = (rt(comp.id)[T] || {}).view || {};
+      document.getElementById(comp.id + '_' + T + '_led')?.classList.toggle('on', !!v.out);
+      const r = document.getElementById(comp.id + '_' + T + '_rem');
+      if (r) r.textContent = (v.e || (v.rem != null && T === 'TOF' && v.out)) && v.rem != null ? `남은 ${(v.rem / 1000).toFixed(1)}s` : 'PRESET (s)';
+      const d = document.getElementById(comp.id + '_' + T + '_disp'), sp = PIN(comp.id, T + '_sp');
+      if (d && sp && d.textContent !== sp.value) d.textContent = sp.value;
+    });
+  }
+
+  /* ======================= 카운터 유닛 ======================= */
+  function counterRender(id, def){
+    return `<div class="comp-box lab lab-mod lab-counter">${HELP(def.type)}${BRAND('COUNTER UNIT')}
+      ${BUS(id,'P',4,'dc24p','+24V')}
+      <div class="lab-ct-body">
+        <div class="lab-ct-face"><div class="lab-ct-brand">CT4S-1P</div>
+          <div class="lab-7seg lab-7seg-r" id="${id}_cnt">0</div><div class="lab-7seg lab-7seg-g" id="${id}_pre">5</div>
+          <input type="hidden" data-persist="pre" value="5" id="${id}_presv">
+          <div class="lab-tm-btns"><button type="button" onclick="labCtRst('${id}',event)">RST</button><button type="button" onclick="labCtAdj('${id}',-1,event)">▼</button><button type="button" onclick="labCtAdj('${id}',1,event)">▲</button></div>
+        </div>
+        <div class="lab-ct-terms">
+          <div class="lab-coil">${J(id,'A1','A1','dc24p',true)}<span class="lab-coilsym">CNT</span>${J(id,'A2','A2','dc24n')}</div>
+          <div class="lab-cc">${J(id,'1','1','sig',true)}<div class="lab-row2">${J(id,'4','4','sig')}${J(id,'2','2','sig')}</div></div>
+          <div class="lab-coil">${J(id,'R1','R1','dc24p',true)}<span class="lab-coilsym">RST</span>${J(id,'R2','R2','dc24n')}</div>
+        </div>
+      </div>
+      <div class="lab-small">A1-A2: 계수 입력 · R1-R2: 리셋 · 1-2: N/O · 1-4: N/C(설정값 도달 시 전환)</div>
+      ${BUS(id,'N',4,'dc24n','0V')}
+      ${PAIR(id,'1','2','no',false)}${PAIR(id,'1','4','nc',true)}
+      ${LABEL(def)}</div>`;
+  }
+  window.labCtAdj = function(id, d, ev){ if (ev) ev.stopPropagation(); const i = document.getElementById(id + '_presv'); if (!i) return; i.value = String(Math.max(1, Math.min(9999, (parseInt(i.value, 10) || 1) + d))); kick(); };
+  window.labCtRst = function(id, ev){ if (ev) ev.stopPropagation(); rt(id).n = 0; kick(); };
+  function counterLoad(comp, nets, stateOf, netOfPin){
+    const s = rt(comp.id);
+    const inp = VOLT(PIN(comp.id,'A1'), PIN(comp.id,'A2'), nets, stateOf, netOfPin);
+    const rst = VOLT(PIN(comp.id,'R1'), PIN(comp.id,'R2'), nets, stateOf, netOfPin);
+    if (s.n == null) s.n = 0;
+    if (rst) s.n = 0;
+    else if (inp && !s.prev) s.n++;
+    s.prev = inp;
+    const pre = Math.max(1, parseInt(PIN(comp.id,'presv')?.value, 10) || 5);
+    const up = s.n >= pre;
+    setPair(comp.id,'no',up); setPair(comp.id,'nc',!up);
+    s.up = up; s.pre = pre;
+  }
+  function counterVisual(comp){
+    const s = rt(comp.id);
+    const c = document.getElementById(comp.id + '_cnt'); if (c) c.textContent = String(s.n || 0);
+    const p = document.getElementById(comp.id + '_pre'); if (p) p.textContent = String(s.pre || PIN(comp.id,'presv')?.value || 5);
+    comp.classList.toggle('lab-up', !!s.up);
+  }
+
+  /* ======================= 부저 & 램프 유닛 ======================= */
+  const LAMPS = [['L1','#ff3b30','적'],['L2','#30d158','녹'],['L3','#ffd60a','황'],['L4','#f2f2f7','백']];
+  function lampRender(id, def){
+    let cells = `<div class="lab-lp"><div class="lab-bz" id="${id}_BZ_f"><i></i></div>${J(id,'BZ_P','+','dc24p',true)}${J(id,'BZ_N','−','dc24n')}<span>BUZZER</span></div>`;
+    LAMPS.forEach(([k, col, nm]) => { cells += `<div class="lab-lp"><div class="lab-lamp" style="--pl:${col}" id="${id}_${k}_f"></div>${J(id,k+'_P','+','dc24p',true)}${J(id,k+'_N','−','dc24n')}<span>${k} ${nm}</span></div>`; });
+    return `<div class="comp-box lab lab-mod lab-lampu">${HELP(def.type)}${BRAND('BUZZER &amp; LAMP UNIT')}
+      ${BUS(id,'P',5,'dc24p','+24V')}<div class="lab-lp-row">${cells}</div>${BUS(id,'N',5,'dc24n','0V')}
+      ${LABEL(def)}</div>`;
+  }
+  let anyBuzz = false;
+  function lampVisual(comp, nets, stateOf, netOfPin){
+    LAMPS.forEach(([k]) => document.getElementById(comp.id + '_' + k + '_f')?.classList.toggle('lit', VOLT(PIN(comp.id, k + '_P'), PIN(comp.id, k + '_N'), nets, stateOf, netOfPin)));
+    const bz = VOLT(PIN(comp.id,'BZ_P'), PIN(comp.id,'BZ_N'), nets, stateOf, netOfPin);
+    document.getElementById(comp.id + '_BZ_f')?.classList.toggle('sounding', bz);
+    if (bz) anyBuzz = true;
+  }
+  let ac = null, osc = null;
+  function buzz(on){
+    try {
+      if (on && !ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+      if (!ac) return;
+      if (on && !osc){ osc = ac.createOscillator(); const g = ac.createGain(); osc.type = 'square'; osc.frequency.value = 2300; g.gain.value = 0.02; osc.connect(g).connect(ac.destination); osc.start(); }
+      else if (!on && osc){ osc.stop(); osc.disconnect(); osc = null; }
+    } catch(e){}
+  }
+
+  /* ======================= 실린더 연동 센서 (리밋스위치 · 근접센서) ======================= */
+  const CYL_SEL = '#canvasInner > .placed-component[data-type^="lab-pn-cyl"], #canvasInner > .placed-component[data-type^="lab-hy-cyl"], #canvasInner > .placed-component[data-type="cyl-double"], #canvasInner > .placed-component[data-type="cyl-single"], #canvasInner > .placed-component[data-type="pn-cyl-cushion"], #canvasInner > .placed-component[data-type="hyd-cyl"], #canvasInner > .placed-component[data-type="hyd-cyl-clear"]';
+  const L = (el) => parseFloat(el.style.left) || 0, Tp = (el) => parseFloat(el.style.top) || 0;
+  function cylName(c){ return (c.dataset.label || labelOf(COMPONENT_DEFS[c.dataset.type] || {}) || c.id); }
+  function linkOptions(comp){
+    const cur = PIN(comp.id, 'link')?.value || '';
+    let h = `<option value="">— 감지할 실린더 —</option>`;
+    document.querySelectorAll(CYL_SEL).forEach(c => {
+      ['ret','ext'].forEach(e => { const v = c.id + '|' + e; h += `<option value="${v}" ${v === cur ? 'selected' : ''}>${escapeHtml(cylName(c))} · ${e === 'ext' ? '전진 끝' : '후진 끝'}</option>`; });
+    });
+    return h;
+  }
+  function sensorLinkUI(id){
+    return `<div class="lab-link"><select class="lab-link-sel" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" onfocus="labLinkFill('${id}')" onchange="labLinkSet('${id}',this.value)"><option value="">— 감지할 실린더 —</option></select>
+      <input type="hidden" data-persist="link" id="${id}_link" value=""></div>`;
+  }
+  window.labLinkFill = function(id){ const c = document.getElementById(id); const s = c && c.querySelector('.lab-link-sel'); if (s) s.innerHTML = linkOptions(c); };
+  window.labLinkSet = function(id, v){ const i = PIN(id, 'link'); if (i){ i.value = v; i.dataset.manual = '1'; } kick(); };
+  function autoLink(comp){
+    const i = PIN(comp.id, 'link'); if (!i || i.dataset.manual === '1') return;
+    const cx = L(comp) + comp.offsetWidth / 2, cy = Tp(comp) + comp.offsetHeight / 2;
+    let best = null, bd = Infinity;
+    document.querySelectorAll(CYL_SEL).forEach(c => {
+      const x0 = L(c), x1 = L(c) + c.offsetWidth, y = Tp(c) + c.offsetHeight / 2;
+      const ext = /^lab-/.test(c.dataset.type) ? x0 + c.offsetWidth + CYL_TRAVEL - 30 : x1 - 10;
+      [[x0 + 40, 'ret'], [ext, 'ext']].forEach(([x, e]) => { const d = Math.hypot(cx - x, (cy - y) * 1.3); if (d < bd){ bd = d; best = c.id + '|' + e; } });
+    });
+    if (best && bd < 520){ i.value = best; window.labLinkFill(comp.id); }
+  }
+  function sensed(comp){
+    const v = PIN(comp.id, 'link')?.value || ''; const [cid, end] = v.split('|');
+    const c = cid && document.getElementById(cid); if (!c) return false;
+    const pct = c.dataset.posPct !== undefined ? parseFloat(c.dataset.posPct) : (c.dataset.pos === 'ext' ? 100 : 0);
+    return end === 'ext' ? pct >= 96 : pct <= 4;
+  }
+  function lsRender(id, def){
+    return `<div class="comp-box lab lab-ls">${HELP(def.type)}
+      <div class="lab-ls-head"><div class="lab-ls-lever" id="${id}_lever"><i></i></div><div class="lab-ls-brand">FONE</div></div>
+      <div class="lab-ls-sym">COM ─┬─ N/O<br><span>└─ N/C</span></div>
+      <div class="lab-ls-jacks">${J(id,'NO','N/O','sig',true)}${J(id,'COM','COM','sig',true)}${J(id,'NC','N/C','sig',true)}</div>
+      ${sensorLinkUI(id)}
+      <button type="button" class="lab-mini" onpointerdown="labLsMan('${id}',true,event)" onpointerup="labLsMan('${id}',false,event)" onpointerleave="labLsMan('${id}',false,event)">👆 손으로 누름</button>
+      ${PAIR(id,'COM','NO','no',false)}${PAIR(id,'COM','NC','nc',true)}
+      ${LABEL(def)}</div>`;
+  }
+  window.labLsMan = function(id, on, ev){ if (ev) ev.stopPropagation(); const s = rt(id); if (!on && !s.man) return; s.man = on; kick(); };
+  function lsLoad(comp){
+    const on = sensed(comp) || !!rt(comp.id).man;
+    setPair(comp.id,'no',on); setPair(comp.id,'nc',!on);
+    rt(comp.id).on = on;
+  }
+  function lsVisual(comp){ comp.classList.toggle('lab-act', !!rt(comp.id).on); }
+  function proxRender(id, def){
+    return `<div class="comp-box lab lab-prox">${HELP(def.type)}
+      <div class="lab-prox-body"><div class="lab-prox-head"><span class="lab-led lab-led-y" id="${id}_led"></span></div><div class="lab-prox-thread"></div></div>
+      <div class="lab-ls-brand">PROXIMITY SENSOR (PNP)</div>
+      <div class="lab-ls-jacks">${J(id,'BN','+24V (BN)','dc24p',true)}${J(id,'BK','OUT (BK)','sig',true)}${J(id,'BU','0V (BU)','dc24n',true)}</div>
+      ${sensorLinkUI(id)}
+      ${PAIR(id,'BN','BK','out',false)}
+      ${LABEL(def)}</div>`;
+  }
+  function proxLoad(comp, nets, stateOf, netOfPin){
+    const pw = VOLT(PIN(comp.id,'BN'), PIN(comp.id,'BU'), nets, stateOf, netOfPin);
+    const on = pw && sensed(comp);
+    setPair(comp.id, 'out', on); rt(comp.id).on = on;
+  }
+
+  /* ======================= 솔레노이드 밸브 ======================= */
+  // 포트는 ISO 번호로 표시: 1(P) 공급 · 4·2 작업 · 5·3 배기(유압은 P·T·A·B)
+  function coilBlock(id, key, name){
+    return `<div class="lab-coilbox"><span class="lab-led lab-led-y" id="${id}_${key}_led"></span>${J(id,key+'P','+','dc24p',true)}${J(id,key+'N','−','dc24n',true)}<b>${name}</b></div>`;
+  }
+  function valveRender(cfg){
+    return function(id, def){
+      const role = cfg.role, r = (s, cap, up) => `<div class="lab-port">${pinPort(id, s, role, cap, up)}</div>`;
+      const coils = cfg.coils.map(([k, n]) => coilBlock(id, k, n));
+      const top = cfg.top.map(([s, c]) => r(s, c, true)).join('');
+      const bot = cfg.bot.map(([s, c]) => r(s, c, false)).join('');
+      return `<div class="comp-box lab lab-valve lab-valve-${role}">${HELP(def.type)}
+        <div class="lab-v-ports">${top}</div>
+        <div class="lab-v-body">${coils[0] || '<div class="lab-coilbox lab-spring">⌇ 스프링</div>'}
+          <div class="lab-v-spool"><div class="lab-v-sym">${cfg.sym}</div><div class="lab-v-pos" id="${id}_pos">${cfg.rest}</div><div class="lab-v-name">${cfg.name}</div></div>
+          ${coils[1] || '<div class="lab-coilbox lab-spring">⌇ 스프링</div>'}</div>
+        <div class="lab-v-ports">${bot}</div>
+        ${LABEL(def)}</div>`;
+    };
+  }
+  function pinPort(id, suf, role, cap, up){
+    const dot = `<div class="pin-mini role-${role}" data-pin="${id}_${suf}" id="${id}_${suf}"></div>`;
+    return up ? `<span class="lab-jc">${cap}</span>${dot}` : `${dot}<span class="lab-jc">${cap}</span>`;
+  }
+  const coilOn = (comp, k, nets, stateOf, netOfPin) => VOLT(PIN(comp.id, k + 'P'), PIN(comp.id, k + 'N'), nets, stateOf, netOfPin);
+  function markCoils(comp, list, nets, stateOf, netOfPin){
+    const s = rt(comp.id); s.coils = {};
+    list.forEach(k => { s.coils[k] = coilOn(comp, k, nets, stateOf, netOfPin); });
+    return s.coils;
+  }
+  // 엔진 그대로 쓰는 밸브: 코일 단자 이름만 엔진 규칙(COIL1P …)에 맞춤
+  function engineValve(opt, coilKeys, posText){
+    return {
+      load: (c, n, s, p) => { if (opt.actuation === 'solenoidSolenoid' && c.dataset.actuated === undefined) c.dataset.actuated = '1'; markCoils(c, coilKeys, n, s, p); dvContributeLoad(c, n, s, p, opt); rt(c.id).pos = posText(c); },
+      visual: (c, n, s, p) => { dvUpdateVisual(c, n, s, p); valveVisual(c); },
+    };
+  }
+  function valveVisual(comp){
+    const s = rt(comp.id);
+    Object.keys(s.coils || {}).forEach(k => document.getElementById(comp.id + '_' + k + '_led')?.classList.toggle('on', !!s.coils[k]));
+    const p = document.getElementById(comp.id + '_pos'); if (p && s.pos) p.textContent = s.pos;
+  }
+  // 3위치(5/3 · 4/3) 양솔 스프링 센터형
+  function threePos(role){
+    return {
+      load: (comp, nets, stateOf, netOfPin) => {
+        const c = markCoils(comp, ['Y1','Y2'], nets, stateOf, netOfPin);
+        const pos = c.Y1 && !c.Y2 ? 'A' : (c.Y2 && !c.Y1 ? 'B' : 'C');
+        const P = PIN(comp.id,'P'), A = PIN(comp.id,'A'), B = PIN(comp.id,'B');
+        if (pos === 'A') pnPassThrough(stateOf, netOfPin, nets, P, A);
+        else if (pos === 'B') pnPassThrough(stateOf, netOfPin, nets, P, B);
+        const ctr = comp.querySelector('[data-persist="ctr"]')?.value || 'closed';
+        rt(comp.id).pos = pos === 'C' ? `중립(${({ closed:'올포트블록', tandem:'탠덤 P→T', open:'오픈', float:'플로트 A·B→T' })[ctr] || ctr})` : (role === 'air' ? (pos === 'A' ? 'Y1: 1→4' : 'Y2: 1→2') : (pos === 'A' ? 'Y1: P→A' : 'Y2: P→B'));
+      },
+      visual: (c, n, s, p) => { dvUpdateVisual(c, n, s, p); valveVisual(c); },
+    };
+  }
+
+  // 공압
+  const V_PN52D = engineValve({ ways:5, role:'air', actuation:'solenoidSolenoid' }, ['COIL1','COIL2'], (c) => c.dataset.actuated === '1' ? 'Y2: 1→2 (래치)' : 'Y1: 1→4 (래치)');
+  const V_PN52S = engineValve({ ways:5, role:'air', actuation:'solenoidSpring' }, ['COIL'], (c) => c.dataset.actuated === '1' ? 'Y1 ON: 1→4' : '스프링: 1→2');
+  const V_PN32S = engineValve({ ways:3, role:'air', actuation:'solenoidSpring' }, ['COIL'], (c) => c.dataset.actuated === '1' ? 'Y1 ON: 1→2' : '스프링: 2→3 배기');
+  const V_PN53 = threePos('air');
+  // 유압
+  const V_HY43 = threePos('oil');
+  const V_HY42S = engineValve({ ways:4, role:'oil', actuation:'solenoidSpring' }, ['COIL'], (c) => c.dataset.actuated === '1' ? 'Y1 ON: P→A' : '스프링: P→B');
+  const V_HY42D = engineValve({ ways:4, role:'oil', actuation:'solenoidSolenoid' }, ['COIL1','COIL2'], (c) => c.dataset.actuated === '1' ? 'Y2: P→B (유지)' : 'Y1: P→A (유지)');
+
+  // 엔진 매핑: 4/2·5/2 평상시(actuated=0) P→A, 작동 시 P→B
+  //   5/2 양솔: SOL1(Y1) → P→A(포트 4), SOL2(Y2) → P→B(포트 2)
+  //   5/2 편솔: 스프링 P→A(포트 2), Y1 ON → P→B(포트 4)
+  const pn52dRender = valveRender({ role:'air', name:'5/2-WAY 양솔레노이드', sym:'⧉⧉ 5/2 (14)·(12)', rest:'Y1: 1→4',
+    coils:[['COIL1','Y1 (14)'],['COIL2','Y2 (12)']], top:[['A','4'],['B','2']], bot:[['T','5'],['P','1 (P)'],['T2','3']] });
+  const pn52sRender = valveRender({ role:'air', name:'5/2-WAY 편솔레노이드', sym:'⧉⧉ 5/2 스프링복귀', rest:'스프링: 1→2',
+    coils:[['COIL','Y1 (14)']], top:[['B','4'],['A','2']], bot:[['T','5'],['P','1 (P)'],['T2','3']] });
+  const pn32sRender = valveRender({ role:'air', name:'3/2-WAY 편솔레노이드(N/C)', sym:'⧉ 3/2 N/C', rest:'스프링: 2→3 배기',
+    coils:[['COIL','Y1 (12)']], top:[['A','2']], bot:[['P','1 (P)'],['T','3']] });
+  const pn53Render = (id, def) => valveRender({ role:'air', name:'5/3-WAY 양솔레노이드', sym:'⧉⧉⧉ 5/3 스프링센터', rest:'중립',
+    coils:[['Y1','Y1 (14)'],['Y2','Y2 (12)']], top:[['A','4'],['B','2']], bot:[['T','5'],['P','1 (P)'],['T2','3']] })(id, def)
+    .replace('<div class="lab-v-name">', `<select class="lab-v-ctr" data-persist="ctr" onmousedown="event.stopPropagation()" onchange="sqKick&&sqKick()"><option value="closed">중립: 올포트블록</option><option value="float">중립: 배기센터</option></select><div class="lab-v-name">`);
+  const hy43Render = (id, def) => valveRender({ role:'oil', name:'4/3-WAY 솔레노이드 밸브', sym:'⧉⧉⧉ 4/3 스프링센터', rest:'중립',
+    coils:[['Y1','Y1 (a)'],['Y2','Y2 (b)']], top:[['A','A'],['B','B']], bot:[['P','P'],['T','T']] })(id, def)
+    .replace('<div class="lab-v-name">', `<select class="lab-v-ctr" data-persist="ctr" onmousedown="event.stopPropagation()"><option value="closed">중립: 올포트블록(클로즈드)</option><option value="tandem">중립: 탠덤(P→T)</option><option value="open">중립: 오픈</option><option value="float">중립: 플로트(A·B→T)</option></select><div class="lab-v-name">`);
+  const hy42sRender = valveRender({ role:'oil', name:'4/2-WAY 편솔레노이드', sym:'⧉⧉ 4/2 스프링복귀', rest:'스프링: P→B',
+    coils:[['COIL','Y1']], top:[['B','A'],['A','B']], bot:[['P','P'],['T','T']] });
+  const hy42dRender = valveRender({ role:'oil', name:'4/2-WAY 양솔레노이드(디텐트)', sym:'⧉⧉ 4/2 디텐트', rest:'Y1: P→A',
+    coils:[['COIL1','Y1'],['COIL2','Y2']], top:[['A','A'],['B','B']], bot:[['P','P'],['T','T']] });
+
+  /* ======================= 서비스 유닛(FRL) · 분배기 · 유압 파워 유닛 ======================= */
+  function frlRender(id, def){
+    return `<div class="comp-box lab lab-frl">${HELP(def.type)}
+      <div class="lab-frl-gauge"><div class="lab-gneedle" id="${id}_needle"></div><span id="${id}_bar">0.0</span><small>bar</small></div>
+      <div class="lab-frl-bowls"><i></i><i></i></div>
+      <button type="button" class="lab-frl-valve" data-persist="open" data-on="1" onclick="labToggleOn(this)" title="차단 밸브(열림/닫힘)">⏻ 공급</button>
+      <div class="lab-ctrl"><span>압력</span><input type="range" min="1" max="8" step="0.5" value="6" data-persist="set" oninput="this.nextElementSibling.textContent=parseFloat(this.value).toFixed(1)" onmousedown="event.stopPropagation()"><b>6.0</b></div>
+      <div class="lab-ls-jacks">${J(id,'P','P (OUT)','air',false)}</div>
+      ${LABEL(def)}</div>`;
+  }
+  window.labToggleOn = function(btn){ btn.dataset.on = btn.dataset.on === '1' ? '0' : '1'; btn.classList.toggle('on', btn.dataset.on === '1'); kick(); };
+  function frlSource(comp, nets, stateOf, netOfPin){
+    const open = comp.querySelector('.lab-frl-valve')?.dataset.on === '1';
+    const bar = parseFloat(comp.querySelector('[data-persist="set"]')?.value) || 6;
+    const live = powerOn && open; // 실습실 컴프레서 공기(전력 투입 = 실습실 전원 ON)
+    rt(comp.id).bar = live ? bar : 0;
+    if (live) pnSetPressure(stateOf, netOfPin(PIN(comp.id,'P'), nets), bar);
+  }
+  function gaugeVis(comp, bar, max){
+    const n = document.getElementById(comp.id + '_needle'); if (n) n.style.transform = `rotate(${Math.min(bar, max) / max * 240 - 120}deg)`;
+    const v = document.getElementById(comp.id + '_bar'); if (v) v.textContent = bar.toFixed(bar >= 100 ? 0 : 1);
+  }
+  function frlVisual(comp){ gaugeVis(comp, rt(comp.id).bar || 0, 10); comp.querySelector('.lab-frl-valve')?.classList.toggle('on', comp.querySelector('.lab-frl-valve')?.dataset.on === '1'); }
+  function distRender(id, def){
+    let top = '', bot = '';
+    for (let i = 1; i <= 4; i++){ top += J(id,'P' + i, '', 'air', true); bot += J(id,'P' + (i + 4), '', 'air', false); }
+    return `<div class="comp-box lab lab-dist comp-junction">${HELP(def.type)}
+      <div class="lab-dist-row">${top}</div><div class="lab-dist-body">AIR DISTRIBUTOR (8)</div><div class="lab-dist-row">${bot}</div>
+      ${LABEL(def)}</div>`;
+  }
+  function puRender(id, def){
+    return `<div class="comp-box lab lab-pu">${HELP(def.type)}
+      <div class="lab-pu-tank"><div class="lab-pu-motor" id="${id}_motor">M</div><div class="lab-pu-oil"></div></div>
+      <div class="lab-frl-gauge lab-pu-gauge"><div class="lab-gneedle" id="${id}_needle"></div><span id="${id}_bar">0</span><small>bar</small></div>
+      <button type="button" class="lab-frl-valve" data-persist="run" data-on="0" onclick="labToggleOn(this)" title="모터 기동/정지">⏻ 펌프 기동</button>
+      <div class="lab-ctrl"><span>릴리프</span><input type="range" min="10" max="70" step="5" value="40" data-persist="set" oninput="this.nextElementSibling.textContent=this.value" onmousedown="event.stopPropagation()"><b>40</b></div>
+      <div class="lab-ls-jacks">${J(id,'P','P (압력)','oil',false)}${J(id,'T','T (탱크)','oil',false)}</div>
+      ${LABEL(def)}</div>`;
+  }
+  function puSource(comp, nets, stateOf, netOfPin){
+    const run = comp.querySelector('.lab-frl-valve')?.dataset.on === '1';
+    const bar = parseFloat(comp.querySelector('[data-persist="set"]')?.value) || 40;
+    const live = powerOn && run;
+    rt(comp.id).bar = live ? bar : 0; rt(comp.id).run = live;
+    if (live) pnSetPressure(stateOf, netOfPin(PIN(comp.id,'P'), nets), bar);
+  }
+  function puVisual(comp){
+    gaugeVis(comp, rt(comp.id).bar || 0, 100);
+    document.getElementById(comp.id + '_motor')?.classList.toggle('spin', !!rt(comp.id).run);
+    comp.querySelector('.lab-frl-valve')?.classList.toggle('on', comp.querySelector('.lab-frl-valve')?.dataset.on === '1');
+  }
+
+  /* ======================= 실린더(실습장치형 외관) ======================= */
+  // 실습장치형 실린더: 피스톤 위치를 긴 몸통 비율로 다시 그림(로드가 몸통 밖으로 튀어나옴)
+  const CYL_TRAVEL = 200;
+  function labCylVisual(double){
+    return (c, n, s, p) => {
+      cylUpdateVisual(c, n, s, p, double);
+      const rod = document.getElementById(c.id + '_rod'); if (!rod) return;
+      const pct = parseFloat(c.dataset.posPct || '0') || 0;
+      rod.style.left = (4 + pct / 100 * CYL_TRAVEL) + 'px';
+    };
+  }
+  const cylLab = (role, extra, title) => (id, def) => cylRender(id, def, true, Object.assign({ role }, extra || {}))
+    .replace('comp-box cyl-box', `comp-box cyl-box lab-cyl lab-cyl-${role}`)
+    .replace('<div class="cyl-body">', `<div class="lab-cyl-title">${title}</div><div class="cyl-body">`);
+  const cylLabS = (id, def) => cylRender(id, def, false, { role:'air' })
+    .replace('comp-box cyl-box', 'comp-box cyl-box lab-cyl lab-cyl-air')
+    .replace('<div class="cyl-body">', '<div class="lab-cyl-title">SINGLE ACTING CYLINDER</div><div class="cyl-body">');
+
+  /* ======================= 판(알루미늄 프로파일) · 랙 ======================= */
+  function boardRender(id, def){
+    return `<div class="lab-board"><button type="button" class="lab-handle" title="끌면 판 위의 부품·배관이 함께 움직입니다">⠿ 실습 판 — 여기를 끌어 전체 이동</button><div class="lab-board-no">${def.no || 1}</div><div class="lab-board-logo">FONE</div></div>`;
+  }
+  function rackRender(id, def){
+    return `<div class="lab-rack"><button type="button" class="lab-handle" title="끌면 랙 위의 모듈·배선이 함께 움직입니다">⠿ 모듈 랙 — 여기를 끌어 전체 이동</button></div>`;
+  }
+  document.addEventListener('mousedown', (e) => {
+    const h = e.target.closest && e.target.closest('.lab-handle'); if (!h || e.button !== 0) return;
+    const host = h.closest('.placed-component'); if (!host) return;
+    e.preventDefault(); e.stopPropagation();
+    const bx = L(host), by = Tp(host), W = host.offsetWidth, H = host.offsetHeight;
+    const inside = (x, y) => x >= bx - 2 && x <= bx + W && y >= by - 2 && y <= by + H;
+    const items = [host];
+    document.querySelectorAll('#canvasInner > .placed-component').forEach(c => { if (c !== host && !c.classList.contains('lab-bg') && inside(L(c) + 10, Tp(c) + 10)) items.push(c); });
+    const start = items.map(c => ({ c, x: L(c), y: Tp(c) }));
+    const wpts = wires.map(w => (w.points || []).map(p => ({ x: p.x, y: p.y, move: inside(p.x, p.y) })));
+    const sx = e.clientX, sy = e.clientY;
+    function mv(ev){
+      let dx = (ev.clientX - sx) / zoomLevel, dy = (ev.clientY - sy) / zoomLevel;
+      dx = Math.max(dx, -bx); dy = Math.max(dy, -by);
+      start.forEach(s => { s.c.style.left = (s.x + dx) + 'px'; s.c.style.top = (s.y + dy) + 'px'; });
+      wires.forEach((w, i) => (wpts[i] || []).forEach((o, j) => { if (o.move && w.points[j]) w.points[j] = { x: o.x + dx, y: o.y + dy }; }));
+      updateAllWires();
+    }
+    function up(){ document.removeEventListener('mousemove', mv, true); document.removeEventListener('mouseup', up, true); try { plcScheduleCheckpoint(); } catch(e){} }
+    document.addEventListener('mousemove', mv, true); document.addEventListener('mouseup', up, true);
+  }, true);
+
+  /* ======================= 등록 ======================= */
+  const D = (type, cat, icon, ko, render, extra) => Object.assign({ type, cat, icon, label:{ ko, en: ko }, render }, extra || {});
+  const defs = {
+    'lab-psu':     D('lab-psu','lab','🔌','DC24V/5A 전원 유닛', psuRender, { contributeSource: psuSource, updateVisual: psuVisual }),
+    'lab-emg':     D('lab-emg','lab','🍄','비상정지 유닛(N/O·N/C)', emgRender),
+    'lab-pbu':     D('lab-pbu','lab','🔘','푸시버튼 유닛(3×, 램프 내장)', pbRender, { updateVisual: pbVisual }),
+    'lab-relay':   D('lab-relay','lab','🟦','릴레이 유닛(K1~K3, 4c 접점)', relayRender, { contributeLoad: relayLoad, updateVisual: relayVisual }),
+    'lab-timer':   D('lab-timer','lab','⏱️','디지털 타이머 유닛(ON/OFF 딜레이)', timerRender, { contributeLoad: timerLoad, updateVisual: timerVisual }),
+    'lab-counter': D('lab-counter','lab','🔢','카운터 유닛(CT4S)', counterRender, { contributeLoad: counterLoad, updateVisual: counterVisual }),
+    'lab-lamp':    D('lab-lamp','lab','💡','부저 & 램프 유닛', lampRender, { updateVisual: lampVisual }),
+    'lab-ls':      D('lab-ls','lab','🔘','리밋스위치(N/O·COM·N/C)', lsRender, { contributeLoad: lsLoad, updateVisual: lsVisual }),
+    'lab-prox':    D('lab-prox','lab','🧲','근접센서(PNP 3선)', proxRender, { contributeLoad: proxLoad, updateVisual: lsVisual }),
+    'lab-pn-frl':  D('lab-pn-frl','lab','💨','서비스 유닛(FRL, 공급 밸브)', frlRender, { contributeSource: frlSource, updateVisual: frlVisual }),
+    'lab-pn-dist': D('lab-pn-dist','lab','➕','공기 분배기(8구)', distRender),
+    'lab-pn-cyl':  D('lab-pn-cyl','lab','🛠️','복동 실린더(쿠션형)', cylLab('air', { cushioned:true }, 'DOUBLE ACTING CYLINDER'), { updateVisual: labCylVisual(true) }),
+    'lab-pn-cyls': D('lab-pn-cyls','lab','🛠️','단동 실린더(스프링 복귀)', cylLabS, { updateVisual: labCylVisual(false) }),
+    'lab-pn-52d':  D('lab-pn-52d','lab','🧲','5/2-WAY 양솔레노이드 밸브', pn52dRender, { contributeLoad: V_PN52D.load, updateVisual: V_PN52D.visual }),
+    'lab-pn-52s':  D('lab-pn-52s','lab','🧲','5/2-WAY 편솔레노이드 밸브', pn52sRender, { contributeLoad: V_PN52S.load, updateVisual: V_PN52S.visual }),
+    'lab-pn-32s':  D('lab-pn-32s','lab','🧲','3/2-WAY 편솔레노이드 밸브(N/C)', pn32sRender, { contributeLoad: V_PN32S.load, updateVisual: V_PN32S.visual }),
+    'lab-pn-53':   D('lab-pn-53','lab','🧲','5/3-WAY 양솔레노이드 밸브(스프링 센터)', pn53Render, { contributeLoad: V_PN53.load, updateVisual: V_PN53.visual }),
+    'lab-hy-pu':   D('lab-hy-pu','lab','⚙️','유압 파워 유닛(펌프·릴리프·게이지)', puRender, { contributeSource: puSource, updateVisual: puVisual }),
+    'lab-hy-43':   D('lab-hy-43','lab','🧲','4/3-WAY 솔레노이드 밸브(스프링 센터)', hy43Render, { contributeLoad: V_HY43.load, updateVisual: V_HY43.visual }),
+    'lab-hy-42s':  D('lab-hy-42s','lab','🧲','4/2-WAY 편솔레노이드 밸브', hy42sRender, { contributeLoad: V_HY42S.load, updateVisual: V_HY42S.visual }),
+    'lab-hy-42d':  D('lab-hy-42d','lab','🧲','4/2-WAY 양솔레노이드 밸브(디텐트)', hy42dRender, { contributeLoad: V_HY42D.load, updateVisual: V_HY42D.visual }),
+    'lab-hy-cyl':  D('lab-hy-cyl','lab','🛠️','유압 복동 실린더(트레이싱)', cylLab('oil', { loadable:true }, 'TRACING DOUBLE ACTING CYLINDER'), { updateVisual: labCylVisual(true) }),
+    'lab-hy-cyld': D('lab-hy-cyld','lab','🛠️','유압 차동 실린더', cylLab('oil', { loadable:true, transparent:true }, 'DIFFERENTIAL CYLINDER'), { updateVisual: labCylVisual(true) }),
+    'lab-board-pn':D('lab-board-pn','lab','▦','공압 실습 판(알루미늄 프로파일)', boardRender, { no:1 }),
+    'lab-board-hy':D('lab-board-hy','lab','▦','유압 실습 판(알루미늄 프로파일)', boardRender, { no:7 }),
+    'lab-rack':    D('lab-rack','lab','▭','모듈 랙(상단 레일)', rackRender),
+  };
+  Object.assign(COMPONENT_DEFS, defs);
+
+  // 그대로 가져다 쓰는 기존 부품
+  const PN_REUSE = ['pn-flow-oneway','pn-quick-exhaust','pn-gauge','pn-tconn','pn-reduce-valve','pn-seq-valve'];
+  const HY_REUSE = ['hyd-relief','hyd-check','hyd-check-pilot','hyd-flow-oneway','hyd-flow-prescomp','hyd-counterbal','hyd-reduce3way','hyd-gauge','hyd-gauge-distrib','hyd-tconn','hyd-motor','hyd-load','hyd-accum','hyd-shutoff'];
+  const ELEC = ['lab-psu','lab-emg','lab-pbu','lab-relay','lab-timer','lab-counter','lab-lamp'];
+  const PN_TYPES = ELEC.concat(['lab-pn-frl','lab-pn-dist','lab-pn-cyl','lab-pn-cyls','lab-pn-52d','lab-pn-52s','lab-pn-32s','lab-pn-53','lab-ls','lab-prox'], PN_REUSE.filter(t => COMPONENT_DEFS[t]), ['lab-board-pn','lab-rack']);
+  const HY_TYPES = ELEC.concat(['lab-hy-pu','lab-hy-43','lab-hy-42s','lab-hy-42d','lab-hy-cyl','lab-hy-cyld','lab-ls','lab-prox'], HY_REUSE.filter(t => COMPONENT_DEFS[t]), ['lab-board-hy','lab-rack']);
+
+  /* ---------------- 도움말 ---------------- */
+  Object.assign(COMP_HELP_BLURB, {
+    'lab-psu': { ko:'DC24V/5A 전원 유닛. 상단 "⚡ 전력 투입"을 켜고 유닛의 전원 스위치(로커)가 ON이면 +24V(빨강)·0V(파랑) 잭으로 직류 24V가 나옵니다. 실습장치 배치 시 다른 모듈의 버스(위 빨간 줄 +24V, 아래 파란 줄 0V)와 점퍼로 이어져 있습니다.' },
+    'lab-emg': { ko:'비상정지 유닛. 13-14는 N/O(누르면 닫힘), 21-22는 N/C(누르면 열림). 버튼을 클릭하면 눌린 채 잠기고, 다시 클릭하면 해제됩니다. 보통 21-22를 제어회로 +24V에 직렬로 넣습니다.' },
+    'lab-pbu': { ko:'푸시버튼 유닛(3개). 버튼마다 N/O 13-14·23-24, N/C 31-32·41-42 접점과 램프(⊗ 두 잭) 내장. 누르고 있는 동안만 동작(복귀형). 위 빨간 줄은 +24V 버스, 아래 파란 줄은 0V 버스입니다.' },
+    'lab-relay': { ko:'릴레이 유닛(K1~K3). 코일 A1(+)-A2(−)에 24V가 걸리면 동작(LED 점등). 접점 4c: 공통 11·21·31·41, N/C 12·22·32·42, N/O 14·24·34·44. 자기유지 회로는 N/O 접점(예: 11-14)을 시작 버튼과 병렬로 연결합니다.' },
+    'lab-timer': { ko:'디지털 타이머 유닛. 위: ON 딜레이 — 코일 A1-A2에 전원이 걸리고 설정 시간이 지나면 접점 전환. 아래: OFF 딜레이 — 전원이 걸리면 즉시 전환, 전원이 끊기고 설정 시간 뒤 복귀. 한시 N/O 17-18·27-28, 한시 N/C 35-36·45-46. ▼▲로 시간 설정(누르고 있으면 빠르게).' },
+    'lab-counter': { ko:'카운터 유닛(CT4S). A1-A2에 전압이 들어올 때마다(상승 에지) 1씩 증가, 설정값 도달 시 1-2(N/O) 닫힘·1-4(N/C) 열림. R1-R2에 전압을 주거나 RST로 0으로 리셋. ▼▲로 설정값 변경.' },
+    'lab-lamp': { ko:'부저 & 램프 유닛. 부저와 램프 L1 적·L2 녹·L3 황·L4 백. 각 +(빨강)와 −(파랑) 잭 사이에 24V가 걸리면 동작합니다.' },
+    'lab-ls': { ko:'전기 리밋스위치(롤러 레버형). COM-N/O는 눌리면 닫힘, COM-N/C는 눌리면 열림. 실린더 근처에 놓으면 가까운 실린더의 전진 끝/후진 끝을 자동으로 감지하도록 연결됩니다(선택칸에서 변경 가능). "손으로 누름"으로 수동 시험.' },
+    'lab-prox': { ko:'근접센서(PNP 3선). BN(갈색)=+24V, BU(청색)=0V, BK(흑색)=출력. 연결된 실린더 위치를 감지하면 BK로 +24V가 나옵니다(릴레이 코일 A1이나 PLC 입력에 연결).' },
+    'lab-pn-frl': { ko:'서비스 유닛(필터·레귤레이터·루브리케이터). "⚡ 전력 투입"(실습실 컴프레서 가동)과 공급 밸브 ON일 때 설정 압력(1~8bar)의 압축공기를 P로 내보냅니다. 분배기로 나눠 각 밸브의 1(P)에 연결하세요.' },
+    'lab-pn-dist': { ko:'공기 분배기(8구). 8개 포트가 모두 내부에서 연결되어 있습니다.' },
+    'lab-pn-cyl': { ko:'복동 실린더. A(헤드측)에 압력 → 전진, B(로드측)에 압력 → 후진. 리밋스위치/근접센서를 옆에 두면 전진 끝/후진 끝에서 자동으로 눌립니다. 속도 슬라이더로 이동 시간 조절.' },
+    'lab-pn-cyls': { ko:'단동 실린더(스프링 복귀). A에 압력 → 전진, 압력이 없어지면 스프링으로 후진. 3/2-WAY 밸브로 제어합니다.' },
+    'lab-pn-52d': { ko:'5/2-WAY 양솔레노이드 밸브(메모리형). Y1 여자 → 1(P)→4, Y2 여자 → 1(P)→2. 신호가 끊겨도 마지막 위치를 유지합니다. 각 코일의 +(빨강)를 릴레이 접점 등으로 +24V에, −(파랑)를 0V에 연결합니다.' },
+    'lab-pn-52s': { ko:'5/2-WAY 편솔레노이드 밸브(스프링 복귀). 평상시 1(P)→2, Y1 여자 중에는 1(P)→4. 신호가 끊기면 즉시 복귀하므로 자기유지 회로가 필요합니다.' },
+    'lab-pn-32s': { ko:'3/2-WAY 편솔레노이드 밸브(N/C). Y1 여자 중에만 1(P)→2, 꺼지면 2가 3으로 배기됩니다. 단동 실린더 제어용.' },
+    'lab-pn-53': { ko:'5/3-WAY 양솔레노이드 밸브(스프링 센터). Y1 → 1→4, Y2 → 1→2, 둘 다 꺼지면 중립(올포트블록: 실린더가 그 자리에 정지). 중간 정지 실습용.' },
+    'lab-hy-pu': { ko:'유압 파워 유닛(전동기·펌프·오일탱크·릴리프·압력 게이지). "⚡ 전력 투입" 후 "펌프 기동"을 누르면 릴리프 설정 압력(10~70bar)의 작동유가 P로 나갑니다. 리턴 라인은 T로 연결하세요.' },
+    'lab-hy-43': { ko:'4/3-WAY 솔레노이드 밸브(스프링 센터). Y1 여자 → P→A(전진), Y2 여자 → P→B(후진), 둘 다 꺼지면 중립 — 실린더 정지. 중립 형식(클로즈드/탠덤/오픈/플로트)을 선택해 교재의 중립 위치 기호를 익힐 수 있습니다.' },
+    'lab-hy-42s': { ko:'4/2-WAY 편솔레노이드 밸브(스프링 복귀). 평상시 P→B, Y1 여자 중에는 P→A.' },
+    'lab-hy-42d': { ko:'4/2-WAY 양솔레노이드 밸브(디텐트형). Y1 → P→A, Y2 → P→B, 마지막 위치 유지.' },
+    'lab-hy-cyl': { ko:'유압 복동 실린더. A에 압력 → 전진, B에 압력 → 후진. "부하 있음"으로 하중을 건 것처럼 느리게.' },
+    'lab-hy-cyld': { ko:'유압 차동 실린더(투명). A에 압력 → 전진, B에 압력 → 후진.' },
+    'lab-board-pn': { ko:'공압 실습 판(알루미늄 프로파일). 위쪽 손잡이를 끌면 판 위의 부품·배관이 함께 움직입니다.' },
+    'lab-board-hy': { ko:'유압 실습 판(알루미늄 프로파일). 위쪽 손잡이를 끌면 판 위의 부품·배관이 함께 움직입니다.' },
+    'lab-rack': { ko:'상단 모듈 랙. 손잡이를 끌면 랙 위의 모듈과 배선이 함께 움직입니다.' },
+  });
+
+  /* ---------------- 저장/불러오기 후 상태 동기화 ---------------- */
+  function syncComp(comp){
+    const t = comp.dataset.type;
+    if (t === 'lab-emg') emgSync(comp);
+    comp.querySelectorAll('.lab-rocker, .lab-frl-valve').forEach(b => b.classList.toggle('on', b.dataset.on === '1'));
+    if (t === 'lab-timer') ['TON','TOF'].forEach(T => { const d = document.getElementById(comp.id + '_' + T + '_disp'), sp = PIN(comp.id, T + '_sp'); if (d && sp) d.textContent = sp.value; });
+    if (t === 'lab-ls' || t === 'lab-prox'){ const i = PIN(comp.id, 'link'); if (i && i.value) i.dataset.manual = '1'; window.labLinkFill(comp.id); }
+    comp.querySelectorAll('.lab-ctrl input[type=range]').forEach(r => { const b = r.nextElementSibling; if (b) b.textContent = r.step === '0.5' ? parseFloat(r.value).toFixed(1) : r.value; });
+  }
+  if (typeof applyPersist === 'function'){
+    const _ap = applyPersist;
+    applyPersist = function(comp){ const r = _ap.apply(this, arguments); try { if (comp && comp.dataset.type && comp.dataset.type.startsWith('lab-')) syncComp(comp); } catch(e){} return r; };
+  }
+
+  // 놓을 때: 판/랙은 맨 뒤로, 센서는 가까운 실린더에 자동 연결
+  const _spawn = spawnComponent;
+  spawnComponent = function(type){
+    const ret = _spawn.apply(this, arguments);
+    try {
+      const el = typeof ret === 'string' ? document.getElementById(ret) : null;
+      if (el && /^lab-(board|rack)/.test(type)) el.classList.add('lab-bg');
+      if (el && (type === 'lab-ls' || type === 'lab-prox')){ autoLink(el); window.labLinkFill(el.id); }
+      if (el && type.startsWith('lab-')) syncComp(el);
+    } catch(e){ console.warn('[lab]', e); }
+    return ret;
+  };
+  // 센서를 끌어다 옮기면 다시 자동 연결(직접 고른 경우는 유지)
+  window.addEventListener('mouseup', () => {
+    const d = document.querySelector('#canvasInner > .placed-component.dragging');
+    if (!d) return;
+    setTimeout(() => {
+      if (d.dataset.type === 'lab-ls' || d.dataset.type === 'lab-prox'){ autoLink(d); window.labLinkFill(d.id); kick(); }
+    }, 0);
+  }, true);
+  // 불러오기(복원)된 판/랙도 뒤로
+  function wiresFront(){ document.body.classList.toggle('lab-wires-front', !!document.querySelector('#canvasInner > .placed-component[data-type^="lab-"]')); }
+  // 랙/판이 위에 올린 모듈·부품을 모두 덮도록 자동으로 늘어남
+  function growBg(){
+    document.querySelectorAll('#canvasInner > .placed-component[data-type="lab-rack"], #canvasInner > .placed-component[data-type^="lab-board"]').forEach(bg => {
+      bg.classList.add('lab-bg');
+      const inner = bg.querySelector('.lab-rack, .lab-board'); if (!inner) return;
+      const bx = L(bg), by = Tp(bg), bh = inner.offsetHeight;
+      const isRack = bg.dataset.type === 'lab-rack';
+      let right = 0, bottom = 0;
+      document.querySelectorAll('#canvasInner > .placed-component').forEach(c => {
+        if (c === bg || c.classList.contains('lab-bg')) return;
+        const t = c.dataset.type || '';
+        if (isRack && !/^lab-(psu|emg|pbu|relay|timer|counter|lamp)$/.test(t)) return;
+        if (!isRack && !t.startsWith('lab-') && !/^(hyd-|pn-|cyl-)/.test(t)) return;
+        const cx = L(c), cy = Tp(c);
+        if (cx < bx - 20 || cy < by - 20 || cy > by + bh + (isRack ? 40 : 0)) return;
+        right = Math.max(right, cx + c.offsetWidth - bx);
+        bottom = Math.max(bottom, cy + c.offsetHeight - by);
+      });
+      const w = Math.ceil(right + (isRack ? 14 : 30));
+      if (right && w > inner.offsetWidth + 2) inner.style.width = w + 'px';
+      if (!isRack && bottom && bottom + 30 > bh) inner.style.height = Math.ceil(bottom + 30) + 'px';
+    });
+  }
+  setInterval(() => { growBg(); wiresFront(); }, 500);
+
+  /* ---------------- 실습장치 배치 ---------------- */
+  function put(type, x, y, label){
+    const id = spawnComponent(type, x, y); const el = id && document.getElementById(id);
+    if (el && label){ el.dataset.label = label; try { refreshComponentLabel(id); } catch(e){} }
+    return el;
+  }
+  const W2 = (a, b) => { if (a && b) createWire(a, b); };
+  function placeRack(ox, oy){
+    const rackEl = put('lab-rack', ox, oy);
+    const mods = [['lab-psu','PSU'],['lab-emg','EMG'],['lab-pbu','PB'],['lab-relay','RY1'],['lab-relay','RY2'],['lab-timer','TIMER'],['lab-counter','CNT'],['lab-lamp','LAMP']];
+    let x = ox + 14; const placed = [];
+    mods.forEach(([t, lb]) => { const el = put(t, x, oy + 34, lb); if (el){ placed.push(el); x += el.offsetWidth + 6; } });
+    const mh = Math.max(...placed.map(el => el.querySelector('.lab-mod')?.offsetHeight || el.offsetHeight));
+    placed.forEach(el => { const m = el.querySelector('.lab-mod'); if (m) m.style.height = mh + 'px'; });
+    const rk = rackEl && rackEl.querySelector('.lab-rack');
+    if (rk){ rk.style.height = (mh + 60) + 'px'; rk.style.width = (x - ox + 14) + 'px'; }
+    placeRack.h = mh + 60;
+    // 버스 점퍼(빨강 +24V / 파랑 0V) — 사진처럼 모듈끼리 이어 둠
+    for (let i = 0; i < placed.length - 1; i++){
+      const a = placed[i], b = placed[i + 1];
+      const lastP = (el) => { const ps = el.querySelectorAll('.lab-bus-dc24p .pin-mini, .lab-psu-top .pin-mini'); return ps[ps.length - 1]; };
+      const firstP = (el) => el.querySelector('.lab-bus-dc24p .pin-mini');
+      const lastN = (el) => { const ps = el.querySelectorAll('.lab-bus-dc24n .pin-mini, .lab-psu-bot .pin-mini'); return ps[ps.length - 1]; };
+      const firstN = (el) => el.querySelector('.lab-bus-dc24n .pin-mini');
+      W2(lastP(a), firstP(b)); W2(lastN(a), firstN(b));
+    }
+    return { placed, w: x - ox };
+  }
+  function fit(totalW, totalH){
+    const area = document.getElementById('canvasArea');
+    zoomLevel = Math.min(1, Math.max(0.35, Math.min((area.clientWidth - 30) / totalW, (area.clientHeight - 20) / totalH)));
+    applyZoom(); area.scrollLeft = 0; area.scrollTop = 0;
+  }
+  function banner(msg){
+    let el = document.getElementById('labBanner');
+    if (!el){ el = document.createElement('div'); el.id = 'labBanner'; el.className = 'lab-banner'; document.body.appendChild(el); el.onclick = () => { el.hidden = true; }; }
+    el.textContent = msg; el.hidden = false; clearTimeout(el._t); el._t = setTimeout(() => { el.hidden = true; }, 9000);
+  }
+  window.labPlaceBench = function(kind){
+    const hasParts = !!document.querySelector('#canvasInner > .placed-component');
+    const name = kind === 'pn' ? '공압제어' : '유압제어';
+    if (hasParts && !confirm(`캔버스를 비우고 ${name} 실습장치를 사진과 같은 구성으로 배치할까요?\n(지금 작업은 Ctrl+Z로 되돌릴 수 있습니다)`)) return;
+    try { plcCheckpoint(); } catch(e){}
+    if (isRunning) toggleRun();
+    clearCanvas();
+    const ox = 40, oy = 30;
+    const rack = placeRack(ox, oy);
+    const by = oy + (placeRack.h || 380) + 50, BW = Math.max(1500, rack.w + 20);
+    const board = put(kind === 'pn' ? 'lab-board-pn' : 'lab-board-hy', ox, by);
+    if (board){ const bd = board.querySelector('.lab-board'); if (bd) bd.style.width = BW + 'px'; }
+    if (kind === 'pn'){
+      const frl = put('lab-pn-frl', ox + 40, by + 50, 'FRL');
+      const dist = put('lab-pn-dist', ox + 40, by + 330, '분배기');
+      const c1 = put('lab-pn-cyl', ox + 240, by + 40, '실린더 A');
+      const c2 = put('lab-pn-cyl', ox + 820, by + 40, '실린더 B');
+      const ls = [put('lab-ls', ox + 230, by + 230, 'S1'), put('lab-ls', ox + 560, by + 230, 'S2'), put('lab-ls', ox + 810, by + 230, 'S3'), put('lab-ls', ox + 1140, by + 230, 'S4')];
+      const v1 = put('lab-pn-52d', ox + 300, by + 470, 'Y1/Y2 밸브');
+      const v2 = put('lab-pn-52d', ox + 880, by + 470, 'Y3/Y4 밸브');
+      [[ls[0], c1, 'ret'], [ls[1], c1, 'ext'], [ls[2], c2, 'ret'], [ls[3], c2, 'ext']].forEach(([s, c, e]) => { if (s && c){ const i = PIN(s.id, 'link'); i.value = c.id + '|' + e; i.dataset.manual = '1'; window.labLinkFill(s.id); } });
+      W2(PIN(frl.id,'P'), PIN(dist.id,'P1'));
+      W2(PIN(dist.id,'P2'), PIN(v1.id,'P')); W2(PIN(dist.id,'P3'), PIN(v2.id,'P'));
+      W2(PIN(v1.id,'A'), PIN(c1.id,'A')); W2(PIN(v1.id,'B'), PIN(c1.id,'B'));
+      W2(PIN(v2.id,'A'), PIN(c2.id,'A')); W2(PIN(v2.id,'B'), PIN(c2.id,'B'));
+    } else {
+      const pu = put('lab-hy-pu', ox + 40, by + 50, 'POWER UNIT');
+      const gd = put('hyd-gauge-distrib', ox + 300, by + 470, 'P 게이지');
+      const c1 = put('lab-hy-cyl', ox + 280, by + 40, '유압 실린더');
+      const ls = [put('lab-ls', ox + 270, by + 250, 'S1'), put('lab-ls', ox + 600, by + 250, 'S2')];
+      const v1 = put('lab-hy-43', ox + 520, by + 440, '4/3 밸브');
+      const fc = put('hyd-flow-oneway', ox + 820, by + 260, '유량제어');
+      put('lab-hy-42s', ox + 900, by + 440, '4/2 편솔');
+      put('hyd-relief', ox + 1180, by + 440, '릴리프');
+      put('lab-hy-cyld', ox + 900, by + 40, '차동 실린더');
+      [[ls[0], c1, 'ret'], [ls[1], c1, 'ext']].forEach(([s, c, e]) => { if (s && c){ const i = PIN(s.id, 'link'); i.value = c.id + '|' + e; i.dataset.manual = '1'; window.labLinkFill(s.id); } });
+      W2(PIN(pu.id,'P'), PIN(gd.id,'P0'));
+      W2(PIN(gd.id,'P1'), PIN(v1.id,'P'));
+      W2(PIN(v1.id,'T'), PIN(pu.id,'T'));
+      W2(PIN(v1.id,'A'), PIN(c1.id,'A'));
+      W2(PIN(v1.id,'B'), PIN(fc.id,'P')); W2(PIN(fc.id,'A'), PIN(c1.id,'B'));
+    }
+    bindPinEvents(); wiresFront(); growBg();
+    fit(ox + BW + 40, by + 820);
+    updateAllWires(); refreshLegend(); evaluateElectricalNets();
+    try { plcScheduleCheckpoint(); } catch(e){}
+    banner(kind === 'pn'
+      ? '🧰 공압제어 실습장치를 배치했습니다 — ⚡ 전력 투입 후, 푸시버튼·릴레이 접점을 거쳐 밸브 코일(Y1·Y2)의 +를 +24V, −를 0V에 배선해 보세요. 리밋스위치 S1~S4는 실린더 끝에 연결되어 있습니다.'
+      : '🧰 유압제어 실습장치를 배치했습니다 — ⚡ 전력 투입 → 파워 유닛 "펌프 기동" 후, 4/3 밸브 코일(Y1 전진·Y2 후진)을 릴레이 회로로 배선해 보세요.');
+  };
+
+  /* ---------------- 팔레트(맨 아래 두 탭, 기본 접힘) ---------------- */
+  if (Array.isArray(PALETTE_CATEGORIES) && !PALETTE_CATEGORIES.some(c => c.key === 'pnlab')){
+    PALETTE_CATEGORIES.push({ key:'pnlab', titleKo:'⑪ 공압제어 실습 (전기-공압 실습장치)', titleEn:'⑪ Electro-Pneumatic Lab', types: PN_TYPES });
+    PALETTE_CATEGORIES.push({ key:'hylab', titleKo:'⑫ 유압제어 실습 (전기-유압 실습장치)', titleEn:'⑫ Electro-Hydraulic Lab', types: HY_TYPES });
+  }
+  function decorate(){
+    const root = document.getElementById('paletteItems'); if (!root) return;
+    const groups = root.querySelectorAll('.palette-group');
+    PALETTE_CATEGORIES.forEach((cat, i) => {
+      if (cat.key !== 'pnlab' && cat.key !== 'hylab') return;
+      const g = groups[i]; if (!g) return;
+      g.classList.add('lab-pgroup', 'lab-pgroup-' + cat.key);
+      const body = g.querySelector('.palette-group-body'); if (!body || body.querySelector('.lab-bench-card')) return;
+      const kind = cat.key === 'pnlab' ? 'pn' : 'hy';
+      const card = document.createElement('div');
+      card.className = 'lab-bench-card lab-bench-' + kind;
+      card.innerHTML = `<div class="lab-bc-mini"><i></i><i></i><i></i><i></i><b></b></div><div><b>${kind === 'pn' ? '공압' : '유압'} 실습장치 배치</b><span>상단 모듈(전원·비상정지·버튼·릴레이·타이머·카운터·램프) + 프로파일 판 + ${kind === 'pn' ? 'FRL·실린더·양솔밸브·리밋스위치' : '파워유닛·4/3 밸브·실린더·리밋스위치'}</span></div>`;
+      card.onclick = () => window.labPlaceBench(kind);
+      body.insertBefore(card, body.firstChild);
+      const sep = (txt, before) => { const s = document.createElement('div'); s.className = 'lab-sep'; s.textContent = txt; const it = body.querySelector(`.palette-item[data-type="${before}"]`); if (it) body.insertBefore(s, it); };
+      sep('상단 모듈(전기 · 24V)', 'lab-psu');
+      sep(kind === 'pn' ? '공압 부품(프로파일 판)' : '유압 부품(프로파일 판)', kind === 'pn' ? 'lab-pn-frl' : 'lab-hy-pu');
+      sep('판 · 랙', kind === 'pn' ? 'lab-board-pn' : 'lab-board-hy');
+    });
+  }
+  if (typeof buildPalette === 'function'){
+    const _bp = buildPalette;
+    buildPalette = function(){ const r = _bp.apply(this, arguments); try { decorate(); } catch(e){} return r; };
+    buildPalette();
+  }
+
+  /* ---------------- 상시 동작(RUN 없이도 전원만 들어오면 릴레이·타이머·실린더 동작) ---------------- */
+  if (typeof evaluateElectricalNets === 'function'){
+    const _ev = evaluateElectricalNets;
+    evaluateElectricalNets = function(){ anyBuzz = false; const r = _ev.apply(this, arguments); if (document.querySelector('#canvasInner > .placed-component[data-type="lab-lamp"]')) buzz(anyBuzz && powerOn); return r; };
+  }
+  (function loop(){
+    try {
+      if (powerOn && !isRunning && document.querySelector('#canvasInner > .placed-component[data-type^="lab-"]') && !document.querySelector('#canvasInner > .placed-component[data-type^="sq-"]')) evaluateElectricalNets();
+      else if (!powerOn) buzz(false);
+    } catch(e){}
+    setTimeout(loop, Math.max(15, scanCycleMs || 20));
+  })();
+  window.__labRT = RT;
 })();
 
 </script>

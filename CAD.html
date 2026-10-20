@@ -394,7 +394,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 
 <div id="app">
 <section id="sw" class="win" aria-label="3D 모델러">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.90</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.92</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
   <div class="menubar" id="swMenu"></div>
   <div class="swmain">
     <nav class="rail" id="railL" aria-label="피처 · 어셈블리 명령"></nav>
@@ -420,7 +420,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 </section>
 
 <section id="ac" class="win" hidden aria-label="2D 도면">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.90</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.92</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
   <div class="menubar" id="acMenu"></div>
   <div class="acrow" id="acStd"></div>
   <div class="acrow" id="acProps"></div>
@@ -714,7 +714,7 @@ const I18N_DICT = {
 "F3 객체 스냅 · F7 모눈 · F8 직교 · F9 스냅": "F3 object snap · F7 grid · F8 ortho · F9 snap",
 "FeatureManager 디자인 트리": "FeatureManager design tree",
 "K-CAD 작업": "K-CAD workspace",
-"K군의 CAD v0.90": "K-CAD v0.90",
+"K군의 CAD v0.92": "K-CAD v0.92",
 "K군의 CAD 정보": "About K-CAD",
 "K군의 CAD 파일이 아닙니다": "Not a K-CAD file",
 "L 선 · C 원 · A 호 · REC 사각형 · POL 다각형 · DT 문자": "L line · C circle · A arc · REC rectangle · POL polygon · DT text",
@@ -1356,7 +1356,7 @@ const I18N_DICT = {
 "DXF로 내보내기": "Export to DXF",
 "DXF로 내보냅니다. 치수는 선과 문자로 분해되어 저장됩니다.": "Exports to DXF. Dimensions are exploded into lines and text.",
 "KS 제도 관례: 외형선 굵은 실선(0.5), 숨은선 파선(0.35), 중심선 1점 쇄선(0.25). 행을 두 번 클릭하면 현재 도면층이 됩니다.": "KS drafting practice: visible lines thick solid (0.5), hidden lines dashed (0.35), centerlines chain (0.25). Double-click a row to make it current.",
-"K군의 CAD v0.90 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.90 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
+"K군의 CAD v0.92 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.92 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
 "{0}   도면층: \"{1}\"": "{0}   Layer: \"{1}\"",
 "{0} (객체 선택됨)": "{0} (objects selected)",
 "{0} 가로 ({1}×{2})": "{0} landscape ({1}×{2})",
@@ -1825,8 +1825,19 @@ function ic(name, size = 16) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 }
 /* ================= release notes (bottom-left button, Help menu) ================= */
-const APP_VER = 'v0.90';
+const APP_VER = 'v0.92';
 const RELEASES = [
+  { v: 'v0.92', date: '2026-10-20', title: ['어셈블리에 표준 부품 불러오기', 'Load standard parts into assemblies'], items: [
+    ['어셈블리 창의 도구 메뉴 맨 위 [불러오기 — 표준 부품]: 기어·볼트·너트·베어링·축·풀리·브라켓 등 부품 템플릿 70종에서 골라 치수를 정하고 [넣기]를 누르면, 부품 문서가 만들어져 지금 어셈블리의 기존 부품 옆에 바로 들어갑니다(빈 어셈블리면 원점에 고정). 삽입 메뉴와 [부품 삽입] 창에도 같은 버튼이 있습니다.', 'Assembly Tools menu → [Load — standard part]: pick one of 70 part templates (gears, bolts, nuts, bearings, shafts, pulleys, brackets…), set the sizes and press [Insert]; the part is made and placed next to the existing components (fixed at the origin in an empty assembly). Also in the Insert menu and the Insert component panel.'],
+  ] },
+  { v: 'v0.91', date: '2026-10-19', title: ['CNC 밀링 — 가공 방식 선택 · 헬리컬 · 소재 크기 · 원점', 'CNC milling — strategies, helical, stock size, work zero'], items: [
+    ['밀링 CAM 창 맨 위 "가공 방식 — 먼저 정하세요": 황삭(Z 레벨 지그재그 + 벽 윤곽 / 윤곽 평행 오프셋), 황삭 진입(수직 / 헬리컬), 정삭(평행 + 벽 등고선 / 평행만 / 등고선만), 잔삭(안 함 / 작은 볼 엔드밀로 남은 곳만), 구멍(드릴만 / 자동 / 헬리컬 우선)을 고르고, 고른 방식의 설명이 바로 아래 나옵니다.', 'Milling CAM now starts with "Machining strategy": roughing (Z-level zig-zag + wall contour / contour-parallel offset), entry (plunge / helical ramp), finishing (raster + waterline / raster / waterline), rest machining (none / small ball where the finisher could not reach) and holes (drills / auto / helical), each with a short explanation.'],
+    ['헬리컬 보간 구멍 가공: T02 엔드밀이 구멍 벽을 따라 나선으로 내려가 정확한 지름과 평평한 바닥을 만듭니다(G03 X Y Z I J — 1회전당 한 블록, 하향 절삭). 드릴보다 큰 구멍도 깎을 수 있습니다. 헬리컬 진입은 포켓에 들어갈 때 같은 방식으로 내려갑니다.', 'Helical hole milling: the T02 end mill spirals down the hole wall for an exact diameter and flat floor (G03 X Y Z I J, one block per turn, climb). Holes larger than any drill can be cut. The helical ramp uses the same move to enter pockets.'],
+    ['잔삭(T05): 정삭이 끝난 뒤 남은 소재를 찾아 구석 R·좁은 홈만 작은 볼 엔드밀로 다시 깎습니다.', 'Rest machining (T05): after finishing, re-cuts only the leftovers in corners and narrow slots with a small ball.'],
+    ['소재 크기 직접 입력: X·Y·Z를 넣으면 칸마다 최소값(부품 크기)이 보이고, 부품보다 작으면 "더 크게 넣으세요" 경고와 함께 경로를 만들지 않습니다. [추천 크기 넣기]로 알맞은 크기를 채웁니다.', 'Exact stock size: each of X, Y, Z shows its minimum (the part); smaller values give a warning and no toolpath. [Use recommended size] fills one in.'],
+    ['원점 G54 선택: 부품·소재의 네 모서리 또는 중심 + 부품 윗면·소재 윗면·소재 밑면. 그 원점에서 본 좌표 범위가 바로 보이고, G코드(.nc · .ngc · .apt)가 그 기준으로 나오며, 시뮬레이션에 노란 G54 축이 표시됩니다.', 'Work zero G54: any corner or the centre of the part or stock, with Z at the part top, stock top or stock bottom. Coordinate ranges are shown, the G-code (.nc, .ngc, .apt) is written from it, and yellow G54 axes mark it in the simulation.'],
+    ['고침: 높이가 다른 구멍 사이를 옮겨 갈 때 시뮬레이션이 부품을 스치던 급속 이동을 G98(처음 높이로 복귀)대로 바로잡았습니다.', 'Fix: the simulation of moves between holes at different heights now follows G98 (return to the initial level) instead of clipping the part.'],
+  ] },
   { v: 'v0.90', date: '2026-10-19', title: ['어셈블리 창에 렌더링 버튼', 'Render button in assemblies'], items: [
     ['어셈블리 창의 왼쪽 명령 막대(모션 스터디·어셈블리 해석 아래)와 위쪽 빠른 도구 모음에 [렌더링] 버튼을 넣었습니다. 전에는 어셈블리에서 보기 메뉴로만 열 수 있었습니다.', 'A [Render] button is now on the assembly command bar (below motion study and assembly study) and the quick-access toolbar; before, assemblies could only open it from the View menu.'],
   ] },
@@ -6176,7 +6187,7 @@ async function saveFile(filename, data, mime) {
 }
 function docExport(d) {
   const strip = (k, v) => (k[0] === '_' ? undefined : v);
-  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.90', doc: JSON.parse(JSON.stringify(d, strip)) };
+  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.92', doc: JSON.parse(JSON.stringify(d, strip)) };
   if (d.type === 'asm') o.parts = [...new Set(d.comps.map(c => c.part))].map(docById).filter(Boolean).map(p => JSON.parse(JSON.stringify(p, strip)));
   return JSON.stringify(o, null, 1);
 }
@@ -6332,7 +6343,7 @@ function helpDialog() {
 function aboutDialog() {
   dialog({
     title: 'K군의 CAD 정보', width: 360, classic: App.doc && App.doc.type === 'dwg', body: h('div', { style: 'display:flex;gap:12px;align-items:flex-start' }, icEl('part', 40),
-      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.90'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
+      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.92'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
     buttons: [{ label: '확인' }]
   });
 }
@@ -8727,12 +8738,13 @@ const Asm = (() => {
       { icon: 'render', label: L('렌더링', 'Render'), tip: L('사진처럼 렌더링 — 부품별 재질·색 지정', 'Photo-realistic render — material and colour per part'), run: () => Render.open() }, '|',
       { icon: 'part', label: '부품 열기', disabled: !selC, run: () => { const p = selC && docById(selC.part); if (p) activate(p); } }];
   }
-  const insertMenu = () => [{ label: '구성 요소 > 기존 부품/어셈블리...', icon: 'insert', run: insertCmd }, { label: '메이트...', icon: 'mate', run: () => mateCmd() }, { label: '부품 패턴 > 선형 패턴...', icon: 'clpattern', run: compPatternCmd }, { label: '분해도...', icon: 'explode', run: explodeCmd }];
+  const insertMenu = () => [{ label: '구성 요소 > 기존 부품/어셈블리...', icon: 'insert', run: insertCmd }, { label: L('구성 요소 > 표준 부품 불러오기 (기어·볼트·베어링…)...', 'Component > Standard part (gears, bolts, bearings…)...'), icon: 'folder', run: loadStd }, { label: '메이트...', icon: 'mate', run: () => mateCmd() }, { label: '부품 패턴 > 선형 패턴...', icon: 'clpattern', run: compPatternCmd }, { label: '분해도...', icon: 'explode', run: explodeCmd }];
   const simMenu = () => [
     { icon: 'motion', label: L('모션 스터디 (애니메이션 · 기구학 · 동역학)', 'Motion study (animation, kinematics, dynamics)'), run: () => MOTIONUI.studyCmd() }, '-',
     { icon: 'fem', label: L('어셈블리 정적 해석 (하중·자중)', 'Assembly static (loads, self-weight)'), run: () => ASMFEMUI.studyCmd('static') },
     { icon: 'fem', label: L('어셈블리 충격 해석 (반사인 펄스)', 'Assembly shock (half-sine pulse)'), run: () => ASMFEMUI.studyCmd('shock') }];
-  const toolsMenu = () => [{ label: '측정', icon: 'measure', run: Part.measureCmd }, { label: '질량 특성...', icon: 'mass', run: Part.massDialog }, { label: '간섭 탐지...', icon: 'interf', run: interferenceCmd }, '-', ...simMenu(), '-', { label: '모든 메이트 다시 풀기', icon: 'rebuild', run: () => { snapshot(A()); solveAll(A()); afterChange(A()); } }];
+  const loadStd = () => AIX.gallery(null, { into: A() });
+  const toolsMenu = () => [{ label: L('불러오기 — 표준 부품 (기어·볼트·베어링·축…)', 'Load — standard part (gears, bolts, bearings, shafts…)'), icon: 'folder', run: loadStd }, '-', { label: '측정', icon: 'measure', run: Part.measureCmd }, { label: '질량 특성...', icon: 'mass', run: Part.massDialog }, { label: '간섭 탐지...', icon: 'interf', run: interferenceCmd }, '-', ...simMenu(), '-', { label: '모든 메이트 다시 풀기', icon: 'rebuild', run: () => { snapshot(A()); solveAll(A()); afterChange(A()); } }];
 
   /* ---------- selection / dragging ---------- */
   function hoverMove(sx, sy) {
@@ -8884,7 +8896,7 @@ const Asm = (() => {
     openPM({
       title: '부품 삽입', icon: 'insert',
       msg: '삽입할 부품을 고르거나 [찾아보기]로 저장해 둔 부품 파일(JSON)이나 STL을 불러오세요. 첫 부품은 원점에 고정됩니다.',
-      groups: () => [{ title: '삽입할 부품/어셈블리', icon: 'part', body: [list, browse] }],
+      groups: () => [{ title: '삽입할 부품/어셈블리', icon: 'part', body: [list, browse, h('button', { class: 'pbtn wide', html: ic('folder', 16), onclick: () => { const d = A(); closePM(false); AIX.gallery(null, { into: d }); } }, h('span', null, L('표준 부품 불러오기 (기어·볼트·베어링…)', 'Standard part (gears, bolts, bearings…)')))] }],
       onClose() { clearGhost(); App.mode = selectMode; renderCM(); },
     });
   }
@@ -12965,7 +12977,7 @@ const Dwg = (() => {
     d.osm = d.osm || { end: true, mid: true, cen: true, quad: true, int: true, perp: true, ins: true };
     buildChrome(); setTitle(); resize();
     setTimeout(() => { if (doc === d) syncViews(false, true); }, 0);
-    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.90 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
+    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.92 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
     setPrompt('명령:');
     setTimeout(() => cin.focus({ preventScroll: true }), 30);
     redraw();
@@ -13902,6 +13914,7 @@ const Guide = (() => {
 <h3>조립 순서</h3>
 <ol><li>새 문서 → ${I('asm')} <b>어셈블리</b>.</li>
 <li>${I('insert')} <b>부품 삽입</b>: 열려 있는 부품을 고르고 화면을 클릭해 놓습니다. <b>처음 넣은 부품은 고정(f)</b>되어 기준이 됩니다.</li>
+<li>기어·볼트·베어링 같은 <b>표준 부품</b>은 <b>도구 → 불러오기</b>(또는 삽입 메뉴, [부품 삽입] 창의 [표준 부품 불러오기])에서 골라 치수를 정하고 [넣기]를 누르면 부품이 만들어져 어셈블리에 바로 들어갑니다.</li>
 <li>${I('mate')} <b>메이트</b>: 두 부품의 면(또는 원통 면·모서리)을 하나씩 클릭 → 메이트 종류를 고르고 ${I('ok')}.</li>
 <li>고정되지 않은 부품을 마우스로 끌어 보며 남은 움직임을 확인합니다.</li></ol>
 <table><tr><th>메이트</th><th>뜻</th><th>예</th></tr>
@@ -13933,6 +13946,7 @@ const Guide = (() => {
 <h3>Steps</h3>
 <ol><li>New document → ${I('asm')} <b>Assembly</b>.</li>
 <li>${I('insert')} <b>Insert component</b>: choose an open part and click to place it. <b>The first part is fixed (f)</b> and becomes the reference.</li>
+<li><b>Standard parts</b> such as gears, bolts and bearings: <b>Tools → Load</b> (or the Insert menu, or [Standard part] in the Insert component panel) — pick one, set its sizes and press [Insert]; the part is made and goes straight into the assembly.</li>
 <li>${I('mate')} <b>Mate</b>: click a face (or cylinder, edge) on each of two parts → choose the mate type → ${I('ok')}.</li>
 <li>Drag the unfixed parts to see what movement is left.</li></ol>
 <table><tr><th>Mate</th><th>Meaning</th><th>Example</th></tr>
@@ -14082,51 +14096,61 @@ const Guide = (() => {
 <p class="lead">블록·브라켓·판처럼 <b>각진 부품</b>을 바이스에 물린 소재에서 위에서 내려오는 공구로 깎는 경로를 만듭니다.</p>
 <h3>여는 방법</h3>
 <p>빠른 도구 모음의 ${I('mill')} 또는 <b>도구 → CAM — CNC 밀링 가공</b>, AI 명령줄에 "<code>밀링</code>", "<code>머시닝</code>".</p>
-<h3>설정 항목</h3>
-<table><tr><th>묶음</th><th>항목 · 뜻</th></tr>
-<tr><td>소재와 방향</td><td><b>공구 방향</b>: 자동(위에서 안 보이는 곳 — 언더컷 — 이 가장 적은 방향) 또는 직접 · <b>윗면 여유</b> · <b>옆면 여유</b>(각 변) · <b>바이스 물림 여유</b>(부품 아래). 소재 = 부품 크기 + 여유</td></tr>
-<tr><td>공정</td><td>윗면 페이스 가공(T01 Ø50) → 황삭 등고선 Z 레벨(T02 평 엔드밀) → 정삭(T03 볼 엔드밀, 평행 + 벽 등고선) → 센터 드릴 + 둥근 관통 구멍 드릴(T04, G83)</td></tr>
-<tr><td>공구와 절삭 조건</td><td>공구 지름 · <b>절입 깊이 ap</b> · 황삭 옆 간격(공구 지름의 0.3~0.8배) · 정삭 옆 간격 · 벽 등고선 간격 · 정삭 여유 · 최고 회전수 · 드릴 최대 지름</td></tr></table>
-<h3>순서</h3>
-<ol><li><b>▶ 가공 경로 만들고 시뮬레이션</b>.</li>
-<li>바이스에 물린 소재가 공구 모양(평·볼·드릴)대로 깎입니다. 색: <b>회색 = 남은 소재 · 노랑 = 정삭 여유 · 청록 = 완성</b>.</li>
-<li>재생 속도를 바꾸며 공구 교환과 급속 이동(빨간 점선)을 살펴봅니다.</li>
-<li>가공 시간·이동 거리·블록 수를 확인하고 G코드로 저장(.nc · .ngc · .apt).</li></ol>
+<h3>1. 가공 방식 — 먼저 정하세요</h3>
+<table><tr><th>단계</th><th>선택지</th><th>언제 쓰나</th></tr>
+<tr><td>황삭 (T02 평 엔드밀)</td><td><b>Z 레벨 — 지그재그 + 벽 윤곽</b>: 높이마다 왕복 후 벽을 한 바퀴<br><b>Z 레벨 — 윤곽 평행(오프셋)</b>: 벽 모양을 따라 일정 간격의 고리</td><td>넓고 평평한 곳은 지그재그가 빠름. 포켓·보스 주변은 윤곽 평행이 공구 부하가 고름</td></tr>
+<tr><td>황삭 진입</td><td><b>수직 진입</b> / <b>헬리컬 진입</b>: 작은 원을 그리며 나선으로 내려감(G03 + Z)</td><td>막힌 포켓에 들어갈 때 헬리컬 진입이 날 끝 부담이 적음. 원이 들어갈 자리가 없으면 자동으로 수직 진입</td></tr>
+<tr><td>정삭 (T03 볼 엔드밀)</td><td><b>평행 + 벽 등고선</b> / <b>평행만</b> / <b>등고선(Z 레벨)만</b></td><td>대부분 평행 + 벽 등고선. 완만한 곡면은 평행, 가파른 벽·리브는 등고선</td></tr>
+<tr><td>잔삭 (T05 작은 볼)</td><td><b>안 함</b> / <b>정삭 공구가 못 깎은 곳만</b></td><td>정삭이 끝난 뒤 구석 R·좁은 홈에 남은 소재만 작은 볼 엔드밀로 다시 깎음</td></tr>
+<tr><td>구멍</td><td><b>드릴만</b>(센터 + G83) / <b>자동</b>(드릴보다 큰 구멍은 헬리컬) / <b>헬리컬 우선</b></td><td>헬리컬 보간: 엔드밀이 구멍 벽을 따라 나선으로 내려가 정확한 지름과 평평한 바닥을 만듦. 구멍이 공구의 1.15배 이상이어야 함</td></tr></table>
+<h3>2. 소재 크기</h3>
+<ul><li><b>여유로</b>: 윗면·옆면·바이스 물림 여유(mm)를 넣으면 소재 = 부품 + 여유.</li>
+<li><b>크기 직접 입력</b>: 소재 X·Y·Z를 넣습니다. 칸 옆에 <b>최소값(부품 크기)</b>이 보이고, 부품보다 작으면 "더 크게 넣으세요" 경고가 나오며 경로를 만들지 않습니다. <b>추천 크기 넣기</b>를 누르면 알맞은 크기가 들어갑니다. 부품은 X·Y 가운데에 놓이고, Z는 윗면 여유를 뺀 나머지가 바이스 물림 여유가 됩니다.</li></ul>
+<h3>3. 원점 (G54)</h3>
+<p>X·Y 원점은 <b>부품 또는 소재의 네 모서리·중심</b>, Z 원점은 <b>부품 윗면 · 소재 윗면 · 소재 밑면</b> 중에서 고릅니다. 고르면 그 원점에서 본 부품·소재의 좌표 범위가 바로 보이고, G코드 좌표가 그 원점 기준으로 바뀝니다. 시뮬레이션에서 <b>노란 축(G54)</b>이 원점입니다. 기계에서는 같은 곳을 아큐센터·터치 센서로 찍어 G54에 넣습니다.</p>
+<h3>4. 공구와 절삭 조건</h3>
+<p>공구 지름(T01 페이스 밀 · T02 평 엔드밀 · T03 볼 엔드밀 · T05 잔삭 볼) · <b>절입 깊이 ap</b> · 황삭 옆 간격(공구 지름의 0.3~0.8배) · 정삭 옆 간격 · 벽 등고선 간격 · 정삭 여유 · 헬리컬 피치(1회전당 내려가는 깊이) · 최고 회전수.</p>
 <h3>원점과 주요 코드</h3>
-<p>공작물 원점 <b>G54 = 부품 왼쪽 앞 모서리(X0 Y0) + 윗면(Z0)</b>. 깎는 동안 Z는 음수입니다.</p>
+<p>기본 원점은 <b>부품 왼쪽 앞 모서리(X0 Y0) + 부품 윗면(Z0)</b>이고, 위 3번에서 바꿀 수 있습니다.</p>
 <table><tr><th>코드</th><th>뜻</th><th>코드</th><th>뜻</th></tr>
 <tr><td>G90 / G91</td><td>절대 / 증분 좌표</td><td>G17</td><td>XY 평면</td></tr>
 <tr><td>G54</td><td>공작물 좌표계</td><td>T02 M06</td><td>2번 공구로 교환</td></tr>
 <tr><td>G43 H02</td><td>공구 길이 보정</td><td>S · F</td><td>회전수(rpm) · 이송(mm/min)</td></tr>
-<tr><td>G81 / G83</td><td>드릴 / 펙 드릴 사이클</td><td>G28 · M30</td><td>원점 복귀 · 끝</td></tr></table>
+<tr><td>G81 / G83</td><td>드릴 / 펙 드릴 사이클</td><td>G28 · M30</td><td>원점 복귀 · 끝</td></tr>
+<tr><td>G03 X Y Z I J</td><td>반시계 원호 + Z 이동 = 헬리컬 보간 (I, J = 시작점에서 원 중심까지)</td><td>G98</td><td>고정 사이클 뒤 처음 높이로 복귀</td></tr></table>
 <div class="tip">💡 옆면의 구멍이나 홈, 아래로 파고든 곳(언더컷)은 위에서 내려오는 3축 공구로 깎을 수 없습니다. 이런 부품은 <b>5축 가공</b>을 쓰세요.</div>
 <div class="warn">⚠️ 교육용 시뮬레이션입니다. 실제 기계에서는 공구 길이 보정, 원점, 바이스 고정, 회전수를 반드시 확인하세요.</div>
-<div class="ex"><b>따라 해 보기 — 베어링 블록</b><ol><li>아래 버튼으로 베어링 블록을 만들고 밀링 CAM을 엽니다.</li><li>정삭 옆 간격을 1.0 → 0.4로 줄이면 시간과 표면(노랑 남은 양)이 어떻게 바뀌는지 비교합니다.</li><li>G코드에서 T03 M06 다음 줄들을 읽고 무엇을 하는지 적어 봅니다.</li></ol>${tryBtn('mill', '베어링 블록으로 밀링 CAM 열기')}</div>
+<div class="ex"><b>따라 해 보기 — 베어링 블록</b><ol><li>아래 버튼으로 베어링 블록을 만들고 밀링 CAM을 엽니다.</li><li>황삭을 지그재그 → 윤곽 평행으로, 진입을 헬리컬로 바꿔 시간과 경로 모양을 비교합니다. 잔삭을 켜고 구석이 어떻게 바뀌는지 봅니다.</li><li>G코드에서 T03 M06 다음 줄들을 읽고 무엇을 하는지 적어 봅니다.</li></ol>${tryBtn('mill', '베어링 블록으로 밀링 CAM 열기')}</div>
 `, `
 <h2>CAM ② CNC milling (3-axis machining centre)</h2>
 <p class="lead">For <b>prismatic parts</b> — blocks, brackets, plates — cut from stock held in a vice by a tool coming down from above.</p>
 <h3>Opening</h3>
 <p>${I('mill')} on the quick-access toolbar or <b>Tools → CAM — CNC milling</b>, or type "<code>milling</code>" in the AI line.</p>
-<h3>Settings</h3>
-<table><tr><th>Group</th><th>Items</th></tr>
-<tr><td>Stock and orientation</td><td><b>Tool direction</b>: auto (fewest areas hidden from above — undercuts) or manual · <b>top allowance</b> · <b>side allowance</b> (each side) · <b>vice allowance</b> (below the part). Stock = part size + allowances</td></tr>
-<tr><td>Operations</td><td>Face the top (T01 Ø50) → Z-level roughing (T02 flat end mill) → finishing (T03 ball end mill, parallel + wall contours) → centre drill + round through holes (T04, G83)</td></tr>
-<tr><td>Tools and cutting data</td><td>Tool diameters · <b>depth of cut ap</b> · roughing stepover (0.3–0.8 × diameter) · finishing stepover · wall contour step · finish allowance · max rpm · largest drilled hole</td></tr></table>
-<h3>Steps</h3>
-<ol><li><b>▶ Make toolpath and simulate</b>.</li>
-<li>The stock in the vice is cut in the shape of each tool (flat, ball, drill). Colours: <b>grey = stock left · yellow = finish allowance · teal = finished</b>.</li>
-<li>Change the playback speed to watch tool changes and rapids (red dashed).</li>
-<li>Check time, distance and blocks; save G-code (.nc · .ngc · .apt).</li></ol>
+<h3>1. Machining strategy — choose first</h3>
+<table><tr><th>Stage</th><th>Choices</th><th>When</th></tr>
+<tr><td>Roughing (T02 flat)</td><td><b>Z-level — zig-zag + wall contour</b> / <b>Z-level — contour-parallel (offset)</b>: rings that follow the walls</td><td>Zig-zag is fast on open flat areas; offset gives an even tool load around pockets and bosses</td></tr>
+<tr><td>Roughing entry</td><td><b>Plunge</b> / <b>Helical ramp</b>: spiral down on a small circle (G03 + Z)</td><td>Helical entry is easier on the tool when entering a closed pocket; falls back to a plunge where the circle doesn't fit</td></tr>
+<tr><td>Finishing (T03 ball)</td><td><b>Raster + waterline</b> / <b>Raster only</b> / <b>Waterline only</b></td><td>Most parts: raster + waterline. Gentle surfaces: raster. Steep walls and ribs: waterline</td></tr>
+<tr><td>Rest (T05 small ball)</td><td><b>None</b> / <b>Only where the finishing tool could not reach</b></td><td>After finishing, re-cuts only the leftovers in corners and narrow slots</td></tr>
+<tr><td>Holes</td><td><b>Drills only</b> (spot + G83) / <b>Auto</b> (helical above the largest drill) / <b>Helical</b></td><td>Helical interpolation: the end mill spirals down the wall for an exact diameter and flat floor; the hole must be ≥ 1.15 × the tool</td></tr></table>
+<h3>2. Stock size</h3>
+<ul><li><b>Allowances</b>: top, side and vise allowances (mm); stock = part + allowances.</li>
+<li><b>Exact size</b>: type stock X, Y, Z. Each box shows the <b>minimum (the part size)</b>; a smaller value gives an "enter larger values" warning and no toolpath. <b>Use recommended size</b> fills a sensible size. The part is centred in X and Y; in Z whatever is left after the top allowance is held in the vise.</li></ul>
+<h3>3. Work zero (G54)</h3>
+<p>X·Y zero: any <b>corner or the centre of the part or the stock</b>; Z zero: <b>top of the part · top of the stock · bottom of the stock</b>. The coordinate ranges of the part and stock from that zero are shown at once, and the G-code is written from it. The <b>yellow axes (G54)</b> in the simulation mark it. On the machine, touch off the same point and set G54.</p>
+<h3>4. Tools and cutting data</h3>
+<p>Tool diameters (T01 face mill · T02 flat · T03 ball · T05 rest ball) · <b>depth of cut ap</b> · roughing stepover (0.3–0.8 × Ø) · finishing stepover · waterline step · allowances · helix pitch · max rpm.</p>
 <h3>Work zero and main codes</h3>
-<p>Work offset <b>G54 = front-left corner of the part (X0 Y0) + top face (Z0)</b>. Z is negative while cutting.</p>
+<p>The default zero is the <b>front-left corner of the part (X0 Y0) + its top (Z0)</b>; change it in step 3.</p>
 <table><tr><th>Code</th><th>Meaning</th><th>Code</th><th>Meaning</th></tr>
 <tr><td>G90 / G91</td><td>Absolute / incremental</td><td>G17</td><td>XY plane</td></tr>
 <tr><td>G54</td><td>Work coordinate system</td><td>T02 M06</td><td>Change to tool 2</td></tr>
 <tr><td>G43 H02</td><td>Tool length offset</td><td>S · F</td><td>Spindle rpm · feed (mm/min)</td></tr>
-<tr><td>G81 / G83</td><td>Drill / peck drill cycle</td><td>G28 · M30</td><td>Return home · end</td></tr></table>
+<tr><td>G81 / G83</td><td>Drill / peck drill cycle</td><td>G28 · M30</td><td>Return home · end</td></tr>
+<tr><td>G03 X Y Z I J</td><td>CCW arc + Z move = helical interpolation (I, J = from start to centre)</td><td>G98</td><td>Return to the initial level after a cycle</td></tr></table>
 <div class="tip">💡 Holes and slots in the sides, or pockets that dig under (undercuts), can't be reached by a 3-axis tool from above. Use <b>5-axis</b> for those parts.</div>
 <div class="warn">⚠️ A teaching simulation. On a real machine always check tool length offsets, work zero, vice clamping and spindle speed.</div>
-<div class="ex"><b>Try it — a pillow block</b><ol><li>Make a pillow block and open milling CAM with the button below.</li><li>Reduce the finishing stepover from 1.0 to 0.4 and compare the time and the surface (yellow left over).</li><li>Read the lines after T03 M06 in the G-code and write down what they do.</li></ol>${tryBtn('mill', 'Open milling CAM on a pillow block')}</div>
+<div class="ex"><b>Try it — a pillow block</b><ol><li>Make a pillow block and open milling CAM with the button below.</li><li>Switch roughing from zig-zag to offset and the entry to helical; compare time and path shape. Turn on rest machining and look at the corners.</li><li>Read the lines after T03 M06 in the G-code and write down what they do.</li></ol>${tryBtn('mill', 'Open milling CAM on a pillow block')}</div>
 `) },
     { id: 'mill5', icon: 'mill5', t: () => K('가공 ③ 5축 가공', 'CAM ③ 5-axis'), html: () => K(`
 <h2>CAM ③ 5축 가공 (3+2 인덱스)</h2>
@@ -15018,18 +15042,26 @@ const AIX = (() => {
   }
 
   /* ================= template gallery ================= */
-  function gallery(preKey) {
-    let cat = preKey ? TPL.byKey.get(preKey).cat : (modeNow() === 'asm' ? 'asm' : 'fast'), sel = preKey || null, q = '', vals = {}, dwg = false;
+  // opts.into = an assembly: only part templates, and the made part is inserted into that assembly next to what is already there
+  function insertInto(A, part) {
+    activate(A); const B = getBuild(part).topo.bbox, mn = B.mn, mx = B.mx;
+    let pos = new THREE.Vector3();
+    if (A.comps.length && App._box && !App._box.isEmpty()) { const ab = App._box; pos.set(ab.max.x + 15 - mn[0], ab.min.y - mn[1], (ab.min.z + ab.max.z) / 2 - (mn[2] + mx[2]) / 2); }
+    const c = Asm.addComp(part, pos, !A.comps.length); View.fit(App._box); return c;
+  }
+  function gallery(preKey, opts = {}) {
+    const into = opts.into && opts.into.type === 'asm' ? opts.into : null;
+    let cat = preKey ? TPL.byKey.get(preKey).cat : into ? 'gear' : (modeNow() === 'asm' ? 'asm' : 'fast'), sel = preKey || null, q = '', vals = {}, dwg = false;
     const body = h('div', { class: 'tplg' });
     const render = () => {
       body.innerHTML = '';
       const search = h('input', { class: 'tplq', placeholder: L('찾기: 기어, 베어링, M8 …', 'Search: gear, bearing, M8 …'), value: q, oninput: e => { q = e.target.value; renderList(); } });
       search.addEventListener('keydown', e => e.stopPropagation());
-      const tabs = h('div', { class: 'tpltabs' }, TPL.CATS.map(([k, ko, en]) => h('button', { class: cat === k && !q ? 'on' : '', onclick: () => { cat = k; q = ''; render(); } }, `${L(ko, en)} ${TPL.CAT.filter(e => e.cat === k).length}`)));
+      const tabs = h('div', { class: 'tpltabs' }, TPL.CATS.filter(([k]) => !into || k !== 'asm').map(([k, ko, en]) => h('button', { class: cat === k && !q ? 'on' : '', onclick: () => { cat = k; q = ''; render(); } }, `${L(ko, en)} ${TPL.CAT.filter(e => e.cat === k).length}`)));
       const list = h('div', { class: 'tpllist' }), form = h('div', { class: 'tplform' });
       function renderList() {
         list.innerHTML = '';
-        const items = q ? TPL.CAT.filter(e => (e.name.join(' ') + ' ' + e.desc).toLowerCase().includes(q.toLowerCase()) || e.re.test(q)) : TPL.CAT.filter(e => e.cat === cat);
+        const items = (q ? TPL.CAT.filter(e => (e.name.join(' ') + ' ' + e.desc).toLowerCase().includes(q.toLowerCase()) || e.re.test(q)) : TPL.CAT.filter(e => e.cat === cat)).filter(e => !into || e.kind === 'part');
         for (const e of items) list.append(h('button', { class: 'tplitem' + (sel === e.key ? ' on' : ''), onclick: () => { sel = e.key; vals = TPL.defaults(e); renderList(); renderForm(); } }, icEl(e.kind === 'asm' ? 'asm' : 'part', 16), h('span', null, L(e.name[0], e.name[1])), e.desc ? h('small', null, e.desc) : null));
         if (!items.length) list.append(h('div', { class: 'hint' }, L('찾는 템플릿이 없습니다.', 'No matching template.')));
       }
@@ -15041,7 +15073,8 @@ const AIX = (() => {
           const inp = numInput(vals[k] ?? def, v => { vals[k] = v; }, { step: Math.abs(+def) >= 20 ? 1 : 0.5 }); inp.addEventListener('keydown', ev => ev.stopPropagation());
           form.append(field(`${label} (${k})`, inp));
         }
-        if (e.kind === 'part') form.append(checkInput(L('도면도 함께 만들기', 'Also make a drawing'), dwg, v => { dwg = v; }));
+        if (e.kind === 'part' && !into) form.append(checkInput(L('도면도 함께 만들기', 'Also make a drawing'), dwg, v => { dwg = v; }));
+        if (into) { form.append(h('button', { class: 'pbtn primary wide', onclick: () => { try { const sc = TPL.build(e.key, vals, false); closeDlg(); exec(sc); const part = App.ws.docs.filter(d => d.type === 'part').slice(-1)[0]; const c = insertInto(into, part); status(L(`${c.name}을(를) "${into.name}"에 넣었습니다 — [메이트]로 다른 부품에 맞추세요.`, `${c.name} inserted into "${into.name}" — use [Mate] to place it.`)); } catch (err) { show([L('만들지 못했습니다: ', 'Could not build it: ') + err.message], true); } } }, L(`"${into.name}"에 넣기`, `Insert into "${into.name}"`)), h('div', { class: 'hint' }, L('부품 문서가 새로 만들어지고, 어셈블리의 기존 부품 옆에 놓입니다. 그다음 [메이트]로 위치를 맞추세요(첫 부품이면 원점에 고정).', 'A new part document is made and placed next to the existing components; then use [Mate] to position it (the first part is fixed at the origin).'))); return; }
         form.append(h('button', { class: 'pbtn primary wide', onclick: () => { try { const sc = TPL.build(e.key, vals, dwg); closeDlg(); report(exec(sc), L('템플릿', 'Template')); } catch (err) { show([L('만들지 못했습니다: ', 'Could not build it: ') + err.message, closeBtn()], 'err'); } } }, L('▶ 만들기', '▶ Make')));
       }
       body.append(h('div', { class: 'tpltop' }, search), tabs, h('div', { class: 'tplmain' }, list, form)); renderList(); renderForm();
@@ -15049,7 +15082,7 @@ const AIX = (() => {
     if (sel) vals = TPL.defaults(TPL.byKey.get(sel));
     render();
     let closeDlg = () => {};
-    const dl = dialog({ title: L(`템플릿 라이브러리 — 부품 ${TPL.CAT.filter(e => e.kind === 'part').length}종 · 어셈블리 ${TPL.CAT.filter(e => e.kind === 'asm').length}종`, `Template library — ${TPL.CAT.length} templates`), width: Math.min(780, innerWidth - 24), body, buttons: [{ label: L('닫기', 'Close') }] }); void dl;
+    const dl = dialog({ title: into ? L(`표준 부품 불러오기 → ${into.name} (부품 ${TPL.CAT.filter(e => e.kind === 'part').length}종)`, `Load a standard part → ${into.name} (${TPL.CAT.filter(e => e.kind === 'part').length} parts)`) : L(`템플릿 라이브러리 — 부품 ${TPL.CAT.filter(e => e.kind === 'part').length}종 · 어셈블리 ${TPL.CAT.filter(e => e.kind === 'asm').length}종`, `Template library — ${TPL.CAT.length} templates`), width: Math.min(780, innerWidth - 24), body, buttons: [{ label: L('닫기', 'Close') }] }); void dl;
     closeDlg = () => { const w = body.closest('.dlgwrap') || body.closest('.dlg'); if (w) w.remove(); };
   }
 
@@ -15528,7 +15561,7 @@ const MillCAM = (() => {
   function heightOf(part, S) {
     const B = getBuild(part), T = B.tris; let dk = S.dir, hidden = null;
     if (!DIRS[dk]) { const r = bestDir(T); dk = r.dir; hidden = r.hidden; }
-    const margin = Math.max(S.Dr, S.Df) / 2 + S.side + 3;
+    const margin = Math.max(S.Dr, S.Df) / 2 + Math.max(S.side || 0, S.sideX || 0, S.sideY || 0) + 3;
     const G = rasterize(T, basis(dk), 0, margin); G.dir = dk;
     if (hidden == null) { const V = meshVolume(T); let vh = 0; for (const z of G.h) if (z > -Infinity) vh += (z + G.H) * G.cell * G.cell; hidden = Math.abs(vh - V) / Math.max(V, 1e-9); }
     G.hidden = hidden; return G;
@@ -15628,9 +15661,21 @@ const MillCAM = (() => {
     return m; }
 
   /* ---------- planning ---------- */
+  // work zero G54 in the plan's frame (X0 Y0 = left-front of the part, Z0 = top of the part)
+  function orgOf(S, b) {
+    const xy = S.orgXY || 'p-lf', z = S.orgZ || 'ptop', st = xy[0] === 's', w = xy.slice(2);
+    const x0 = st ? b.sx0 : 0, x1 = st ? b.sx1 : b.Lx, y0 = st ? b.sy0 : 0, y1 = st ? b.sy1 : b.Ly;
+    const ox = w === 'c' ? (x0 + x1) / 2 : w[0] === 'r' ? x1 : x0, oy = w === 'c' ? (y0 + y1) / 2 : w[1] === 'b' ? y1 : y0;
+    return [ox, oy, z === 'stop' ? b.ztop : z === 'sbot' ? b.zbot : 0];
+  }
+  const ORGXY = () => [['p-lf', L('부품 왼쪽 앞 모서리', 'Part front-left corner')], ['p-rf', L('부품 오른쪽 앞 모서리', 'Part front-right corner')], ['p-lb', L('부품 왼쪽 뒤 모서리', 'Part back-left corner')], ['p-rb', L('부품 오른쪽 뒤 모서리', 'Part back-right corner')], ['p-c', L('부품 중심', 'Part centre')],
+    ['s-lf', L('소재 왼쪽 앞 모서리', 'Stock front-left corner')], ['s-rf', L('소재 오른쪽 앞 모서리', 'Stock front-right corner')], ['s-lb', L('소재 왼쪽 뒤 모서리', 'Stock back-left corner')], ['s-rb', L('소재 오른쪽 뒤 모서리', 'Stock back-right corner')], ['s-c', L('소재 중심', 'Stock centre')]];
+  const ORGZ = () => [['ptop', L('부품 윗면 (완성 높이)', 'Top of the part (finished)')], ['stop', L('소재 윗면', 'Top of the stock')], ['sbot', L('소재 밑면 (바이스 바닥)', 'Bottom of the stock')]];
+  const orgText = (xy, z) => ({ 'p-lf': 'LEFT FRONT CORNER OF PART', 'p-rf': 'RIGHT FRONT CORNER OF PART', 'p-lb': 'LEFT BACK CORNER OF PART', 'p-rb': 'RIGHT BACK CORNER OF PART', 'p-c': 'CENTRE OF PART', 's-lf': 'LEFT FRONT CORNER OF STOCK', 's-rf': 'RIGHT FRONT CORNER OF STOCK', 's-lb': 'LEFT BACK CORNER OF STOCK', 's-rb': 'RIGHT BACK CORNER OF STOCK', 's-c': 'CENTRE OF STOCK' }[xy || 'p-lf']) + ', Z0 = ' + ({ ptop: 'TOP OF PART', stop: 'TOP OF STOCK', sbot: 'BOTTOM OF STOCK' }[z || 'ptop']);
   function plan(G, S, part, opt = {}) { // opt.init: starting stock height map (5-axis sides), opt.far: far side of the part for drilling
     const { nx, ny, cell } = G, N = nx * ny, zb = -G.H, mat = MATM[S.mat];
-    const P = { G, zb, Z0: 0, sx0: -S.side, sx1: G.Lx + S.side, sy0: -S.side, sy1: G.Ly + S.side, ztop: S.top, zbot: zb - S.grip, ops: [], holes: [], warn: [] };
+    const sX = S.sideX != null ? S.sideX : S.side, sY = S.sideY != null ? S.sideY : S.side;
+    const P = { G, zb, Z0: 0, sx0: -sX, sx1: G.Lx + sX, sy0: -sY, sy1: G.Ly + sY, ztop: S.top, zbot: zb - S.grip, ops: [], holes: [], warn: [] };
     P.Zc = S.top + 5; P.Lx = G.Lx; P.Ly = G.Ly; P.H = G.H;
     const X = i => G.gx0 + i * cell, Y = j => G.gy0 + j * cell, idx = (x, y) => [Math.round((x - G.gx0) / cell), Math.round((y - G.gy0) / cell)];
     // --- holes: enclosed empty regions that are round and small enough → drill; filled for milling
@@ -15639,9 +15684,12 @@ const MillCAM = (() => {
       while (q.length) { const c = q.pop(); cells.push(c); const i = c % nx, j = (c - i) / nx; if (i === 0 || j === 0 || i === nx - 1 || j === ny - 1) border = true; sx += i; sy += j; mnx = Math.min(mnx, i); mxx = Math.max(mxx, i); mny = Math.min(mny, j); mxy = Math.max(mxy, j);
         for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= nx || jj >= ny) continue; const k = jj * nx + ii; if (h[k] === -Infinity) { if (lab[k] < 0) { lab[k] = id; q.push(k); } } else rim = Math.max(rim, h[k]); } }
       comps.push({ cells, border, cx: X(sx / cells.length), cy: Y(sy / cells.length), w: (mxx - mnx + 1) * cell, hgt: (mxy - mny + 1) * cell, A: cells.length * cell * cell, rim }); }
+    // hole method: 'drill' = drills only; 'auto' = drill up to maxDrill, helical above; 'helix' = helical whenever the end mill fits
+    const hm = S.holeMode || 'drill', helixOK = d => hm !== 'drill' && d >= S.Dr * 1.15 && d <= (S.maxHelix || 60) && (hm === 'helix' || d > S.maxDrill);
+    const maxD = hm === 'drill' ? S.maxDrill : Math.max(S.maxDrill, S.maxHelix || 60);
     const addHole = (c, floor) => { const d = 2 * Math.sqrt(c.A / Math.PI), dm = (c.w + c.hgt) / 2;
       const round = Math.abs(c.w - c.hgt) / Math.max(c.w, c.hgt) < 0.15 && c.A / (Math.PI * dm * dm / 4) > 0.82;
-      if (!(S.doDrill && round && d >= 1.5 && d <= S.maxDrill)) return; // refine with a least-squares circle through the mesh vertices on the hole wall
+      if (!(S.doDrill && round && d >= 1.5 && (d <= S.maxDrill || helixOK(d)))) return; // refine with a least-squares circle through the mesh vertices on the hole wall
         let cx = c.cx, cy = c.cy, dd = d; for (let it = 0; it < 3; it++) { const band = it ? 0.03 : Math.max(0.15, cell * 0.6); let sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0, sxz = 0, syz = 0, sz = 0, m = 0;
           for (let q = 0; q < G.vx.length; q++) { const x = G.vx[q], y = G.vy[q], rr = Math.hypot(x - cx, y - cy); if (Math.abs(rr - dd / 2) > band) continue; const z = x * x + y * y; sx += x; sy += y; sxx += x * x; syy += y * y; sxy += x * y; sxz += x * z; syz += y * z; sz += z; m++; }
           if (m < 6) break; // solve [sxx sxy sx; sxy syy sy; sx sy m] [a b c] = [sxz syz sz]; circle x²+y² = a x + b y + c
@@ -15649,10 +15697,10 @@ const MillCAM = (() => {
           if (!m) break; const A0 = M[0][3] / M[0][0], B0 = M[1][3] / M[1][1], C0 = M[2][3] / M[2][2], ncx = A0 / 2, ncy = B0 / 2, nr = Math.sqrt(C0 + ncx * ncx + ncy * ncy);
           if (!(nr > 0) || Math.hypot(ncx - c.cx, ncy - c.cy) > 2 * cell || Math.abs(2 * nr - d) > 3 * cell) break; cx = ncx; cy = ncy; dd = 2 * nr; }
         const snap = v => Math.abs(v - Math.round(v * 100) / 100) < 0.004 ? Math.round(v * 100) / 100 : v;
-        P.holes.push({ x: snap(cx), y: snap(cy), d: Math.round(dd * 10) / 10, top: c.rim, floor }); /* drills come in 0.1 mm steps */ for (const k of c.cells) h[k] = c.rim; };
+        { const dr = Math.round(dd * 10) / 10; P.holes.push({ x: snap(cx), y: snap(cy), d: helixOK(dd) ? Math.round(dd * 100) / 100 : dr, top: c.rim, floor, helix: helixOK(dd) }); } /* drills come in 0.1 mm steps */ for (const k of c.cells) h[k] = c.rim; };
     for (const c of comps) if (!c.border) addHole(c, null);
     // blind holes and cross holes: round pits that a morphological closing (disk Ø maxDrill) fills
-    if (S.doDrill) { const rC = S.maxDrill / 2 + cell, hh = Float32Array.from(h, v => v === -Infinity ? zb - 50 : v), cl = dilateFlat(G, dilateFlat(G, hh, rC).map(v => -v), rC).map(v => -v), lab2 = new Int32Array(N).fill(-1);
+    if (S.doDrill) { const rC = maxD / 2 + cell, hh = Float32Array.from(h, v => v === -Infinity ? zb - 50 : v), cl = dilateFlat(G, dilateFlat(G, hh, rC).map(v => -v), rC).map(v => -v), lab2 = new Int32Array(N).fill(-1);
       for (let s0 = 0; s0 < N; s0++) { if (lab2[s0] >= 0 || !(h[s0] > -Infinity) || cl[s0] - h[s0] < 0.4) continue; const q = [s0], cells = []; lab2[s0] = 1; let sx = 0, sy = 0, mnx = 1e9, mxx = -1e9, mny = 1e9, mxy = -1e9, rim = -Infinity, fl = -Infinity, edge = false; // fl: highest point under the hole (drill stops there)
         while (q.length) { const c = q.pop(); cells.push(c); const i = c % nx, j = (c - i) / nx; sx += i; sy += j; mnx = Math.min(mnx, i); mxx = Math.max(mxx, i); mny = Math.min(mny, j); mxy = Math.max(mxy, j); rim = Math.max(rim, cl[c]); fl = Math.max(fl, h[c]);
           for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= nx || jj >= ny) { edge = true; continue; } const k = jj * nx + ii; if (lab2[k] >= 0) continue; if (!(h[k] > -Infinity)) { edge = true; continue; } if (cl[k] - h[k] >= 0.4) { lab2[k] = 1; q.push(k); } } }
@@ -15673,6 +15721,7 @@ const MillCAM = (() => {
       rough: { n: 2, kind: 'flat', D: S.Dr, z: 4, name: L(`평 엔드밀 Ø${S.Dr} (4날)`, `Flat end mill Ø${S.Dr} (4 fl)`) },
       fin: { n: 3, kind: 'ball', D: S.Df, z: 2, name: L(`볼 엔드밀 Ø${S.Df} (R${fmt(S.Df / 2, 2)})`, `Ball end mill Ø${S.Df} (R${fmt(S.Df / 2, 2)})`) },
       spot: { n: 4, kind: 'spot', D: 8, z: 2, name: L('센터 드릴 Ø8 (90°)', 'Spot drill Ø8 (90°)') },
+      rest: { n: 5, kind: 'ball', D: S.Drest > 0 ? S.Drest : Math.max(1, Math.round(S.Df / 2 * 10) / 10), z: 2, name: L(`잔삭 볼 엔드밀 Ø${S.Drest > 0 ? S.Drest : Math.max(1, Math.round(S.Df / 2 * 10) / 10)}`, `Rest ball end mill Ø${S.Drest > 0 ? S.Drest : Math.max(1, Math.round(S.Df / 2 * 10) / 10)}`) },
     };
     P.tools = tools;
     const rpmOf = (Vc, D) => Math.round(Math.min(S.smax, 1000 * Vc / (Math.PI * D)) / 10) * 10;
@@ -15696,6 +15745,11 @@ const MillCAM = (() => {
           if (cur && cur.z < P.Zc - 1e-6) push(0, cur.x, cur.y, P.Zc);
           push(0, x, y, P.Zc);
           const top = topUnder(st, tool, x, y), zr = Math.max(z, top) + 1; if (zr < P.Zc - 0.01) push(0, x, y, zr);
+          // helical entry: spiral down on a circle through (x, y) that stays in the allowed region, instead of plunging straight
+          const rr = op.ramp && top > z + 0.05 ? op.ramp(x, y) : 0;
+          if (rr) { const cx = x - rr, pitch = op.rampPitch, n = Math.max(1, Math.ceil((zr - z) / pitch - 1e-9)), SEG = 36, Fr = Math.round(op.F * 0.6);
+            for (let k = 0; k < n; k++) for (let s = 1; s <= SEG; s++) { const a = 2 * Math.PI * s / SEG, zz = zr - (zr - z) * (k * SEG + s) / (n * SEG); push(1, cx + rr * Math.cos(a), y + rr * Math.sin(a), zz, Fr); const m = op.moves[op.moves.length - 1]; if (s < SEG) m.sub = true; else m.arc = { cx, cy: y }; }
+            op.ramps = (op.ramps || 0) + 1; return; }
           push(1, x, y, z, op.Fz);
         },
         end() { if (cur && cur.z < P.Zc - 1e-6) push(0, cur.x, cur.y, P.Zc); },
@@ -15713,7 +15767,7 @@ const MillCAM = (() => {
     }
     // --- 2) roughing (Z-level)
     if (S.doRough) {
-      const t = tools.rough, R = t.D / 2, u = S.u, uz = S.uz, rpm = rpmOf(mat[0], t.D), op = { key: 'rough', name: L('황삭 (등고선 Z 레벨)', 'Roughing (Z-level)'), tool: t, rpm, F: Math.round(mat[1] * t.z * rpm), Fz: 0, levels: 0 };
+      const t = tools.rough, R = t.D / 2, u = S.u, uz = S.uz, rpm = rpmOf(mat[0], t.D), op = { key: 'rough', name: S.roughMode === 'offset' ? L('황삭 (Z 레벨 · 윤곽 평행)', 'Roughing (Z-level, offset)') : L('황삭 (Z 레벨 · 지그재그)', 'Roughing (Z-level, zig-zag)'), tool: t, rpm, F: Math.round(mat[1] * t.z * rpm), Fz: 0, levels: 0, rampPitch: S.rampPitch > 0 ? S.rampPitch : Math.max(0.3, Math.round(t.D * 0.08 * 10) / 10) };
       op.Fz = Math.round(op.F * 0.3);
       const hr = Float32Array.from(h, (v, k) => v === -Infinity ? zb - uz - 1 : hp[k]);
       const Hr = dilateFlat(G, hr, R + u + cell); // highest part cell within the tool + allowance (+1 cell: contour points are interpolated)
@@ -15731,6 +15785,21 @@ const MillCAM = (() => {
         if (!anyNeed) continue; erode(need, inStock); if (!need.some(v => v)) continue; op.levels++;
         const near = boxDilate(G, need, R * 0.95), C = new Uint8Array(N); for (let k = 0; k < N; k++) C[k] = A[k] && near[k];
         const safe = (a, c) => { const L0 = Math.hypot(c.x - a.x, c.y - a.y), n = Math.max(1, Math.ceil(L0 / cell)); for (let s = 0; s <= n; s++) { const [i, j] = idx(a.x + (c.x - a.x) * s / n, a.y + (c.y - a.y) * s / n); if (i < 0 || j < 0 || i >= nx || j >= ny || !A[j * nx + i]) return false; } return true; };
+        const okAt = (x, y) => { const [i, j] = idx(x, y); return i >= 0 && j >= 0 && i < nx && j < ny && A[j * nx + i]; };
+        op.ramp = S.entry === 'helix' ? (x, y) => { for (const rr of [t.D * 0.45, t.D * 0.3, t.D * 0.18]) { let ok = true; for (let a = 0; a < 24 && ok; a++) { const w = a / 24 * 2 * Math.PI; ok = okAt(x - rr + rr * Math.cos(w), y + rr * Math.sin(w)); } if (ok) return rr; } return 0; } : null;
+        if (S.roughMode === 'offset') {
+          // contour-parallel: rings at k·stepover from the edge of the allowed region, cut from the farthest ring towards the part
+          const D2 = new Float32Array(N); for (let k = 0; k < N; k++) D2[k] = A[k] ? 1e9 : 0; const c1 = cell, c2 = cell * Math.SQRT2;
+          for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const k = j * nx + i; if (!D2[k]) continue; let v = D2[k]; if (i > 0) v = Math.min(v, D2[k - 1] + c1); if (j > 0) { v = Math.min(v, D2[k - nx] + c1); if (i > 0) v = Math.min(v, D2[k - nx - 1] + c2); if (i < nx - 1) v = Math.min(v, D2[k - nx + 1] + c2); } D2[k] = v; }
+          for (let j = ny - 1; j >= 0; j--) for (let i = nx - 1; i >= 0; i--) { const k = j * nx + i; if (!D2[k]) continue; let v = D2[k]; if (i < nx - 1) v = Math.min(v, D2[k + 1] + c1); if (j < ny - 1) { v = Math.min(v, D2[k + nx] + c1); if (i < nx - 1) v = Math.min(v, D2[k + nx + 1] + c2); if (i > 0) v = Math.min(v, D2[k + nx - 1] + c2); } D2[k] = v; }
+          const stp = Math.max(cell * 1.5, S.so * t.D); let dmax = 0; for (let k = 0; k < N; k++) if (C[k] && D2[k] < 1e8) dmax = Math.max(dmax, D2[k]);
+          for (let kk = Math.floor(dmax / stp); kk >= 1; kk--) {
+            const F = new Float32Array(N); for (let k = 0; k < N; k++) F[k] = (D2[k] > 1e8 ? 1e6 : D2[k]) - kk * stp;
+            for (const c of contours(F, nx, ny)) { const pts = c.pts.map(([gi, gj]) => ({ x: G.gx0 + gi * cell, y: G.gy0 + gj * cell, ok: near[Math.round(gj) * nx + Math.round(gi)] && A[Math.round(gj) * nx + Math.round(gi)] }));
+              const runs = []; let cur = []; for (const p of pts) { if (p.ok) cur.push(p); else { if (cur.length > 1) runs.push(cur); cur = []; } } if (cur.length > 1) runs.push(cur);
+              for (const r0 of runs) { const r = dp3(r0.map(p => [p.x, p.y, z]), cell * 0.15); b.start(r[0][0], r[0][1], z, safe); for (let i = 1; i < r.length; i++) b.feed(r[i][0], r[i][1], z); } }
+          }
+        } else {
         // zig-zag rows
         const rows = []; let jmin = ny, jmax = -1; for (let k = 0; k < N; k++) if (C[k]) { const j = (k / nx) | 0; jmin = Math.min(jmin, j); jmax = Math.max(jmax, j); }
         if (jmax < 0) continue;
@@ -15748,6 +15817,7 @@ const MillCAM = (() => {
           }
           b.feed(dir > 0 ? X(nxt.b) : X(nxt.a), Y(nxt.j), z); nxt.done = true; left--; last = nxt;
         }
+        } // zig-zag
         // contour along the boundary of the allowed region (cleans the staircase on the walls)
         const F = new Float32Array(N); for (let k = 0; k < N; k++) F[k] = z - uz - Hr[k];
         const cs = contours(F, nx, ny);
@@ -15763,24 +15833,22 @@ const MillCAM = (() => {
     }
     // --- 3) finishing with the ball end mill: drop-cutter map, raster + waterline on steep walls
     const finNeed = (() => { for (let k = 0; k < N; k++) if (st.m[k] && st.S[k] > hp[k] + 0.02) return true; return false; })();
-    if (S.doFinish && finNeed) {
-      const t = tools.fin, r = t.D / 2, rpm = rpmOf(mat[0], t.D), op = { key: 'finish', name: L('정삭 (볼 엔드밀: 평행 + 벽 등고선)', 'Finishing (ball: raster + waterline)'), tool: t, rpm, F: Math.round(mat[1] * 0.8 * t.z * rpm), Fz: 0 };
-      op.Fz = Math.round(op.F * 0.4);
+    // finishing pass shared by finishing (T03) and rest machining (smaller ball): raster rows and/or waterline contours over 'left'
+    const finMode = S.finMode || (S.wall === false ? 'raster' : 'both');
+    const finPass = (t, op, left, fso, mode, wz) => {
+      const r = t.D / 2;
       const Dm = dilate(G, hp, r, (v, d) => v + Math.sqrt(Math.max(0, r * r - d * d)) - r); for (let k = 0; k < N; k++) if (!(Dm[k] >= zb)) Dm[k] = zb;
-      P.drop = Dm;
-      // only where material is left above the part after facing/roughing
-      const left = new Uint8Array(N); for (let k = 0; k < N; k++) { if (!st.m[k] || !(st.S[k] > hp[k] + 0.02)) continue; if (h[k] === -Infinity) { const i = k % nx, j = (k - i) / nx; if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([di, dj]) => !st.m[(j + dj) * nx + i + di])) continue; } left[k] = 1; }
       const zone = boxDilate(G, left, r + cell);
-      const b = Builder(op), ks = Math.max(1, Math.round(S.fso / cell)); let dir = 1;
+      const b = Builder(op), ks = Math.max(1, Math.round(fso / cell)); let dir = 1;
       // exact lowest tip of the ball at any (x, y) — waterline points are moved onto it
       const re2 = (r + 0.03) * (r + 0.03), dropAt = (x, y) => { let m = zb; const i0 = Math.max(0, Math.ceil((x - r - G.gx0) / cell)), i1 = Math.min(nx - 1, Math.floor((x + r - G.gx0) / cell)), j0 = Math.max(0, Math.ceil((y - r - G.gy0) / cell)), j1 = Math.min(ny - 1, Math.floor((y + r - G.gy0) / cell));
         for (let j = j0; j <= j1; j++) { const dy = G.gy0 + j * cell - y; for (let i = i0; i <= i1; i++) { const dx = G.gx0 + i * cell - x, d2 = dx * dx + dy * dy; if (d2 > re2) continue; const v = hp[j * nx + i] + Math.sqrt(Math.max(0, r * r - d2)) - r; if (v > m) m = v; } } return m; };
       // contour point in grid units → a point on the segment between the two grid centres where the tool just touches
-      P.dropAt = dropAt;
       const place = (gi, gj, z) => { const fi = Math.floor(gi + 1e-9), fj = Math.floor(gj + 1e-9); let a, c; if (Math.abs(gi - Math.round(gi)) < 1e-9) { a = [Math.round(gi), fj]; c = [Math.round(gi), fj + 1]; } else { a = [fi, Math.round(gj)]; c = [fi + 1, Math.round(gj)]; }
         const P0 = [G.gx0 + a[0] * cell, G.gy0 + a[1] * cell], P1 = [G.gx0 + c[0] * cell, G.gy0 + c[1] * cell]; let ok0 = dropAt(...P0) <= z + 1e-4, ok1 = dropAt(...P1) <= z + 1e-4; if (ok0 === ok1) return ok0 ? [G.gx0 + gi * cell, G.gy0 + gj * cell, z] : null;
         let lo = ok0 ? P0 : P1, hi = ok0 ? P1 : P0; for (let it = 0; it < 7; it++) { const m = [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2]; if (dropAt(...m) <= z + 1e-4) lo = m; else hi = m; } return [lo[0], lo[1], z]; };
       const safe = (a, c) => { const L0 = Math.hypot(c.x - a.x, c.y - a.y), n = Math.max(1, Math.ceil(L0 / cell)); for (let s = 0; s <= n; s++) { const w = s / n, [i, j] = idx(a.x + (c.x - a.x) * w, a.y + (c.y - a.y) * w); if (i < 0 || j < 0 || i >= nx || j >= ny) return false; if (Dm[j * nx + i] > a.z + (c.z - a.z) * w + 0.005) return false; } return true; };
+      if (mode !== 'water') {
       let jr = 0; while (jr < ny && !zone.slice(jr * nx, jr * nx + nx).some(v => v)) jr++;
       for (let j = jr; j < ny; j += ks) {
         const iv = []; let s = -1; for (let i = 0; i <= nx; i++) { const on = i < nx && zone[j * nx + i]; if (on && s < 0) s = i; if (!on && s >= 0) { iv.push([s, i - 1]); s = -1; } }
@@ -15792,12 +15860,12 @@ const MillCAM = (() => {
           b.start(pts[0][0], pts[0][1], pts[0][2], (p, q) => safe(p, q)); for (let i = 1; i < pts.length; i++) b.feed(pts[i][0], pts[i][1], pts[i][2]); }
         dir = -dir;
       }
-      b.end();
-      // waterline on steep walls
-      if (S.wall) {
-        const steep = new Uint8Array(N); for (let j = 1; j < ny - 1; j++) for (let i = 1; i < nx - 1; i++) { const k = j * nx + i, gx = (Dm[k + 1] - Dm[k - 1]) / (2 * cell), gy = (Dm[k + nx] - Dm[k - nx]) / (2 * cell); steep[k] = Math.hypot(gx, gy) > 1.2 && zone[k] ? 1 : 0; }
+      b.end(); }
+      // waterline on steep walls (everywhere in 'water' mode)
+      if (mode !== 'raster') {
+        const steep = new Uint8Array(N); for (let j = 1; j < ny - 1; j++) for (let i = 1; i < nx - 1; i++) { const k = j * nx + i, gx = (Dm[k + 1] - Dm[k - 1]) / (2 * cell), gy = (Dm[k + nx] - Dm[k - nx]) / (2 * cell); steep[k] = (mode === 'water' || Math.hypot(gx, gy) > 1.2) && zone[k] ? 1 : 0; }
         const stp = boxDilate(G, steep, cell);
-        for (let z = -S.wz; z > zb + 0.02; z -= S.wz) {
+        for (let z = -Math.min(S.wz, wz); z > zb + 0.02; z -= Math.min(S.wz, wz)) {
           const F = new Float32Array(N); for (let k = 0; k < N; k++) F[k] = z - Dm[k];
           const cs = contours(F, nx, ny); const runs = [];
           for (const c of cs) { let cur = []; for (const [gi, gj] of c.pts) { const ok = stp[Math.round(gj) * nx + Math.round(gi)]; if (ok) { const q = place(gi, gj, z); if (q && topUnder(st, t, q[0], q[1]) > z + 0.01) { cur.push(q); continue; } } if (cur.length > 2) runs.push(cur); cur = []; } if (cur.length > 2) runs.push(cur); }
@@ -15808,25 +15876,61 @@ const MillCAM = (() => {
         }
         b.end();
       }
+
+      return Dm;
+    };
+    if (S.doFinish && finNeed) {
+      const t = tools.fin, r = t.D / 2, rpm = rpmOf(mat[0], t.D), op = { key: 'finish', name: L('정삭 (볼 엔드밀: 평행 + 벽 등고선)', 'Finishing (ball: raster + waterline)'), tool: t, rpm, F: Math.round(mat[1] * 0.8 * t.z * rpm), Fz: 0 };
+      op.Fz = Math.round(op.F * 0.4);
+      const left = new Uint8Array(N); for (let k = 0; k < N; k++) { if (!st.m[k] || !(st.S[k] > hp[k] + 0.02)) continue; if (h[k] === -Infinity) { const i = k % nx, j = (k - i) / nx; if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([di, dj]) => !st.m[(j + dj) * nx + i + di])) continue; } left[k] = 1; }
+      P.drop = finPass(t, op, left, S.fso, finMode, S.wz);
       if (op.moves.length) P.ops.push(op);
     }
-    // --- 4) drilling: spot + peck drilling per size
-    if (S.doDrill && P.holes.length) {
-      P.holes.sort((a, c) => a.d - c.d || a.y - c.y || a.x - c.x);
-      const order = hs => { const out = [], rest = hs.slice(); let cp = { x: 0, y: 0 }; while (rest.length) { let bi = 0, bd = Infinity; rest.forEach((p, i) => { const d = Math.hypot(p.x - cp.x, p.y - cp.y); if (d < bd) { bd = d; bi = i; } }); cp = rest.splice(bi, 1)[0]; out.push(cp); } return out; };
-      const spot = { key: 'spot', name: L('센터 드릴 (위치 잡기)', 'Spot drilling'), tool: tools.spot, rpm: Math.round(Math.min(S.smax, 1500)), F: 80, Fz: 80, cycle: 'G81', holes: order(P.holes) };
-      spot.moves = []; for (const p of spot.holes) { const zt = p.top, zd = zt - Math.min(2, p.d * 0.4); spot.moves.push({ g: 0, x: p.x, y: p.y, z: P.Zc }, { g: 0, x: p.x, y: p.y, z: zt + 2, hole: p }, { g: 1, x: p.x, y: p.y, z: zd, f: 80 }, { g: 0, x: p.x, y: p.y, z: zt + 2 }); p.spot = zd; }
+    // --- 3b) rest machining: a smaller ball end mill only where the finishing tool could not reach (corners, narrow slots)
+    if (S.restMode === 'rest' && S.doFinish) {
+      const t = tools.rest, rpm = rpmOf(mat[0], t.D), op = { key: 'rest', name: L(`잔삭 (볼 엔드밀 Ø${t.D} — 남은 곳만)`, `Rest machining (ball Ø${t.D} — leftovers only)`), tool: t, rpm, F: Math.round(mat[1] * 0.6 * t.z * rpm), Fz: 0 };
+      op.Fz = Math.round(op.F * 0.4); op.moves = [];
+      const left = new Uint8Array(N); let any = 0; for (let k = 0; k < N; k++) if (st.m[k] && G.h[k] > -Infinity && st.S[k] > hp[k] + (S.restTol > 0 ? S.restTol : 0.05)) { left[k] = 1; any++; }
+      if (any > 2) { finPass(t, op, left, Math.min(S.fso, t.D * 0.25), finMode === 'raster' ? 'raster' : 'both', Math.min(S.wz, t.D * 0.15)); }
+      if (op.moves.length) P.ops.push(op); else P.warn.push(L('잔삭: 정삭 공구가 남긴 곳이 없어 잔삭 경로를 만들지 않았습니다.', 'Rest machining: nothing was left by the finishing tool.'));
+    }
+    P.holes.sort((a, c) => a.d - c.d || a.y - c.y || a.x - c.x);
+    const order = hs => { const out = [], rest = hs.slice(); let cp = { x: 0, y: 0 }; while (rest.length) { let bi = 0, bd = Infinity; rest.forEach((p, i) => { const d = Math.hypot(p.x - cp.x, p.y - cp.y); if (d < bd) { bd = d; bi = i; } }); cp = rest.splice(bi, 1)[0]; out.push(cp); } return out; };
+    // --- 4a) helical interpolation (T02 end mill spirals down the hole wall: G03 + Z per revolution, climb milling)
+    const hxs = S.doDrill ? P.holes.filter(p => p.helix) : [];
+    if (hxs.length) {
+      const t = tools.rough, rpm = rpmOf(mat[0], t.D), F = Math.max(20, Math.round(mat[1] * t.z * rpm * 0.6 / 10) * 10);
+      const pitch = Math.max(0.2, S.hpitch > 0 ? S.hpitch : Math.round(Math.min(mat[6] * 0.5, t.D * 0.15) * 10) / 10);
+      const op = { key: 'helix', name: L(`헬리컬 보간 구멍 (T02 Ø${t.D}, 1회전 ${fmt(pitch, 2)} mm)`, `Helical hole milling (T02 Ø${t.D}, ${fmt(pitch, 2)} mm/rev)`), tool: t, rpm, F, Fz: Math.max(10, Math.round(F * 0.4)), pitch, holes: order(hxs) };
+      const b = Builder(op), SEG = 48;
+      const circle = (p, rp, z0, z1) => { for (let s = 1; s <= SEG; s++) { const a = 2 * Math.PI * s / SEG; b.feed(p.x + rp * Math.cos(a), p.y + rp * Math.sin(a), z0 + (z1 - z0) * s / SEG); const m = op.moves[op.moves.length - 1]; if (s < SEG) m.sub = true; else m.arc = { cx: p.x, cy: p.y }; } };
+      for (const p of op.holes) {
+        const rp = p.d / 2 - t.D / 2, zEnd = p.floor != null ? p.floor : (opt.far != null ? opt.far : zb) - 0.5;
+        const z0 = Math.max(p.top, topUnder(st, t, p.x + rp, p.y)) + 0.5, turns = Math.max(1, Math.ceil((z0 - zEnd) / pitch - 1e-9));
+        b.start(p.x + rp, p.y, z0); op.moves[op.moves.length - 1].hole = p;
+        for (let k = 0; k < turns; k++) circle(p, rp, z0 - (z0 - zEnd) * k / turns, z0 - (z0 - zEnd) * (k + 1) / turns);
+        circle(p, rp, zEnd, zEnd); // one flat revolution on the floor
+        b.feed(p.x, p.y, zEnd); b.feed(p.x, p.y, zEnd + 0.5); p.zd = zEnd; p.turns = turns;
+      }
+      b.end(); P.ops.push(op);
+    }
+    // --- 4b) drilling: spot + peck drilling per size
+    const drs = P.holes.filter(p => !p.helix);
+    if (S.doDrill && drs.length) {
+      const spot = { key: 'spot', name: L('센터 드릴 (위치 잡기)', 'Spot drilling'), tool: tools.spot, rpm: Math.round(Math.min(S.smax, 1500)), F: 80, Fz: 80, cycle: 'G81', holes: order(drs) };
+      spot.moves = []; for (const p of spot.holes) { const zt = p.top, zd = zt - Math.min(2, p.d * 0.4); spot.moves.push({ g: 0, x: p.x, y: p.y, z: P.Zc }, { g: 0, x: p.x, y: p.y, z: zt + 2, hole: p }, { g: 1, x: p.x, y: p.y, z: zd, f: 80 }, { g: 0, x: p.x, y: p.y, z: zt + 2 }, { g: 0, x: p.x, y: p.y, z: P.Zc }); p.spot = zd; }
       spot.moves.push({ g: 0, x: spot.holes[spot.holes.length - 1].x, y: spot.holes[spot.holes.length - 1].y, z: P.Zc }); P.ops.push(spot);
-      const sizes = [...new Set(P.holes.map(p => p.d))]; let tn = 5;
+      const sizes = [...new Set(drs.map(p => p.d))]; let tn = P.ops.some(o => o.key === 'rest') ? 6 : 5;
       for (const d of sizes) { const t = { n: tn++, kind: 'drill', D: d, z: 2, name: L(`드릴 Ø${d}`, `Drill Ø${d}`) }, rpm = Math.round(Math.min(S.smax, 1000 * mat[4] / (Math.PI * d))), fr = Math.max(0.03, mat[5] * Math.min(1.5, d / 10)), F = Math.round(fr * rpm);
-        const op = { key: 'drill', name: L(`드릴 Ø${d} (펙 G83)`, `Drill Ø${d} (peck G83)`), tool: t, rpm, F, Fz: F, cycle: 'G83', Q: Math.max(1, Math.round(d * 10) / 10), holes: order(P.holes.filter(p => p.d === d)) };
-        op.moves = []; for (const p of op.holes) { const zt = p.top, zd = p.floor != null ? p.floor : (opt.far != null ? opt.far : zb) - d * 0.3 - 1; p.zd = zd; op.moves.push({ g: 0, x: p.x, y: p.y, z: P.Zc }, { g: 0, x: p.x, y: p.y, z: zt + 2, hole: p }, { g: 1, x: p.x, y: p.y, z: zd, f: F }, { g: 0, x: p.x, y: p.y, z: zt + 2 }); }
+        const op = { key: 'drill', name: L(`드릴 Ø${d} (펙 G83)`, `Drill Ø${d} (peck G83)`), tool: t, rpm, F, Fz: F, cycle: 'G83', Q: Math.max(1, Math.round(d * 10) / 10), holes: order(drs.filter(p => p.d === d)) };
+        op.moves = []; for (const p of op.holes) { const zt = p.top, zd = p.floor != null ? p.floor : (opt.far != null ? opt.far : zb) - d * 0.3 - 1; p.zd = zd; op.moves.push({ g: 0, x: p.x, y: p.y, z: P.Zc }, { g: 0, x: p.x, y: p.y, z: zt + 2, hole: p }, { g: 1, x: p.x, y: p.y, z: zd, f: F }, { g: 0, x: p.x, y: p.y, z: zt + 2 }, { g: 0, x: p.x, y: p.y, z: P.Zc }); /* G98: back to the initial level between holes */ }
         op.moves.push({ g: 0, x: op.holes[op.holes.length - 1].x, y: op.holes[op.holes.length - 1].y, z: P.Zc }); P.ops.push(op); }
       P.tools.drills = sizes;
       for (const op of P.ops) if (op.cycle) for (const p of op.holes) cutSeg(st, op.tool, { x: p.x, y: p.y, z: p.top + 2 }, { x: p.x, y: p.y, z: op.cycle === 'G81' ? p.spot : p.zd }); // drilled stock
     }
     if (!opt.init && G.hidden > 0.03) P.warn.push(L(`위에서 보이지 않는 부분(언더컷)이 부피의 ${Math.round(G.hidden * 100)}%입니다. 3축 밀링으로 한 번에 깎을 수 없으니 뒤집어서 두 번째 고정으로 가공해야 합니다.`, `${Math.round(G.hidden * 100)}% of the volume is hidden from the top (undercuts): a 3-axis machine needs a second setup (flip the part).`));
     const bigHoles = comps.filter(c => !c.border && !P.holes.some(p => Math.hypot(p.x - c.cx, p.y - c.cy) < 1e-6)).length; P.through = bigHoles;
+    P.org = orgOf(S, P); P.orgXY = S.orgXY || 'p-lf'; P.orgZ = S.orgZ || 'ptop';
     return P;
   }
 
@@ -15844,8 +15948,10 @@ const MillCAM = (() => {
   }
 
   /* ---------- post processors ---------- */
+  let O = [0, 0, 0]; const fx = v => f3(v - O[0]), fy = v => f3(v - O[1]), fz = v => f3(v - O[2]);
   function header(P, S, name) {
-    return [`(MATERIAL ${S.mat.toUpperCase()}  STOCK X${f3(P.sx1 - P.sx0)} Y${f3(P.sy1 - P.sy0)} Z${f3(P.ztop - P.zbot)})`, '(WCS G54: X0 Y0 = LEFT FRONT CORNER OF PART, Z0 = TOP OF PART)', `(PART X${f3(P.Lx)} Y${f3(P.Ly)} Z${f3(P.H)}  BOTTOM Z${f3(P.zb)})`,
+    O = P.org || [0, 0, 0];
+    return [`(MATERIAL ${S.mat.toUpperCase()}  STOCK X${f3(P.sx1 - P.sx0)} Y${f3(P.sy1 - P.sy0)} Z${f3(P.ztop - P.zbot)})`, `(WCS G54: X0 Y0 = ${orgText(P.orgXY, P.orgZ)})`, `(PART X${f3(P.Lx)} Y${f3(P.Ly)} Z${f3(P.H)}  BOTTOM Z${fz(P.zb)})`,
       ...P.ops.map(op => `(T${String(op.tool.n).padStart(2, '0')} ${toolTxt(op.tool)})`).filter((v, i, a) => a.indexOf(v) === i)];
   }
   function toolTxt(t) { return t.kind === 'ball' ? `BALL END MILL D${f3(t.D)}` : t.kind === 'drill' ? `DRILL D${f3(t.D)}` : t.n === 1 ? `FACE MILL D${f3(t.D)}` : t.kind === 'spot' ? 'SPOT DRILL D8 90DEG' : `FLAT END MILL D${f3(t.D)}`; }
@@ -15857,34 +15963,38 @@ const MillCAM = (() => {
       const T = String(op.tool.n).padStart(2, '0');
       out.push(`(${op.key.toUpperCase()} - T${T} ${toolTxt(op.tool)})`);
       N('G91 G28 Z0.'); N('G90'); N(`T${T} M06`); const m0 = op.moves[0];
-      N(`G54 G00 X${f3(m0.x)} Y${f3(m0.y)} S${op.rpm} M03`); N(`G43 Z${f3(P.Zc)} H${T} M08`);
+      N(`G54 G00 X${fx(m0.x)} Y${fy(m0.y)} S${op.rpm} M03`); N(`G43 Z${fz(P.Zc)} H${T} M08`);
       if (op.cycle) {
         op.holes.forEach((p, i) => { const R = p.top + 2, Z = op.cycle === 'G81' ? p.spot : p.zd; const mv = op.moves.find(m => m.hole === p);
-          const ln = i === 0 ? N(op.cycle === 'G81' ? `G98 G81 X${f3(p.x)} Y${f3(p.y)} Z${f3(Z)} R${f3(R)} F${op.F}` : `G98 G83 X${f3(p.x)} Y${f3(p.y)} Z${f3(Z)} R${f3(R)} Q${f3(op.Q)} F${op.F}`) : out.push(`X${f3(p.x)} Y${f3(p.y)} Z${f3(Z)} R${f3(R)}`) - 1;
+          const ln = i === 0 ? N(op.cycle === 'G81' ? `G98 G81 X${fx(p.x)} Y${fy(p.y)} Z${fz(Z)} R${fz(R)} F${op.F}` : `G98 G83 X${fx(p.x)} Y${fy(p.y)} Z${fz(Z)} R${fz(R)} Q${f3(op.Q)} F${op.F}`) : out.push(`X${fx(p.x)} Y${fy(p.y)} Z${fz(Z)} R${fz(R)}`) - 1;
           const k = op.moves.indexOf(mv); for (let q = k - 1; q <= k + 2; q++) if (op.moves[q]) map.set(op.moves[q], ln); });
         N('G80');
       } else {
         let lx = null, ly = null, lz = null, lg = null, lf = null;
-        for (const m of op.moves) { let w = ''; if (m.g !== lg) { w += m.g ? 'G01' : 'G00'; lg = m.g; }
-          if (m.x !== lx) w += ` X${f3(m.x)}`; if (m.y !== ly) w += ` Y${f3(m.y)}`; if (m.z !== lz) w += ` Z${f3(m.z)}`;
+        for (const m of op.moves) { if (m.sub) { map.set(m, out.length); continue; }
+          if (m.arc) { out.push(`G03 X${fx(m.x)} Y${fy(m.y)} Z${fz(m.z)} I${f3(m.arc.cx - lx)} J${f3(m.arc.cy - ly)}` + (m.f !== lf ? ` F${m.f}` : '')); lf = m.f; lg = 3; lx = m.x; ly = m.y; lz = m.z; map.set(m, out.length - 1); continue; }
+          let w = ''; if (m.g !== lg) { w += m.g ? 'G01' : 'G00'; lg = m.g; }
+          if (m.x !== lx) w += ` X${fx(m.x)}`; if (m.y !== ly) w += ` Y${fy(m.y)}`; if (m.z !== lz) w += ` Z${fz(m.z)}`;
           if (m.g && m.f !== lf) { w += ` F${m.f}`; lf = m.f; } lx = m.x; ly = m.y; lz = m.z; w = w.trim(); if (!w) continue; out.push(w); map.set(m, out.length - 1); }
       }
-      N(`G00 Z${f3(P.Zc)} M09`); N('M05');
+      N(`G00 Z${fz(P.Zc)} M09`); N('M05');
     });
     N('G91 G28 Z0.'); N('G28 Y0.'); N('G90'); N('M30'); out.push('%');
     return { text: out.join('\n'), map };
   }
   function linuxcnc(P, S, name) {
+    O = P.org || [0, 0, 0];
     const out = [`( K-CAD MILL ${asc(name)} )`, ...header(P, S, name), 'G21 G17 G40 G49 G80 G90 G94 G54'];
-    P.ops.forEach(op => { const m0 = op.moves[0]; out.push(`( ${op.key} )`, 'G53 G0 Z0', `T${op.tool.n} M6`, `G43 H${op.tool.n}`, `S${op.rpm} M3`, 'M8', `G0 X${f3(m0.x)} Y${f3(m0.y)}`, `G0 Z${f3(P.Zc)}`);
-      if (op.cycle) { op.holes.forEach(p => { const R = p.top + 2; out.push(op.cycle === 'G81' ? `G98 G81 X${f3(p.x)} Y${f3(p.y)} Z${f3(p.spot)} R${f3(R)} F${op.F}` : `G98 G83 X${f3(p.x)} Y${f3(p.y)} Z${f3(p.zd)} R${f3(R)} Q${f3(op.Q)} F${op.F}`); }); out.push('G80'); }
-      else { let lf = null; for (const m of op.moves) { let w = `${m.g ? 'G1' : 'G0'} X${f3(m.x)} Y${f3(m.y)} Z${f3(m.z)}`; if (m.g && m.f !== lf) { w += ` F${m.f}`; lf = m.f; } out.push(w); } }
-      out.push(`G0 Z${f3(P.Zc)}`, 'M9', 'M5'); });
+    P.ops.forEach(op => { const m0 = op.moves[0]; out.push(`( ${op.key} )`, 'G53 G0 Z0', `T${op.tool.n} M6`, `G43 H${op.tool.n}`, `S${op.rpm} M3`, 'M8', `G0 X${fx(m0.x)} Y${fy(m0.y)}`, `G0 Z${fz(P.Zc)}`);
+      if (op.cycle) { op.holes.forEach(p => { const R = p.top + 2; out.push(op.cycle === 'G81' ? `G98 G81 X${fx(p.x)} Y${fy(p.y)} Z${fz(p.spot)} R${fz(R)} F${op.F}` : `G98 G83 X${fx(p.x)} Y${fy(p.y)} Z${fz(p.zd)} R${fz(R)} Q${f3(op.Q)} F${op.F}`); }); out.push('G80'); }
+      else { let lf = null, lx = null, ly = null; for (const m of op.moves) { if (m.sub) continue; let w = m.arc ? `G3 X${fx(m.x)} Y${fy(m.y)} Z${fz(m.z)} I${f3(m.arc.cx - lx)} J${f3(m.arc.cy - ly)}` : `${m.g ? 'G1' : 'G0'} X${fx(m.x)} Y${fy(m.y)} Z${fz(m.z)}`; if (m.g && m.f !== lf) { w += ` F${m.f}`; lf = m.f; } out.push(w); lx = m.x; ly = m.y; } }
+      out.push(`G0 Z${fz(P.Zc)}`, 'M9', 'M5'); });
     out.push('G53 G0 Z0', 'M2'); return out.join('\n');
   }
   function apt(P, S, name) {
-    const out = [`PARTNO/${asc(name)}`, 'UNITS/MM', 'MACHIN/MILL,1', 'MULTAX/OFF', '$$ CL DATA: TOOL TIP, X0 Y0 = LEFT FRONT CORNER OF PART, Z0 = TOP OF PART', `$$ STOCK ${f3(P.sx1 - P.sx0)} X ${f3(P.sy1 - P.sy0)} X ${f3(P.ztop - P.zbot)}`];
-    const G = m => `GOTO/${f3(m.x)},${f3(m.y)},${f3(m.z)}`;
+    O = P.org || [0, 0, 0];
+    const out = [`PARTNO/${asc(name)}`, 'UNITS/MM', 'MACHIN/MILL,1', 'MULTAX/OFF', `$$ CL DATA: TOOL TIP, X0 Y0 = ${orgText(P.orgXY, P.orgZ)}`, `$$ STOCK ${f3(P.sx1 - P.sx0)} X ${f3(P.sy1 - P.sy0)} X ${f3(P.ztop - P.zbot)}`];
+    const G = m => `GOTO/${fx(m.x)},${fy(m.y)},${fz(m.z)}`;
     P.ops.forEach(op => { const t = op.tool; out.push(`$$ ${op.key.toUpperCase()}`, `LOADTL/${t.n}`, t.kind === 'ball' ? `CUTTER/${f3(t.D)},${f3(t.D / 2)}` : `CUTTER/${f3(t.D)}`, `SPINDL/${op.rpm},RPM,CLW`, 'COOLNT/ON');
       let lf = null; for (const m of op.moves) { if (m.g === 0) out.push('RAPID'); else if (m.f !== lf) { out.push(`FEDRAT/${m.f},MMPM`); lf = m.f; } out.push(G(m)); }
       out.push('COOLNT/OFF'); });
@@ -15895,7 +16005,7 @@ const MillCAM = (() => {
   let grp = null, stockMesh = null, toolMesh = null, ghost = null, pathGrp = null, anim = 0, state = null, nrmT = 0;
   const A = () => App.doc;
   function clear() { cancelAnimationFrame(anim); anim = 0; if (grp) { View.scene.remove(grp); grp.traverse(o => { if (o.geometry && !o.userData.shared) o.geometry.dispose(); if (o.material) o.material.dispose(); }); } if (ghost) { View.scene.remove(ghost); ghost.material.dispose(); } grp = stockMesh = toolMesh = ghost = pathGrp = null; View.world.visible = true; View.req(); }
-  const OPC = { face: 0xF2A53D, rough: 0x4DA3FF, finish: 0x7BD88F, spot: 0xFF8FB1, drill: 0xC792EA };
+  const OPC = { face: 0xF2A53D, rough: 0x4DA3FF, finish: 0x7BD88F, rest: 0xB5E853, spot: 0xFF8FB1, drill: 0xC792EA, helix: 0x3FD0D6 };
   // stock mesh: a vertex per grid cell inside the stock + side skirts down to the bottom
   function stockMeshNew(P) {
     const G = P.G, i0 = Math.round((P.sx0 - G.gx0) / G.cell), i1 = Math.round((P.sx1 - G.gx0) / G.cell), j0 = Math.round((P.sy0 - G.gy0) / G.cell), j1 = Math.round((P.sy1 - G.gy0) / G.cell);
@@ -15946,6 +16056,12 @@ const MillCAM = (() => {
     const jawH = Math.max(3, P.zb - P.zbot - 0.5), sx = P.sx1 - P.sx0 + 20;
     for (const [y, s] of [[P.sy0, -1], [P.sy1, 1]]) { const j = new THREE.Mesh(new THREE.BoxGeometry(sx, 12, jawH + 15), new THREE.MeshLambertMaterial({ color: 0x3d4652 })); j.position.set((P.sx0 + P.sx1) / 2, y + s * 6, P.zbot - 15 + (jawH + 15) / 2); grp.add(j); }
     const base = new THREE.Mesh(new THREE.BoxGeometry(sx + 40, P.sy1 - P.sy0 + 60, 10), new THREE.MeshLambertMaterial({ color: 0x2b323b })); base.position.set((P.sx0 + P.sx1) / 2, (P.sy0 + P.sy1) / 2, P.zbot - 20); grp.add(base);
+    // work zero G54: axes + label
+    { const o = P.org || [0, 0, 0], sz = Math.max(8, Math.min(30, Math.max(P.Lx, P.Ly) * 0.25)), og = new THREE.Group(); og.position.set(o[0], o[1], o[2]);
+      const ax = new THREE.AxesHelper(sz); ax.material.depthTest = false; ax.material.linewidth = 2; ax.renderOrder = 9; og.add(ax);
+      const bl = new THREE.Mesh(new THREE.SphereGeometry(sz * 0.08, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffd23f, depthTest: false })); bl.renderOrder = 9; og.add(bl);
+      const c = document.createElement('canvas'); c.width = 128; c.height = 48; const x = c.getContext('2d'); x.fillStyle = 'rgba(0,0,0,.65)'; x.fillRect(0, 0, 128, 48); x.fillStyle = '#ffd23f'; x.font = 'bold 30px monospace'; x.fillText('G54', 20, 35);
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false })); sp.scale.set(sz * 0.8, sz * 0.3, 1); sp.position.set(-sz * 0.3, -sz * 0.3, sz * 0.45); sp.renderOrder = 10; og.add(sp); grp.add(og); }
     // tool paths: one LineSegments per op for feeds, one for rapids
     pathGrp = new THREE.Group(); grp.add(pathGrp); const rap = [], byOp = new Map();
     for (const s of state.tl.seg) { const arr = s.g === 0 ? rap : (byOp.get(s.op) || (byOp.set(s.op, []), byOp.get(s.op))); arr.push(s.a.x, s.a.y, s.a.z, s.b.x, s.b.y, s.b.z); }
@@ -15992,15 +16108,23 @@ const MillCAM = (() => {
     const B = getBuild(d); if (!B.topo.nt) { status(L('가공할 형상이 없습니다.', 'There is no body to machine.')); return; }
     const mat = MATM[d.material] ? d.material : 'steel', mc = MATM[mat];
     d.mill = d.mill || {};
-    const S = Object.assign({ dir: 'auto', top: 1, side: 0, grip: 5, u: 0.3, Dface: 50, Dr: 10, Df: 6, so: 0.6, fso: 0.5, wall: true, wz: 0.5, maxDrill: 20, uz: 0, smax: 8000, doFace: true, doRough: true, doFinish: true, doDrill: true }, d.mill, { mat });
+    const S = Object.assign({ dir: 'auto', top: 1, side: 0, grip: 5, stockMode: 'allow', holeMode: 'auto', maxHelix: 60, hpitch: 0, orgXY: 'p-lf', orgZ: 'ptop', u: 0.3, Dface: 50, Dr: 10, Df: 6, so: 0.6, fso: 0.5, wall: true, wz: 0.5, maxDrill: 20, uz: 0, smax: 8000, doFace: true, doRough: true, doFinish: true, doDrill: true }, d.mill, { mat });
     if (!(S.ap > 0)) S.ap = mc[6];
     state = null; let msg = null, err = false, G = null, busy = false;
-    const geo = () => { G = heightOf(d, S); return G; };
-    geo();
+    const geo = () => { G = heightOf(d, eff()); return G; };
+    // stock: allowances, or an absolute size X×Y×Z that must be at least the part (+ top allowance in Z); the part sits centred in X and Y
+    const rec = () => [Math.ceil(G.Lx + 2 * Math.max(S.side, 2)), Math.ceil(G.Ly + 2 * Math.max(S.side, 2)), Math.ceil(G.H + S.top + Math.max(S.grip, 5))];
+    const stockErr = () => { if (S.stockMode !== 'size' || !G) return [];
+      const e = [], q = (v, mn, ax) => { if (!(v >= mn - 1e-6)) e.push(L(`${ax} ${fmt(v || 0, 2)} mm < 최소 ${fmt(mn, 2)} mm`, `${ax} ${fmt(v || 0, 2)} mm < minimum ${fmt(mn, 2)} mm`)); };
+      q(S.sX, G.Lx, 'X'); q(S.sY, G.Ly, 'Y'); q(S.sZ, G.H + S.top, 'Z'); return e; };
+    function eff() { const E = Object.assign({}, S); if (S.stockMode === 'size' && G) { E.sideX = Math.max(0, (S.sX - G.Lx) / 2); E.sideY = Math.max(0, (S.sY - G.Ly) / 2); E.grip = Math.max(0, S.sZ - G.H - S.top); E.side = Math.max(E.sideX, E.sideY); } else { E.sideX = E.sideY = S.side; } return E; }
+    const box = () => { const E = eff(); return { sx0: -E.sideX, sx1: G.Lx + E.sideX, sy0: -E.sideY, sy1: G.Ly + E.sideY, ztop: E.top, zbot: -G.H - E.grip, Lx: G.Lx, Ly: G.Ly }; };
+    G = heightOf(d, S); geo();
     const run = () => {
-      if (busy) return; busy = true; msg = L('경로 계산 중…', 'Computing toolpaths…'); err = false; renderPM();
+      if (busy) return; const se = stockErr(); if (se.length) { msg = L('소재가 부품보다 작습니다 — ', 'The stock is smaller than the part — ') + se.join(' · ') + L('. 소재 크기를 더 크게 넣으세요.', '. Enter a larger stock.'); err = true; renderPM(); return; }
+      busy = true; msg = L('경로 계산 중…', 'Computing toolpaths…'); err = false; renderPM();
       setTimeout(() => { try {
-        geo(); const P = plan(G, S, d), tl = timeline(P), post = fanuc(P, S, d.name);
+        geo(); const E = eff(), P = plan(G, E, d), tl = timeline(P), post = fanuc(P, E, d.name);
         if (!tl.seg.length) throw new Error(L('깎을 곳이 없습니다', 'nothing to cut'));
         state = { P, tl, post, lines: post.text.split('\n'), t: 0, k: 0, done: 0, st: simNew(G, P), speed: state && state.speed || 20, playing: false, toolOp: -1 };
         d.mill = Object.assign({}, S); delete d.mill.mat; save();
@@ -16024,7 +16148,7 @@ const MillCAM = (() => {
             checkInput(L('가공 경로 선 보이기', 'Show toolpaths'), pathGrp ? pathGrp.visible : true, v => { if (pathGrp) pathGrp.visible = v; View.req(); }),
             checkInput(L('완성품 윤곽 (파란 유령)', 'Finished part ghost'), ghost ? ghost.visible : true, v => { if (ghost) ghost.visible = v; View.req(); }),
             h('div', { class: 'hint' }, L('소재 색: 회색 = 남은 소재 · 노랑 = 정삭 여유 · 청록 = 완성 치수 · 빨강 = 과절삭', 'Stock colour: grey = stock · yellow = allowance · teal = on size · red = overcut')),
-            h('div', { class: 'hint' }, L('선 색: 빨간 점선 = 급속(G00) · 주황 = 페이스 · 파랑 = 황삭 · 초록 = 정삭 · 분홍 = 센터 드릴 · 보라 = 드릴', 'Lines: red dashed = rapid (G00) · orange = facing · blue = roughing · green = finishing · pink = spot · purple = drill'))] });
+            h('div', { class: 'hint' }, L('선 색: 빨간 점선 = 급속(G00) · 주황 = 페이스 · 파랑 = 황삭 · 초록 = 정삭 · 연두 = 잔삭 · 청록 = 헬리컬 · 분홍 = 센터 드릴 · 보라 = 드릴 · 노란 축 = 원점 G54', 'Lines: red dashed = rapid (G00) · orange = facing · blue = roughing · green = finishing · lime = rest · cyan = helical · pink = spot · purple = drill · yellow axes = work zero G54'))] });
           g.push({ title: L('가공 결과', 'Summary'), icon: 'mass', body: [h('div', { class: 'kv' },
             h('span', null, L('예상 가공 시간', 'Estimated cycle time')), h('b', { style: 'color:#3FD0D6' }, fmtT(tl.T) + L(' (분:초)', ' (min:s)')),
             h('span', null, L('절삭 / 급속 이동 거리', 'Cutting / rapid length')), h('b', null, `${Math.round(tl.lf)} / ${Math.round(tl.lr)} mm`),
@@ -16032,29 +16156,60 @@ const MillCAM = (() => {
             h('span', null, L('황삭 Z 레벨', 'Roughing levels')), h('b', null, String((P.ops.find(o => o.key === 'rough') || {}).levels || 0)),
             h('span', null, L('소재 (가로×세로×높이)', 'Stock (X×Y×Z)')), h('b', null, `${fmt(P.sx1 - P.sx0, 1)} × ${fmt(P.sy1 - P.sy0, 1)} × ${fmt(P.ztop - P.zbot, 1)} (${mname(mat)})`),
             h('span', null, L('완성품', 'Part')), h('b', null, `${fmt(P.Lx, 2)} × ${fmt(P.Ly, 2)} × ${fmt(P.H, 2)}`),
-            h('span', null, L('드릴 구멍', 'Drilled holes')), h('b', null, P.holes.length ? P.holes.length + L('개 (', ' (') + [...new Set(P.holes.map(p => 'Ø' + p.d))].join(', ') + ')' : L('없음', 'none')),
+            h('span', null, L('드릴 구멍', 'Drilled holes')), h('b', null, P.holes.filter(p => !p.helix).length ? P.holes.filter(p => !p.helix).length + L('개 (', ' (') + [...new Set(P.holes.filter(p => !p.helix).map(p => 'Ø' + p.d))].join(', ') + ')' : L('없음', 'none')),
+            h('span', null, L('헬리컬 구멍', 'Helical holes')), h('b', null, P.holes.filter(p => p.helix).length ? P.holes.filter(p => p.helix).length + L('개 (', ' (') + [...new Set(P.holes.filter(p => p.helix).map(p => 'Ø' + fmt(p.d, 2)))].join(', ') + ')' : L('없음', 'none')),
+            h('span', null, L('원점 G54', 'Work zero G54')), h('b', null, (ORGXY().find(o => o[0] === P.orgXY) || ['', ''])[1] + ' · ' + (ORGZ().find(o => o[0] === P.orgZ) || ['', ''])[1]),
             h('span', null, L('NC 블록 수', 'NC blocks')), h('b', null, String(state.lines.length))),
             ...P.warn.map(w => h('div', { class: 'warn' }, w)),
-            S.grip > 0 ? h('div', { class: 'hint' }, L(`부품 아래 ${fmt(S.grip, 1)} mm를 바이스 물림용으로 남깁니다. 가공 후 잘라내거나 뒤집어서 밑면을 페이스 가공하세요.`, `${fmt(S.grip, 1)} mm under the part is left for the vise; cut it off or flip and face it afterwards.`)) : null].filter(Boolean) });
+            eff().grip > 0 ? h('div', { class: 'hint' }, L(`부품 아래 ${fmt(eff().grip, 1)} mm를 바이스 물림용으로 남깁니다. 가공 후 잘라내거나 뒤집어서 밑면을 페이스 가공하세요.`, `${fmt(eff().grip, 1)} mm under the part is left for the vise; cut it off or flip and face it afterwards.`)) : null].filter(Boolean) });
           g.push({ title: L('NC 파일 (다른 기계로)', 'NC files (for other machines)'), icon: 'save', body: [
             h('button', { class: 'pbtn wide', onclick: () => textDialog(L('G코드 — 화낙 계열 (ISO 6983)', 'G-code — Fanuc (ISO 6983)'), state.post.text, L('복사해서 쓰거나 아래 저장 버튼을 쓰세요.', 'Copy it or use the save buttons.')) }, L('G코드 보기', 'View G-code')),
             h('button', { class: 'pbtn wide', onclick: () => saveFile(`${d.name}_mill.nc`, state.post.text, 'text/plain') }, L('저장: 화낙 계열 G코드 (.nc)', 'Save: Fanuc G-code (.nc)')),
-            h('button', { class: 'pbtn wide', onclick: () => saveFile(`${d.name}_mill.ngc`, linuxcnc(state.P, S, d.name), 'text/plain') }, L('저장: LinuxCNC G코드 (.ngc)', 'Save: LinuxCNC G-code (.ngc)')),
-            h('button', { class: 'pbtn wide', onclick: () => saveFile(`${d.name}_mill.apt`, apt(state.P, S, d.name), 'text/plain') }, L('저장: APT CL 데이터 (.apt, 기계 독립)', 'Save: APT CL data (.apt, machine-neutral)')),
-            h('div', { class: 'hint' }, L('G코드는 ISO 6983 형식입니다. 화낙 계열 머시닝센터(화천·두산·현대위아 등)는 .nc를 그대로, LinuxCNC는 .ngc를 씁니다. APT CL은 기계와 무관한 중립 공구 경로입니다. 원점 G54: X0 Y0 = 부품 왼쪽 앞 모서리, Z0 = 부품 윗면. 실제 기계에서는 공구 길이 보정(H)·원점을 맞추고 싱글 블록과 드라이 런으로 먼저 확인하세요.', 'ISO 6983 G-code: Fanuc-style machining centres use .nc, LinuxCNC uses .ngc; APT CL is a machine-neutral toolpath. Work zero G54: X0 Y0 = left-front corner of the part, Z0 = top of the part. On a real machine set tool length offsets (H) and the work zero, then prove out in single block and dry run.'))] });
+            h('button', { class: 'pbtn wide', onclick: () => saveFile(`${d.name}_mill.ngc`, linuxcnc(state.P, eff(), d.name), 'text/plain') }, L('저장: LinuxCNC G코드 (.ngc)', 'Save: LinuxCNC G-code (.ngc)')),
+            h('button', { class: 'pbtn wide', onclick: () => saveFile(`${d.name}_mill.apt`, apt(state.P, eff(), d.name), 'text/plain') }, L('저장: APT CL 데이터 (.apt, 기계 독립)', 'Save: APT CL data (.apt, machine-neutral)')),
+            h('div', { class: 'hint' }, L('G코드는 ISO 6983 형식입니다. 화낙 계열 머시닝센터(화천·두산·현대위아 등)는 .nc를 그대로, LinuxCNC는 .ngc를 씁니다. APT CL은 기계와 무관한 중립 공구 경로입니다. 원점 G54는 [조건 바꾸기] → 원점에서 고릅니다(노란 축 G54). 실제 기계에서는 공구 길이 보정(H)·원점을 맞추고 싱글 블록과 드라이 런으로 먼저 확인하세요.', 'ISO 6983 G-code: Fanuc-style machining centres use .nc, LinuxCNC uses .ngc; APT CL is a machine-neutral toolpath. Work zero G54: X0 Y0 = left-front corner of the part, Z0 = top of the part. On a real machine set tool length offsets (H) and the work zero, then prove out in single block and dry run.'))] });
           g.push({ title: '', body: h('button', { class: 'pbtn wide', onclick: () => { state.playing = false; cancelAnimationFrame(anim); state = null; clear(); renderPM(); } }, L('조건 바꾸기', 'Change settings')) });
           return g;
         }
+        // ---- machining strategy, chosen first: roughing / entry / finishing / rest / holes
+        { const sel = (lab, val, opts, set, tip) => [field(lab, selectInput(opts, val, v => { set(v); renderPM(); })), tip ? h('div', { class: 'hint camtip' }, tip) : null];
+          const rm = S.doRough === false ? 'none' : (S.roughMode || 'zigzag'), fm = S.doFinish === false ? 'none' : (S.finMode || (S.wall === false ? 'raster' : 'both'));
+          const RT = { zigzag: L('Z 높이를 ap씩 내려가며 각 높이에서 지그재그로 왕복하고, 마지막에 벽을 한 바퀴 따라 깎습니다. 넓은 면에 빠르고 경로가 단순합니다.', 'Steps down by ap; at each level zig-zag rows, then one pass around the walls. Fast and simple on open areas.'), offset: L('각 높이에서 벽 모양을 따라 일정 간격의 고리를 그리며 바깥(또는 안쪽)부터 벽 쪽으로 깎습니다. 공구 부하가 고르고 포켓·보스 주변에 좋습니다.', 'At each level, rings parallel to the walls at a fixed stepover, working towards the part. Even tool load; good around pockets and bosses.'), none: L('황삭을 하지 않습니다(이미 형상에 가까운 소재일 때).', 'No roughing (near-net stock).') };
+          const FT = { both: L('볼 엔드밀이 평행(지그재그)으로 면 전체를 훑고, 가파른 벽은 Z 등고선으로 한 번 더 깎습니다. 대부분의 부품에 알맞습니다.', 'Ball end mill rasters the whole surface and adds Z-level contours on steep walls. Suits most parts.'), raster: L('평행(지그재그) 경로만 씁니다. 완만한 곡면·평면에 좋고, 가파른 벽은 결이 거칠 수 있습니다.', 'Raster only — good on gentle surfaces; steep walls may be rough.'), water: L('Z 높이마다 등고선을 따라 돕니다. 가파른 벽·리브에 좋고, 평평한 바닥은 덜 깎일 수 있습니다.', 'Z-level contours only — good on steep walls and ribs; flat floors may be left.'), none: L('정삭을 하지 않습니다.', 'No finishing.') };
+          g.push({ title: L('가공 방식 — 먼저 정하세요', 'Machining strategy — choose first'), icon: 'options', body: [
+            ck('doFace', L('윗면 페이스 가공 (T01 페이스 밀)', 'Face the top (T01 face mill)')),
+            ...sel(L('황삭 (T02 평 엔드밀)', 'Roughing (T02 flat end mill)'), rm, [['zigzag', L('Z 레벨 — 지그재그 + 벽 윤곽', 'Z-level — zig-zag + wall contour')], ['offset', L('Z 레벨 — 윤곽 평행 (오프셋)', 'Z-level — contour-parallel (offset)')], ['none', L('안 함', 'None')]], v => { S.doRough = v !== 'none'; if (v !== 'none') S.roughMode = v; }, RT[rm]),
+            rm !== 'none' ? sel(L('황삭 진입 방식', 'Roughing entry'), S.entry || 'plunge', [['plunge', L('수직 진입 (곧바로 내려감)', 'Plunge (straight down)')], ['helix', L('헬리컬 진입 (나선으로 내려감)', 'Helical ramp (spiral down)')]], v => { S.entry = v; }, (S.entry || 'plunge') === 'helix' ? L(`소재 속으로 들어갈 때 공구가 작은 원을 그리며 나선으로 내려갑니다(G03 + Z). 날 끝 부담이 적어 공구 수명에 좋고, 포켓 가공에 씁니다. 원이 들어갈 자리가 없으면 수직 진입합니다.`, 'The tool spirals down on a small circle (G03 + Z) when it enters material — easier on the tool tip, used for pockets. Falls back to a plunge where the circle does not fit.') : L('공구가 곧바로 아래로 내려갑니다(절삭 이송의 30%). 가장 단순하지만 날 끝에 부담이 큽니다.', 'Straight plunge at 30% feed — simplest, hard on the tool tip.')) : [],
+            ...sel(L('정삭 (T03 볼 엔드밀)', 'Finishing (T03 ball end mill)'), fm, [['both', L('평행 + 벽 등고선', 'Raster + waterline')], ['raster', L('평행 (지그재그)만', 'Raster only')], ['water', L('등고선 (Z 레벨)만', 'Waterline only')], ['none', L('안 함', 'None')]], v => { S.doFinish = v !== 'none'; if (v !== 'none') { S.finMode = v; S.wall = v !== 'raster'; } }, FT[fm]),
+            fm !== 'none' ? sel(L('잔삭 (T05 작은 볼 엔드밀)', 'Rest machining (T05 small ball)'), S.restMode || 'none', [['none', L('안 함', 'None')], ['rest', L('정삭 공구가 못 깎은 곳만 작은 공구로', 'Only where the finishing tool could not reach')]], v => { S.restMode = v; }, (S.restMode || 'none') === 'rest' ? L(`정삭이 끝난 뒤 남은 소재(구석 R, 좁은 홈)를 찾아 그곳만 작은 볼 엔드밀(Ø${S.Drest > 0 ? S.Drest : Math.max(1, Math.round(S.Df / 2 * 10) / 10)})로 다시 깎습니다.`, `After finishing, finds the material left in corners and narrow slots and cuts only there with a small ball (Ø${S.Drest > 0 ? S.Drest : Math.max(1, Math.round(S.Df / 2 * 10) / 10)}).`) : L('정삭 볼 엔드밀 반지름보다 작은 구석은 덜 깎인 채 남습니다.', 'Corners smaller than the finishing ball radius stay uncut.')) : [],
+            ck('doDrill', L('둥근 구멍 가공', 'Machine round holes')),
+            S.doDrill ? sel(L('구멍 가공 방식', 'Hole method'), S.holeMode || 'auto', [['drill', L('드릴만 (센터 + G83)', 'Drills only (spot + G83)')], ['auto', L('자동 — 드릴보다 큰 구멍은 헬리컬', 'Auto — helical above the largest drill')], ['helix', L('헬리컬 우선 — 엔드밀이 들어가는 구멍은 모두', 'Helical — every hole the end mill fits')]], v => { S.holeMode = v; },
+              S.holeMode === 'drill' ? L('센터 드릴로 자리를 잡고 지름별 드릴로 펙 드릴링(G83)합니다.', 'Spot drill, then peck-drill each size (G83).') : L(`헬리컬 보간: T02 엔드밀(Ø${S.Dr})이 구멍 벽을 따라 원을 그리며 나선으로 내려갑니다(G03 + Z, 하향 절삭). 구멍이 공구의 1.15배(Ø${fmt(S.Dr * 1.15, 2)}) 이상이어야 하고, 드릴 없이 정확한 지름과 평평한 바닥을 만듭니다.`, `Helical interpolation: the T02 end mill (Ø${S.Dr}) circles down the hole wall (G03 + Z, climb). Needs a hole ≥ 1.15 × the tool (Ø${fmt(S.Dr * 1.15, 2)}); exact diameter and a flat floor with no drill.`)) : [],
+            S.doDrill && S.holeMode !== 'drill' ? num('hpitch', 0.1, L('헬리컬 1회전당 내려가는 깊이 (mm, 0 = 자동)', 'Helix pitch per turn (mm, 0 = auto)')) : null,
+            S.doDrill && S.holeMode !== 'drill' ? num('maxHelix', 5, L('헬리컬로 깎을 최대 구멍 지름 (mm)', 'Largest helical hole (mm)')) : null].flat().filter(Boolean) }); }
         g.push({ title: L('소재와 방향', 'Stock and orientation'), icon: 'mill', body: [
           field(L('공구 방향 (위에서 깎을 면)', 'Tool axis (machined from)'), selectInput([['auto', L('자동 (언더컷 최소)', 'Auto (fewest undercuts)')], ...Object.keys(DIRS).map(k => [k, dirName(k)])], S.dir, v => { S.dir = v; geo(); renderPM(); })),
           h('div', { class: 'kv' }, h('span', null, L('부품 크기 X×Y×Z', 'Part X×Y×Z')), h('b', null, `${fmt(G.Lx, 2)} × ${fmt(G.Ly, 2)} × ${fmt(G.H, 2)}`), h('span', null, L('위 방향', 'Up')), h('b', null, dirName(G.dir)), h('span', null, L('재질', 'Material')), h('b', null, mname(mat)), h('span', null, L('격자 간격', 'Grid')), h('b', null, fmt(G.cell, 2) + ' mm')),
           G.hidden > 0.03 ? h('div', { class: 'warn' }, L(`이 방향에서 보이지 않는 부분이 ${Math.round(G.hidden * 100)}% 있습니다 (언더컷). 다른 방향을 고르거나 두 번 고정해야 합니다.`, `${Math.round(G.hidden * 100)}% is hidden from this side (undercuts).`)) : null,
-          num('top', 0.5, L('윗면 여유 (mm)', 'Top stock (mm)')), num('side', 1, L('옆면 여유 (각 변, mm)', 'Side stock (each side, mm)')), num('grip', 1, L('바이스 물림 여유 (부품 아래, mm)', 'Vise grip stock (under the part, mm)'))].filter(Boolean) });
-        g.push({ title: L('공정', 'Operations'), icon: 'options', body: [ck('doFace', L('윗면 페이스 가공 (T01)', 'Face milling (T01)')), ck('doRough', L('황삭 — 등고선 Z 레벨 (T02 평 엔드밀)', 'Roughing — Z-level (T02 flat end mill)')), ck('doFinish', L('정삭 — 평행 + 벽 등고선 (T03 볼 엔드밀)', 'Finishing — raster + waterline (T03 ball)')), ck('wall', L('정삭에 벽 등고선 포함', 'Include waterline on walls')), ck('doDrill', L('둥근 관통 구멍 드릴 (T04 센터 + 드릴, G83)', 'Drill round through holes (spot + G83)'))] });
+          field(L('소재 지정', 'Stock'), h('div', { class: 'seg' }, h('button', { class: S.stockMode !== 'size' ? 'on' : '', onclick: () => { S.stockMode = 'allow'; renderPM(); } }, L('여유로', 'Allowances')), h('button', { class: S.stockMode === 'size' ? 'on' : '', onclick: () => { S.stockMode = 'size'; if (!(S.sX > 0 && S.sY > 0 && S.sZ > 0)) [S.sX, S.sY, S.sZ] = rec(); renderPM(); } }, L('크기 직접 입력', 'Exact size')))),
+          ...(S.stockMode === 'size' ? (() => { const e = stockErr(), r = rec(), inp = (k, ax, mn) => { const i = numInput(S[k], v => { S[k] = v; }, { step: 1, min: 0 }); i.addEventListener('change', () => renderPM()); return field(L(`소재 ${ax} (mm) — 최소 ${fmt(mn, 2)}`, `Stock ${ax} (mm) — min ${fmt(mn, 2)}`), i); };
+            return [h('div', { class: 'hint' }, L(`소재는 부품(${fmt(G.Lx, 2)} × ${fmt(G.Ly, 2)} × ${fmt(G.H, 2)})보다 커야 합니다. 부품은 소재의 X·Y 가운데에 놓이고, Z는 윗면 여유를 뺀 나머지가 바이스 물림 여유가 됩니다.`, `The stock must be larger than the part (${fmt(G.Lx, 2)} × ${fmt(G.Ly, 2)} × ${fmt(G.H, 2)}). The part sits centred in X and Y; in Z whatever is left after the top allowance is held in the vise.`)),
+              inp('sX', 'X', G.Lx), inp('sY', 'Y', G.Ly), num('top', 0.5, L('윗면 여유 (mm)', 'Top stock (mm)')), inp('sZ', 'Z', G.H + S.top),
+              e.length ? h('div', { class: 'warn' }, L('소재가 부품보다 작습니다: ', 'Stock smaller than the part: ') + e.join(' · ') + L(' → 더 크게 넣으세요.', ' → enter larger values.')) : h('div', { class: 'hint' }, L(`여유: X 양쪽 ${fmt((S.sX - G.Lx) / 2, 2)} · Y 양쪽 ${fmt((S.sY - G.Ly) / 2, 2)} · 바이스 물림 ${fmt(S.sZ - G.H - S.top, 2)} mm`, `Allowance: X each side ${fmt((S.sX - G.Lx) / 2, 2)} · Y each side ${fmt((S.sY - G.Ly) / 2, 2)} · vise grip ${fmt(S.sZ - G.H - S.top, 2)} mm`)),
+              !e.length && S.sZ - G.H - S.top < 3 ? h('div', { class: 'warn' }, L('바이스로 잡을 부분이 3 mm보다 적습니다. 공작물이 빠질 수 있으니 Z를 더 크게 하세요.', 'Less than 3 mm left for the vise — make Z larger so the work is held safely.')) : null,
+              h('button', { class: 'pbtn wide', onclick: () => { [S.sX, S.sY, S.sZ] = r; renderPM(); } }, L(`추천 크기 넣기 (${r.join(' × ')})`, `Use recommended size (${r.join(' × ')})`))]; })()
+            : [num('top', 0.5, L('윗면 여유 (mm)', 'Top stock (mm)')), num('side', 1, L('옆면 여유 (각 변, mm)', 'Side stock (each side, mm)')), num('grip', 1, L('바이스 물림 여유 (부품 아래, mm)', 'Vise grip stock (under the part, mm)'))])].filter(Boolean) });
+        { const b = box(), o = orgOf(S, b), rg = (a, c) => `${fmt(a, 2)} ~ ${fmt(c, 2)}`;
+          g.push({ title: L('원점 (공작물 좌표계 G54)', 'Work zero (G54)'), icon: 'origin', body: [
+            field(L('X·Y 원점', 'X·Y zero'), selectInput(ORGXY(), S.orgXY, v => { S.orgXY = v; renderPM(); })),
+            field(L('Z 원점', 'Z zero'), selectInput(ORGZ(), S.orgZ, v => { S.orgZ = v; renderPM(); })),
+            h('div', { class: 'kv' }, h('span', null, L('부품 X / Y / Z', 'Part X / Y / Z')), h('b', null, `${rg(-o[0], b.Lx - o[0])} / ${rg(-o[1], b.Ly - o[1])} / ${rg(-G.H - o[2], -o[2])}`),
+              h('span', null, L('소재 X / Y / Z', 'Stock X / Y / Z')), h('b', null, `${rg(b.sx0 - o[0], b.sx1 - o[0])} / ${rg(b.sy0 - o[1], b.sy1 - o[1])} / ${rg(b.zbot - o[2], b.ztop - o[2])}`)),
+            h('div', { class: 'hint' }, L('G코드의 좌표가 이 원점 기준으로 바뀝니다. 기계에서는 같은 곳을 터치(아큐센터·터치 센서)해 G54에 입력하세요. 시뮬레이션의 노란 축이 원점입니다.', 'G-code coordinates are measured from this point. On the machine, touch off the same point (edge finder / probe) and set it as G54. The yellow axes in the simulation show it.'))] }); }
         g.push({ title: L('공구와 절삭 조건', 'Tools and cutting data'), icon: 'mass', body: [
           num('Dface', 5, L('T01 페이스 밀 지름 (mm)', 'T01 face mill Ø (mm)')), num('Dr', 1, L('T02 황삭 평 엔드밀 지름 (mm)', 'T02 roughing end mill Ø (mm)')), num('Df', 1, L('T03 정삭 볼 엔드밀 지름 (mm)', 'T03 finishing ball Ø (mm)')),
           num('ap', 0.5, L('황삭 절입 깊이 ap (mm)', 'Roughing depth of cut ap (mm)')), num('so', 0.05, L('황삭 옆 간격 (공구 지름 비, 0.3~0.8)', 'Roughing stepover (× tool Ø)')), num('u', 0.05, L('정삭 여유 — 벽 (mm)', 'Finishing allowance — walls (mm)')), num('uz', 0.05, L('정삭 여유 — 바닥 (mm, 0이면 평 엔드밀로 바닥 완성)', 'Finishing allowance — floors (mm; 0 = floors finished by the flat end mill)')),
-          num('fso', 0.05, L('정삭 옆 간격 (mm)', 'Finishing stepover (mm)')), num('wz', 0.1, L('벽 등고선 높이 간격 (mm)', 'Waterline step (mm)')), num('maxDrill', 1, L('드릴로 뚫을 최대 구멍 지름 (mm)', 'Largest hole to drill (mm)')), num('smax', 500, L('최고 회전수 (rpm)', 'Max spindle speed (rpm)')),
+          num('fso', 0.05, L('정삭 옆 간격 (mm)', 'Finishing stepover (mm)')), num('wz', 0.1, L('벽 등고선 높이 간격 (mm)', 'Waterline step (mm)')), num('maxDrill', 1, L('드릴로 뚫을 최대 구멍 지름 (mm)', 'Largest hole to drill (mm)')), S.restMode === 'rest' ? num('Drest', 0.5, L('T05 잔삭 볼 엔드밀 지름 (mm, 0 = 정삭의 절반)', 'T05 rest ball Ø (mm, 0 = half the finishing ball)')) : null, S.entry === 'helix' ? num('rampPitch', 0.1, L('헬리컬 진입 1회전당 깊이 (mm, 0 = 자동)', 'Helical ramp pitch (mm, 0 = auto)')) : null, num('smax', 500, L('최고 회전수 (rpm)', 'Max spindle speed (rpm)')),
           h('div', { class: 'hint' }, L(`${mname(mat)} 기준: 엔드밀 Vc ${mc[0]} m/min · 날당 이송 ${mc[1]} mm · 페이스 밀 Vc ${mc[2]} · 드릴 Vc ${mc[4]}. 회전수와 이송 속도는 공구 지름에서 계산합니다.`, `For ${mname(mat)}: end mill Vc ${mc[0]} m/min, fz ${mc[1]} mm · face mill Vc ${mc[2]} · drill Vc ${mc[4]}; rpm and feed follow from the tool diameter.`))] });
         g.push({ title: L('방법', 'Method'), icon: 'options', body: h('div', { class: 'hint solver' }, L('부품을 공구 방향에서 내려다본 높이 지도(격자)로 바꿔 계산합니다 · 황삭: 각 Z 높이에서 공구 반지름+여유만큼 부품을 부풀린 영역 밖을 지그재그로 깎고 경계를 한 바퀴 따라감, 평평한 바닥마다 높이를 추가 · 정삭: 볼 엔드밀이 부품에 닿는 가장 낮은 높이(드롭 커터)를 따라 평행 가공, 가파른 벽은 등고선으로 · 드릴: 둥근 관통 구멍을 찾아 센터 드릴 후 G83 펙 · 시뮬레이션: 소재를 높이 격자로 두고 공구 모양대로 깎음', 'The part becomes a height map seen along the tool axis · Roughing: at each Z level, zig-zag outside the part grown by tool radius + allowance, then one pass along the boundary; extra levels on flat floors · Finishing: ball end mill on the drop-cutter surface in parallel rows, waterline contours on steep walls · Drilling: round through holes, spot then G83 · Simulation: the stock as a height grid cut by each tool shape')) });
         g.push({ title: '', body: h('button', { class: 'pbtn primary wide', onclick: run, disabled: busy }, L('▶ 가공 경로 만들고 시뮬레이션', '▶ Make toolpath and simulate')) });
