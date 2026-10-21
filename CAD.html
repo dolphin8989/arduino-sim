@@ -394,7 +394,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 
 <div id="app">
 <section id="sw" class="win" aria-label="3D 모델러">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.92</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.93</em></b><span class="t">3D 모델링</span></div><div class="qat" id="swQAT"></div><span class="sp"></span><span class="docname" id="swTitle"></span><span class="sp"></span><span class="mode" id="swMode">PART</span></div>
   <div class="menubar" id="swMenu"></div>
   <div class="swmain">
     <nav class="rail" id="railL" aria-label="피처 · 어셈블리 명령"></nav>
@@ -420,7 +420,7 @@ canvas.chart{width:100%;height:170px;border:1px solid var(--border);border-radiu
 </section>
 
 <section id="ac" class="win" hidden aria-label="2D 도면">
-  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.92</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
+  <div class="ttl"><span class="logo">K</span><div class="brand"><b>K군의 CAD <em class="ver">v0.93</em></b><span class="t" id="acTitle">2D 도면</span></div><span class="sp"></span><span class="docname" id="acDocName"></span><span class="sp"></span><span class="mode">DRAWING</span></div>
   <div class="menubar" id="acMenu"></div>
   <div class="acrow" id="acStd"></div>
   <div class="acrow" id="acProps"></div>
@@ -714,7 +714,7 @@ const I18N_DICT = {
 "F3 객체 스냅 · F7 모눈 · F8 직교 · F9 스냅": "F3 object snap · F7 grid · F8 ortho · F9 snap",
 "FeatureManager 디자인 트리": "FeatureManager design tree",
 "K-CAD 작업": "K-CAD workspace",
-"K군의 CAD v0.92": "K-CAD v0.92",
+"K군의 CAD v0.93": "K-CAD v0.93",
 "K군의 CAD 정보": "About K-CAD",
 "K군의 CAD 파일이 아닙니다": "Not a K-CAD file",
 "L 선 · C 원 · A 호 · REC 사각형 · POL 다각형 · DT 문자": "L line · C circle · A arc · REC rectangle · POL polygon · DT text",
@@ -1356,7 +1356,7 @@ const I18N_DICT = {
 "DXF로 내보내기": "Export to DXF",
 "DXF로 내보냅니다. 치수는 선과 문자로 분해되어 저장됩니다.": "Exports to DXF. Dimensions are exploded into lines and text.",
 "KS 제도 관례: 외형선 굵은 실선(0.5), 숨은선 파선(0.35), 중심선 1점 쇄선(0.25). 행을 두 번 클릭하면 현재 도면층이 됩니다.": "KS drafting practice: visible lines thick solid (0.5), hidden lines dashed (0.35), centerlines chain (0.25). Double-click a row to make it current.",
-"K군의 CAD v0.92 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.92 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
+"K군의 CAD v0.93 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기": "K-CAD v0.93 · 2D drawing — type a command, e.g. L, C, REC, DLI, VB (place 3D views). HELP lists commands",
 "{0}   도면층: \"{1}\"": "{0}   Layer: \"{1}\"",
 "{0} (객체 선택됨)": "{0} (objects selected)",
 "{0} 가로 ({1}×{2})": "{0} landscape ({1}×{2})",
@@ -1825,8 +1825,12 @@ function ic(name, size = 16) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 }
 /* ================= release notes (bottom-left button, Help menu) ================= */
-const APP_VER = 'v0.92';
+const APP_VER = 'v0.93';
 const RELEASES = [
+  { v: 'v0.93', date: '2026-10-21', title: ['작업 화면 배경색 변경 · 상세도 자동 갱신', 'Workspace background colour · associative detail views'], items: [
+    ['제목 줄 오른쪽 PART / ASSEMBLY 표시 바로 아래 [🎨 배경색 변경]: 기본·검정·진회색·남색·청회색·연회색·흰색·솔리드웍스 풍(하늘색→흰색) 견본과 [직접 고르기], 점 격자 켜기/끄기, [기본값으로]. 고른 색은 이 브라우저에 기억됩니다. 밝은 배경에서는 와이어프레임·스케치 중 흐린 모서리 선이 어두운 색으로 바뀌어 잘 보입니다.', 'A [🎨 Background] button just below the PART / ASSEMBLY badge: default, black, graphite, navy, slate, light grey, white and a SolidWorks-style gradient, a custom colour, dot grid on/off and reset. The choice is remembered in this browser; on light backgrounds faint wireframe/sketch edges turn dark so they stay visible.'],
+    ['2D 도면의 상세도(DETAIL)가 3D 모델과 연결됩니다: 모델을 고쳐 투상도가 다시 그려질 때(도면을 열 때 자동 또는 UPDATEVIEWS) 상세도도 새 형상으로 다시 잘라 그립니다. 상세도나 원본의 범위 원을 옮겨도 그 위치를 따릅니다(이 버전부터 새로 넣은 상세도에 적용).', 'Detail views (DETAIL) in 2D drawings are now associative: when the 3D model changes and the views are redrawn (automatically on opening, or UPDATEVIEWS), each detail is clipped again from the new geometry, following its own boundary circle and the source circle if they were moved (details placed from this version on).'],
+  ] },
   { v: 'v0.92', date: '2026-10-20', title: ['어셈블리에 표준 부품 불러오기', 'Load standard parts into assemblies'], items: [
     ['어셈블리 창의 도구 메뉴 맨 위 [불러오기 — 표준 부품]: 기어·볼트·너트·베어링·축·풀리·브라켓 등 부품 템플릿 70종에서 골라 치수를 정하고 [넣기]를 누르면, 부품 문서가 만들어져 지금 어셈블리의 기존 부품 옆에 바로 들어갑니다(빈 어셈블리면 원점에 고정). 삽입 메뉴와 [부품 삽입] 창에도 같은 버튼이 있습니다.', 'Assembly Tools menu → [Load — standard part]: pick one of 70 part templates (gears, bolts, nuts, bearings, shafts, pulleys, brackets…), set the sizes and press [Insert]; the part is made and placed next to the existing components (fixed at the origin in an empty assembly). Also in the Insert menu and the Insert component panel.'],
   ] },
@@ -6187,7 +6191,7 @@ async function saveFile(filename, data, mime) {
 }
 function docExport(d) {
   const strip = (k, v) => (k[0] === '_' ? undefined : v);
-  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.92', doc: JSON.parse(JSON.stringify(d, strip)) };
+  const o = { format: 'kcad-doc', version: 2, app: 'K군의 CAD v0.93', doc: JSON.parse(JSON.stringify(d, strip)) };
   if (d.type === 'asm') o.parts = [...new Set(d.comps.map(c => c.part))].map(docById).filter(Boolean).map(p => JSON.parse(JSON.stringify(p, strip)));
   return JSON.stringify(o, null, 1);
 }
@@ -6343,7 +6347,7 @@ function helpDialog() {
 function aboutDialog() {
   dialog({
     title: 'K군의 CAD 정보', width: 360, classic: App.doc && App.doc.type === 'dwg', body: h('div', { style: 'display:flex;gap:12px;align-items:flex-start' }, icEl('part', 40),
-      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.92'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
+      h('div', null, h('b', { style: 'font-size:14px' }, 'K군의 CAD v0.93'), h('div', null, '3D 부품·어셈블리 모델링 + 2D 명령줄 도면'), h('div', { style: 'margin-top:8px;color:var(--text-dim)' }, '개발: Kim,JongUk'), h('div', { style: 'color:var(--text-dim)' }, '단위: mm · 투상법: 제3각법(KS)'))),
     buttons: [{ label: '확인' }]
   });
 }
@@ -12071,15 +12075,11 @@ const Dwg = (() => {
     addEnt(mk(br || def)); log(L(`부품표 ${rows.length - 1}행을 넣었습니다 (KS: 표제란 위, 품번은 아래에서 위로).`, `Parts list with ${rows.length - 1} rows.`));
   });
   // detail view: enlarge a circular region
-  CMD.DETAIL = () => run('DETAIL', async () => {
-    const c = await getPoint(L('상세도로 확대할 부분의 중심 지정:', 'Centre of the area to enlarge:'));
-    const rv = await getPoint(L('범위 원의 반지름 지정:', 'Radius of the boundary circle:'), { base: c, number: true, rubber: true, preview: p => [{ t: 'circle', c, r: dist(c, p) }] });
-    const r = typeof rv === 'number' ? rv : dist(c, rv); if (!(r > 0)) return;
-    const used = new Set(doc.ents.filter(e => e.dvl).map(e => e.dvl)); let next = 'A'; while (used.has(next)) next = String.fromCharCode(next.charCodeAt(0) + 1);
-    const ls = await getString(L(`상세도 이름 <${next}>:`, `Detail name <${next}>:`)); const lab = (ls || '').trim().toUpperCase() || next;
-    const ks = await getString(L('배율 <2> (예: 2, 5):', 'Scale <2> (e.g. 2, 5):')); const k = parseFloat(ks) > 0 ? parseFloat(ks) : 2;
-    // clip the geometry to the circle
-    const src = doc.ents.filter(e => (e.t === 'line' || e.t === 'circle' || e.t === 'arc') && !e.dv);
+  // [v0.93] associative: the definition is kept in doc.details, so when the 3D model changes and the views are
+  // redrawn (syncViews), every detail is clipped again from the new geometry. The detail is found by its own
+  // boundary circle (dvb) and the marker circle on the source (dvs), so moving either one is respected.
+  function detailPieces(c, r) {
+    const src = doc.ents.filter(e => (e.t === 'line' || e.t === 'circle' || e.t === 'arc') && !e.dv && !e.dvl);
     const clipSeg = (a, b) => { const d = [b[0] - a[0], b[1] - a[1]], f = [a[0] - c[0], a[1] - c[1]], A = d[0] * d[0] + d[1] * d[1], B = 2 * (f[0] * d[0] + f[1] * d[1]), Cc = f[0] * f[0] + f[1] * f[1] - r * r; if (A < 1e-12) return null; const disc = B * B - 4 * A * Cc; if (disc <= 0) return null; const sq = Math.sqrt(disc), t0 = Math.max(0, (-B - sq) / (2 * A)), t1 = Math.min(1, (-B + sq) / (2 * A)); return t1 > t0 ? [[a[0] + d[0] * t0, a[1] + d[1] * t0], [a[0] + d[0] * t1, a[1] + d[1] * t1]] : null; };
     const pieces = [];
     for (const e of src) {
@@ -12089,14 +12089,46 @@ const Dwg = (() => {
       const pts = e.t === 'circle' ? circPts(e.c, e.r, 0, Math.PI * 2, 96) : circPts(e.c, e.r, e.a0, sweepOf(e), 64);
       for (let i = 0; i + 1 < pts.length; i++) { const s2 = clipSeg(pts[i], pts[i + 1]); if (s2) pieces.push({ t: 'line', a: s2[0], b: s2[1], layer: e.layer }); }
     }
+    return pieces;
+  }
+  function detailMake(pieces, c, r, k, lab, at) {
+    const T = q => [at[0] + (q[0] - c[0]) * k, at[1] + (q[1] - c[1]) * k];
+    const out = pieces.map(e => e.t === 'line' ? { t: 'line', a: T(e.a), b: T(e.b), layer: e.layer } : { t: 'circle', c: T(e.c), r: e.r * k, layer: e.layer });
+    out.push({ t: 'circle', c: at.slice(), r: r * k, layer: '0', dvb: 1 }, { t: 'text', p: [at[0], at[1] - r * k - 8], h: 3.5, s: L(`상세 ${lab} (${fmt(k)} : 1)`, `DETAIL ${lab} (${fmt(k)} : 1)`), al: 'c', layer: '문자', dvt: 1 });
+    return out;
+  }
+  function regenDetails() {
+    if (!doc || !doc.details || !doc.details.length) return 0;
+    let n = 0;
+    doc.details = doc.details.filter(dd => doc.ents.some(e => e.dv === dd.id));
+    for (const dd of doc.details) {
+      const old = doc.ents.filter(e => e.dv === dd.id);
+      const bc = old.find(e => e.dvb && e.t === 'circle');
+      const at = bc ? bc.c.slice() : dd.at.slice();
+      const mk = doc.ents.find(e => e.dvs === dd.id && e.t === 'circle');
+      const c = mk ? mk.c.slice() : dd.c, r = mk ? mk.r : dd.r;
+      const pieces = detailPieces(c, r); if (!pieces.length) continue;
+      doc.ents = doc.ents.filter(e => { if (e.dv === dd.id) { sel.delete(e.id); return false; } return true; });
+      for (const e of detailMake(pieces, c, r, dd.k, dd.lab, at)) { e.dv = dd.id; e.id = uid('e'); if (!e.layer) e.layer = doc.cur; doc.ents.push(e); }
+      dd.c = c; dd.r = r; dd.at = at; n++;
+    }
+    return n;
+  }
+  CMD.DETAIL = () => run('DETAIL', async () => {
+    const c = await getPoint(L('상세도로 확대할 부분의 중심 지정:', 'Centre of the area to enlarge:'));
+    const rv = await getPoint(L('범위 원의 반지름 지정:', 'Radius of the boundary circle:'), { base: c, number: true, rubber: true, preview: p => [{ t: 'circle', c, r: dist(c, p) }] });
+    const r = typeof rv === 'number' ? rv : dist(c, rv); if (!(r > 0)) return;
+    const used = new Set(doc.ents.filter(e => e.dvl).map(e => e.dvl)); let next = 'A'; while (used.has(next)) next = String.fromCharCode(next.charCodeAt(0) + 1);
+    const ls = await getString(L(`상세도 이름 <${next}>:`, `Detail name <${next}>:`)); const lab = (ls || '').trim().toUpperCase() || next;
+    const ks = await getString(L('배율 <2> (예: 2, 5):', 'Scale <2> (e.g. 2, 5):')); const k = parseFloat(ks) > 0 ? parseFloat(ks) : 2;
+    const pieces = detailPieces(c, r);
     if (!pieces.length) { log(L('범위 안에 형상이 없습니다.', 'Nothing inside the circle.')); return; }
-    const make = at => { const T = q => [at[0] + (q[0] - c[0]) * k, at[1] + (q[1] - c[1]) * k]; const out = pieces.map(e => e.t === 'line' ? { t: 'line', a: T(e.a), b: T(e.b), layer: e.layer } : { t: 'circle', c: T(e.c), r: e.r * k, layer: e.layer });
-      out.push({ t: 'circle', c: at, r: r * k, layer: '0' }, { t: 'text', p: [at[0], at[1] - r * k - 8], h: 3.5, s: L(`상세 ${lab} (${fmt(k)} : 1)`, `DETAIL ${lab} (${fmt(k)} : 1)`), al: 'c', layer: '문자' }); return out; };
-    const at = await getPoint(L('상세도 놓을 위치 지정:', 'Place the detail view:'), { preview: q => make(q) });
+    const at = await getPoint(L('상세도 놓을 위치 지정:', 'Place the detail view:'), { preview: q => detailMake(pieces, c, r, k, lab, q) });
     const id = uid('dv');
-    addEnt({ t: 'circle', c: c.slice(), r, layer: '0', dvl: lab }); addEnt({ t: 'text', p: [c[0] + r * 0.75, c[1] + r * 0.75 + 1], h: 5, s: lab, al: 'l', layer: '문자', dvl: lab });
-    for (const e of make(at)) { e.dv = id; addEnt(e); }
-    log(L(`상세도 ${lab}을(를) ${fmt(k)}:1로 넣었습니다. 치수는 실제 값으로 읽히도록 DIMLFAC을 확인하세요 (상세도 안 치수는 1/${fmt(k)}).`, `Detail ${lab} at ${fmt(k)}:1 placed.`));
+    addEnt({ t: 'circle', c: c.slice(), r, layer: '0', dvl: lab, dvs: id }); addEnt({ t: 'text', p: [c[0] + r * 0.75, c[1] + r * 0.75 + 1], h: 5, s: lab, al: 'l', layer: '문자', dvl: lab });
+    for (const e of detailMake(pieces, c, r, k, lab, at)) { e.dv = id; addEnt(e); }
+    doc.details = doc.details || []; doc.details.push({ id, c: c.slice(), r, k, lab, at: at.slice() }); save();
+    log(L(`상세도 ${lab}을(를) ${fmt(k)}:1로 넣었습니다. 3D 모델을 고쳐 투상도가 다시 그려지면 상세도도 함께 다시 그려집니다. 치수는 실제 값으로 읽히도록 DIMLFAC을 확인하세요 (상세도 안 치수는 1/${fmt(k)}).`, `Detail ${lab} at ${fmt(k)}:1 placed. It is redrawn together with the views when the 3D model changes.`));
   });
   CMD.ERASE = () => run('ERASE', async () => { const s = await getSel(); s.forEach(removeEnt); });
   CMD.MOVE = () => run('MOVE', async () => {
@@ -12732,9 +12764,11 @@ const Dwg = (() => {
       const fd = followDims(oldEnts, newEnts); dimsMoved += fd.moved; dimsLoose += fd.loose;
       v.sig = srcSig(src); n++;
     }
+    const nDet = n ? regenDetails() : 0;
     if (n) {
       doc.rev++; save(); redraw(); renderProps();
       log(L(`3D 모델이 바뀌어 투상도 ${n}묶음을 다시 그렸습니다.`, `The 3D model changed: redrew ${n} view group(s).`) + (dimsMoved ? L(` 치수 ${dimsMoved}개가 형상을 따라 옮겨지고 값이 바뀌었습니다.`, ` ${dimsMoved} dimension(s) followed the geometry.`) : '') + (dimsLoose ? L(` 형상에 붙지 않은 치수 ${dimsLoose}개는 그대로 두었으니 확인하세요.`, ` ${dimsLoose} dimension(s) not attached to the views were left as they were — please check them.`) : ''));
+      if (nDet) log(L(`상세도 ${nDet}개도 새 형상으로 다시 그렸습니다.`, `Also redrew ${nDet} detail view(s).`));
     }
     return n;
   }
@@ -12977,7 +13011,7 @@ const Dwg = (() => {
     d.osm = d.osm || { end: true, mid: true, cen: true, quad: true, int: true, perp: true, ins: true };
     buildChrome(); setTitle(); resize();
     setTimeout(() => { if (doc === d) syncViews(false, true); }, 0);
-    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.92 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
+    if (!d._opened) { d._opened = true; if (d.ents.length) setTimeout(() => { if (doc === d) zoomExtents(); }, 30); if (!hist.textContent) { log('K군의 CAD v0.93 · 2D 도면 — 명령을 입력하세요. 예) L, C, REC, DLI, VB(3D 뷰 배치). HELP로 목록 보기'); } }
     setPrompt('명령:');
     setTimeout(() => cin.focus({ preventScroll: true }), 30);
     redraw();
@@ -14392,6 +14426,121 @@ const Guide = (() => {
   document.head.append(style);
 
   return { start, stop, manual, addBtns, onActivate, pmHelpBtn, chapterFor, CH, TOURS, state: () => ({ tour: T && { mode: T.mode, i: T.i, n: T.steps.length }, manual: MAN && MAN.id }) };
+})();
+/* ================= [v0.93] 3D 작업 화면 배경색 변경 =================
+   제목 줄 오른쪽 PART / ASSEMBLY 표시 바로 아래(메뉴 줄 오른쪽 끝)에 [🎨 배경색 변경] 버튼을 둡니다.
+   누르면 견본(기본·검정·진회색·남색·청회색·연회색·흰색·솔리드웍스 풍 그라데이션)과 [직접 고르기],
+   점 격자 표시를 고르는 작은 창이 열립니다. 고른 값은 이 브라우저에만 기억됩니다(localStorage).
+   밝은 배경에서는 와이어프레임/스케치 중 흐린 모서리 선을 어두운 색으로 바꿔 잘 보이게 합니다. */
+const BG_KEY = 'kcad.bg3d';
+const BG_PRESETS = [
+  { k: 'default', ko: '기본', en: 'Default', c: '#0b0e12' },
+  { k: 'black', ko: '검정', en: 'Black', c: '#000000' },
+  { k: 'graphite', ko: '진회색', en: 'Graphite', c: '#2b2f36' },
+  { k: 'navy', ko: '남색', en: 'Navy', c: '#13233a' },
+  { k: 'slate', ko: '청회색', en: 'Slate', c: '#4a5868' },
+  { k: 'light', ko: '연회색', en: 'Light grey', c: '#c9ced6' },
+  { k: 'white', ko: '흰색', en: 'White', c: '#ffffff' },
+  { k: 'sw', ko: '솔리드웍스 풍', en: 'SolidWorks style', c: '#dfe8f3', grad: ['#9fbbd9', '#f4f7fb'] },
+];
+const BG_DEFAULT = { k: 'default', c: '#0b0e12', grid: true };
+function bgLoad() { try { const v = JSON.parse(localStorage.getItem(BG_KEY) || 'null'); if (v && /^#[0-9a-f]{6}$/i.test(v.c)) return Object.assign({}, BG_DEFAULT, v); } catch (e) { } return Object.assign({}, BG_DEFAULT); }
+function bgStore(v) { try { localStorage.setItem(BG_KEY, JSON.stringify(v)); } catch (e) { } }
+let BG_CUR = bgLoad();
+function bgLum(hex) { const n = parseInt(hex.slice(1), 16), r = (n >> 16 & 255) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255; const f = x => x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); }
+function bgMix(hex, toward, t) { const a = parseInt(hex.slice(1), 16), b = parseInt(toward.slice(1), 16); const ch = s => Math.round(((a >> s) & 255) * (1 - t) + ((b >> s) & 255) * t); return '#' + [16, 8, 0].map(s => ch(s).toString(16).padStart(2, '0')).join(''); }
+// 밝은 배경용으로 바꿔 줄 흐린 선 재질(원래 색 기억)
+const BG_LINE_MATS = (() => { const out = []; try { out.push([lightEdgeMat, 0x3a4552], [dimEdgeMat, 0x5b6675]); } catch (e) { } return out.map(([m, dark]) => ({ m, orig: m.color.getHex(), dark })); })();
+function bgApply(v) {
+  const g = document.getElementById('gfx'); if (!g) return;
+  const preset = BG_PRESETS.find(p => p.k === v.k);
+  const base = v.c;
+  const light = bgLum(preset && preset.grad ? preset.c : base) > 0.35;
+  const dot = light ? bgMix(base, '#000000', 0.16) : bgMix(base, '#ffffff', 0.12);
+  g.style.setProperty('--bg-canvas', base);
+  g.style.setProperty('--grid-dot', v.grid ? dot : 'transparent');
+  if (preset && preset.grad) {
+    g.style.backgroundImage = `radial-gradient(circle,${v.grid ? dot : 'transparent'} 1px,transparent 1.2px),linear-gradient(180deg,${preset.grad[0]},${preset.grad[1]})`;
+    g.style.backgroundSize = '22px 22px,100% 100%';
+  } else { g.style.backgroundImage = ''; g.style.backgroundSize = ''; }
+  document.body.classList.toggle('kc-lightbg', light);
+  for (const x of BG_LINE_MATS) x.m.color.setHex(light ? x.dark : x.orig);
+  const sw = document.querySelector('#bgBtn .bgsw'); if (sw) sw.style.background = preset && preset.grad ? `linear-gradient(180deg,${preset.grad[0]},${preset.grad[1]})` : base;
+}
+function bgSet(v) { BG_CUR = Object.assign({}, BG_CUR, v); bgStore(BG_CUR); bgApply(BG_CUR); bgPopSync(); }
+let bgPopEl = null;
+function bgPopSync() {
+  if (!bgPopEl) return;
+  bgPopEl.querySelectorAll('.bgp-sw').forEach(b => b.classList.toggle('on', b.dataset.k === BG_CUR.k));
+  const ci = bgPopEl.querySelector('input[type=color]'); if (ci) ci.value = BG_CUR.c;
+  const gc = bgPopEl.querySelector('input[type=checkbox]'); if (gc) gc.checked = !!BG_CUR.grid;
+}
+function bgClose() { if (bgPopEl) { bgPopEl.remove(); bgPopEl = null; document.removeEventListener('pointerdown', bgOutside, true); } }
+function bgOutside(ev) { if (bgPopEl && !bgPopEl.contains(ev.target) && !ev.target.closest('#bgBtn')) bgClose(); }
+function bgOpen(btn) {
+  if (bgPopEl) { bgClose(); return; }
+  const p = h('div', { class: 'bgpop', role: 'dialog', 'aria-label': L('배경색 변경', 'Background colour') });
+  p.append(h('div', { class: 'bgp-h' }, L('작업 화면 배경색', 'Workspace background')));
+  const grid = h('div', { class: 'bgp-grid' });
+  for (const pr of BG_PRESETS) {
+    const b = h('button', { type: 'button', class: 'bgp-sw', 'data-k': pr.k, title: L(pr.ko, pr.en) });
+    const chip = h('span', { class: 'bgp-chip' }); chip.style.background = pr.grad ? `linear-gradient(180deg,${pr.grad[0]},${pr.grad[1]})` : pr.c;
+    b.append(chip, h('span', { class: 'bgp-n' }, L(pr.ko, pr.en)));
+    b.addEventListener('click', () => bgSet({ k: pr.k, c: pr.c }));
+    grid.append(b);
+  }
+  p.append(grid);
+  const row = h('div', { class: 'bgp-row' });
+  const ci = h('input', { type: 'color', value: BG_CUR.c, title: L('직접 고르기', 'Pick any colour') });
+  ci.addEventListener('input', () => bgSet({ k: 'custom', c: ci.value }));
+  row.append(h('label', { class: 'bgp-l' }, ci, h('span', null, L('직접 고르기', 'Custom colour'))));
+  const gc = h('input', { type: 'checkbox' }); gc.checked = !!BG_CUR.grid;
+  gc.addEventListener('change', () => bgSet({ grid: gc.checked }));
+  row.append(h('label', { class: 'bgp-l' }, gc, h('span', null, L('점 격자', 'Dot grid'))));
+  p.append(row);
+  const rs = h('button', { type: 'button', class: 'bgp-reset' }, L('기본값으로', 'Reset to default'));
+  rs.addEventListener('click', () => bgSet(Object.assign({}, BG_DEFAULT)));
+  p.append(rs);
+  document.body.append(p); bgPopEl = p; bgPopSync();
+  const r = btn.getBoundingClientRect(), pw = 236;
+  p.style.left = Math.max(8, Math.min(window.innerWidth - pw - 8, r.right - pw)) + 'px'; p.style.top = (r.bottom + 4) + 'px';
+  setTimeout(() => document.addEventListener('pointerdown', bgOutside, true), 0);
+}
+function bgButton() {
+  const b = h('button', { type: 'button', id: 'bgBtn', class: 'bgbtn', title: L('3D 작업 화면의 배경색을 바꿉니다', 'Change the 3D workspace background') });
+  const sw = h('span', { class: 'bgsw' });
+  b.append(sw, h('span', null, L('배경색 변경', 'Background')));
+  b.addEventListener('click', () => bgOpen(b));
+  return b;
+}
+// 메뉴 줄은 화면이 바뀔 때마다 다시 만들어지므로(buildMenubar), 3D 창 메뉴 줄을 만들 때마다 버튼을 끝에 붙입니다.
+(function () {
+  const _build = buildMenubar;
+  buildMenubar = function (bar, menus, classic) {
+    _build(bar, menus, classic);
+    if (bar && bar.id === 'swMenu') { bar.append(h('span', { class: 'bgsp' }), bgButton()); bgApply(BG_CUR); }
+  };
+  const css = document.createElement('style');
+  css.textContent = `
+.menubar .bgsp{flex:1 1 auto;min-width:8px}
+.menubar>button.bgbtn{display:inline-flex;align-items:center;gap:6px;padding:0 10px;border:1px solid var(--border-strong);margin:3px 2px;color:var(--text)}
+.menubar>button.bgbtn:hover{border-color:var(--teal);color:var(--teal-strong)}
+.bgbtn .bgsw{width:14px;height:14px;border-radius:3px;border:1px solid var(--border-strong);flex:none}
+.bgpop{position:fixed;z-index:70;width:236px;box-sizing:border-box;background:var(--bg-panel-2);border:1px solid var(--border-strong);border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,.5);padding:10px;color:var(--text)}
+.bgp-h{font-weight:600;font-size:12px;margin-bottom:8px}
+.bgp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.bgp-sw{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;border:1px solid var(--border);border-radius:6px;background:var(--bg-panel);cursor:pointer;color:var(--text-dim,#9aa6b4)}
+.bgp-sw:hover{border-color:var(--border-strong)}
+.bgp-sw.on{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal);color:var(--text)}
+.bgp-chip{width:30px;height:20px;border-radius:4px;border:1px solid rgba(127,127,127,.5)}
+.bgp-n{font-size:10px;line-height:1.15;text-align:center;word-break:keep-all}
+.bgp-row{display:flex;justify-content:space-between;gap:8px;margin-top:9px}
+.bgp-l{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer}
+.bgp-l input[type=color]{width:26px;height:22px;padding:0;border:1px solid var(--border-strong);border-radius:4px;background:none;cursor:pointer}
+.bgp-reset{margin-top:9px;width:100%;height:26px;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-panel);color:var(--text);cursor:pointer}
+.bgp-reset:hover{border-color:var(--teal)}
+body.kc-lightbg #gfx #corner button{box-shadow:0 0 0 1px rgba(0,0,0,.15)}`;
+  document.head.append(css);
 })();
 /* ================= template library for the AI command bar and the template gallery =================
    Every entry: { key, cat, name [ko, en], re (words that pick it), kind: part|asm, p: [[param, label, default]…],

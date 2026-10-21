@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>K군의 PLC 시뮬레이터 Ver0.994</title>
+<title>K군의 PLC 시뮬레이터 Ver0.995</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -1546,7 +1546,7 @@ body.lab-wires-front .wire-path:hover{filter:drop-shadow(0 0 3px rgba(255,255,25
   <div class="brand">
     <div class="brand-mark">P1</div>
     <div class="brand-text">
-      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.994</b>
+      <b data-i18n="brand.title">K군의 PLC 시뮬레이터 Ver0.995</b>
       <span data-i18n="brand.subtitle">Multi-Vendor PLC / HMI Virtual Commissioning</span>
     </div>
   </div>
@@ -1731,11 +1731,11 @@ body.lab-wires-front .wire-path:hover{filter:drop-shadow(0 0 3px rgba(255,255,25
    에이전트·실제 산업통신 프로토콜은 다음 버전으로 미룹니다(팔레트에는 자리를 잡아
    두고 "다음 버전에서 지원" 안내만 뜨게 해 확장 지점을 명확히 남겨둡니다).
    ============================================================ */
-const APP_VERSION = 'Ver0.994';
+const APP_VERSION = 'Ver0.995';
 
 /* ---------------- i18n ---------------- */
 const STRINGS = {
-  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.994", en: "K's PLC Simulator Ver0.994" },
+  "brand.title": { ko: "K군의 PLC 시뮬레이터 Ver0.995", en: "K's PLC Simulator Ver0.995" },
   "brand.subtitle": { ko: "Multi-Vendor PLC / HMI Virtual Commissioning", en: "Multi-Vendor PLC / HMI Virtual Commissioning" },
   "toolbar.newProject": { ko: "🆕 새 프로젝트", en: "🆕 New Project" },
   "toolbar.projectNameTitle": { ko: "프로젝트 이름", en: "Project name" },
@@ -1871,7 +1871,7 @@ const STRINGS = {
   "ai.sugg.robot": { ko: "로봇 사용법", en: "Robot how-to" },
   "hmi.dblclickHint": { ko: "(더블클릭: 화면 편집)", en: "(double-click: edit screen)" },
   "ladder.dupCoil": { ko: "이중 코일 경고: {addr} 이 두 개 이상의 랑에서 OUT으로 사용되었습니다.", en: "Double-coil warning: {addr} is used as an OUT coil in more than one rung." },
-  "ladder.legend": { ko: "접점의 기호(⊣⊢)를 클릭하면 NO→NC→상승엣지(P)→하강엣지(N) 순서로 바뀌고, 옆의 ⇄ 버튼으로 일반접점/비교접점을 전환할 수 있습니다. 주소는 드롭다운에서 선택하세요(PLC사에 따라 표시 형식이 다릅니다). RUN 중에는 전류가 흐르는 접점/랑이 초록색으로 표시됩니다. 코일 종류에서 MOV/ADD/SUB/MUL/DIV/INC/DEC를 고르면 D레지스터 연산을, PLS/PLF를 고르면 상승/하강 엣지에서 1스캔만 켜지는 펄스 출력을, CALL을 고르면 다른 프로그램(서브루틴) 호출을 할 수 있습니다 — Main 프로그램만 매 스캔 자동 실행되고, 나머지는 CALL로 호출될 때만 실행됩니다. [분기] '+ OR'로 병렬 가지를, '+ 직렬 접점 ▶'으로 OR 묶음 뒤에 직렬 접점(가지 합류)을, '+ 출력 분기'로 같은 조건의 출력을 여러 개 달 수 있고, '+비교'로 비교 접점(=, <>, >, >=, <, <=)을 바로 넣을 수 있습니다.", en: "Click a contact's symbol (⊣⊢) to cycle NO → NC → rising-edge (P) → falling-edge (N), and use the ⇄ button beside it to switch between a bit contact and a comparison contact. Pick the address from the dropdown (shown per-vendor). While RUN, energized contacts and rungs highlight in green. Setting a coil to MOV/ADD/SUB/MUL/DIV/INC/DEC performs a D-register operation, PLS/PLF outputs a one-scan pulse on a rising/falling edge, and CALL invokes another program (subroutine) — only Main runs automatically every scan; other programs run only when called." },
+  "ladder.legend": { ko: "접점의 기호(⊣⊢)를 클릭하면 NO→NC→상승엣지(P)→하강엣지(N) 순서로 바뀌고, 옆의 ⇄ 버튼으로 일반접점/비교접점을 전환할 수 있습니다. 주소는 드롭다운에서 선택하세요(PLC사에 따라 표시 형식이 다릅니다). RUN 중에는 전류가 흐르는 접점/랑이 초록색으로 표시됩니다. 코일 종류에서 MOV/ADD/SUB/MUL/DIV/INC/DEC를 고르면 D레지스터 연산을, PLS/PLF를 고르면 상승/하강 엣지에서 1스캔만 켜지는 펄스 출력을, PLSY(주파수 Hz·펄스 수·Y출력)를 고르면 Y출력에 배선된 서보/전동실린더로 펄스열을, CALL을 고르면 다른 프로그램(서브루틴) 호출을 할 수 있습니다 — Main 프로그램만 매 스캔 자동 실행되고, 나머지는 CALL로 호출될 때만 실행됩니다. [분기] '+ OR'로 병렬 가지를, '+ 직렬 접점 ▶'으로 OR 묶음 뒤에 직렬 접점(가지 합류)을, '+ 출력 분기'로 같은 조건의 출력을 여러 개 달 수 있고, '+비교'로 비교 접점(=, <>, >, >=, <, <=)을 바로 넣을 수 있습니다.", en: "Click a contact's symbol (⊣⊢) to cycle NO → NC → rising-edge (P) → falling-edge (N), and use the ⇄ button beside it to switch between a bit contact and a comparison contact. Pick the address from the dropdown (shown per-vendor). While RUN, energized contacts and rungs highlight in green. Setting a coil to MOV/ADD/SUB/MUL/DIV/INC/DEC performs a D-register operation, PLS/PLF outputs a one-scan pulse on a rising/falling edge, PLSY (Hz, pulse count, Y output) sends a pulse train to a servo/electric cylinder wired to that Y, and CALL invokes another program (subroutine) — only Main runs automatically every scan; other programs run only when called." },
   "ladder.shortcutHint": { ko: "⌨ 키보드 단축키: 접점 그룹이나 코일을 먼저 클릭해 선택한 뒤 — F5=A접점 추가, F6=B접점 추가, Shift+F5=P접점(상승엣지) 추가, F7=아래에 새 랑 추가, F8=코일 종류 순환 전환, F9=OR 그로개(가로선) 추가.", en: "⌨ Keyboard shortcuts: click a contact group or coil to select it, then — F5 = add NO contact, F6 = add NC contact, Shift+F5 = add rising-edge (P) contact, F7 = add a new rung below, F8 = cycle the coil type, F9 = add an OR branch (horizontal line)." },
   "ladder.rungSelectHint": { ko: "랑 번호 클릭: 선택 / Ctrl+클릭: 다중 선택 / Shift+클릭: 범위 선택 / 드래그: 순서 변경 (Ctrl+C 복사, Ctrl+V 붙여넣기)", en: "Click a rung number to select it / Ctrl+click to multi-select / Shift+click for a range / drag to reorder (Ctrl+C to copy, Ctrl+V to paste)" },
   "ladder.copySelected": { ko: "복사", en: "Copy" },
@@ -1883,7 +1883,7 @@ const STRINGS = {
   "devc.title": { ko: "디바이스 코멘트(주소별 태그명)", en: "Device Comments (per-address tag names)" },
   "devc.legend": { ko: "주소 옆 입력란에 태그명을 적으면 저장되고, 래더 다이어그램의 해당 접점/코일 위에 작게 표시됩니다. 비워두면 태그가 사라집니다. 프로젝트 저장/불러오기에도 함께 저장됩니다.", en: "Type a tag name next to an address to save it — it then appears in small text above that address's contact/coil in the ladder diagram. Clearing the field removes the tag. Comments are saved and restored with the project." },
   "devc.placeholder": { ko: "태그명 입력...", en: "Enter tag name..." },
-  "ladder.ilLegend": { ko: "니모닉(IL) 프로그램 모드입니다. LD/AND/OR(+I/P/F 접미사로 반전·상승엣지·하강엣지), ANB/ORB(블록 결합), MPS/MRD/MPP(분기 스택), LDCMP/ANDCMP/ORCMP(비교), OUT/SET/RST/PLS/PLF/TON/CTU/CRST/MOV/ADD/SUB/MUL/DIV/INC/DEC/CALL 명령을 한 줄에 하나씩 입력하세요. //  또는 ;로 시작하는 줄은 주석입니다. 아래 '컴파일' 버튼을 눌러야 실제 실행에 반영됩니다.", en: "This program is in mnemonic (IL) mode. Enter one instruction per line: LD/AND/OR (with I/P/F suffixes for invert/rising-edge/falling-edge), ANB/ORB (block combination), MPS/MRD/MPP (branch stack), LDCMP/ANDCMP/ORCMP (comparison), and OUT/SET/RST/PLS/PLF/TON/CTU/CRST/MOV/ADD/SUB/MUL/DIV/INC/DEC/CALL. Lines starting with // or ; are comments. Click 'Compile' below to apply changes to execution." },
+  "ladder.ilLegend": { ko: "니모닉(IL) 프로그램 모드입니다. LD/AND/OR(+I/P/F 접미사로 반전·상승엣지·하강엣지), ANB/ORB(블록 결합), MPS/MRD/MPP(분기 스택), LDCMP/ANDCMP/ORCMP(비교), OUT/SET/RST/PLS/PLF/TON/CTU/CRST/MOV/ADD/SUB/MUL/DIV/INC/DEC/PLSY/CALL 명령을 한 줄에 하나씩 입력하세요. //  또는 ;로 시작하는 줄은 주석입니다. 아래 '컴파일' 버튼을 눌러야 실제 실행에 반영됩니다.", en: "This program is in mnemonic (IL) mode. Enter one instruction per line: LD/AND/OR (with I/P/F suffixes for invert/rising-edge/falling-edge), ANB/ORB (block combination), MPS/MRD/MPP (branch stack), LDCMP/ANDCMP/ORCMP (comparison), and OUT/SET/RST/PLS/PLF/TON/CTU/CRST/MOV/ADD/SUB/MUL/DIV/INC/DEC/PLSY/CALL. Lines starting with // or ; are comments. Click 'Compile' below to apply changes to execution." },
   "ladder.ilAddHint": { ko: "니모닉(IL) 텍스트 기반 프로그램을 새로 추가합니다", en: "Add a new mnemonic (IL) text-based program" },
   "ladder.addILProgram": { ko: "IL 프로그램 추가", en: "Add IL Program" },
   "ladder.exportILHint": { ko: "현재 래더 다이어그램을 니모닉(IL) 텍스트로 변환하여 보여줍니다(가져오기 전용 참고용, 최선의 근사치 변환)", en: "Convert this ladder diagram to mnemonic (IL) text for viewing (best-effort, read-only reference conversion)" },
@@ -1901,7 +1901,10 @@ const STRINGS = {
   "ladder.stCompile": { ko: "컴파일", en: "Compile" },
   "ladder.stErrorCount": { ko: "개 오류", en: "error(s)" },
   "ladder.stLineCount": { ko: "문장 컴파일됨", en: "statement(s) compiled" },
-  "ladder.stCheatsheet": { ko: "문법 요약: IF <조건> THEN ... [ELSIF <조건> THEN ...] [ELSE ...] END_IF; · FOR i:=1 TO 10 [BY 2] DO ... END_FOR; · WHILE <조건> DO ... END_WHILE; · REPEAT ... UNTIL <조건> END_REPEAT; · 대입은 Y0 := TRUE; · 타이머 T0(IN:=X0, PT:=3000); 후 T0.Q / T0.ET 로 결과 읽기 · 카운터 C0(CU:=X0, R:=X1, PV:=5); 후 C0.Q / C0.CV · 다른 프로그램 호출은 CALL('프로그램명'); · 연산자 AND/OR/XOR/NOT/MOD, 비교 = <> < > <= >= · 참고: VAR 지역변수 선언은 지원하지 않습니다(FOR 루프 변수만 지역 변수로 사용 가능). ST → 래더 자동 변환도 지원하지 않습니다(실제 IEC 툴체인 대부분도 임의 제어 흐름의 역변환은 지원하지 않습니다).", en: "Cheatsheet: IF <cond> THEN ... [ELSIF <cond> THEN ...] [ELSE ...] END_IF; · FOR i:=1 TO 10 [BY 2] DO ... END_FOR; · WHILE <cond> DO ... END_WHILE; · REPEAT ... UNTIL <cond> END_REPEAT; · Assignment: Y0 := TRUE; · Timer: T0(IN:=X0, PT:=3000); then read T0.Q / T0.ET · Counter: C0(CU:=X0, R:=X1, PV:=5); then read C0.Q / C0.CV · Call another program: CALL('ProgramName'); · Operators AND/OR/XOR/NOT/MOD, comparisons = <> < > <= >= · Note: VAR local-variable declarations are not supported (only FOR-loop induction variables act as local variables). ST → Ladder auto-conversion is also not supported (most real IEC toolchains don't support reverse-converting arbitrary control flow either)." },
+  "plsy.count": { ko: "개", en: "pulses" },
+  "plsy.freqTip": { ko: "펄스 주파수(Hz) — 상수 K1000 또는 D0", en: "Pulse frequency (Hz) — constant K1000 or D0" },
+  "plsy.countTip": { ko: "내보낼 펄스 수 — 0이면 조건이 켜져 있는 동안 계속", en: "Pulses to output — 0 = keep going while the rung is ON" },
+  "ladder.stCheatsheet": { ko: "문법 요약: IF <조건> THEN ... [ELSIF <조건> THEN ...] [ELSE ...] END_IF; · FOR i:=1 TO 10 [BY 2] DO ... END_FOR; · WHILE <조건> DO ... END_WHILE; · REPEAT ... UNTIL <조건> END_REPEAT; · 대입은 Y0 := TRUE; · 타이머 T0(IN:=X0, PT:=3000); 후 T0.Q / T0.ET 로 결과 읽기 · 카운터 C0(CU:=X0, R:=X1, PV:=5); 후 C0.Q / C0.CV · 다른 프로그램 호출은 CALL('프로그램명'); · 연산자 AND/OR/XOR/NOT/MOD, 비교 = <> < > <= >= · CASE D0 OF 1: ...; 2, 3: ...; 10..20: ...; ELSE ... END_CASE; · 지역변수/엣지: VAR 상승1 : R_TRIG; 하강1 : F_TRIG; 단계 : INT := 0; END_VAR 선언 후 상승1(CLK := X0); IF 상승1.Q THEN ... (R_TRIG=OFF→ON 순간 1스캔, F_TRIG=ON→OFF 순간 1스캔) · 지원 형: BOOL/INT/DINT/TIME/R_TRIG/F_TRIG (VAR 값은 스캔 사이에 유지, 저장 파일에는 넣지 않음). ST → 래더 자동 변환도 지원하지 않습니다(실제 IEC 툴체인 대부분도 임의 제어 흐름의 역변환은 지원하지 않습니다).", en: "Cheatsheet: IF <cond> THEN ... [ELSIF <cond> THEN ...] [ELSE ...] END_IF; · FOR i:=1 TO 10 [BY 2] DO ... END_FOR; · WHILE <cond> DO ... END_WHILE; · REPEAT ... UNTIL <cond> END_REPEAT; · Assignment: Y0 := TRUE; · Timer: T0(IN:=X0, PT:=3000); then read T0.Q / T0.ET · Counter: C0(CU:=X0, R:=X1, PV:=5); then read C0.Q / C0.CV · Call another program: CALL('ProgramName'); · Operators AND/OR/XOR/NOT/MOD, comparisons = <> < > <= >= · CASE D0 OF 1: ...; 2, 3: ...; 10..20: ...; ELSE ... END_CASE; · Locals/edges: VAR rise1 : R_TRIG; fall1 : F_TRIG; stepNo : INT := 0; END_VAR then rise1(CLK := X0); IF rise1.Q THEN ... (R_TRIG = one scan on OFF→ON, F_TRIG = one scan on ON→OFF) · Types: BOOL/INT/DINT/TIME/R_TRIG/F_TRIG (VAR values persist between scans, not saved to the project file). ST → Ladder auto-conversion is also not supported (most real IEC toolchains don't support reverse-converting arbitrary control flow either)." },
   "toolbar.pausedStatus": { ko: "일시정지됨", en: "Paused" },
   "debug.bpHit": { ko: "브레이크포인트 도달", en: "Breakpoint hit" },
   "debug.bpClear": { ko: "지우기", en: "Clear" },
@@ -2291,6 +2294,7 @@ const POLARITY_PIN_PAIRS = [
   { pos:'COILP', neg:'COILN', plcOnly:false, lintKey:'lint.polarityReversedCoil' },
 ];
 function evaluateElectricalNets(){
+  if (PLSY_TRAINS) for (const k in PLSY_TRAINS) delete PLSY_TRAINS[k];
   const nets = computeNets();
   // net -> {dc24p:bool, dc24n:bool, ac:Set(role), analog: number|null}
   const netState = new Map();
@@ -3835,7 +3839,9 @@ function ecylServoUpdateVisual(comp, nets, stateOf, netOfPin){
   const strokeInput = comp.querySelector('.ecyl-stroke-pulses');
   const totalPulses = Math.max(1, parseInt(strokeInput && strokeInput.value, 10) || 200);
   let count = comp.dataset.pulseCount !== undefined ? parseInt(comp.dataset.pulseCount, 10) : 0;
-  if (pulseOn && !last) count = Math.max(0, Math.min(totalPulses, count + (dirFwd ? 1 : -1)));
+  const plsyN = pulseOn ? plsyPulsesOnPin(pulse, nets, netOfPin) : 0;
+  if (plsyN > 0) count = Math.max(0, Math.min(totalPulses, count + (dirFwd ? plsyN : -plsyN)));
+  else if (pulseOn && !last) count = Math.max(0, Math.min(totalPulses, count + (dirFwd ? 1 : -1)));
   comp.dataset.lastPulse = pulseOn ? '1' : '0';
   comp.dataset.pulseCount = String(count);
   const prevPct = comp.dataset.posPct !== undefined ? parseFloat(comp.dataset.posPct) : 0;
@@ -4551,7 +4557,9 @@ function servoUpdateVisual(comp, nets, stateOf, netOfPin){
   const dirFwd = pinDC24P(dir,nets,stateOf,netOfPin);
   const last = comp.dataset.lastPulse === '1';
   let pos = parseInt(comp.dataset.pos||'0', 10);
-  if (pulseOn && !last) pos += dirFwd ? 1 : -1;
+  const plsyN = pulseOn ? plsyPulsesOnPin(pulse, nets, netOfPin) : 0;
+  if (plsyN > 0) pos += dirFwd ? plsyN : -plsyN;
+  else if (pulseOn && !last) pos += dirFwd ? 1 : -1;
   comp.dataset.lastPulse = pulseOn ? '1' : '0';
   comp.dataset.pos = String(pos);
   const posEl = document.getElementById(comp.id+'_pos');
@@ -5100,7 +5108,42 @@ function cmpConducts(mem, op, a, b){
   if (op==='<=') return av <= bv;
   return false;
 }
-const DATA_COIL_TYPES = ['MOV','ADD','SUB','MUL','DIV','INC','DEC'];
+const DATA_COIL_TYPES = ['MOV','ADD','SUB','MUL','DIV','INC','DEC','PLSY'];
+/* [Ver0.995] PLSY <주파수 Hz> <펄스 수> <출력 Y> — 미쓰비시 FX의 PLSY와 같은 펄스열 출력 명령.
+   실제 PLC는 트랜지스터 출력으로 수 kHz 펄스를 내보내지만, 이 시뮬레이터의 스캔(기본 20ms)으로는
+   ON/OFF를 그만큼 빨리 바꿀 수 없으므로, 펄스열이 나가는 동안 출력 Y를 켜 둔 채 "이번 스캔에 나간
+   펄스 수"를 PLSY_TRAINS[그 PLC의 Y핀 id]에 적어 둡니다. 그 Y핀과 같은 net(배선)으로 이어진
+   서보/스텝·전동실린더의 PULSE 입력만 그 수만큼 움직입니다(배선이 없으면 아무것도 움직이지 않음).
+   조건이 ON인 동안 정해진 펄스 수를 다 내보내면 출력이 꺼지고, 조건을 껐다 켜면 처음부터 다시 나갑니다.
+   펄스 수 0 = 조건이 ON인 동안 계속. 최대 100kHz. */
+var PLSY_TRAINS = {};
+const PLSY_MAX_HZ = 100000;
+function plsyExec(mem, st, power, scanMs, freqTok, countTok, yTok){
+  const y = String(yTok || 'Y0').trim().toUpperCase();
+  if (!/^Y\d+$/.test(y)) return;
+  if (!power){ st._plsyDone = 0; st._plsyFrac = 0; setBit(mem, y, false); return; }
+  const hz = Math.max(0, Math.min(PLSY_MAX_HZ, Number(resolveOperand(mem, freqTok)) || 0));
+  const total = Math.max(0, Math.round(Number(resolveOperand(mem, countTok)) || 0));
+  const done = st._plsyDone || 0;
+  if (hz <= 0 || (total > 0 && done >= total)){ setBit(mem, y, false); return; }
+  let acc = (st._plsyFrac || 0) + hz * scanMs / 1000;
+  let n = Math.floor(acc); acc -= n;
+  if (total > 0) n = Math.min(n, total - done);
+  st._plsyFrac = acc; st._plsyDone = done + n;
+  setBit(mem, y, true);
+  if (n > 0 && typeof CURRENT_SCAN_PLC_ID !== 'undefined' && CURRENT_SCAN_PLC_ID){
+    const key = CURRENT_SCAN_PLC_ID + '_' + y;
+    PLSY_TRAINS[key] = (PLSY_TRAINS[key] || 0) + n;
+  }
+}
+// 서보/전동실린더 PULSE 핀과 같은 net에 이어진 PLSY 출력이 이번 틱에 낸 펄스 수
+function plsyPulsesOnPin(pinEl, nets, netOfPin){
+  if (!pinEl || !PLSY_TRAINS) return 0;
+  const keys = Object.keys(PLSY_TRAINS); if (!keys.length) return 0;
+  const myNet = netOfPin(pinEl, nets); let n = 0;
+  keys.forEach(k => { const yp = document.getElementById(k); if (yp && myNet.has(yp)) n += PLSY_TRAINS[k]; });
+  return n;
+}
 function contactConducts(mem, c){
   // 결과를 c._liveLastResult에 캐시해 둡니다 — 래더 에디터의 실시간 하이라이트가
   // 이 값을 다시 읽기만 하고 재계산(재호출)하지 않도록 하기 위함입니다.
@@ -5135,6 +5178,7 @@ function execRung(mem, rung, scanMs, prog, callStack){
     else if (coil.type === 'DIV'){ if (power){ const b = resolveOperand(mem,coil.src2); if (b!==0) writeDReg(mem, coil.dst, Math.trunc(resolveOperand(mem,coil.src1)/b)); } }
     else if (coil.type === 'INC'){ if (power) writeDReg(mem, coil.dst, resolveOperand(mem, coil.dst) + 1); }
     else if (coil.type === 'DEC'){ if (power) writeDReg(mem, coil.dst, resolveOperand(mem, coil.dst) - 1); }
+    else if (coil.type === 'PLSY'){ plsyExec(mem, coil, power, scanMs, coil.src1, coil.src2, coil.dst); }
     return;
   }
   if (!coil.addr) return;
@@ -5215,6 +5259,10 @@ function compileIL(source){
     } else if (IL_INCDEC_OPS.includes(op)){
       if (args.length!==1){ errors.push(`${lineNo}: ${op} needs 1 destination (e.g. ${op} D0)`); return; }
       compiled.push({op, dst:args[0].toUpperCase(), lineNo});
+    } else if (op==='PLSY'){
+      if (args.length!==3){ errors.push(`${lineNo}: PLSY needs frequency + pulse count + output (e.g. PLSY K1000 K200 Y0)`); return; }
+      if (!/^Y\d+$/i.test(args[2])){ errors.push(`${lineNo}: PLSY output must be a Y address (e.g. Y0)`); return; }
+      compiled.push({op, src1:args[0], src2:args[1], dst:args[2].toUpperCase(), lineNo});
     } else if (op==='CALL'){
       if (args.length!==1){ errors.push(`${lineNo}: CALL needs 1 program name`); return; }
       compiled.push({op, addr:args[0], lineNo});
@@ -5262,6 +5310,7 @@ function ilExecOutput(mem, instr, power, scanMs, prog, callStack){
   else if (op==='DIV'){ if (power){ const b = resolveOperand(mem,instr.src2); if (b!==0) writeDReg(mem, instr.dst, Math.trunc(resolveOperand(mem,instr.src1)/b)); } }
   else if (op==='INC'){ if (power) writeDReg(mem, instr.dst, resolveOperand(mem, instr.dst) + 1); }
   else if (op==='DEC'){ if (power) writeDReg(mem, instr.dst, resolveOperand(mem, instr.dst) - 1); }
+  else if (op==='PLSY'){ plsyExec(mem, instr, power, scanMs, instr.src1, instr.src2, instr.dst); }
   else if (op==='CALL'){ if (power) callSubProgram(mem, prog, instr.addr, scanMs, callStack); }
 }
 function runILProgram(mem, compiledLines, scanMs, prog, callStack, program){
@@ -5331,7 +5380,7 @@ function runProgramBody(mem, prog, program, scanMs, callStack){
    컴파일 실패(구문 오류) 시 IL과 동일하게 "이전에 컴파일된 버전을 그대로 실행 유지"합니다.
    무한 루프(WHILE/REPEAT/FOR 오용) 방지를 위해 한 스캔당 실행 스텝 수에 상한(10만 스텝)을
    두고, 초과 시 그 스캔에서 조용히 중단합니다(프로그램 객체의 _runtimeError에 사유 기록). */
-const ST_KEYWORDS = new Set(['IF','THEN','ELSIF','ELSE','END_IF','FOR','TO','BY','DO','END_FOR','WHILE','END_WHILE','REPEAT','UNTIL','END_REPEAT','AND','OR','NOT','XOR','MOD','TRUE','FALSE','CALL']);
+const ST_KEYWORDS = new Set(['IF','THEN','ELSIF','ELSE','END_IF','FOR','TO','BY','DO','END_FOR','WHILE','END_WHILE','REPEAT','UNTIL','END_REPEAT','AND','OR','NOT','XOR','MOD','TRUE','FALSE','CALL','CASE','OF','END_CASE','VAR','END_VAR','R_TRIG','F_TRIG','BOOL','INT','DINT','TIME']);
 function stParseTimeLiteral(lit){
   let ms = 0, matched = false;
   const re = /(\d+(?:\.\d+)?)\s*(MS|S|M|H)/gi;
@@ -5399,6 +5448,8 @@ function stTokenize(source){
     if (c === '<' && src[i+1] === '>'){ tokens.push({ type:'<>', line }); i += 2; continue; }
     if (c === '<' && src[i+1] === '='){ tokens.push({ type:'<=', line }); i += 2; continue; }
     if (c === '>' && src[i+1] === '='){ tokens.push({ type:'>=', line }); i += 2; continue; }
+    if (c === '.' && src[i+1] === '.'){ tokens.push({ type:'..', line }); i += 2; continue; }
+    if (c === ':'){ tokens.push({ type:':', line }); i++; continue; }
     if ('=<>+-*/().,;'.includes(c)){ tokens.push({ type:c, line }); i++; continue; }
     tokens.push({ type:'ERROR', value:c, line }); i++;
   }
@@ -5430,6 +5481,7 @@ function stParseProgram(tokens){
       let member = null;
       if (at('.')){ advance(); member = expect('IDENT', '멤버 이름(.Q/.ET/.CV) 필요').value; }
       if (stAddrArea(tok.value)) return { kind:'Addr', addr: tok.value, member, line: tok.line };
+      if (member) return { kind:'FbMember', name: tok.value, member, line: tok.line };
       return { kind:'LocalVar', name: tok.value, line: tok.line };
     }
     fail('식(expression) 필요');
@@ -5531,12 +5583,60 @@ function stParseProgram(tokens){
     expect(')'); expect(';');
     return { kind:'CallProg', name: s.value, line };
   }
+  // [Ver0.995] CASE <식> OF 1: ...; 2, 3: ...; 10..20: ...; ELSE ... END_CASE;
+  function parseCase(){
+    const line = peek().line;
+    expectKw('CASE'); const sel = parseExpr(); expectKw('OF');
+    const atLabel = () => at('NUM') || (at('-') && tokens[pos+1] && tokens[pos+1].type === 'NUM');
+    const readInt = () => { let neg = false; if (at('-')){ advance(); neg = true; } const t = expect('NUM', 'CASE 값(정수) 필요'); return neg ? -t.value : t.value; };
+    const branches = [];
+    if (!atLabel() && !atKw('ELSE') && !atKw('END_CASE')) fail('CASE 값(정수, 예: 1:) 필요');
+    while (atLabel()){
+      const bline = peek().line;
+      const labels = [];
+      for (;;){
+        const a = readInt();
+        if (at('..')){ advance(); const b = readInt(); labels.push([Math.min(a,b), Math.max(a,b)]); }
+        else labels.push([a, a]);
+        if (at(',')){ advance(); continue; }
+        break;
+      }
+      expect(':', '":" 필요 (예: 1: Y0 := TRUE;)');
+      const body = [];
+      while (!at('EOF') && !atLabel() && !atKw('ELSE') && !atKw('END_CASE')) body.push(parseStatement());
+      branches.push({ labels, body, line: bline });
+    }
+    let elseBody = null;
+    if (atKw('ELSE')){ advance(); elseBody = parseStatements(new Set(['END_CASE'])); }
+    expectKw('END_CASE'); if (at(';')) advance();
+    return { kind:'Case', sel, branches, elseBody, line };
+  }
+  // [Ver0.995] VAR 이름 : 형 [:= 초기값]; ... END_VAR — 프로그램 안에서 스캔 사이에 값이 유지되는 지역변수
+  function parseVar(){
+    const line = peek().line;
+    expectKw('VAR');
+    const decls = [];
+    while (!atKw('END_VAR') && !at('EOF')){
+      const names = [expect('IDENT', '변수 이름 필요')];
+      while (at(',')){ advance(); names.push(expect('IDENT', '변수 이름 필요')); }
+      expect(':', '":" 필요 (예: 상승1 : R_TRIG;)');
+      const ty = expect('IDENT', '형 이름(BOOL/INT/DINT/TIME/R_TRIG/F_TRIG) 필요');
+      let init = null;
+      if (at(':=')){ advance(); init = parseExpr(); }
+      expect(';');
+      names.forEach(n => decls.push({ name: n.value, type: ty.value, init, line: n.line }));
+    }
+    expectKw('END_VAR'); if (at(';')) advance();
+    return { kind:'VarDecl', decls, line };
+  }
   function parseStatement(){
     if (atKw('IF')) return parseIf();
     if (atKw('FOR')) return parseFor();
     if (atKw('WHILE')) return parseWhile();
     if (atKw('REPEAT')) return parseRepeat();
     if (atKw('CALL')) return parseCall();
+    if (atKw('CASE')) return parseCase();
+    if (atKw('VAR')) return parseVar();
     if (at('IDENT')){
       const tok = advance();
       if (at(':=')){
@@ -5584,7 +5684,27 @@ function compileST(source, vendorClass){
   // 컴파일 시점 추가 검증: 대입 대상은 쓰기 가능(Y/M/D)해야 하고, FB 호출 주소는 T/C여야 함
   function validate(list){
     list.forEach(node => {
-      if (node.kind === 'Assign'){
+      if (node.kind === 'VarDecl'){ /* 선언은 아래 stCollectDecls에서 처리 */ }
+      else if (node.kind === 'Assign' && ST_DECLS[node.addr]){
+        const d = ST_DECLS[node.addr];
+        if (ST_FB_TYPES.includes(d.type)) errors.push(`${node.line}: "${node.addr}" 은(는) ${d.type} 함수블록이라 대입할 수 없습니다 — ${node.addr}(CLK:=...); 로 호출하고 ${node.addr}.Q 로 읽으세요`);
+        else { node.kind = 'AssignLocal'; node.name = node.addr; node.vtype = d.type; }
+      }
+      else if (node.kind === 'FbCall' && ST_DECLS[node.addr]){
+        const d = ST_DECLS[node.addr];
+        if (!ST_FB_TYPES.includes(d.type)) errors.push(`${node.line}: "${node.addr}" 은(는) ${d.type} 변수라 호출할 수 없습니다`);
+        else {
+          node.kind = 'EdgeCall'; node.name = node.addr; node.fbType = d.type;
+          Object.keys(node.params).forEach(p => { if (p !== 'CLK') errors.push(`${node.line}: ${d.type} 은(는) CLK 입력만 받습니다("${p}"는 알 수 없음)`); });
+          if (!node.params.CLK) errors.push(`${node.line}: ${node.addr}(CLK := 조건); 처럼 CLK 입력이 필요합니다`);
+        }
+      }
+      else if (node.kind === 'Case'){
+        stValidateExpr(node.sel);
+        node.branches.forEach(b => validate(b.body));
+        if (node.elseBody) validate(node.elseBody);
+      }
+      else if (node.kind === 'Assign'){
         const a = stAddrArea(node.addr);
         if (!a) errors.push(`${node.line}: "${node.addr}" 은(는) 알 수 없는 주소입니다`);
         else if (!['Y','M','D'].includes(a.area)) errors.push(`${node.line}: "${node.addr}" 에는 대입할 수 없습니다(읽기 전용 입력) — Y/M/D 주소에만 대입 가능`);
@@ -5605,6 +5725,47 @@ function compileST(source, vendorClass){
       }
     });
   }
+  // 선언된 이름을 모은 뒤 검증 — 엣지 FB 멤버(.Q) 읽기는 선언된 R_TRIG/F_TRIG만 허용
+  const ST_FB_TYPES = ['R_TRIG','F_TRIG'];
+  const ST_VAR_TYPES = ['BOOL','INT','DINT','TIME'].concat(ST_FB_TYPES);
+  const ST_DECLS = {};
+  (function stCollectDecls(list){
+    list.forEach(node => {
+      if (!node) return;
+      if (node.kind === 'VarDecl') node.decls.forEach(d => {
+        if (!ST_VAR_TYPES.includes(d.type)) errors.push(`${d.line}: "${d.type}" 형은 지원하지 않습니다 (BOOL/INT/DINT/TIME/R_TRIG/F_TRIG)`);
+        else if (stAddrArea(d.name)) errors.push(`${d.line}: "${d.name}" 은(는) PLC 주소와 같은 이름이라 변수 이름으로 쓸 수 없습니다`);
+        else ST_DECLS[d.name] = d;
+      });
+      if (node.kind === 'If'){ node.branches.forEach(b => stCollectDecls(b.body)); if (node.elseBody) stCollectDecls(node.elseBody); }
+      if (node.kind === 'For' || node.kind === 'While' || node.kind === 'Repeat') stCollectDecls(node.body);
+      if (node.kind === 'Case'){ node.branches.forEach(b => stCollectDecls(b.body)); if (node.elseBody) stCollectDecls(node.elseBody); }
+    });
+  })(statements);
+  function stValidateExpr(e){
+    if (!e) return;
+    if (e.kind === 'FbMember'){
+      const d = ST_DECLS[e.name];
+      if (!d || !ST_FB_TYPES.includes(d.type)) errors.push(`${e.line}: "${e.name}.${e.member}" — ${e.name} 이(가) VAR 안에 R_TRIG/F_TRIG로 선언되지 않았습니다`);
+      else if (e.member !== 'Q' && e.member !== 'CLK') errors.push(`${e.line}: ${d.type} 의 출력은 .Q 입니다("${e.member}"는 알 수 없음)`);
+    } else if (e.kind === 'Un') stValidateExpr(e.expr);
+    else if (e.kind === 'Bin'){ stValidateExpr(e.l); stValidateExpr(e.r); }
+  }
+  (function stWalkExprs(list){
+    list.forEach(node => {
+      if (!node) return;
+      if (node.expr) stValidateExpr(node.expr);
+      if (node.cond) stValidateExpr(node.cond);
+      if (node.from) stValidateExpr(node.from);
+      if (node.to) stValidateExpr(node.to);
+      if (node.by) stValidateExpr(node.by);
+      if (node.params) Object.values(node.params).forEach(stValidateExpr);
+      if (node.kind === 'If'){ node.branches.forEach(b => { stValidateExpr(b.cond); stWalkExprs(b.body); }); if (node.elseBody) stWalkExprs(node.elseBody); }
+      if (node.kind === 'For' || node.kind === 'While' || node.kind === 'Repeat') stWalkExprs(node.body);
+      if (node.kind === 'Case'){ node.branches.forEach(b => stWalkExprs(b.body)); if (node.elseBody) stWalkExprs(node.elseBody); }
+      if (node.kind === 'VarDecl') node.decls.forEach(d => { if (d.init) stValidateExpr(d.init); });
+    });
+  })(statements);
   validate(statements);
   return { compiled: statements, errors };
 }
@@ -5622,7 +5783,16 @@ function stEvalExpr(node, mem, scope){
       if (area==='X'||area==='Y'||area==='M'||area==='T'||area==='C') return bitVal(mem, a);
       return resolveOperand(mem, a); // D/AI
     }
-    case 'LocalVar': return (scope && Object.prototype.hasOwnProperty.call(scope, node.name)) ? scope[node.name] : 0;
+    case 'LocalVar': {
+      if (scope && Object.prototype.hasOwnProperty.call(scope, node.name)) return scope[node.name];
+      const lv = ST_CUR_VARS && ST_CUR_VARS[node.name];
+      return (lv && 'v' in lv) ? lv.v : 0;
+    }
+    case 'FbMember': {
+      const fb = ST_CUR_VARS && ST_CUR_VARS[node.name];
+      if (!fb) return false;
+      return node.member === 'CLK' ? !!fb.clk : !!fb.q;
+    }
     case 'Un': {
       const v = stEvalExpr(node.expr, mem, scope);
       return node.op==='-' ? -v : !v;
@@ -5644,6 +5814,14 @@ function stEvalExpr(node, mem, scope){
     }
   }
   return 0;
+}
+var ST_CUR_VARS = null;
+function stCoerceLocal(t, v){
+  if (t === 'BOOL') return !!v;
+  let n = Math.trunc(Number(v) || 0);
+  if (t === 'INT'){ n = ((n + 32768) % 65536 + 65536) % 65536 - 32768; }
+  else if (t === 'DINT'){ n = n | 0; }
+  return n;
 }
 function stExecStmts(list, mem, scanMs, prog, callStack, scope, guard, bpLines){
   for (const stmt of list) stExecStmt(stmt, mem, scanMs, prog, callStack, scope, guard, bpLines);
@@ -5687,6 +5865,44 @@ function stExecStmt(node, mem, scanMs, prog, callStack, scope, guard, bpLines){
       break;
     }
     case 'CallProg': callSubProgram(mem, prog, node.name, scanMs, callStack); break;
+    case 'VarDecl': {
+      const store = ST_CUR_VARS; if (!store) break;
+      node.decls.forEach(d => {
+        const cur = store[d.name];
+        if (cur && cur.t === d.type) return; // 이미 있으면 스캔 사이 값 유지
+        if (d.type === 'R_TRIG' || d.type === 'F_TRIG') store[d.name] = { t:d.type, clk:false, q:false };
+        else {
+          const iv = d.init ? stEvalExpr(d.init, mem, scope) : 0;
+          store[d.name] = { t:d.type, v: stCoerceLocal(d.type, iv) };
+        }
+      });
+      break;
+    }
+    case 'AssignLocal': {
+      const store = ST_CUR_VARS; if (!store) break;
+      const v = stEvalExpr(node.expr, mem, scope);
+      const cur = store[node.name] || (store[node.name] = { t: node.vtype, v: 0 });
+      cur.v = stCoerceLocal(node.vtype, v);
+      if (bpLines && bpLines.has(node.line) && !!v) bpTrip('st', node, tr('debug.bpLine').replace('{n}', node.line));
+      break;
+    }
+    case 'EdgeCall': {
+      const store = ST_CUR_VARS; if (!store) break;
+      const fb = store[node.name] || (store[node.name] = { t: node.fbType, clk:false, q:false });
+      const clk = !!stEvalExpr(node.params.CLK, mem, scope);
+      fb.q = node.fbType === 'R_TRIG' ? (clk && !fb.clk) : (!clk && fb.clk);
+      fb.clk = clk;
+      if (bpLines && bpLines.has(node.line) && fb.q) bpTrip('st', node, tr('debug.bpLine').replace('{n}', node.line));
+      break;
+    }
+    case 'Case': {
+      const v = Math.round(Number(stEvalExpr(node.sel, mem, scope)) || 0);
+      for (const br of node.branches){
+        if (br.labels.some(([a, b]) => v >= a && v <= b)){ stExecStmts(br.body, mem, scanMs, prog, callStack, scope, guard, bpLines); return; }
+      }
+      if (node.elseBody) stExecStmts(node.elseBody, mem, scanMs, prog, callStack, scope, guard, bpLines);
+      break;
+    }
     case 'If': {
       for (const br of node.branches){
         if (stEvalExpr(br.cond, mem, scope)){ stExecStmts(br.body, mem, scanMs, prog, callStack, scope, guard, bpLines); return; }
@@ -5710,7 +5926,15 @@ function stExecStmt(node, mem, scanMs, prog, callStack, scope, guard, bpLines){
 function runSTProgram(mem, compiledStatements, scanMs, prog, callStack, program){
   const guard = { steps:0, limit:100000 };
   try {
-    stExecStmts(compiledStatements||[], mem, scanMs, prog, callStack, {}, guard, program && program._bpLines);
+    // [Ver0.995] VAR 지역변수·엣지 FB 상태는 프로그램 객체에 보관(저장 파일/되돌리기에는 넣지 않음)
+    let store = null;
+    if (program){
+      if (!Object.prototype.hasOwnProperty.call(program, '__stVars')) Object.defineProperty(program, '__stVars', { value:{}, enumerable:false, writable:true, configurable:true });
+      store = program.__stVars;
+    } else store = {};
+    const prevVars = ST_CUR_VARS; ST_CUR_VARS = store;
+    try { stExecStmts(compiledStatements||[], mem, scanMs, prog, callStack, {}, guard, program && program._bpLines); }
+    finally { ST_CUR_VARS = prevVars; }
     if (program) program._runtimeError = null;
   } catch (e){
     if (program) program._runtimeError = (e && e.message==='ST_RUNAWAY') ? 'ST_RUNAWAY' : String((e&&e.message)||e);
@@ -6958,6 +7182,10 @@ function ladderSetCoilField(plcId, ri, field, val){
         if (coil.src1==null || coil.src1==='') coil.src1 = 'D0';
         if (coil.src2==null || coil.src2==='') coil.src2 = 'D1';
         if (!/^D\d+$/.test(coil.dst||'')) coil.dst = 'D2';
+      } else if (val==='PLSY'){
+        if (coil.src1==null || coil.src1==='' ) coil.src1 = 'K1000';
+        if (coil.src2==null || coil.src2==='' ) coil.src2 = 'K200';
+        if (!/^Y\d+$/.test(coil.dst||'')) coil.dst = 'Y0';
       } else { // INC/DEC
         if (!/^D\d+$/.test(coil.dst||'')) coil.dst = 'D0';
       }
@@ -7014,6 +7242,7 @@ function dataCoilFieldsHTML(plcId, ri, coil){
     const symbol = {ADD:'+',SUB:'-',MUL:'×',DIV:'÷'}[coil.type];
     return `${opInput('src1', coil.src1, 'D0')}<span class="data-op-arrow">${symbol}</span>${opInput('src2', coil.src2, 'D1')}<span class="data-op-arrow">→</span>${opInput('dst', coil.dst, 'D2')}`;
   }
+  if (coil.type === 'PLSY') return `<span class="data-op-arrow" title="${tr('plsy.freqTip')}">Hz</span>${opInput('src1', coil.src1, 'K1000')}<span class="data-op-arrow" title="${tr('plsy.countTip')}">${tr('plsy.count')}</span>${opInput('src2', coil.src2, 'K200')}<span class="data-op-arrow">→</span>${opInput('dst', coil.dst, 'Y0')}`;
   if (['INC','DEC'].includes(coil.type)) return `${opInput('dst', coil.dst, 'D0')}<span class="data-op-arrow">${coil.type==='INC'?'+1':'-1'}</span>`;
   return '';
 }
@@ -7657,6 +7886,7 @@ function rungToILLines(rung, vendorClass){
     if (DATA_COIL_TYPES.includes(coil.type)){
       if (coil.type==='MOV') lines.push(`MOV ${cv(coil.src)} ${cv(coil.dst)}`);
       else if (['ADD','SUB','MUL','DIV'].includes(coil.type)) lines.push(`${coil.type} ${cv(coil.src1)} ${cv(coil.src2)} ${cv(coil.dst)}`);
+      else if (coil.type==='PLSY') lines.push(`PLSY ${cv(coil.src1)} ${cv(coil.src2)} ${cv(coil.dst)}`);
       else lines.push(`${coil.type} ${cv(coil.dst)}`);
     } else if (coil.type==='TON') lines.push(`TON ${cv(coil.addr)} ${coil.preset||1000}`);
     else if (coil.type==='CTU') lines.push(`CTU ${cv(coil.addr)} ${coil.preset||1}`);
@@ -7715,7 +7945,7 @@ function ladderSaveILToFile(plcId){
 const IL_LD_OPS = ['LD','LDI','LDP','LDF'];
 const IL_AND_OPS = ['AND','ANI','ANDP','ANDF'];
 const IL_OR_OPS = ['OR','ORI','ORP','ORF'];
-const IL_OUTPUT_OPS = IL_BITCOIL_OPS.concat(IL_TIMERCOUNTER_OPS, ['CRST','MOV','CALL'], IL_ARITH_OPS, IL_INCDEC_OPS);
+const IL_OUTPUT_OPS = IL_BITCOIL_OPS.concat(IL_TIMERCOUNTER_OPS, ['CRST','MOV','CALL','PLSY'], IL_ARITH_OPS, IL_INCDEC_OPS);
 const IL_DECOMPILE_MAX_CHAINS = 200;
 function ilBitContactFromOp(op, addr){
   if (op.endsWith('P')) return { addr, neg:false, edge:'P' };
@@ -7780,6 +8010,7 @@ function ilDecompileToRungs(compiledLines){
       if (op==='MOV') coil = { type:'MOV', src:instr.src, dst:instr.dst, preset:1000 };
       else if (IL_ARITH_OPS.includes(op)) coil = { type:op, src1:instr.src1, src2:instr.src2, dst:instr.dst, preset:1000 };
       else if (IL_INCDEC_OPS.includes(op)) coil = { type:op, dst:instr.dst, preset:1000 };
+      else if (op==='PLSY') coil = { type:'PLSY', src1:instr.src1, src2:instr.src2, dst:instr.dst, preset:1000 };
       else if (op==='TON' || op==='CTU') coil = { type:op, addr:instr.addr, preset:instr.preset };
       else coil = { type:op, addr:instr.addr, preset:1000 }; // OUT/SET/RST/PLS/PLF/CRST/CALL
       const groupsSrc = chains.length ? chains : [[]];
@@ -9186,6 +9417,7 @@ setTimeout(plcCheckpoint, 600);
 
 /* ---------------- 릴리즈 노트 ---------------- */
 const RELEASE_NOTES = [
+  { ver:'Ver0.995', items:{ ko:['ST(구조화 텍스트)에 CASE ~ OF ~ END_CASE 분기 추가 — 값 1개, 여러 값(2, 3), 범위(10..20), ELSE 지원', 'ST에 VAR ~ END_VAR 지역변수 선언 추가 — BOOL/INT/DINT/TIME (스캔 사이에 값 유지)', 'ST에 상승·하강 엣지 함수블록 R_TRIG / F_TRIG 추가 — 상승1(CLK := X0); IF 상승1.Q THEN ...', '래더·IL에 펄스 출력 명령 PLSY(주파수 Hz, 펄스 수, Y출력) 추가 — Y출력에 배선된 서보/스텝·전동실린더 PULSE 입력만 지정한 펄스 수만큼 움직임(스캔 주기와 무관하게 최대 100kHz)'], en:['ST: CASE..OF..END_CASE', 'ST: VAR..END_VAR locals (BOOL/INT/DINT/TIME)', 'ST: R_TRIG / F_TRIG edge function blocks', 'Ladder/IL: PLSY pulse-train output to wired servo/stepper and electric cylinder'] } },
   { ver:'Ver0.994', items:{ ko:['부품 상자 맨 아래에 「⑪ 공압제어 실습」 「⑫ 유압제어 실습」 탭 추가(기본 접힘) — 학교 전기-공압/전기-유압 실습장치 구성', '상단 랙 모듈: DC24V 전원·비상정지·푸시버튼(램프 내장)·릴레이(K1~K3 4c)·디지털 타이머(ON/OFF 딜레이)·카운터·부저&램프 — +24V/0V 버스 점퍼 연결', '프로파일 판 부품: FRL·분배기·복동/단동 실린더·5/2 양솔·5/2 편솔·3/2 편솔·5/3 양솔·리밋스위치·근접센서 / 유압 파워유닛·4/3 솔레노이드(중립 형식 선택)·4/2 편솔·4/2 양솔·유압 실린더 등', '「실습장치 배치」 카드 한 번으로 랙+판+배관까지 사진처럼 자동 구성, 리밋스위치는 실린더 끝 위치를 자동 감지', '전력 투입만으로(RUN 없이) 릴레이·타이머·카운터·밸브·실린더가 실제처럼 동작, 공압(하늘색)/유압(황갈색) 배관 구분'], en:['Electro-pneumatic / electro-hydraulic lab tabs'] } },
   { ver:'Ver0.993', items:{ ko:['확장 카드 크기를 회사별 PLC 높이에 맞춤 — PLC 오른쪽에 틈 없이 딱 붙음(LS·미쓰비시·지멘스·옴론 카드 폭도 회사별로 다름)', '카드를 PLC 쪽으로 끌어오면 자석처럼 붙고(초록 테두리) 슬롯 번호가 정해짐 · 멀리 떼면 분리(미장착)', 'PLC를 옮기면 장착된 카드도 함께 이동', '같은 회사 PLC 없이 카드를 놓으면 알림 창 — 꼭 같은 제조회사 PLC를 선택하도록 안내, 버튼 한 번으로 맞는 PLC 배치·장착', '다른 회사 PLC에 붙이려 하면 빨간 테두리와 경고 문구, 미장착 카드는 빨간 점선과 「PLC에 장착하세요」 표시'], en:['Expansion cards sized to each vendor PLC and docked flush; magnetic snap; no-PLC notice'] } },
   { ver:'Ver0.992', items:{ ko:['처음 시작 안내(화면을 하나씩 비추며 설명) 추가 — 📘 사용 안내 버튼으로 다시 보기'], en:['First-run guided tour added'] } },

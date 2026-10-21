@@ -2577,6 +2577,209 @@
 .xp-dimlamp{--b:0; width:40px; height:40px; margin:3px auto; border-radius:50%; background:#2a2a22; border:2px solid #777; box-shadow:0 0 calc(var(--b)*24px) calc(var(--b)*8px) rgba(255,230,140,calc(var(--b)*.9)); position:relative;}
 .xp-dimlamp::after{content:''; position:absolute; inset:0; border-radius:50%; background:#fff3b0; opacity:var(--b);}
 .xp .comp-pin-row{justify-content:center; flex-wrap:wrap;}
+/* [Ver0.994] 공압·유압 제어 실습장치 */
+.lab{font-family:'IBM Plex Sans','Noto Sans KR',sans-serif; color:#1c2228;}
+.lab .lab-label{color:#1c2228; font-size:.6rem; margin-top:3px;}
+.lab-j{display:flex; flex-direction:column; align-items:center; gap:1px; min-width:22px;}
+.lab-j .pin-mini{width:14px; height:14px; border-radius:50%; border:3px solid #111; background:radial-gradient(circle at 45% 40%, #3c3c3c 0 2px, #050505 3px 100%); box-shadow:0 1px 1px rgba(0,0,0,.4), inset 0 0 0 1px #666;}
+.lab-j .pin-mini.role-dc24p{border-color:#d62828; box-shadow:0 1px 1px rgba(0,0,0,.4), inset 0 0 0 1px #ff8a8a;}
+.lab-j .pin-mini.role-dc24n{border-color:#1d5fd1; box-shadow:0 1px 1px rgba(0,0,0,.4), inset 0 0 0 1px #8ab4ff;}
+.lab-j .pin-mini.role-air{border-color:#2f7fc4; background:radial-gradient(circle,#dfeffc 0 3px,#5aa9e6 4px 100%);}
+.lab-j .pin-mini.role-oil{border-color:#8a5a1d; background:radial-gradient(circle,#f2e3c9 0 3px,#c98a3e 4px 100%);}
+.lab-jc{font:600 .5rem/1 'IBM Plex Mono',monospace; color:#222; white-space:nowrap;}
+.lab-brand{font:italic 800 .62rem/1 'IBM Plex Sans',sans-serif; color:#1a4f9c; letter-spacing:.04em; padding:2px 8px 0;}
+.lab-small{font-size:.5rem; color:#55606a; text-align:center; margin:1px 4px;}
+.lab-sym{font:700 .62rem/1 'IBM Plex Mono',monospace; color:#333;}
+.lab-led{display:inline-block; width:9px; height:9px; border-radius:50%; background:#5a1515; border:1px solid #222;}
+.lab-led.on{background:#ff3b30; box-shadow:0 0 6px #ff3b30;}
+.lab-led-y.on{background:#ffd60a; box-shadow:0 0 6px #ffd60a;}
+.lab-led-w{background:#555;} .lab-led-w.on{background:#fff7d6; box-shadow:0 0 7px #ffe08a;}
+.lab-mini{font-size:.56rem; padding:2px 6px; border:1px solid #8a939d; border-radius:4px; background:#fff; color:#222; cursor:pointer; margin:3px auto 0; display:block;}
+
+/* 랙 모듈 공통: 은색 패널 + 검은 측면 프레임 */
+.lab-mod{background:linear-gradient(180deg,#f4f6f7,#dfe3e6); border:1px solid #9aa2a8; border-left:6px solid #1b1e21; border-right:6px solid #1b1e21; border-radius:3px; padding:2px 4px 4px; box-shadow:0 4px 12px rgba(0,0,0,.45); min-height:300px; display:flex; flex-direction:column;}
+.lab-bus{position:relative; display:flex; justify-content:space-between; padding:3px 4px; margin:1px 0;}
+.lab-bus .lab-j{z-index:1;}
+.lab-bus-line{position:absolute; left:12px; right:12px; top:10px; height:2px; background:#c62828;}
+.lab-bus-dc24n .lab-bus-line{background:#1d5fd1;}
+.lab-bus-dc24n{margin-top:auto;}
+.lab-coil{display:flex; flex-direction:column; align-items:center; gap:2px; padding:0 4px; border-right:1px dashed #b5bcc2; min-width:34px;}
+.lab-coilsym{font:700 .55rem/1 'IBM Plex Mono',monospace; border:1.5px solid #222; padding:2px 3px; background:#fff;}
+.lab-cc{display:grid; grid-template-columns:1fr 1fr; gap:1px 2px; align-items:center; justify-items:center; padding:0 3px;}
+.lab-cc > .lab-sym{grid-column:1 / span 2;}
+.lab-cc > .lab-j:last-child{grid-column:1 / span 2;}
+.lab-cc2{display:flex; flex-direction:column; align-items:center; gap:2px;}
+.lab-row2{display:flex; gap:4px; grid-column:1 / span 2;}
+
+.lab-psu{width:236px;}
+.lab-psu-top{display:flex; justify-content:flex-end; gap:8px; align-items:flex-end; padding:2px 6px;}
+.lab-psu-title{margin-right:auto; font:600 1rem/1.2 'IBM Plex Sans',sans-serif; color:#333; padding-top:6px;}
+.lab-psu-mid{flex:1; display:flex; align-items:center; justify-content:center;}
+.lab-plate{border:1px solid #9aa; background:#fff; font-size:.6rem; padding:8px 10px; text-align:center; color:#334; line-height:1.4;}
+.lab-psu-bot{display:flex; align-items:flex-end; gap:10px; padding:2px 6px;}
+.lab-led-wrap{display:flex; flex-direction:column; align-items:center; font-size:.5rem; color:#333;}
+.lab-rocker{width:28px; height:36px; background:#111; border:2px solid #444; border-radius:3px; cursor:pointer; position:relative;}
+.lab-rocker i{position:absolute; left:3px; right:3px; top:3px; height:14px; background:#333; border-radius:2px;}
+.lab-rocker.on i{top:auto; bottom:3px; background:#c62828;}
+
+.lab-emg{width:150px;}
+.lab-emg-c{display:flex; justify-content:space-around; padding:4px 0;}
+.lab-emg-btn{width:62px; height:62px; margin:6px auto; border-radius:50%; border:5px solid #ffcf26; background:radial-gradient(circle at 40% 35%,#ff6b5a,#c1121f 60%,#7a0a12); box-shadow:0 5px 0 #7a0a12, 0 7px 10px rgba(0,0,0,.4); cursor:pointer; display:block;}
+.lab-emg-btn.on{transform:translateY(4px); box-shadow:0 1px 0 #7a0a12;}
+
+.lab-pbu{width:250px;}
+.lab-pb-row{display:flex; align-items:center; gap:4px; padding:3px 2px; border-bottom:1px dashed #c3c9ce;}
+.lab-pb{width:34px; height:34px; border-radius:50%; border:3px solid #9aa2a8; background:radial-gradient(circle at 40% 35%,#fff, var(--pb) 70%); cursor:pointer; position:relative; flex:none; box-shadow:0 3px 0 #6b747b;}
+.lab-pb.pressed{transform:translateY(2px); box-shadow:0 1px 0 #6b747b;}
+.lab-pb span{position:absolute; inset:7px; border-radius:50%;}
+.lab-pb span.lit{background:radial-gradient(circle,#fffbe0,#ffd84d 70%); box-shadow:0 0 10px 3px #ffe066;}
+.lab-pb-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:1px 2px; flex:1;}
+.lab-pb-name{font:700 .55rem/1 'IBM Plex Mono',monospace; writing-mode:vertical-rl; color:#333;}
+
+.lab-relay{width:282px;}
+.lab-rly-row{display:flex; align-items:center; padding:3px 0; border-bottom:1px dashed #c3c9ce;}
+.lab-sym-c{font-size:.5rem;}
+
+.lab-timer{width:340px;}
+.lab-tm-row{display:flex; align-items:center; padding:3px 0; border-bottom:1px dashed #c3c9ce;}
+.lab-tm-c{display:flex;}
+.lab-tm-set{display:flex; flex-direction:column; align-items:center; gap:2px; margin-left:auto; padding-right:2px;}
+.lab-tm-name{font:700 .5rem/1 'IBM Plex Mono',monospace; color:#333;}
+.lab-7seg{min-width:52px; text-align:right; background:#2a0606; color:#ff3b30; font:700 .95rem/1.15 'IBM Plex Mono',monospace; padding:1px 4px; border:2px solid #600; border-radius:2px; text-shadow:0 0 5px #ff3b30;}
+.lab-7seg-g{color:#4cff7a; text-shadow:0 0 5px #4cff7a; background:#062a0e; border-color:#064;}
+.lab-tm-btns{display:flex; gap:3px;}
+.lab-tm-btns button{font-size:.55rem; padding:1px 5px; border:1px solid #777; border-radius:3px; background:#eee; cursor:pointer;}
+.lab-tm-rem{font-size:.48rem; color:#a33;}
+
+.lab-counter{width:220px;}
+.lab-ct-body{display:flex; flex-direction:column; gap:4px; padding:4px 0;}
+.lab-ct-face{background:#1d2126; border-radius:4px; padding:5px; display:flex; flex-direction:column; align-items:center; gap:3px; margin:0 6px;}
+.lab-ct-brand{font:700 .5rem/1 'IBM Plex Mono',monospace; color:#ddd;}
+.lab-ct-terms{display:flex; justify-content:space-around; align-items:center;}
+.lab-counter.lab-up .lab-7seg-r{color:#fff36b; text-shadow:0 0 6px #ff3b30;}
+
+.lab-lampu{width:236px; background:linear-gradient(180deg,#f7f1dc,#e4dcc0);}
+.lab-lp-row{display:grid; grid-template-columns:repeat(5,1fr); gap:2px; padding:6px 0;}
+.lab-lp{display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.48rem; color:#333;}
+.lab-lamp{width:24px; height:24px; border-radius:50%; background:radial-gradient(circle at 40% 35%,#fff,color-mix(in srgb,var(--pl) 45%,#555) 75%); border:2px solid #777;}
+.lab-lamp.lit{background:radial-gradient(circle at 40% 35%,#fff,var(--pl) 70%); box-shadow:0 0 12px 3px var(--pl);}
+.lab-bz{width:24px; height:24px; border-radius:50%; background:#222; border:2px solid #666; position:relative;}
+.lab-bz i{position:absolute; inset:7px; border-radius:50%; background:#444;}
+.lab-bz.sounding{animation:labBz .15s linear infinite;}
+@keyframes labBz{50%{box-shadow:0 0 0 4px rgba(255,200,0,.5);}}
+
+/* 판 위 부품 */
+.lab-ls,.lab-prox{width:132px; background:linear-gradient(180deg,#26292d,#121416); color:#eee; border:1px solid #000; border-radius:6px; padding:4px 5px; box-shadow:0 4px 10px rgba(0,0,0,.45);}
+.lab-ls .lab-jc,.lab-prox .lab-jc{color:#eee;}
+.lab-ls .lab-label,.lab-prox .lab-label{color:#cfd6dc;}
+.lab-ls-head{display:flex; align-items:center; justify-content:space-between;}
+.lab-ls-lever{width:34px; height:22px; position:relative;}
+.lab-ls-lever i{position:absolute; left:4px; bottom:2px; width:24px; height:4px; background:#bbb; transform-origin:left center; transform:rotate(-30deg); border-radius:2px;}
+.lab-ls-lever i::after{content:''; position:absolute; right:-6px; top:-5px; width:10px; height:10px; border-radius:50%; background:#ddd; border:1px solid #888;}
+.lab-act .lab-ls-lever i{transform:rotate(-5deg); background:#ffd60a;}
+.lab-ls-brand{font:italic 800 .55rem/1 'IBM Plex Sans',sans-serif; color:#5ab0ff;}
+.lab-ls-sym{font:600 .52rem/1.25 'IBM Plex Mono',monospace; color:#ccc; text-align:center; margin:2px 0;}
+.lab-ls-jacks{display:flex; justify-content:space-around; margin:2px 0;}
+.lab-link-sel{width:100%; font-size:.52rem; margin-top:3px; background:#fff; color:#222; border:1px solid #888; border-radius:3px;}
+.lab-act{outline:2px solid #ffd60a; outline-offset:1px;}
+.lab-prox-body{display:flex; align-items:center; justify-content:center; margin:2px 0 4px;}
+.lab-prox-head{width:26px; height:18px; background:#3b6fb6; border-radius:4px 0 0 4px; display:flex; align-items:center; justify-content:center;}
+.lab-prox-thread{width:60px; height:16px; background:repeating-linear-gradient(90deg,#c8cdd2 0 3px,#8d949a 3px 5px); border-radius:0 3px 3px 0;}
+
+.lab-valve{min-width:200px; background:linear-gradient(180deg,#f3f5f6,#d3d8dc); border:1px solid #7f878e; border-radius:5px; padding:3px 4px; box-shadow:0 4px 10px rgba(0,0,0,.4);}
+.lab-valve-oil{background:linear-gradient(180deg,#3c6fb5,#24508f); color:#fff; border-color:#173561;}
+.lab-valve-oil .lab-jc,.lab-valve-oil .lab-v-name,.lab-valve-oil .lab-label{color:#fff;}
+.lab-v-ports{display:flex; justify-content:center; gap:18px; padding:2px 0;}
+.lab-port{display:flex; flex-direction:column; align-items:center; gap:1px;}
+.lab-port .pin-mini{width:15px; height:15px; border-radius:50%; border-width:3px;}
+.lab-v-body{display:flex; align-items:stretch; gap:3px;}
+.lab-coilbox{background:#141619; color:#ddd; border-radius:4px; padding:3px 4px; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.5rem; min-width:40px;}
+.lab-coilbox .lab-jc{color:#ddd;}
+.lab-coilbox b{font-size:.5rem;}
+.lab-spring{justify-content:center; color:#999;}
+.lab-v-spool{flex:1; background:#fff; color:#222; border:1px solid #999; border-radius:3px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2px 4px; gap:2px;}
+.lab-v-sym{font:700 .62rem/1 'IBM Plex Mono',monospace;}
+.lab-v-pos{font:700 .6rem/1.1 'IBM Plex Mono',monospace; color:#0a7d3b; background:#e8f7ee; padding:1px 4px; border-radius:3px;}
+.lab-v-name{font-size:.52rem; color:#334;}
+.lab-valve-oil .lab-v-spool .lab-v-name{color:#334;}
+.lab-v-ctr{font-size:.5rem; max-width:120px;}
+
+.lab-frl,.lab-pu{width:170px; background:linear-gradient(180deg,#f3f5f6,#d3d8dc); border:1px solid #7f878e; border-radius:6px; padding:4px; box-shadow:0 4px 10px rgba(0,0,0,.4); display:flex; flex-direction:column; align-items:center; gap:3px;}
+.lab-frl-gauge{width:62px; height:62px; border-radius:50%; background:radial-gradient(circle,#fff 55%,#dfe6ea); border:4px solid #3a4148; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:8px; font:700 .62rem/1 'IBM Plex Mono',monospace; color:#222;}
+.lab-frl-gauge small{font-size:.45rem; color:#666;}
+.lab-gneedle{position:absolute; left:50%; top:50%; width:2px; height:24px; background:#d62828; transform-origin:50% 100%; margin-left:-1px; margin-top:-24px; transform:rotate(-120deg); transition:transform .3s;}
+.lab-frl-bowls{display:flex; gap:6px;}
+.lab-frl-bowls i{width:16px; height:26px; border-radius:3px 3px 8px 8px; background:linear-gradient(180deg,rgba(150,200,240,.5),rgba(90,140,190,.7)); border:1px solid #567;}
+.lab-frl-valve{font-size:.6rem; padding:2px 8px; border-radius:4px; border:1px solid #777; background:#eee; cursor:pointer;}
+.lab-frl-valve.on{background:#2e8b57; color:#fff; border-color:#1e6b40;}
+.lab-ctrl{display:flex; align-items:center; gap:3px; font-size:.55rem;}
+.lab-ctrl input{width:76px;}
+.lab-pu{width:190px;}
+.lab-pu-tank{width:150px; height:56px; background:linear-gradient(180deg,#5b6168,#33383d); border-radius:4px; position:relative; overflow:hidden;}
+.lab-pu-oil{position:absolute; left:0; right:0; bottom:0; height:40%; background:linear-gradient(180deg,#d8a24f,#9b6a26); opacity:.85;}
+.lab-pu-motor{position:absolute; left:50%; top:6px; margin-left:-16px; width:32px; height:32px; border-radius:50%; background:#1d6fb8; color:#fff; font:700 .8rem/32px 'IBM Plex Sans',sans-serif; text-align:center; border:2px solid #0d3f6b;}
+.lab-pu-motor.spin{animation:labSpin .6s linear infinite;}
+@keyframes labSpin{to{transform:rotate(360deg);}}
+.lab-dist{width:150px; background:linear-gradient(180deg,#d9dee2,#b9c0c6); border:1px solid #7f878e; border-radius:5px; padding:3px 6px; align-items:stretch !important;}
+.lab-dist-row{display:flex; justify-content:space-between;}
+.lab-dist-body{font:700 .5rem/1 'IBM Plex Mono',monospace; text-align:center; color:#333; padding:3px 0;}
+
+.lab-cyl{background:linear-gradient(180deg,#f4f6f7,#d7dce0); border:1px solid #8a939d; border-radius:5px; box-shadow:0 4px 10px rgba(0,0,0,.4); color:#1c2228;}
+.lab-cyl .cyl-body{background:linear-gradient(180deg,#f6f7f8,#b8c0c6 45%,#f6f7f8); border-color:#6d767d;}
+.lab-cyl-oil{background:linear-gradient(180deg,#2b2f33,#14171a); color:#eee;}
+.lab-cyl-oil .cyl-body{background:linear-gradient(180deg,#3c4146,#101214 45%,#3c4146);}
+.lab-cyl-title{font:700 .5rem/1 'IBM Plex Mono',monospace; letter-spacing:.04em; text-align:center; opacity:.8; margin-bottom:2px;}
+
+/* 판 · 랙(배경) */
+.placed-component.lab-bg{z-index:1 !important; pointer-events:none;}
+.placed-component.lab-bg .lab-handle,.placed-component.lab-bg .comp-help-btn{pointer-events:auto;}
+.lab-board{width:1500px; height:780px; border-radius:6px; position:relative; border:2px solid #9ba3aa;
+  background:repeating-linear-gradient(180deg,#dfe3e6 0 22px,#aeb6bc 22px 25px,#f3f5f6 25px 27px,#c5ccd1 27px 30px); box-shadow:0 8px 20px rgba(0,0,0,.5), inset 0 0 0 8px #c9cfd4;}
+.placed-component[data-type^="lab-board"]{width:auto;}
+.placed-component[data-type^="lab-board"] .lab-board{width:100%;}
+.lab-board-no{position:absolute; right:14px; top:12px; width:46px; height:46px; background:#f4f4f4; border:1px solid #888; font:700 1.8rem/46px 'IBM Plex Sans',sans-serif; text-align:center; color:#222;}
+.lab-board-logo{position:absolute; right:22px; bottom:14px; font:italic 800 1.4rem/1 'IBM Plex Sans',sans-serif; color:#2f86d6; opacity:.8;}
+.lab-handle{position:absolute; left:10px; top:-24px; font-size:.68rem; padding:3px 10px; border-radius:5px 5px 0 0; border:1px solid #6d767d; background:#3a4148; color:#fff; cursor:move;}
+.lab-rack{width:1500px; height:350px; border-radius:4px; position:relative; background:linear-gradient(180deg,#8f989f 0 18px,#c9cfd4 18px 26px,transparent 26px calc(100% - 26px),#c9cfd4 calc(100% - 26px) calc(100% - 18px),#8f989f calc(100% - 18px)); border-left:10px solid #9aa2a8; border-right:10px solid #9aa2a8;}
+.placed-component[data-type="lab-rack"]{width:auto;}
+
+/* 팔레트 */
+.lab-bench-card{display:flex; gap:8px; align-items:center; margin:4px 4px 6px; padding:7px 8px; border-radius:8px; cursor:pointer; background:linear-gradient(135deg,rgba(90,169,230,.18),rgba(90,169,230,.05)); border:1px solid var(--w-air);}
+.lab-bench-hy{background:linear-gradient(135deg,rgba(201,138,62,.2),rgba(201,138,62,.05)); border-color:var(--w-oil);}
+.lab-bench-card b{display:block; font-size:.74rem; color:var(--text);}
+.lab-bench-card span{display:block; font-size:.6rem; color:var(--text-dim); line-height:1.3;}
+.lab-bench-card:hover{filter:brightness(1.15);}
+.lab-bc-mini{flex:none; width:42px; height:38px; border-radius:4px; background:repeating-linear-gradient(180deg,#c9cfd4 0 4px,#8f989f 4px 5px); position:relative; display:flex; gap:2px; padding:2px; align-items:flex-start;}
+.lab-bc-mini i{width:7px; height:12px; background:#f2f4f5; border:1px solid #333;}
+.lab-bc-mini b{position:absolute; left:6px; right:6px; bottom:6px; height:5px; background:#5aa9e6; border-radius:3px;}
+.lab-bench-hy .lab-bc-mini b{background:#c98a3e;}
+.lab-sep{font-size:.6rem; color:var(--text-faint); padding:5px 6px 2px; border-top:1px dashed var(--border); margin-top:3px;}
+.lab-banner{position:fixed; left:50%; top:74px; transform:translateX(-50%); z-index:100000; background:#16324f; color:#fff; padding:10px 16px; border-radius:8px; font-size:.82rem; box-shadow:0 8px 24px rgba(0,0,0,.5); max-width:min(92vw,760px); cursor:pointer;}
+.lab-banner[hidden]{display:none;}
+
+/* v2: 컴팩트 릴레이 · 긴 실린더 */
+.lab-cc-r{grid-template-rows:auto auto;}
+.lab-cc-r > .lab-j:last-child{grid-column:1 / span 2;}
+.lab-coil-h{gap:1px;}
+.lab-coil-hd{display:flex; align-items:center; gap:3px;}
+.lab-coil-pins{display:flex; gap:2px;}
+.lab-relay{width:300px;}
+.lab-cyl{min-width:300px; padding:4px 6px;}
+.lab-cyl .cyl-body{width:270px; height:30px; overflow:visible; border-radius:6px; background:linear-gradient(180deg,#fbfcfc,#aeb6bd 45%,#e9ecee 70%,#9aa3aa);}
+.lab-cyl .cyl-body::before{content:''; position:absolute; left:-8px; top:-3px; width:12px; height:36px; background:linear-gradient(90deg,#c2c8cd,#8a939a); border-radius:3px;}
+.lab-cyl .cyl-body::after{content:''; position:absolute; right:-10px; top:-3px; width:14px; height:36px; background:linear-gradient(90deg,#c2c8cd,#8a939a); border-radius:3px;}
+.lab-cyl .cyl-rod{top:3px; width:16px; height:24px; background:linear-gradient(90deg,#3a3f44,#1e2226); border-radius:2px; z-index:3;}
+.lab-cyl .cyl-rod::after{content:''; position:absolute; left:100%; top:8px; width:252px; height:8px; background:linear-gradient(180deg,#f6f8f9,#a9b2b9); border-radius:0 3px 3px 0; box-shadow:0 1px 1px rgba(0,0,0,.3);}
+.lab-cyl .cyl-rod::before{content:''; position:absolute; left:calc(100% + 252px); top:1px; width:26px; height:22px; background:radial-gradient(circle at 40% 35%,#fff,#b9c1c7 60%,#7f888f); border-radius:4px 10px 10px 4px; box-shadow:0 2px 3px rgba(0,0,0,.4);}
+.lab-cyl-oil .cyl-body{background:linear-gradient(180deg,#4a5056,#15181b 45%,#3a4045 70%,#111);}
+.lab-cyl .cyl-ls-row,.lab-cyl .cyl-ls-trip{display:none;}
+.lab-cyl .comp-pin-row{justify-content:space-between; padding:0 10px;}
+.lab-cyl .comp-pin-row .pin-mini{width:15px; height:15px; border-radius:50%; border-width:3px;}
+.lab-cyl > .comp-pin-row{width:100%; box-sizing:border-box;}
+/* 실습장치가 있으면 배선(점퍼선·배관)을 부품 앞에 그림 — 실제 장치처럼 선이 모듈 위로 지나감 */
+body.lab-wires-front svg#wireCanvas{z-index:4;}
+body.lab-wires-front .wire-path{stroke-width:3.5; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.55));}
+body.lab-wires-front .wire-path:hover{filter:drop-shadow(0 0 3px rgba(255,255,255,.6));}
 </style>
 </head>
 <body>
